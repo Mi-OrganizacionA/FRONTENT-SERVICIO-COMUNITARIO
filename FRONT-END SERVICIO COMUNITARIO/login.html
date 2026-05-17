@@ -556,22 +556,25 @@
       document.getElementById('loginUser').focus();
     }
 
-    /* ── Login loading animation ── */
-    const form = document.getElementById('loginForm');
-    const btn  = document.getElementById('loginBtn');
-    form.addEventListener('submit', function(e) {
-      const u = document.getElementById('loginUser').value.trim();
-      const p = document.getElementById('loginPass').value.trim();
-      if (!u || !p) {
-        e.preventDefault();
-        const alert = document.getElementById('loginAlert');
-        document.getElementById('loginAlertMsg').textContent = 'Completa todos los campos antes de continuar.';
-        alert.classList.add('show');
-        setTimeout(() => alert.classList.remove('show'), 4000);
-        return;
-      }
-      btn.classList.add('loading');
-    });
+    /* ── Login loading animation corregido ── */
+const form = document.getElementById('loginForm');
+const btn  = document.getElementById('loginBtn');
+
+form.addEventListener('submit', function(e) {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  
+  if (!u || !p) {
+    e.preventDefault();
+    btn.classList.remove('loading'); // Corrección: quitar estado de carga visual si falla
+    const alert = document.getElementById('loginAlert');
+    document.getElementById('loginAlertMsg').textContent = 'Completa todos los campos antes de continuar.';
+    alert.classList.add('show');
+    setTimeout(() => alert.classList.remove('show'), 4000);
+    return;
+  }
+  btn.classList.add('loading');
+});
   </script>
 </body>
 </html>
