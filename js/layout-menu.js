@@ -183,10 +183,133 @@
     });
   };
 
+  const initSpaRouter = () => {
+    document.body.addEventListener('click', async (e) => {
+      const link = e.target.closest('.sidebar-nav-link');
+      if (!link) return;
+      
+      const href = link.getAttribute('href');
+      // No interceptar enlaces externos, modales o la página de login
+      if (!href || href.startsWith('http') || href.startsWith('#') || link.target === '_blank' || href === 'login.html') {
+        return;
+      }
+      
+      e.preventDefault();
+      
+      // Actualizar menú activo
+      document.querySelectorAll('.sidebar-nav-link').forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      
+      // Mostrar indicador visual en la página actual
+      const mainContent = document.querySelector('main.app-main');
+      if (mainContent) {
+        mainContent.style.opacity = '0.5';
+        mainContent.style.pointerEvents = 'none';
+      }
+      
+      try {
+        const response = await fetch(href);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const htmlText = await response.text();
+        
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlText, 'text/html');
+        
+        const newMain = doc.querySelector('main.app-main');
+        if (newMain) {
+          // Reemplazar main principal
+          if (mainContent) {
+            mainContent.replaceWith(newMain);
+          } else {
+            document.body.appendChild(newMain);
+          }
+          
+          document.title = doc.title;
+          
+          // Asegurar que si la nueva página requiere Bootstrap CSS, se inyecte
+          const currentLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map(l => l.getAttribute('href'));
+          doc.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+            const hrefAttr = link.getAttribute('href');
+            if (hrefAttr && !currentLinks.includes(hrefAttr)) {
+              const newLink = document.createElement('link');
+              newLink.rel = 'stylesheet';
+              newLink.href = hrefAttr;
+              newLink.className = 'spa-dynamic-style';
+              document.head.appendChild(newLink);
+            }
+          });
+          
+          // Sincronizar y ejecutar scripts
+          const currentExternalSrcs = Array.from(document.querySelectorAll('script[src]')).map(s => s.getAttribute('src'));
+          const newScripts = Array.from(doc.querySelectorAll('script'));
+          
+          for (const oldScript of newScripts) {
+            const src = oldScript.getAttribute('src');
+            
+            // Ignorar scripts base para evitar conflictos
+            if (src && (src.includes('layout-menu.js') || src.includes('roles.js'))) continue;
+            
+            // Si es una librería externa (CDN), cargarla solo una vez y esperar a que termine
+            if (src && src.startsWith('http')) {
+              if (!currentExternalSrcs.includes(src)) {
+                await new Promise(resolve => {
+                  const newScript = document.createElement('script');
+                  newScript.src = src;
+                  newScript.onload = resolve;
+                  newScript.onerror = resolve;
+                  document.head.appendChild(newScript);
+                  currentExternalSrcs.push(src); // registrar para no volver a cargar
+                });
+              }
+              continue;
+            }
+            
+            // Scripts locales o inline: re-ejecutar siempre
+            const newScript = document.createElement('script');
+            Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+            if (!src) newScript.textContent = oldScript.textContent;
+            newScript.className = 'spa-dynamic-script';
+            document.body.appendChild(newScript);
+            
+            // Limpiar scripts inline del DOM para no saturarlo
+            if (!src) {
+              setTimeout(() => { if (newScript.parentNode) newScript.remove(); }, 100);
+            }
+          }
+
+          // Cerrar sidebar en móviles tras navegar
+          const sidebar = document.getElementById('sidebar');
+          const overlay = document.getElementById('sidebarOverlay');
+          if (sidebar && overlay) {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+          }
+          
+          window.history.pushState(null, '', href);
+          window.scrollTo(0, 0);
+          
+          // Trigger evento personalizado por si otros módulos lo necesitan
+          document.dispatchEvent(new Event('spa-navigated'));
+        } else {
+          window.location.href = href; // fallback si la página no tiene un <main> compatible
+        }
+      } catch (err) {
+        console.error('SPA Navigation Error:', err);
+        window.location.href = href; // fallback si falla fetch
+      }
+    });
+    
+    // Manejar botón de retroceso nativo del navegador
+    window.addEventListener('popstate', () => {
+      window.location.reload(); 
+    });
+  };
+
   window.addEventListener('DOMContentLoaded', () => {
     ensureTricolor();
     renderHeader();
     renderSidebar();
     initSidebarToggle();
+    initSpaRouter();
   });
 })();

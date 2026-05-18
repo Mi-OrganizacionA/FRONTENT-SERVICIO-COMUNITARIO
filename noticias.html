@@ -7,6 +7,8 @@
   <title>Cartelera Digital — SICAG</title>
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="css/admin.css" rel="stylesheet">
   <style>
     .table-sicag.table-green thead {
@@ -386,7 +388,7 @@
       }
     }
 
-    let deleteNotId = null;
+    var deleteNotId = null;
     function confirmarEliminarNot(id) {
       deleteNotId = id;
       document.getElementById('modalElimNot').classList.add('show');
