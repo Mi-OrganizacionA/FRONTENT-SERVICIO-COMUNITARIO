@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Configuración — SICAG</title>
+  <link href="css/admin.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+</head>
+<body data-search-placeholder="Buscar configuración...">
+  <div class="barra-tricolor" aria-hidden="true"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div id="header-placeholder"></div>
+  <nav id="sidebar-placeholder"></nav>
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral"><i class="fas fa-bars"></i></button>
+
+  <main class="app-main">
+    <nav class="breadcrumb-nav"><a href="dashboard.html">Inicio</a><span>/</span><span>Configuración</span></nav>
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-title"><i class="fas fa-cog"></i> Configuración</h1>
+        <p class="page-description">Administra los ajustes del sistema, voceros comunitarios y la comunicación pública desde un solo lugar.</p>
+      </div>
+    </header>
+
+    <section class="card-sicag">
+      <div class="card-header-sicag">
+        <span><i class="fas fa-user-cog" style="color:var(--vp);"></i> Gestión del Sistema</span>
+      </div>
+      <div class="card-body">
+        <div class="config-grid">
+          <article class="config-card">
+            <h3>Voceros</h3>
+            <p>Administra voceros comunitarios, asigna comunidades y controla el acceso.</p>
+            <a href="#voceros" class="btn-sicag btn-outline-verde">Administrar Voceros</a>
+          </article>
+          <article class="config-card">
+            <h3>Encuestas y Avisos</h3>
+            <p>Publica encuestas, avisos y noticias para toda la comunidad.</p>
+            <a href="#encuestas" class="btn-sicag btn-outline-verde">Gestionar Encuestas</a>
+          </article>
+          <article class="config-card">
+            <h3>Portal Público</h3>
+            <p>Configura el contenido visible en el portal público y los enlaces destacados.</p>
+            <a href="#portal" class="btn-sicag btn-outline-verde">Ajustes del Portal</a>
+          </article>
+        </div>
+
+        <section id="voceros" class="mt-4">
+          <div class="section-title-row">
+            <div>
+              <h2>Gestión de Voceros</h2>
+              <p class="text-muted">Registra y administra los voceros comunitarios del censo.</p>
+            </div>
+            <button class="btn-sicag btn-primary" id="btnAgregarVocero"><i class="fas fa-user-plus"></i> Agregar Vocero</button>
+          </div>
+
+          <div class="table-responsive-sicag">
+            <table class="table-sicag" id="tablaVoceros">
+              <thead>
+                <tr>
+                  <th>Cédula</th>
+                  <th>Nombre</th>
+                  <th>Comunidad</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+    </section>
+  </main>
+
+  <!-- Modal agregar vocero (idéntico al usado en voceros.html) -->
+  <div id="modalAgregar" class="modal-overlay" aria-hidden="true">
+    <div class="modal-content-sicag">
+      <div class="modal-header-sicag">
+        <h3>Agregar Vocero</h3>
+        <button class="modal-close" id="closeModal" type="button">×</button>
+      </div>
+      <div class="modal-body-sicag">
+        <form id="formAgregar">
+          <label>Comunidad</label>
+          <select id="selComunidad" required>
+          <option value="">Seleccionar comunidad...</option>
+          <option value="C.C. Jobito I">C.C. Jobito I</option>
+          <option value="C.C. Jobito II">C.C. Jobito II</option>
+          <option value="C.C. Brisas del Yurubí">C.C. Brisas del Yurubí</option>
+          <option value="C.C. Andrés Eloy Blanco">C.C. Andrés Eloy Blanco</option>
+        </select>
+        <label>Buscar Habitante (Cédula)</label>
+        <input id="inputCedula" placeholder="Ej: 12345678" required>
+        <div id="buscarResult" style="margin:.5rem 0;color:#444"></div>
+        <label>Confirmar (contraseña admin)</label>
+        <input id="confirmPass" type="password" placeholder="Contraseña admin" required>
+        <div style="margin-top:.6rem">
+          <button class="btn-sicag btn-primary" type="submit">Agregar Vocero</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/layout-menu.js"></script>
+  <script src="js/roles.js"></script>
+  <script src="js/voceros.js"></script>
+</body>
+</html>

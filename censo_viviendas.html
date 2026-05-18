@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Censo de Viviendas (Módulo T2) — SICAG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/admin.css" rel="stylesheet">
+  <style>
+    :root {
+      --verde-agro: #4CAF50;
+      --verde-oscuro: #228B22;
+      --rojo-socialista: #C8102E;
+      --amarillo-patria: #FFD700;
+      --bg-card: #f8faf7;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f4f6f4;
+      color: #1a2e1a;
+    }
+
+    .page-header {
+      padding: 1.5rem 0 1rem;
+    }
+
+    .page-title {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--verde-oscuro);
+    }
+
+    .kpi-card {
+      background: #ffffff;
+      border: 1px solid rgba(34, 139, 34, 0.16);
+      border-radius: 1rem;
+      min-height: 140px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.05);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 24px 45px rgba(0, 0, 0, 0.08);
+    }
+
+    .kpi-title {
+      font-size: 0.85rem;
+      color: #5f6d5f;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    .kpi-value {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--verde-oscuro);
+      margin-bottom: 0.45rem;
+    }
+
+    .kpi-note {
+      font-size: 0.95rem;
+      color: #63796b;
+    }
+
+    .table thead {
+      background: var(--verde-oscuro);
+      color: #fff;
+    }
+
+    .table thead th {
+      border: none;
+      font-weight: 600;
+      vertical-align: middle;
+    }
+
+    .table tbody tr {
+      background: #fff;
+    }
+
+    .table tbody tr:hover {
+      background: #f3f8f2;
+    }
+
+    .modal-header {
+      background: var(--verde-agro);
+      color: #fff;
+    }
+
+    .modal-header .modal-title {
+      font-weight: 700;
+    }
+
+    .accordion-button:not(.collapsed) {
+      color: #1a2e1a;
+      background-color: rgba(76, 175, 80, 0.1);
+      box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .125);
+    }
+
+    .form-label {
+      font-weight: 600;
+    }
+
+    .badge-regular {
+      background: var(--amarillo-patria);
+      color: #1f1f1f;
+    }
+
+    .toast-container {
+      z-index: 1080;
+    }
+
+    .app-main {
+      min-height: calc(100vh - 70px);
+    }
+  </style>
+</head>
+<body data-search-placeholder="Buscar cédula, comunidad, servicio...">
+  <div class="barra-tricolor" aria-hidden="true"></div>
+  <div id="header-placeholder"></div>
+  <div id="sidebar-placeholder"></div>
+
+  <main class="app-main">
+    <div class="container-fluid py-4">
+      <div class="page-header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div>
+          <h1 class="page-title"><i class="fas fa-home me-2"></i>Gestión de Infraestructura y Vivienda (Módulo T2)</h1>
+          <p class="text-muted mb-0">Registro único de viviendas por Jefe de Familia, según la regla 1:1 del censo.</p>
+        </div>
+        <button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#modalVivienda"><i class="fas fa-plus me-2"></i>Registrar Nueva Vivienda</button>
+      </div>
+
+      <div class="row g-3 mt-3">
+        <div class="col-md-4">
+          <div class="kpi-card p-4 h-100">
+            <div class="kpi-title">Viviendas Censadas</div>
+            <div class="kpi-value" id="kpi-total">0</div>
+            <div class="kpi-note">Registros únicos en el sistema de la comunidad.</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="kpi-card p-4 h-100">
+            <div class="kpi-title">Viviendas en Alto Riesgo</div>
+            <div class="kpi-value text-danger" id="kpi-riesgo">0</div>
+            <div class="kpi-note">Casos priorizados por infraestructura crítica.</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="kpi-card p-4 h-100">
+            <div class="kpi-title">Sin servicio de Gas</div>
+            <div class="kpi-value text-warning" id="kpi-sin-gas">0</div>
+            <div class="kpi-note">Familias sin acceso a gas doméstico seguro.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-4 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h5 mb-0">Listado de Viviendas</h2>
+            <small class="text-muted">Cada cédula reporta una sola vivienda.</small>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle" id="tablaViviendas">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Cédula Jefe Familia</th>
+                  <th scope="col">Sector / Comunidad</th>
+                  <th scope="col">Habitantes</th>
+                  <th scope="col">Condición</th>
+                  <th scope="col">Gas</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Filas generadas por JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal fade" id="modalVivienda" tabindex="-1" aria-labelledby="modalViviendaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalViviendaLabel"><i class="fas fa-house-user me-2"></i>Registro de Vivienda - Planilla T2</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <form id="formVivienda">
+          <div class="modal-body">
+            <div class="accordion" id="wizardAccordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    SECCIÓN A: Ubicación y Datos Generales del Hogar
+                  </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#wizardAccordion">
+                  <div class="accordion-body">
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <label for="cedulaJefe" class="form-label">Cédula Jefe de Familia</label>
+                        <div class="input-group">
+                          <input type="text" class="form-control" id="cedulaJefe" placeholder="Ej. V-12.345.678" required>
+                          <button class="btn btn-outline-secondary" type="button" id="btnValidarCedula">Buscar/Validar</button>
+                        </div>
+                        <div class="form-text">Esta cédula es la llave foránea única para la vivienda.</div>
+                      </div>
+                      <div class="col-md-6">
+                        <label for="sectorComunidad" class="form-label">Consejo Comunal</label>
+                        <select class="form-select" id="sectorComunidad" required>
+                          <option value="" selected>Seleccione consejo comunal</option>
+                          <option value="Jobito I">Jobito I</option>
+                          <option value="Jobito II">Jobito II</option>
+                          <option value="Brisas del Yurubí">Brisas del Yurubí</option>
+                          <option value="Cacique Tamanaco">Cacique Tamanaco</option>
+                          <option value="La Esperanza">La Esperanza</option>
+                          <option value="Tierra Viva">Tierra Viva</option>
+                          <option value="Nueva Raíz">Nueva Raíz</option>
+                          <option value="Arcoíris">Arcoíris</option>
+                          <option value="Unidos en Madera">Unidos en Madera</option>
+                        </select>
+                      </div>
+                      <div class="col-12">
+                        <label for="direccionExacta" class="form-label">Dirección Exacta</label>
+                        <textarea class="form-control" id="direccionExacta" rows="2" placeholder="Calle, casa, sector" required></textarea>
+                      </div>
+                      <div class="col-md-6">
+                        <label for="cantidadHabitantes" class="form-label">Cantidad de Habitantes</label>
+                        <input type="number" class="form-control" id="cantidadHabitantes" min="1" placeholder="Ej. 5" required>
+                      </div>
+                      <div class="col-md-6">
+                        <label for="condicionGeneral" class="form-label">Condición General</label>
+                        <select class="form-select" id="condicionGeneral" required>
+                          <option value="" selected>Seleccione condición</option>
+                          <option value="Buena">Buena</option>
+                          <option value="Regular">Regular</option>
+                          <option value="Mala">Mala</option>
+                          <option value="Alto Riesgo">Alto Riesgo</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-4">
+                      <button type="button" class="btn btn-primary" id="btnNextA">Siguiente</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    SECCIÓN B: Situación Estructural de la Vivienda
+                  </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#wizardAccordion">
+                  <div class="accordion-body">
+                    <div class="row g-3">
+                      <div class="col-md-4">
+                        <label for="tipoVivienda" class="form-label">Tipo de Vivienda</label>
+                        <select class="form-select" id="tipoVivienda" required>
+                          <option value="" selected>Seleccione tipo</option>
+                          <option value="Quinta">Quinta</option>
+                          <option value="Casa">Casa</option>
+                          <option value="Apartamento">Apartamento</option>
+                          <option value="Rancho">Rancho</option>
+                          <option value="Barraca">Barraca</option>
+                          <option value="Habitación">Habitación</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label for="tenencia" class="form-label">Tenencia</label>
+                        <select class="form-select" id="tenencia" required>
+                          <option value="" selected>Seleccione tenencia</option>
+                          <option value="Propia">Propia</option>
+                          <option value="Alquilada">Alquilada</option>
+                          <option value="Compartida">Compartida</option>
+                          <option value="Invadida">Invadida</option>
+                          <option value="Prestada">Prestada</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label for="condicionesTerreno" class="form-label">Condiciones del Terreno</label>
+                        <select class="form-select" id="condicionesTerreno" required>
+                          <option value="" selected>Seleccione condición</option>
+                          <option value="Estable">Estable</option>
+                          <option value="Inestable">Inestable</option>
+                          <option value="Alto Riesgo">Alto Riesgo</option>
+                          <option value="Vulnerable">Vulnerable</option>
+                        </select>
+                      </div>
+                      <div class="col-md-6">
+                        <label for="materialParedes" class="form-label">Material de Paredes</label>
+                        <select class="form-select" id="materialParedes" required>
+                          <option value="" selected>Seleccione material</option>
+                          <option value="Frisadas">Frisadas</option>
+                          <option value="Sin Frisar">Sin Frisar</option>
+                          <option value="Tablas">Tablas</option>
+                          <option value="Bahareque/Adobe">Bahareque/Adobe</option>
+                          <option value="Zinc">Zinc</option>
+                          <option value="Cartón">Cartón</option>
+                        </select>
+                      </div>
+                      <div class="col-md-6">
+                        <label for="materialTecho" class="form-label">Material de Techo</label>
+                        <select class="form-select" id="materialTecho" required>
+                          <option value="" selected>Seleccione material</option>
+                          <option value="Platabanda">Platabanda</option>
+                          <option value="Asbesto">Asbesto</option>
+                          <option value="Teja">Teja</option>
+                          <option value="Zinc">Zinc</option>
+                          <option value="Machihembrado">Machihembrado</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-4">
+                      <button type="button" class="btn btn-outline-secondary" id="btnPrevB">Anterior</button>
+                      <button type="button" class="btn btn-primary" id="btnNextB">Siguiente</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    SECCIÓN C: Servicios Básicos (Módulo T2)
+                  </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#wizardAccordion">
+                  <div class="accordion-body">
+                    <div class="row g-3">
+                      <div class="col-md-4">
+                        <label for="aguasBlancas" class="form-label">Aguas Blancas</label>
+                        <select class="form-select" id="aguasBlancas" required>
+                          <option value="" selected>Seleccione fuente</option>
+                          <option value="Acueducto">Acueducto</option>
+                          <option value="Pila pública">Pila pública</option>
+                          <option value="Camión cisterna">Camión cisterna</option>
+                          <option value="No tiene">No tiene</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label for="aguasServidas" class="form-label">Aguas Servidas</label>
+                        <select class="form-select" id="aguasServidas" required>
+                          <option value="" selected>Seleccione salida</option>
+                          <option value="Cloacas">Cloacas</option>
+                          <option value="Pozo séptico">Pozo séptico</option>
+                          <option value="Letrinas">Letrinas</option>
+                          <option value="Al aire libre">Al aire libre</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label for="gasDomestico" class="form-label">Gas Doméstico</label>
+                        <select class="form-select" id="gasDomestico" required>
+                          <option value="" selected>Seleccione servicio</option>
+                          <option value="Bombona">Bombona</option>
+                          <option value="Tubería">Tubería</option>
+                          <option value="No posee">No posee</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4" id="rowCilindrosGas">
+                        <label for="cantidadCilindrosGas" class="form-label">Cantidad de Cilindros Gas</label>
+                        <input type="number" class="form-control" id="cantidadCilindrosGas" min="1" placeholder="Ej. 2" disabled>
+                      </div>
+                      <div class="col-md-4">
+                        <label for="sistemaElectrico" class="form-label">Sistema Eléctrico</label>
+                        <select class="form-select" id="sistemaElectrico" required>
+                          <option value="" selected>Seleccione opción</option>
+                          <option value="Pública">Pública</option>
+                          <option value="Planta eléctrica">Planta eléctrica</option>
+                          <option value="No tiene">No tiene</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label for="recoleccionBasura" class="form-label">Recolección de Basura</label>
+                        <select class="form-select" id="recoleccionBasura" required>
+                          <option value="" selected>Seleccione servicio</option>
+                          <option value="Aseo urbano">Aseo urbano</option>
+                          <option value="Contenedor">Contenedor</option>
+                          <option value="Quema">Quema</option>
+                          <option value="Al aire libre">Al aire libre</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-start mt-4">
+                      <button type="button" class="btn btn-outline-secondary" id="btnPrevC">Anterior</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-success">Guardar Vivienda</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/layout-menu.js"></script>
+  <script src="js/roles.js"></script>
+  <script src="js/censo-viviendas.js"></script>
+</body>
+</html>

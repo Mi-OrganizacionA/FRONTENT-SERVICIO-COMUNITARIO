@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cartelera Digital — Noticias y convocatorias de la Comuna Socialista Simón Rodríguez.">
+  <title>Cartelera Digital — SICAG</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="css/admin.css" rel="stylesheet">
+  <style>
+    .table-sicag.table-green thead {
+      background: linear-gradient(135deg, var(--vv), var(--vd));
+      color: #fff;
+    }
+    .table-sicag.table-green thead th {
+      color: #fff;
+    }
+    .badge-convocatoria { background: rgba(249,168,37,.12); color: #E65100; }
+    .badge-encuesta { background: rgba(106,27,154,.1); color: #6A1B9A; }
+    .badge-aviso { background: rgba(255,152,0,.12); color: #EF6C00; }
+    .page-description { max-width: 780px; margin: 0 0 1.25rem; color: var(--muted); line-height: 1.75; }
+  </style>
+</head>
+<body data-search-placeholder="Buscar noticias...">
+
+  <div class="barra-tricolor" aria-hidden="true"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div id="header-placeholder"></div>
+
+  <nav id="sidebar-placeholder"></nav>
+
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral"><i class="fas fa-bars"></i></button>
+
+  <!-- MAIN CONTENT -->
+  <main class="app-main" role="main">
+
+    <nav class="breadcrumb-nav" aria-label="Navegación de ruta">
+      <a href="dashboard.html">Inicio</a> <span>/</span> Cartelera Digital
+    </nav>
+
+    <div class="page-header fade-in">
+      <div>
+        <h1 class="page-title"><i class="fas fa-newspaper"></i> Cartelera Digital</h1>
+        <p class="page-description">Gestiona noticias, convocatorias y encuestas en una sola cartelera. Publica con rapidez, revisa el estado y destaca lo más importante para la comunidad.</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn-sicag btn-primary" onclick="abrirModalNoticia()">
+          <i class="fas fa-plus"></i> Nueva Publicación
+        </button>
+      </div>
+    </div>
+
+    <!-- FILTER -->
+    <div class="filter-bar fade-in-up">
+      <div class="filter-group">
+        <label class="filter-label" for="filterTipo">Tipo</label>
+        <select class="filter-select" id="filterTipo">
+          <option value="">Todos</option>
+          <option value="noticia">Noticia</option>
+          <option value="convocatoria">Convocatoria</option>
+          <option value="encuesta">Encuesta</option>
+          <option value="aviso">Aviso</option>
+        </select>
+      </div>
+      <div class="filter-group" style="flex:1; min-width:200px;">
+        <label class="filter-label" for="filterBuscarNot">Buscar</label>
+        <div style="position:relative;">
+          <input type="text" class="filter-input" id="filterBuscarNot" placeholder="Título de la publicación..." style="width:100%; padding-left:36px;">
+          <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--gris-neutro);font-size:0.85rem;"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-cards-grid fade-in-up" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1rem; margin-bottom:1.5rem;">
+      <div class="card-sicag">
+        <div class="card-header-sicag">
+          <span><i class="fas fa-newspaper" style="color:#1565C0;"></i> Noticias</span>
+          <button class="btn-sicag btn-sm btn-outline-verde" onclick="abrirModalNoticia(null, 'noticia')">Crear</button>
+        </div>
+        <div class="card-body-sicag">
+          <p style="margin-bottom:1rem; color:var(--gris-neutro);">Publicaciones informativas de la comuna: estado de obras, servicios y comunicados.</p>
+          <ul style="padding-left:1rem; margin:0; color:var(--gris-oscuro);">
+            <li>Información de interés general.</li>
+            <li>Visibilidad inmediata en la cartelera.</li>
+            <li>Adjunta imágenes o documentos.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sicag">
+        <div class="card-header-sicag">
+          <span><i class="fas fa-bullhorn" style="color:#F9A825;"></i> Convocatorias</span>
+          <button class="btn-sicag btn-sm btn-outline-verde" onclick="abrirModalNoticia(null, 'convocatoria')">Crear</button>
+        </div>
+        <div class="card-body-sicag">
+          <p style="margin-bottom:1rem; color:var(--gris-neutro);">Eventos, asambleas y llamadas a la participación del pueblo.</p>
+          <ul style="padding-left:1rem; margin:0; color:var(--gris-oscuro);">
+            <li>Define lugar y hora.</li>
+            <li>Incluye enlace o instrucciones.</li>
+            <li>Comparte con todas las comunidades.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-sicag">
+        <div class="card-header-sicag">
+          <span><i class="fas fa-poll" style="color:#6A1B9A;"></i> Encuestas</span>
+          <button class="btn-sicag btn-sm btn-outline-verde" onclick="abrirModalNoticia(null, 'encuesta')">Crear</button>
+        </div>
+        <div class="card-body-sicag">
+          <p style="margin-bottom:1rem; color:var(--gris-neutro);">Sube encuestas para la comunidad y consulta la opinión popular.</p>
+          <ul style="padding-left:1rem; margin:0; color:var(--gris-oscuro);">
+            <li>Pregunta a los vecinos.</li>
+            <li>Define un enlace de participación.</li>
+            <li>Monitorea respuestas y resultados.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTICIAS TABLE -->
+    <div class="table-container fade-in-up">
+      <div class="table-responsive-sicag">
+        <table class="table-sicag table-green" id="tablaNoticias">
+          <thead>
+            <tr>
+              <th style="width:40px;">#</th>
+              <th>Título</th>
+              <th>Tipo</th>
+              <th>Fecha</th>
+              <th>Autor</th>
+              <th>Destacada</th>
+              <th>Estado</th>
+              <th style="width:130px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="noticiasBody">
+            <tr>
+              <td>1</td>
+              <td><strong>Reparación de transformador en sector La Esperanza</strong><br><small class="text-gris">CORPOELEC realizó trabajos de mantenimiento eléctrico</small></td>
+              <td><span class="badge-sicag badge-activo"><i class="fas fa-newspaper me-1"></i>Noticia</span></td>
+              <td>21/04/2026</td>
+              <td>Sala de Autogobierno</td>
+              <td><i class="fas fa-star" style="color:var(--amarillo-patria);"></i></td>
+              <td><span class="badge-sicag badge-activo">Publicada</span></td>
+              <td>
+                <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver"><i class="fas fa-eye"></i></button>
+                <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalNoticia(1)"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="confirmarEliminarNot(1)"><i class="fas fa-trash-alt"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><strong>Convocatoria: Asamblea Extraordinaria de Ciudadanos</strong><br><small class="text-gris">Todos los voceros están convocados para el 25/04/2026</small></td>
+              <td><span class="badge-sicag badge-convocatoria"><i class="fas fa-bullhorn me-1"></i>Convocatoria</span></td>
+              <td>20/04/2026</td>
+              <td>Sala de Autogobierno</td>
+              <td><i class="fas fa-star" style="color:var(--amarillo-patria);"></i></td>
+              <td><span class="badge-sicag badge-activo">Publicada</span></td>
+              <td>
+                <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver"><i class="fas fa-eye"></i></button>
+                <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalNoticia(2)"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="confirmarEliminarNot(2)"><i class="fas fa-trash-alt"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><strong>Jornada de vacunación en el ambulatorio comunal</strong><br><small class="text-gris">Ministerio de Salud realizó jornada de inmunización infantil</small></td>
+              <td><span class="badge-sicag badge-activo"><i class="fas fa-newspaper me-1"></i>Noticia</span></td>
+              <td>18/04/2026</td>
+              <td>Comité de Salud</td>
+              <td><i class="fas fa-star-half-alt" style="color:var(--gris-neutro);"></i></td>
+              <td><span class="badge-sicag badge-activo">Publicada</span></td>
+              <td>
+                <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver"><i class="fas fa-eye"></i></button>
+                <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalNoticia(3)"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="confirmarEliminarNot(3)"><i class="fas fa-trash-alt"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td><strong>Aviso: Suspensión de agua por mantenimiento</strong><br><small class="text-gris">Hidrocapital informa suspensión temporal del servicio</small></td>
+              <td><span class="badge-sicag badge-aviso"><i class="fas fa-exclamation-triangle me-1"></i>Aviso</span></td>
+              <td>17/04/2026</td>
+              <td>Sala de Autogobierno</td>
+              <td><i class="fas fa-star-half-alt" style="color:var(--gris-neutro);"></i></td>
+              <td><span class="badge-sicag badge-activo">Publicada</span></td>
+              <td>
+                <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver"><i class="fas fa-eye"></i></button>
+                <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalNoticia(4)"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="confirmarEliminarNot(4)"><i class="fas fa-trash-alt"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td><strong>Reunión institucional con FONDAS</strong><br><small class="text-gris">Coordinación para entrega de insumos agrícolas 2026</small></td>
+              <td><span class="badge-sicag badge-activo"><i class="fas fa-newspaper me-1"></i>Noticia</span></td>
+              <td>15/04/2026</td>
+              <td>Comité de Economía</td>
+              <td><i class="fas fa-star-half-alt" style="color:var(--gris-neutro);"></i></td>
+              <td><span class="badge-sicag badge-activo">Publicada</span></td>
+              <td>
+                <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver"><i class="fas fa-eye"></i></button>
+                <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalNoticia(5)"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="confirmarEliminarNot(5)"><i class="fas fa-trash-alt"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL: Nueva/Editar Noticia -->
+  <div class="modal-overlay" id="modalNoticia" role="dialog" aria-modal="true" aria-labelledby="modalNotTitle">
+    <div class="modal-content-sicag" style="max-width:700px;">
+      <div class="modal-header-sicag">
+        <h3 id="modalNotTitle"><i class="fas fa-plus-circle me-2" style="color:var(--verde-agro);"></i>Nueva Publicación</h3>
+        <button class="modal-close" onclick="cerrarModalNoticia()" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body-sicag">
+        <form id="formNoticia">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="form-group-sicag">
+                <label class="form-label-sicag" for="notTitulo">Título *</label>
+                <input type="text" class="form-control-sicag" id="notTitulo" placeholder="Ej: Reparación de transformador..." required>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group-sicag">
+                <label class="form-label-sicag" for="notTipo">Tipo *</label>
+                <select class="form-control-sicag" id="notTipo" required>
+                  <option value="">Seleccionar...</option>
+                  <option value="noticia">📰 Noticia</option>
+                  <option value="convocatoria">📢 Convocatoria</option>
+                  <option value="aviso">⚠️ Aviso</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group-sicag">
+            <label class="form-label-sicag" for="notDescripcion">Descripción *</label>
+            <textarea class="form-control-sicag" id="notDescripcion" rows="5" placeholder="Detalle completo de la noticia o convocatoria..." required></textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group-sicag">
+                <label class="form-label-sicag" for="notFecha">Fecha *</label>
+                <input type="date" class="form-control-sicag" id="notFecha" required>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group-sicag">
+                <label class="form-label-sicag" for="notAutor">Autor</label>
+                <input type="text" class="form-control-sicag" id="notAutor" value="Sala de Autogobierno">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group-sicag" style="padding-top:28px;">
+                <label style="display:flex; align-items:center; gap:8px; font-size:0.9rem; cursor:pointer;">
+                  <input type="checkbox" id="notDestacada" style="accent-color:var(--amarillo-patria);">
+                  <i class="fas fa-star" style="color:var(--amarillo-patria);"></i> Publicación Destacada
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="row" id="notExtraGroup" style="display:none;">
+            <div class="col-md-8">
+              <div class="form-group-sicag">
+                <label class="form-label-sicag" id="notExtraLabel" for="notExtra">Detalle adicional</label>
+                <input type="text" class="form-control-sicag" id="notExtra" name="detalle_extra" placeholder="URL de encuesta, lugar/hora de convocatoria o comentario extra">
+                <small class="text-gris" id="notExtraHint">Si es encuesta o convocatoria, añade el enlace de participación, ubicación o detalles clave.</small>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group-sicag">
+                <label class="form-label-sicag" for="notCierre">Fecha de cierre</label>
+                <input type="date" class="form-control-sicag" id="notCierre" name="fecha_cierre">
+              </div>
+            </div>
+          </div>
+          <div class="form-group-sicag">
+            <label class="form-label-sicag" for="notFoto">Fotografía</label>
+            <input type="file" class="form-control-sicag" id="notFoto" accept="image/*">
+            <small style="color:var(--gris-neutro); font-size:0.75rem;">Formatos: JPG, PNG. Máximo 5MB.</small>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer-sicag">
+        <button class="btn-sicag btn-outline-verde" onclick="cerrarModalNoticia()"><i class="fas fa-times"></i> Cancelar</button>
+        <button class="btn-sicag btn-primary" onclick="guardarNoticia()"><i class="fas fa-paper-plane"></i> Publicar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Confirmar Eliminación -->
+  <div class="modal-overlay" id="modalElimNot" role="dialog" aria-modal="true">
+    <div class="modal-content-sicag" style="max-width:450px;">
+      <div class="modal-header-sicag">
+        <h3 style="color:var(--rojo-socialista);"><i class="fas fa-exclamation-triangle me-2"></i>Eliminar Publicación</h3>
+        <button class="modal-close" onclick="cerrarModalElimNot()" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body-sicag" style="text-align:center;">
+        <div style="width:70px;height:70px;border-radius:50%;background:rgba(200,16,46,0.08);display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-lg);font-size:2rem;color:var(--rojo-socialista);">
+          <i class="fas fa-newspaper"></i>
+        </div>
+        <p>¿Eliminar esta publicación de la cartelera?</p>
+        <p style="font-size:0.875rem; color:var(--gris-neutro);">Ya no será visible para la comunidad.</p>
+      </div>
+      <div class="modal-footer-sicag" style="justify-content:center;">
+        <button class="btn-sicag btn-outline-verde" onclick="cerrarModalElimNot()"><i class="fas fa-times"></i> Cancelar</button>
+        <button class="btn-sicag btn-danger" onclick="eliminarNoticia()"><i class="fas fa-trash-alt"></i> Sí, Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+
+  <script>
+    function abrirModalNoticia(id, tipo = 'noticia') {
+      const modal = document.getElementById('modalNoticia');
+      const title = document.getElementById('modalNotTitle');
+      if (id) {
+        title.innerHTML = '<i class="fas fa-pencil-alt me-2" style="color:var(--naranja-cosecha);"></i>Editar Publicación #' + id;
+      } else {
+        title.innerHTML = '<i class="fas fa-plus-circle me-2" style="color:var(--verde-agro);"></i>Nueva Publicación';
+        document.getElementById('formNoticia').reset();
+        document.getElementById('notAutor').value = 'Sala de Autogobierno';
+        document.getElementById('notTipo').value = tipo;
+        handleTipoNoticia();
+      }
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function cerrarModalNoticia() {
+      document.getElementById('modalNoticia').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+    function guardarNoticia() {
+      const titulo = document.getElementById('notTitulo').value.trim();
+      const tipo = document.getElementById('notTipo').value;
+      const desc = document.getElementById('notDescripcion').value.trim();
+      const extra = document.getElementById('notExtra').value.trim();
+      if (!titulo || !tipo || !desc) {
+        window.alert('Complete los campos obligatorios (*).');
+        return;
+      }
+      if ((tipo === 'encuesta' || tipo === 'convocatoria') && !extra) {
+        window.alert('Complete el detalle adicional requerido para encuestas o convocatorias.');
+        return;
+      }
+      const btn = document.querySelector('#modalNoticia .modal-footer-sicag .btn-primary');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publicando...';
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-check"></i> ¡Publicado!';
+        btn.style.background = 'var(--verde-oscuro)';
+        setTimeout(() => {
+          cerrarModalNoticia();
+          btn.innerHTML = '<i class="fas fa-paper-plane"></i> Publicar';
+          btn.style.background = '';
+          btn.disabled = false;
+        }, 800);
+      }, 1200);
+    }
+    function handleTipoNoticia() {
+      const tipo = document.getElementById('notTipo').value;
+      const extraGroup = document.getElementById('notExtraGroup');
+      const extraLabel = document.getElementById('notExtraLabel');
+      const extraInput = document.getElementById('notExtra');
+      const extraHint = document.getElementById('notExtraHint');
+      if (tipo === 'convocatoria') {
+        extraGroup.style.display = '';
+        extraLabel.textContent = 'Lugar / Horario';
+        extraInput.placeholder = 'Ej: Plazoleta central - 10:00 am';
+        extraHint.textContent = 'Describe el punto de encuentro y la hora de la convocatoria.';
+      } else if (tipo === 'encuesta') {
+        extraGroup.style.display = '';
+        extraLabel.textContent = 'Enlace de encuesta';
+        extraInput.placeholder = 'https://example.com/encuesta';
+        extraHint.textContent = 'Agrega el enlace de participación o el formulario digital.';
+      } else {
+        extraGroup.style.display = 'none';
+        extraInput.value = '';
+      }
+    }
+
+    let deleteNotId = null;
+    function confirmarEliminarNot(id) {
+      deleteNotId = id;
+      document.getElementById('modalElimNot').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+    function cerrarModalElimNot() {
+      document.getElementById('modalElimNot').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+    function eliminarNoticia() {
+      if (deleteNotId) {
+        const rows = document.querySelectorAll('#noticiasBody tr');
+        if (rows[deleteNotId - 1]) {
+          rows[deleteNotId - 1].style.transition = 'all 0.4s ease';
+          rows[deleteNotId - 1].style.opacity = '0';
+          setTimeout(() => rows[deleteNotId - 1].style.display = 'none', 400);
+        }
+      }
+      cerrarModalElimNot();
+    }
+
+    // Escape & backdrop
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { cerrarModalNoticia(); cerrarModalElimNot(); }
+    });
+    document.getElementById('modalNoticia').addEventListener('click', function(e) { if (e.target === this) cerrarModalNoticia(); });
+    document.getElementById('modalElimNot').addEventListener('click', function(e) { if (e.target === this) cerrarModalElimNot(); });
+    document.getElementById('notTipo').addEventListener('change', handleTipoNoticia);
+  </script>
+
+  <script src="js/layout-menu.js"></script>
+  <script src="js/roles.js"></script>
+</body>
+</html>

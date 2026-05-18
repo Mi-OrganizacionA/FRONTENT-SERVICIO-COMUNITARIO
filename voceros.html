@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Voceros — SICAG</title>
+  <link href="css/admin.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+</head>
+<body data-search-placeholder="Buscar voceros...">
+  <div class="barra-tricolor" aria-hidden="true"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div id="header-placeholder"></div>
+  <nav id="sidebar-placeholder"></nav>
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral"><i class="fas fa-bars"></i></button>
+
+  <main class="app-main">
+    <nav class="breadcrumb-nav"><a href="dashboard.html">Inicio</a><span>/</span><span>Voceros</span></nav>
+
+    <header class="page-header">
+      <div>
+        <h1 class="page-title"><i class="fas fa-users"></i> Voceros</h1>
+        <p class="page-description">Gestiona los voceros comunitarios autorizados para acceder al censo y registrar viviendas.</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn-sicag btn-primary" id="btnAgregarVocero"><i class="fas fa-user-plus"></i> Agregar Vocero</button>
+      </div>
+    </header>
+
+    <section class="card-sicag">
+      <div class="card-body">
+        <div class="table-responsive-sicag">
+          <table class="table-sicag" id="tablaVoceros">
+            <thead>
+              <tr>
+                <th>Cédula</th>
+                <th>Nombre</th>
+                <th>Comunidad</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal agregar vocero -->
+  <div id="modalAgregar" class="modal-overlay" aria-hidden="true">
+    <div class="modal-content-sicag">
+      <div class="modal-header-sicag">
+        <h3>Agregar Vocero</h3>
+        <button class="modal-close" id="closeModal" type="button">×</button>
+      </div>
+      <div class="modal-body-sicag">
+        <form id="formAgregar">
+          <label>Comunidad</label>
+          <select id="selComunidad" required>
+          <option value="">Seleccionar comunidad...</option>
+          <option value="C.C. Jobito I">C.C. Jobito I</option>
+          <option value="C.C. Jobito II">C.C. Jobito II</option>
+          <option value="C.C. Brisas del Yurubí">C.C. Brisas del Yurubí</option>
+          <option value="C.C. Andrés Eloy Blanco">C.C. Andrés Eloy Blanco</option>
+        </select>
+        <label>Buscar Habitante (Cédula)</label>
+        <input id="inputCedula" placeholder="Ej: 12345678" required>
+        <div id="buscarResult" style="margin:.5rem 0;color:#444"></div>
+        <label>Confirmar (contraseña admin)</label>
+        <input id="confirmPass" type="password" placeholder="Contraseña admin" required>
+        <div style="margin-top:.6rem">
+          <button class="btn-sicag btn-primary" type="submit">Agregar Vocero</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/layout-menu.js"></script>
+  <script src="js/roles.js"></script>
+  <script src="js/voceros.js"></script>
+</body>
+</html>

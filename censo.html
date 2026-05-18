@@ -1,0 +1,625 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Censo Comunitario — Sistema de Gestión Comunal SICAG.">
+  <title>Censo Comunitario — SICAG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="css/admin.css" rel="stylesheet">
+  <style>
+    .form-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    .input-with-icon {
+      position: relative;
+    }
+    .input-with-icon input {
+      padding-left: 2.75rem;
+    }
+    .input-icon {
+      position: absolute;
+      left: 0.95rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+      font-size: 0.9rem;
+    }
+    .status-summary {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-bottom: 1.5rem;
+    }
+    .card-sicag .report-dl-title {
+      margin-bottom: 0.35rem;
+    }
+  </style>
+</head>
+<body data-search-placeholder="Buscar habitantes, reportes...">
+
+  <div class="barra-tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div id="header-placeholder"></div>
+
+  <nav id="sidebar-placeholder"></nav>
+
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <main class="app-main" role="main">
+    <nav class="breadcrumb-nav" aria-label="Ruta de navegación">
+      <a href="dashboard.html">Inicio</a>
+      <span>/</span>
+      <span>Censo Comunitario</span>
+    </nav>
+
+    <div class="page-header fade-in">
+      <h1 class="page-title"><i class="fas fa-users"></i> Censo Comunitario</h1>
+      <div class="page-actions">
+        <button class="btn-sicag btn-primary" onclick="abrirModalCenso()">
+          <i class="fas fa-user-plus"></i> Registrar Habitante
+        </button>
+        <button class="btn-sicag btn-terracota" id="btnExportCenso">
+          <i class="fas fa-file-pdf"></i> Exportar Censo
+        </button>
+      </div>
+    </div>
+
+    <div class="status-summary fade-in-up">
+      <div class="report-dl-card">
+        <div class="report-dl-header">
+          <div class="report-dl-icon verde"><i class="fas fa-users"></i></div>
+          <div>
+            <div class="report-dl-title">Habitantes Censados</div>
+            <span>347</span>
+          </div>
+        </div>
+        <div class="report-dl-desc">Total de registros activos dentro del censo comunitario.</div>
+      </div>
+      <div class="report-dl-card">
+        <div class="report-dl-header">
+          <div class="report-dl-icon azul"><i class="fas fa-vote-yea"></i></div>
+          <div>
+            <div class="report-dl-title">Electores Activos</div>
+            <span>231</span>
+          </div>
+        </div>
+        <div class="report-dl-desc">Personas habilitadas para votar según el registro electoral.</div>
+      </div>
+      <div class="report-dl-card">
+        <div class="report-dl-header">
+          <div class="report-dl-icon amarillo"><i class="fas fa-map-marked-alt"></i></div>
+          <div>
+            <div class="report-dl-title">Consejos Comunales</div>
+            <span>9</span>
+          </div>
+        </div>
+        <div class="report-dl-desc">Consejos comunales registrados en la Comuna Simón Rodríguez.</div>
+      </div>
+    </div>
+
+    <div class="filter-bar fade-in-up">
+      <div class="filter-group">
+        <label class="filter-label" for="filterCC">Consejo Comunal</label>
+        <select class="filter-select" id="filterCC">
+          <option value="">Todos</option>
+          <option value="el_progreso">El Progreso</option>
+          <option value="vencedores">Vencedores</option>
+          <option value="patria_nueva">Patria Nueva</option>
+          <option value="zamora_vive">Zamora Vive</option>
+          <option value="sierra_verde">Sierra Verde</option>
+          <option value="la_esperanza">La Esperanza</option>
+          <option value="pueblo_nuevo">Pueblo Nuevo</option>
+          <option value="los_proceres">Los Próceres</option>
+          <option value="bicentenario">Bicentenario</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label" for="filterClasif">Clasificación</label>
+        <select class="filter-select" id="filterClasif">
+          <option value="">Todas</option>
+          <option value="nino">Niño (0-11)</option>
+          <option value="adolescente">Adolescente</option>
+          <option value="adulto_mayor">Adulto Mayor</option>
+          <option value="embarazada">Embarazada</option>
+          <option value="lactante">Lactante</option>
+          <option value="encamado">Encamado</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label" for="filterGenero">Género</label>
+        <select class="filter-select" id="filterGenero">
+          <option value="">Todos</option>
+          <option value="M">Masculino</option>
+          <option value="F">Femenino</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label" for="filterElector">Elector</label>
+        <select class="filter-select" id="filterElector">
+          <option value="">Todos</option>
+          <option value="si">Sí</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+      <div class="filter-group" style="flex:1; min-width:220px;">
+        <label class="filter-label" for="filterBuscar">Buscar</label>
+        <div class="input-with-icon">
+          <i class="fas fa-search input-icon" aria-hidden="true"></i>
+          <input type="text" class="filter-input" id="filterBuscar" placeholder="Cédula o nombre...">
+        </div>
+      </div>
+      <div class="filter-group" style="align-self:flex-end;">
+        <button class="btn-sicag btn-primary btn-sm" onclick="filtrarCenso(event)">
+          <i class="fas fa-filter"></i> Filtrar
+        </button>
+      </div>
+    </div>
+
+    <div class="result-info-row fade-in-up">
+      <span id="resultCount">Mostrando <strong>10</strong> de <strong>347</strong> habitantes</span>
+      <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+        <button class="btn-sicag btn-sm btn-outline-verde" onclick="exportarExcelCenso()">
+          <i class="fas fa-file-excel"></i> Excel
+        </button>
+      </div>
+    </div>
+
+    <div class="table-container fade-in-up">
+      <div class="table-responsive-sicag">
+        <table class="table-sicag" id="tablaCenso">
+          <thead>
+            <tr>
+              <th style="width:40px;">#</th>
+              <th>Cédula</th>
+              <th>Nombre Completo</th>
+              <th>Edad</th>
+              <th>Género</th>
+              <th>Consejo Comunal</th>
+              <th>Clasificación</th>
+              <th>Elector</th>
+              <th style="width:130px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="censoBody">
+            <tr>
+              <td>1</td>
+              <td>V-18.456.789</td>
+              <td><strong>María del Carmen Pérez</strong><br><small class="text-gris">Sector La Esperanza, Casa #12</small></td>
+              <td>34</td>
+              <td><i class="fas fa-venus me-1" style="color:#E91E63;"></i>F</td>
+              <td>El Progreso</td>
+              <td><span class="badge-sicag badge-desarrollo">Embarazada</span></td>
+              <td><i class="fas fa-check-circle" style="color:var(--vp);"></i> Sí</td>
+              <td>
+                <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver" aria-label="Ver detalle"><i class="fas fa-eye"></i></button>
+                <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" aria-label="Editar" onclick="abrirModalCenso(1)"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" aria-label="Eliminar" onclick="confirmarEliminarHab(1)"><i class="fas fa-trash-alt"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>V-25.123.456</td>
+              <td><strong>José Luis Rodríguez</strong><br><small class="text-gris">Sector El Progreso, Casa #5</small></td>
+              <td>28</td>
+              <td><i class="fas fa-mars me-1" style="color:#2196F3;"></i>M</td>
+              <td>Vencedores</td>
+              <td><span class="badge-sicag badge-activo">Ninguna</span></td>
+              <td><i class="fas fa-check-circle" style="color:var(--vp);"></i> Sí</td>
+              <td>
+                <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver" aria-label="Ver detalle"><i class="fas fa-eye"></i></button>
+                <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" aria-label="Editar" onclick="abrirModalCenso(2)"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" aria-label="Eliminar" onclick="confirmarEliminarHab(2)"><i class="fas fa-trash-alt"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>V-8.765.432</td>
+              <td><strong>Carmen Teresa Méndez</strong><br><small class="text-gris">Sector Zamora, Casa #8</small></td>
+              <td>72</td>
+              <td><i class="fas fa-venus me-1" style="color:#E91E63;"></i>F</td>
+              <td>Patria Nueva</td>
+              <td><span class="badge-sicag badge-finalizado">Adulto Mayor</span></td>
+              <td><i class="fas fa-check-circle" style="color:var(--vp);"></i> Sí</td>
+              <td>
+                <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver" aria-label="Ver detalle"><i class="fas fa-eye"></i></button>
+                <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" aria-label="Editar" onclick="abrirModalCenso(3)"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" aria-label="Eliminar" onclick="confirmarEliminarHab(3)"><i class="fas fa-trash-alt"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>V-30.987.654</td>
+              <td><strong>Andrés Felipe Gómez</strong><br><small class="text-gris">Sector Pueblo Nuevo, Casa #3</small></td>
+              <td>8</td>
+              <td><i class="fas fa-mars me-1" style="color:#2196F3;"></i>M</td>
+              <td>Zamora Vive</td>
+              <td><span class="badge-sicag badge-pendiente">Niño (0-11)</span></td>
+              <td><i class="fas fa-minus-circle" style="color:var(--muted);"></i> No</td>
+              <td>
+                <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver" aria-label="Ver detalle"><i class="fas fa-eye"></i></button>
+                <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" aria-label="Editar" onclick="abrirModalCenso(4)"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" aria-label="Eliminar" onclick="confirmarEliminarHab(4)"><i class="fas fa-trash-alt"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>V-20.456.123</td>
+              <td><strong>Ana Gabriela Flores</strong><br><small class="text-gris">Sector Sierra, Casa #15</small></td>
+              <td>26</td>
+              <td><i class="fas fa-venus me-1" style="color:#E91E63;"></i>F</td>
+              <td>Sierra Verde</td>
+              <td><span class="badge-sicag badge-desarrollo">Lactante</span></td>
+              <td><i class="fas fa-check-circle" style="color:var(--vp);"></i> Sí</td>
+              <td>
+                <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver" aria-label="Ver detalle"><i class="fas fa-eye"></i></button>
+                <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" aria-label="Editar" onclick="abrirModalCenso(5)"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" aria-label="Eliminar" onclick="confirmarEliminarHab(5)"><i class="fas fa-trash-alt"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>V-15.321.654</td>
+              <td><strong>Luis Alberto Martínez</strong><br><small class="text-gris">Sector Bicentenario, Casa #7</small></td>
+              <td>67</td>
+              <td><i class="fas fa-mars me-1" style="color:#2196F3;"></i>M</td>
+              <td>La Esperanza</td>
+              <td><span class="badge-sicag badge-finalizado">Encamado</span></td>
+              <td><i class="fas fa-check-circle" style="color:var(--vp);"></i> Sí</td>
+              <td>
+                <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver" aria-label="Ver detalle"><i class="fas fa-eye"></i></button>
+                <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" aria-label="Editar" onclick="abrirModalCenso(6)"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" aria-label="Eliminar" onclick="confirmarEliminarHab(6)"><i class="fas fa-trash-alt"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>V-28.654.321</td>
+              <td><strong>Daniela Rojas Suárez</strong><br><small class="text-gris">Sector Los Próceres, Casa #2</small></td>
+              <td>15</td>
+              <td><i class="fas fa-venus me-1" style="color:#E91E63;"></i>F</td>
+              <td>Pueblo Nuevo</td>
+              <td><span class="badge-sicag" style="background:rgba(255,140,0,0.12); color:#FF8C00;">Adolescente</span></td>
+              <td><i class="fas fa-check-circle" style="color:var(--vp);"></i> Sí</td>
+              <td>
+                <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver" aria-label="Ver detalle"><i class="fas fa-eye"></i></button>
+                <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" aria-label="Editar" onclick="abrirModalCenso(7)"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" aria-label="Eliminar" onclick="confirmarEliminarHab(7)"><i class="fas fa-trash-alt"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination-sicag">
+        <button class="page-btn" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">...</button>
+        <button class="page-btn">35</button>
+        <button class="page-btn" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/roles.js"></script>
+
+  <div class="modal-overlay" id="modalCenso" role="dialog" aria-modal="true" aria-labelledby="modalCensoTitle">
+    <div class="modal-content-sicag" style="max-width:780px;">
+      <div class="modal-header-sicag">
+        <h3 id="modalCensoTitle"><i class="fas fa-user-plus" style="color:var(--vv);"></i> Registrar Habitante</h3>
+        <button class="modal-close" onclick="cerrarModalCenso()" aria-label="Cerrar modal">&times;</button>
+      </div>
+      <div class="modal-body-sicag">
+        <form id="formCenso">
+          <div class="form-section-header form-section-verde">
+            <i class="fas fa-id-card"></i> Datos Personales
+          </div>
+          <div class="form-grid">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="habCedula">Cédula de Identidad *</label>
+              <input type="text" class="form-control-sicag" id="habCedula" name="cedula_identidad" placeholder="V-12.345.678" required>
+              <small class="text-gris">Llave fuerte para consultas y validación en encuestas.</small>
+            </div>
+            <div class="form-group-sicag" style="grid-column: span 2;">
+              <label class="form-label-sicag" for="habNombre">Nombres y Apellidos *</label>
+              <input type="text" class="form-control-sicag" id="habNombre" name="nombres_apellidos" placeholder="Nombre y Apellido" required>
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="habFechaNac">Fecha de Nacimiento *</label>
+              <input type="date" class="form-control-sicag" id="habFechaNac" name="fecha_nacimiento" required>
+              <small class="text-gris">Campo maestro: calcula edad, clasificación T4 y estado electoral.</small>
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="habEdad">Edad</label>
+              <input type="number" class="form-control-sicag" id="habEdad" name="edad" readonly placeholder="Se calcula automáticamente">
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="habGenero">Género *</label>
+              <select class="form-control-sicag" id="habGenero" name="genero" required>
+                <option value="">Seleccionar...</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+              </select>
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="habTelefono">Teléfono</label>
+              <input type="tel" class="form-control-sicag" id="habTelefono" name="telefono" placeholder="0412-1234567">
+            </div>
+          </div>
+
+          <div class="form-section-header form-section-terracota">
+            <i class="fas fa-map-marker-alt"></i> Ubicación Comunal
+          </div>
+          <div class="form-grid">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="habCC">Consejo Comunal / Comunidad *</label>
+              <select class="form-control-sicag" id="habCC" name="id_comunidad" required>
+                <option value="">Seleccionar...</option>
+                <option value="1">El Progreso</option>
+                <option value="2">Vencedores</option>
+                <option value="3">Patria Nueva</option>
+                <option value="4">Zamora Vive</option>
+                <option value="5">Sierra Verde</option>
+                <option value="6">La Esperanza</option>
+                <option value="7">Pueblo Nuevo</option>
+                <option value="8">Los Próceres</option>
+                <option value="9">Bicentenario</option>
+              </select>
+              <small class="text-gris">FK obligatoria para control por territorio.</small>
+            </div>
+            <div class="form-group-sicag" style="grid-column: span 2;">
+              <label class="form-label-sicag" for="habDireccion">Dirección</label>
+              <input type="text" class="form-control-sicag" id="habDireccion" name="direccion" placeholder="Sector, calle, casa...">
+            </div>
+          </div>
+
+          <div class="form-section-header form-section-rojo">
+            <i class="fas fa-clipboard-list"></i> Clasificaciones y Productores
+          </div>
+          <div class="form-grid">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="habProductor">Es productor</label>
+              <select class="form-control-sicag" id="habProductor" name="es_productor">
+                <option value="no">No</option>
+                <option value="si">Sí</option>
+              </select>
+            </div>
+            <div class="form-group-sicag" id="rubroProduccionGroup" style="display:none;">
+              <label class="form-label-sicag" for="rubroProduccion">Rubro de producción</label>
+              <input type="text" class="form-control-sicag" id="rubroProduccion" name="rubro_produccion" placeholder="Café, Cacao, Hortalizas...">
+              <small class="text-gris">Solo se completa si es productor.</small>
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="condicionSalud">Condición de Salud</label>
+              <select class="form-control-sicag" id="condicionSalud" name="condicion_salud">
+                <option value="Ninguna">Ninguna</option>
+                <option value="Discapacidad Física">Discapacidad Física</option>
+                <option value="Discapacidad Cognitiva">Discapacidad Cognitiva</option>
+                <option value="Encamado">Encamado</option>
+              </select>
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="t4Status">Clasificación T4</label>
+              <input type="text" class="form-control-sicag" id="t4Status" name="clasificacion_t4" readonly placeholder="Se determina por fecha de nacimiento">
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="electoralStatus">Estado Electoral</label>
+              <input type="text" class="form-control-sicag" id="electoralStatus" name="estado_electoral" readonly placeholder="Se determina por fecha de nacimiento">
+            </div>
+          </div>
+
+          <div class="form-group-sicag">
+            <label class="form-label-sicag" for="habFoto">Foto del Habitante</label>
+            <input type="file" class="form-control-sicag" id="habFoto" name="foto" accept="image/*">
+            <small style="color:var(--muted); font-size:0.75rem;">Opcional. Formatos: JPG, PNG. Máximo 5MB.</small>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer-sicag">
+        <button class="btn-sicag btn-outline-verde" onclick="cerrarModalCenso()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button class="btn-sicag btn-primary" onclick="guardarHabitante()">
+          <i class="fas fa-save"></i> Guardar Habitante
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalEliminarHab" role="dialog" aria-modal="true" aria-labelledby="modalElimHabTitle">
+    <div class="modal-content-sicag" style="max-width:450px;">
+      <div class="modal-header-sicag">
+        <h3 id="modalElimHabTitle" style="color:var(--ru);"><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h3>
+        <button class="modal-close" onclick="cerrarModalElimHab()" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body-sicag" style="text-align:center;">
+        <div style="width:70px;height:70px;border-radius:50%;background:rgba(198,40,40,0.08);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:2rem;color:var(--ru);">
+          <i class="fas fa-user-times"></i>
+        </div>
+        <p style="font-size:1rem; margin-bottom:0.65rem;">¿Está seguro de eliminar este habitante del censo?</p>
+        <p style="font-size:0.875rem; color:var(--muted);">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer-sicag" style="justify-content:center;">
+        <button class="btn-sicag btn-outline-verde" onclick="cerrarModalElimHab()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button class="btn-sicag btn-danger" onclick="eliminarHabitante()">
+          <i class="fas fa-trash-alt"></i> Sí, Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    function abrirModalCenso(id) {
+      const modal = document.getElementById('modalCenso');
+      const title = document.getElementById('modalCensoTitle');
+      if (id) {
+        title.innerHTML = '<i class="fas fa-user-edit" style="color:var(--au);"></i> Editar Habitante #' + id;
+      } else {
+        title.innerHTML = '<i class="fas fa-user-plus" style="color:var(--vv);"></i> Registrar Habitante';
+        document.getElementById('formCenso').reset();
+      }
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModalCenso() {
+      document.getElementById('modalCenso').classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    function guardarHabitante() {
+      const cedula = document.getElementById('habCedula').value.trim();
+      const nombre = document.getElementById('habNombre').value.trim();
+      const fechaNac = document.getElementById('habFechaNac').value;
+      const edad = document.getElementById('habEdad').value;
+      const genero = document.getElementById('habGenero').value;
+      const cc = document.getElementById('habCC').value;
+      const productor = document.getElementById('habProductor').value;
+      const rubro = document.getElementById('rubroProduccion').value.trim();
+      const condicion = document.getElementById('condicionSalud').value;
+
+      if (!cedula || !nombre || !fechaNac || !edad || !genero || !cc || !condicion) {
+        window.alert('Por favor complete todos los campos obligatorios y calcule la fecha de nacimiento.');
+        return;
+      }
+
+      if (productor === 'si' && !rubro) {
+        window.alert('Si el habitante es productor, debe especificar el rubro de producción.');
+        return;
+      }
+
+      const btn = document.querySelector('#modalCenso .modal-footer-sicag .btn-primary');
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-check"></i> ¡Registrado!';
+        btn.style.background = 'var(--vd)';
+        setTimeout(() => {
+          cerrarModalCenso();
+          btn.innerHTML = '<i class="fas fa-save"></i> Guardar Habitante';
+          btn.style.background = '';
+          btn.disabled = false;
+        }, 800);
+      }, 1200);
+    }
+
+    function toggleRubroProduccion() {
+      const productor = document.getElementById('habProductor').value;
+      const rubroGroup = document.getElementById('rubroProduccionGroup');
+      const rubroInput = document.getElementById('rubroProduccion');
+      if (productor === 'si') {
+        rubroGroup.style.display = 'block';
+      } else {
+        rubroGroup.style.display = 'none';
+        rubroInput.value = '';
+      }
+    }
+
+    let deleteHabId = null;
+    function confirmarEliminarHab(id) {
+      deleteHabId = id;
+      document.getElementById('modalEliminarHab').classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarModalElimHab() {
+      document.getElementById('modalEliminarHab').classList.remove('show');
+      document.body.style.overflow = '';
+      deleteHabId = null;
+    }
+
+    function eliminarHabitante() {
+      if (deleteHabId) {
+        const rows = document.querySelectorAll('#censoBody tr');
+        if (rows[deleteHabId - 1]) {
+          rows[deleteHabId - 1].style.transition = 'all 0.4s ease';
+          rows[deleteHabId - 1].style.opacity = '0';
+          rows[deleteHabId - 1].style.transform = 'translateX(-20px)';
+          setTimeout(() => rows[deleteHabId - 1].style.display = 'none', 400);
+        }
+      }
+      cerrarModalElimHab();
+    }
+
+    function filtrarCenso(e) {
+      const btn = (e && e.target) ? e.target.closest('.btn-sicag') : document.querySelector('.filter-bar .btn-sicag');
+      if (!btn) return;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Filtrando...';
+      setTimeout(() => { btn.innerHTML = '<i class="fas fa-filter"></i> Filtrar'; }, 600);
+    }
+
+    function exportarExcelCenso() {
+      window.alert('Exportación del Censo iniciada. El archivo Excel se descargará en breve.');
+    }
+
+    document.getElementById('habFechaNac').addEventListener('change', function() {
+      const birthDate = new Date(this.value);
+      const today = new Date();
+      if (!this.value || isNaN(birthDate.getTime())) {
+        document.getElementById('habEdad').value = '';
+        document.getElementById('t4Status').value = '';
+        document.getElementById('electoralStatus').value = '';
+        return;
+      }
+
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+      document.getElementById('habEdad').value = age >= 0 ? age : '';
+
+      const t4Value = age >= 0 && age <= 10 ? 'Niño' : age >= 60 ? 'Adulto Mayor' : 'Ninguna';
+      const electoralValue = age < 15 ? 'Inactivo electoralmente' : age < 18 ? 'Elector Comunal' : 'Elector Universal';
+
+      document.getElementById('t4Status').value = age >= 0 ? t4Value : '';
+      document.getElementById('electoralStatus').value = age >= 0 ? electoralValue : '';
+    });
+
+    document.getElementById('habProductor').addEventListener('change', toggleRubroProduccion);
+
+    document.getElementById('btnExportCenso').addEventListener('click', function() {
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+      this.disabled = true;
+      setTimeout(() => {
+        this.innerHTML = '<i class="fas fa-check"></i> ¡Listo!';
+        setTimeout(() => {
+          this.innerHTML = '<i class="fas fa-file-pdf"></i> Exportar Censo';
+          this.disabled = false;
+        }, 1000);
+      }, 2000);
+    });
+
+    document.querySelectorAll('.page-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+        if (!this.querySelector('i') && this.textContent !== '...') this.classList.add('active');
+      });
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { cerrarModalCenso(); cerrarModalElimHab(); }
+    });
+    document.getElementById('modalCenso').addEventListener('click', function(e) {
+      if (e.target === this) cerrarModalCenso();
+    });
+    document.getElementById('modalEliminarHab').addEventListener('click', function(e) {
+      if (e.target === this) cerrarModalElimHab();
+    });
+  </script>
+
+  <script src="js/layout-menu.js"></script>
+</body>
+</html>
