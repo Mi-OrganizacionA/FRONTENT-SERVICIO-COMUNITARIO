@@ -45,21 +45,14 @@ body {
 
 /* ── TRICOLOR ── */
 .barra-tricolor {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 1100;
-  height: 4px; display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  height: 4px;
+  background: linear-gradient(to right, var(--au) 0%, var(--au) 33.33%, var(--az) 33.33%, var(--az) 66.66%, var(--ru) 66.66%, var(--ru) 100%);
 }
-.barra-tricolor::before  { content:''; flex:1; background: var(--au); }
-.barra-tricolor::after   { content:''; flex:1; background: var(--az); }
-.barra-tricolor { background: var(--ru); }
-.barra-tricolor::before, .barra-tricolor::after,
-.barra-tricolor-seg { flex: 1; display: block; }
-.barra-tricolor span { flex: 1; display: block; }
-
-/* Truco: usar 3 spans dentro */
-.barra-tricolor span:nth-child(1) { background: var(--au); flex:1; }
-.barra-tricolor span:nth-child(2) { background: var(--az); flex:1; }
-.barra-tricolor span:nth-child(3) { background: var(--ru); flex:1; }
-.barra-tricolor { display: flex; height: 4px; }
 
 /* ── HEADER ── */
 .app-header {

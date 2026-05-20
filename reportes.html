@@ -324,16 +324,6 @@
   </main>
 
   <script>
-    /* ── SIDEBAR TOGGLE ── */
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    document.getElementById('sidebarToggle').addEventListener('click', () => {
-      sidebar.classList.toggle('open'); overlay.classList.toggle('show');
-    });
-    overlay.addEventListener('click', () => {
-      sidebar.classList.remove('open'); overlay.classList.remove('show');
-    });
-
     /* ── DOWNLOAD SIMULATION ── */
     function simDownload(btn, label) {
       const orig = btn.innerHTML;

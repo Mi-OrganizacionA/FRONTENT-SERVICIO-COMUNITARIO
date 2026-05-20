@@ -19,7 +19,10 @@
   const protectPage = () => {
     const role = getCurrentRole();
     const page = getCurrentPage();
-    if (!role) return;
+    if (!role) {
+      window.location.replace('login.html');
+      return;
+    }
     if (!isPageAllowed(role, page)) {
       const destination = ROLE_RULES[role].redirectTo || 'dashboard.html';
       window.location.replace(destination);

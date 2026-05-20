@@ -245,13 +245,6 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
-    /* ── SIDEBAR TOGGLE ── */
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    const toggle  = document.getElementById('sidebarToggle');
-    toggle.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
-    overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
-
     /* ── LEAFLET MAP ── */
     const CENTER = [10.351969522108448, -68.73344284186831];
     const map = L.map('mapaCartografia').setView(CENTER, 13);

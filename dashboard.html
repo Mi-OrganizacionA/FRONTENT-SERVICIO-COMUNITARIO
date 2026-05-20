@@ -185,19 +185,6 @@
   </main>
 
   <script>
-    /* ── SIDEBAR TOGGLE ── */
-    var sidebar = document.getElementById('sidebar');
-    var overlay = document.getElementById('sidebarOverlay');
-    var toggle  = document.getElementById('sidebarToggle');
-    toggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('show');
-    });
-    overlay.addEventListener('click', () => {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('show');
-    });
-
     /* ── REFRESH ── */
     document.getElementById('refreshBtn').addEventListener('click', function() {
       const icon = this.querySelector('i');

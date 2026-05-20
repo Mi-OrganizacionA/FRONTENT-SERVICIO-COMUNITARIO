@@ -130,13 +130,7 @@
       </div>`;
   };
 
-  const ensureTricolor = () => {
-    const bar = document.querySelector('.barra-tricolor');
-    if (!bar) return;
-    if (!bar.querySelector('span')) {
-      bar.innerHTML = '<span></span><span></span><span></span>';
-    }
-  };
+
 
   const renderHeader = () => {
     let header = document.querySelector('header.app-header');
@@ -168,9 +162,25 @@
 
   const initSidebarToggle = () => {
     const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    const toggle = document.getElementById('sidebarToggle');
-    if (!sidebar || !overlay || !toggle) return;
+    if (!sidebar) return;
+
+    let overlay = document.getElementById('sidebarOverlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'sidebarOverlay';
+      overlay.className = 'sidebar-overlay';
+      document.body.appendChild(overlay);
+    }
+
+    let toggle = document.getElementById('sidebarToggle');
+    if (!toggle) {
+      toggle = document.createElement('button');
+      toggle.id = 'sidebarToggle';
+      toggle.className = 'sidebar-toggle';
+      toggle.setAttribute('aria-label', 'Abrir menú lateral');
+      toggle.innerHTML = '<i class="fas fa-bars"></i>';
+      document.body.appendChild(toggle);
+    }
 
     toggle.addEventListener('click', () => {
       sidebar.classList.toggle('open');
@@ -306,7 +316,6 @@
   };
 
   window.addEventListener('DOMContentLoaded', () => {
-    ensureTricolor();
     renderHeader();
     renderSidebar();
     initSidebarToggle();
