@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Cartografía Social — Mapeo interactivo del territorio de la Comuna Socialista Simón Rodríguez, SICAG.">
+  <meta name="description"
+    content="Cartografía Social — Mapeo interactivo del territorio de la Comuna Socialista Simón Rodríguez, SICAG.">
   <title>Cartografía Social — SICAG v3.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <link href="css/admin.css" rel="stylesheet">
@@ -18,58 +21,115 @@
       overflow: hidden;
       box-shadow: var(--shadow-md);
     }
+
     .cc-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1rem;
       margin-top: 1.25rem;
     }
+
     .cc-card {
       background: var(--card);
       border-radius: var(--r-md);
       padding: 1rem 1.25rem;
-      display: flex; align-items: flex-start; gap: .9rem;
-      box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: .9rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
       transition: transform var(--tr), box-shadow var(--tr);
     }
-    .cc-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    .cc-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
     .cc-dot {
-      width: 40px; height: 40px; border-radius: var(--r-sm);
-      display: flex; align-items: center; justify-content: center;
-      font-size: .9rem; flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--r-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .9rem;
+      flex-shrink: 0;
     }
-    .cc-card strong { display: block; font-size: .87rem; color: var(--txt); margin-bottom: .2rem; }
-    .cc-card span   { font-size: .76rem; color: var(--muted); line-height: 1.5; }
+
+    .cc-card strong {
+      display: block;
+      font-size: .87rem;
+      color: var(--txt);
+      margin-bottom: .2rem;
+    }
+
+    .cc-card span {
+      font-size: .76rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
     .map-legend-panel {
-      display: flex; flex-wrap: wrap; gap: .75rem; align-items: center;
-      background: var(--card); border-radius: var(--r-md);
-      padding: .9rem 1.25rem; margin-bottom: 1rem;
-      box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      align-items: center;
+      background: var(--card);
+      border-radius: var(--r-md);
+      padding: .9rem 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
     }
+
     .legend-item {
-      display: flex; align-items: center; gap: .45rem;
-      font-size: .78rem; color: var(--sub); font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+      font-size: .78rem;
+      color: var(--sub);
+      font-weight: 500;
     }
+
     .legend-dot {
-      width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
-      border: 2px solid rgba(255,255,255,.8);
-      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 2px solid rgba(255, 255, 255, .8);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .2);
     }
+
     .map-controls {
-      display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: 1rem;
+      display: flex;
+      gap: .6rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
     }
+
     .map-filter-btn {
-      padding: .4rem .9rem; border-radius: 20px;
-      border: 1.5px solid var(--border); background: var(--card);
-      font-size: .78rem; font-weight: 600; font-family: inherit;
-      color: var(--sub); cursor: pointer;
+      padding: .4rem .9rem;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      font-size: .78rem;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--sub);
+      cursor: pointer;
       transition: all var(--tr);
     }
-    .map-filter-btn.active, .map-filter-btn:hover {
-      border-color: var(--vv); background: rgba(67,160,71,.08); color: var(--vp);
+
+    .map-filter-btn.active,
+    .map-filter-btn:hover {
+      border-color: var(--vv);
+      background: rgba(67, 160, 71, .08);
+      color: var(--vp);
     }
   </style>
 </head>
+
 <body data-search-placeholder="Buscar ubicación, consejo comunal...">
 
   <div class="barra-tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -107,7 +167,8 @@
     </div>
 
     <!-- KPI rápidos de territorio -->
-    <div class="kpi-grid stagger fade-in-up" style="grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); margin-bottom:1.25rem;">
+    <div class="kpi-grid stagger fade-in-up"
+      style="grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); margin-bottom:1.25rem;">
       <div class="kpi-card border-verde">
         <div class="kpi-icon verde"><i class="fas fa-map"></i></div>
         <div class="kpi-info">
@@ -144,7 +205,8 @@
 
     <!-- Leyenda del mapa -->
     <div class="map-legend-panel fade-in-up">
-      <strong style="font-size:.8rem;color:var(--txt);margin-right:.25rem;"><i class="fas fa-map-pin" style="color:var(--vp);"></i> Leyenda:</strong>
+      <strong style="font-size:.8rem;color:var(--txt);margin-right:.25rem;"><i class="fas fa-map-pin"
+          style="color:var(--vp);"></i> Leyenda:</strong>
       <div class="legend-item"><span class="legend-dot" style="background:#4CAF50;"></span> Consejo Comunal</div>
       <div class="legend-item"><span class="legend-dot" style="background:#F9A825;"></span> Zona Productiva</div>
       <div class="legend-item"><span class="legend-dot" style="background:#1565C0;"></span> Sede Comunal</div>
@@ -170,19 +232,22 @@
     <!-- CONSEJOS COMUNALES CARDS -->
     <div class="card-sicag fade-in-up">
       <div class="card-header-sicag">
-        <span><i class="fas fa-landmark" style="color:var(--vp);"></i> 9 Consejos Comunales — Distribución Territorial</span>
+        <span><i class="fas fa-landmark" style="color:var(--vp);"></i> 9 Consejos Comunales — Distribución
+          Territorial</span>
       </div>
       <div style="padding:1.25rem 1.5rem;">
         <div class="cc-grid">
           <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i></div>
+            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i>
+            </div>
             <div>
               <strong>C.C. Jobito I</strong>
               <span>Zona norte · 185 familias · Maíz y caraotas</span>
             </div>
           </div>
           <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i></div>
+            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i>
+            </div>
             <div>
               <strong>C.C. Jobito II</strong>
               <span>Zona norte-este · 170 familias · Maíz</span>
@@ -203,14 +268,16 @@
             </div>
           </div>
           <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(21,101,192,.1);color:var(--az);"><i class="fas fa-flag"></i></div>
+            <div class="cc-dot" style="background:rgba(21,101,192,.1);color:var(--az);"><i class="fas fa-flag"></i>
+            </div>
             <div>
               <strong>C.C. Mercedes I</strong>
               <span>Zona central-sur · 145 familias · Café</span>
             </div>
           </div>
           <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(21,101,192,.1);color:var(--az);"><i class="fas fa-flag"></i></div>
+            <div class="cc-dot" style="background:rgba(21,101,192,.1);color:var(--az);"><i class="fas fa-flag"></i>
+            </div>
             <div>
               <strong>C.C. Mercedes II</strong>
               <span>Zona sur · 130 familias · Yuca y tubérculos</span>
@@ -224,14 +291,16 @@
             </div>
           </div>
           <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i></div>
+            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i>
+            </div>
             <div>
               <strong>C.C. Fortaleza del Corozo</strong>
               <span>Zona sur-este · 110 familias · Maíz colectivo</span>
             </div>
           </div>
           <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i></div>
+            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i>
+            </div>
             <div>
               <strong>C.C. Vencedores del Corozo</strong>
               <span>Zona montañosa · 95 familias · Café de altura</span>
@@ -267,15 +336,15 @@
 
     /* Consejos Comunales */
     const consejos = [
-      { lat: 10.358, lng: -68.718, nombre: 'C.C. Jobito I',               hab: 185, color: '#2E7D32', cultivo: 'Maíz y caraotas' },
-      { lat: 10.360, lng: -68.722, nombre: 'C.C. Jobito II',              hab: 170, color: '#388E3C', cultivo: 'Maíz' },
-      { lat: 10.345, lng: -68.728, nombre: 'C.C. Brisas del Yurubí',      hab: 210, color: '#F9A825', cultivo: 'Cacao y frutales' },
-      { lat: 10.352, lng: -68.733, nombre: 'C.C. Andrés Eloy Blanco',     hab: 160, color: '#FF8C00', cultivo: 'Hortalizas' },
-      { lat: 10.347, lng: -68.738, nombre: 'C.C. Mercedes I',             hab: 145, color: '#1565C0', cultivo: 'Café' },
-      { lat: 10.350, lng: -68.742, nombre: 'C.C. Mercedes II',            hab: 130, color: '#1976D2', cultivo: 'Yuca y tubérculos' },
+      { lat: 10.358, lng: -68.718, nombre: 'C.C. Jobito I', hab: 185, color: '#2E7D32', cultivo: 'Maíz y caraotas' },
+      { lat: 10.360, lng: -68.722, nombre: 'C.C. Jobito II', hab: 170, color: '#388E3C', cultivo: 'Maíz' },
+      { lat: 10.345, lng: -68.728, nombre: 'C.C. Brisas del Yurubí', hab: 210, color: '#F9A825', cultivo: 'Cacao y frutales' },
+      { lat: 10.352, lng: -68.733, nombre: 'C.C. Andrés Eloy Blanco', hab: 160, color: '#FF8C00', cultivo: 'Hortalizas' },
+      { lat: 10.347, lng: -68.738, nombre: 'C.C. Mercedes I', hab: 145, color: '#1565C0', cultivo: 'Café' },
+      { lat: 10.350, lng: -68.742, nombre: 'C.C. Mercedes II', hab: 130, color: '#1976D2', cultivo: 'Yuca y tubérculos' },
       { lat: 10.340, lng: -68.745, nombre: 'C.C. Santa Cruz de las Mercedes', hab: 140, color: '#C62828', cultivo: 'Ganadería menor' },
-      { lat: 10.362, lng: -68.726, nombre: 'C.C. Fortaleza del Corozo',   hab: 110, color: '#43A047', cultivo: 'Maíz colectivo' },
-      { lat: 10.335, lng: -68.750, nombre: 'C.C. Vencedores del Corozo',  hab: 95,  color: '#66BB6A', cultivo: 'Café de altura' },
+      { lat: 10.362, lng: -68.726, nombre: 'C.C. Fortaleza del Corozo', hab: 110, color: '#43A047', cultivo: 'Maíz colectivo' },
+      { lat: 10.335, lng: -68.750, nombre: 'C.C. Vencedores del Corozo', hab: 95, color: '#66BB6A', cultivo: 'Café de altura' },
     ];
 
     const ccLayer = L.layerGroup();
@@ -317,4 +386,5 @@
   <script src="js/layout-menu.js"></script>
   <script src="js/roles.js"></script>
 </body>
+
 </html>
