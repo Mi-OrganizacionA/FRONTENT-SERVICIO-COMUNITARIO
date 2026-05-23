@@ -30,14 +30,163 @@
       pointer-events: none;
       font-size: 0.9rem;
     }
-    .status-summary {
-      display: grid;
-      gap: 1rem;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      margin-bottom: 1.5rem;
-    }
     .card-sicag .report-dl-title {
       margin-bottom: 0.35rem;
+    }
+
+    /* --- PREMIUM CUSTOM STYLES (MATCHES THE SCREENSHOT EXACTLY) --- */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      padding-bottom: 1.25rem;
+      margin-top: 0.5rem;
+    }
+
+    .page-header .page-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1b5e20; /* Deep green */
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .page-header .page-title i {
+      color: #2E7D32; /* Vibrant green */
+      font-size: 1.6rem;
+    }
+
+    .page-actions {
+      display: flex;
+      gap: 0.85rem;
+      align-items: center;
+    }
+
+    .page-actions .btn-primary {
+      background: #2E7D32 !important;
+      color: #ffffff !important;
+      border-radius: 8px !important;
+      padding: 0.65rem 1.4rem !important;
+      font-weight: 700 !important;
+      font-size: 0.875rem !important;
+      box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2) !important;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: none !important;
+      transition: all 0.2s ease-in-out !important;
+      cursor: pointer;
+    }
+
+    .page-actions .btn-primary:hover {
+      background: #1B5E20 !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 14px rgba(27, 94, 32, 0.3) !important;
+    }
+
+    .page-actions .btn-terracota {
+      background: #FF5722 !important; /* Premium orange-red */
+      color: #ffffff !important;
+      border-radius: 8px !important;
+      padding: 0.65rem 1.4rem !important;
+      font-weight: 700 !important;
+      font-size: 0.875rem !important;
+      box-shadow: 0 4px 10px rgba(255, 87, 34, 0.2) !important;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: none !important;
+      transition: all 0.2s ease-in-out !important;
+      cursor: pointer;
+    }
+
+    .page-actions .btn-terracota:hover {
+      background: #E64A19 !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 14px rgba(230, 74, 25, 0.3) !important;
+    }
+
+    .status-summary {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      margin-bottom: 2rem;
+    }
+
+    .status-summary .report-dl-card {
+      background: #ffffff !important;
+      border: 1.5px solid #E8EEE8 !important;
+      border-radius: 18px !important;
+      padding: 1.6rem 1.75rem !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s ease !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.85rem !important;
+    }
+
+    .status-summary .report-dl-card:hover {
+      transform: translateY(-5px) !important;
+      box-shadow: 0 10px 25px rgba(27, 94, 32, 0.05) !important;
+      border-color: #A5D6A7 !important;
+    }
+
+    .status-summary .report-dl-header {
+      display: flex !important;
+      align-items: center !important;
+      gap: 1.25rem !important;
+      border: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      background: transparent !important;
+    }
+
+    .status-summary .report-dl-icon {
+      width: auto !important;
+      height: auto !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      color: #1a3b22 !important;
+      font-size: 2rem !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex-shrink: 0 !important;
+    }
+
+    .status-summary .report-dl-header div {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.15rem !important;
+    }
+
+    .status-summary .report-dl-title {
+      font-size: 0.95rem !important;
+      font-weight: 700 !important;
+      color: #1b5e20 !important;
+      margin: 0 !important;
+      font-family: 'Poppins', sans-serif !important;
+    }
+
+    .status-summary .report-dl-header span {
+      font-size: 1.15rem !important;
+      font-weight: 500 !important;
+      color: #555555 !important;
+      font-family: 'Poppins', sans-serif !important;
+    }
+
+    .status-summary .report-dl-desc {
+      font-size: 0.8rem !important;
+      color: #9E9E9E !important;
+      line-height: 1.5 !important;
+      font-weight: 400 !important;
+      margin-top: 0.4rem !important;
     }
   </style>
 </head>
@@ -76,7 +225,7 @@
     <div class="status-summary fade-in-up">
       <div class="report-dl-card">
         <div class="report-dl-header">
-          <div class="report-dl-icon verde"><i class="fas fa-users"></i></div>
+          <div class="report-dl-icon"><i class="fas fa-users"></i></div>
           <div>
             <div class="report-dl-title">Habitantes Censados</div>
             <span>347</span>
@@ -86,7 +235,7 @@
       </div>
       <div class="report-dl-card">
         <div class="report-dl-header">
-          <div class="report-dl-icon azul"><i class="fas fa-vote-yea"></i></div>
+          <div class="report-dl-icon"><i class="fa-regular fa-square-check"></i></div>
           <div>
             <div class="report-dl-title">Electores Activos</div>
             <span>231</span>
@@ -96,7 +245,7 @@
       </div>
       <div class="report-dl-card">
         <div class="report-dl-header">
-          <div class="report-dl-icon amarillo"><i class="fas fa-map-marked-alt"></i></div>
+          <div class="report-dl-icon"><i class="fa-solid fa-map-location-dot"></i></div>
           <div>
             <div class="report-dl-title">Consejos Comunales</div>
             <span>9</span>
