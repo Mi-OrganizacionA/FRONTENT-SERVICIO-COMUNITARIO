@@ -254,7 +254,7 @@ ul {
   z-index: 10;
   text-align: center;
   padding: 0 1.5rem;
-  max-width: 900px
+  max-width: 1000px
 }
 
 .pub-hero-badge {
@@ -399,8 +399,8 @@ ul {
   padding: 3.5rem 2rem;
   position: relative;
   overflow: hidden;
-  border-top: 4px solid rgba(255,255,255,.08);
-  border-bottom: 4px solid rgba(255,255,255,.08);
+  border-top: 4px solid rgba(255, 255, 255, .08);
+  border-bottom: 4px solid rgba(255, 255, 255, .08);
 }
 
 .pub-stats::before {
@@ -453,13 +453,13 @@ ul {
   top: 15%;
   height: 70%;
   width: 1px;
-  background: rgba(255,255,255,.18);
+  background: rgba(255, 255, 255, .18);
 }
 
 .pub-stat-icon {
   font-size: 1.8rem;
   margin-bottom: .6rem;
-  color: rgba(255,255,255,.65);
+  color: rgba(255, 255, 255, .65);
   display: block;
 }
 
@@ -475,7 +475,7 @@ ul {
 
 .pub-stat-label {
   font-size: .72rem;
-  color: rgba(255,255,255,.65);
+  color: rgba(255, 255, 255, .65);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1.2px;
@@ -1736,7 +1736,7 @@ ul {
   transform: translateY(40px);
 }
 
-.pub-hero-content > p {
+.pub-hero-content>p {
   opacity: 0;
   transform: translateY(25px);
 }
@@ -1773,4 +1773,4 @@ ul {
 .pub-7t-card {
   opacity: 0;
   transform: translateX(-40px);
-}
+}
