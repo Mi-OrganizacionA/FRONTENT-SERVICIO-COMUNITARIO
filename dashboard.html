@@ -29,61 +29,71 @@
   <!-- ══ MAIN ══ -->
   <main class="app-main" role="main">
 
-    <nav class="breadcrumb-nav" aria-label="Ruta de navegación">
-      <a href="dashboard.html">Inicio</a>
-      <span>/</span>
-      <span style="color:#1A2E1A">Dashboard</span>
-    </nav>
-
-    <div class="page-header fade-in">
-      <h1 class="page-title">
-        <i class="fas fa-tachometer-alt"></i> Panel de Control
-      </h1>
-      <div class="page-actions">
-        <a href="reportes.html" class="btn-sicag btn-outline-verde">
-          <i class="fas fa-file-alt"></i> Ver Reportes
-        </a>
-        <button class="btn-sicag btn-primary" id="refreshBtn">
-          <i class="fas fa-sync-alt"></i> Actualizar
-        </button>
+    <!-- ══ PREMIUM HEADER ══ -->
+    <div class="ph-wrap fade-in">
+      <nav class="ph-breadcrumb" aria-label="Ruta de navegación">
+        <a href="dashboard.html"><i class="fas fa-home"></i></a>
+        <i class="fas fa-chevron-right ph-sep"></i>
+        <span class="ph-cur">Panel de Control</span>
+      </nav>
+      <div class="ph-body">
+        <div class="ph-left">
+          <div class="ph-icon"><i class="fas fa-gauge-high"></i></div>
+          <div>
+            <div class="ph-module"><i class="fas fa-layer-group"></i> SICAG — Inicio</div>
+            <h1 class="ph-title">Panel de Control General</h1>
+            <p class="ph-sub">Resumen estadístico · 9 Consejos Comunales · Gestión Comunal 2026</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:.6rem;align-self:center;flex-wrap:wrap">
+          <a href="reportes.html" class="ph-btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)">
+            <i class="fas fa-file-alt"></i> Ver Reportes
+          </a>
+          <button class="ph-btn" id="refreshBtn">
+            <i class="fas fa-rotate-right"></i> Actualizar
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- KPI CARDS -->
-    <div class="kpi-grid stagger fade-in-up">
-      <div class="kpi-card border-verde">
-        <div class="kpi-icon verde"><i class="fas fa-users"></i></div>
-        <div class="kpi-info">
-          <h3>Habitantes Censados</h3>
-          <div class="kpi-value">347</div>
-          <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> +15 este mes</span>
+    <div class="ph-kpi-float">
+      <div class="kpi-grid stagger fade-in-up">
+        <div class="kpi-card border-verde">
+          <div class="kpi-icon verde"><i class="fas fa-users"></i></div>
+          <div class="kpi-info">
+            <h3>Habitantes Censados</h3>
+            <div class="kpi-value">347</div>
+            <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> +15 este mes</span>
+          </div>
         </div>
-      </div>
-      <div class="kpi-card border-rojo">
-        <div class="kpi-icon rojo"><i class="fas fa-vote-yea"></i></div>
-        <div class="kpi-info">
-          <h3>Electores Activos</h3>
-          <div class="kpi-value">231</div>
-          <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> 66.6% del total</span>
+        <div class="kpi-card border-rojo">
+          <div class="kpi-icon rojo"><i class="fas fa-vote-yea"></i></div>
+          <div class="kpi-info">
+            <h3>Electores Activos</h3>
+            <div class="kpi-value">231</div>
+            <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> 66.6% del total</span>
+          </div>
         </div>
-      </div>
-      <div class="kpi-card border-amarillo">
-        <div class="kpi-icon amarillo"><i class="fas fa-child"></i></div>
-        <div class="kpi-info">
-          <h3>Niños (0–11 años)</h3>
-          <div class="kpi-value">62</div>
-          <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> 17.9% del total</span>
+        <div class="kpi-card border-amarillo">
+          <div class="kpi-icon amarillo"><i class="fas fa-child"></i></div>
+          <div class="kpi-info">
+            <h3>Niños (0–11 años)</h3>
+            <div class="kpi-value">62</div>
+            <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> 17.9% del total</span>
+          </div>
         </div>
-      </div>
-      <div class="kpi-card border-terracota">
-        <div class="kpi-icon terracota"><i class="fas fa-newspaper"></i></div>
-        <div class="kpi-info">
-          <h3>Noticias Publicadas</h3>
-          <div class="kpi-value">12</div>
-          <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> 4 esta semana</span>
+        <div class="kpi-card border-terracota">
+          <div class="kpi-icon terracota"><i class="fas fa-newspaper"></i></div>
+          <div class="kpi-info">
+            <h3>Noticias Publicadas</h3>
+            <div class="kpi-value">12</div>
+            <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> 4 esta semana</span>
+          </div>
         </div>
       </div>
     </div>
+
 
     <!-- CHARTS ROW 1 -->
     <div class="charts-grid fade-in-up">
@@ -184,71 +194,13 @@
 
   </main>
 
-  <script>
-    /* ── REFRESH ── */
-    document.getElementById('refreshBtn').addEventListener('click', function() {
-      const icon = this.querySelector('i');
-      icon.classList.add('fa-spin');
-      setTimeout(() => icon.classList.remove('fa-spin'), 1200);
-    });
-
-    /* ── CHARTS ── */
-    var palVerde = ['#2E7D32','#388E3C','#43A047','#4CAF50','#66BB6A','#81C784','#A5D6A7','#C8E6C9','#E8F5E9'];
-
-    // Donut
-    new Chart(document.getElementById('chartConsejos').getContext('2d'), {
-      type: 'doughnut',
-      data: {
-        labels: ['Jobito I','Jobito II','Brisas del Yurubí','A. E. Blanco','Mercedes I','Mercedes II','Santa Cruz','Fortaleza Corozo','Vencedores Corozo'],
-        datasets: [{ data: [52,45,41,38,36,35,38,32,30], backgroundColor: palVerde, borderWidth: 3, borderColor: '#fff', hoverOffset: 8 }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false, cutout: '52%',
-        plugins: {
-          legend: { position: 'bottom', labels: { padding: 10, font: { family: 'Poppins', size: 10 }, usePointStyle: true, pointStyleWidth: 8 } },
-          tooltip: { backgroundColor: '#1A2E1A', padding: 12, cornerRadius: 8,
-            callbacks: { label: ctx => { const t = ctx.dataset.data.reduce((a,b)=>a+b,0); return ` ${ctx.label}: ${ctx.raw} hab. (${((ctx.raw/t)*100).toFixed(1)}%)`; } } }
-        }
-      }
-    });
-
-    // Bar clasificaciones
-    new Chart(document.getElementById('chartClasificaciones').getContext('2d'), {
-      type: 'bar',
-      data: {
-        labels: ['Niños\n(0-11)','Adolesc.','Adultos\nMayores','Embaraz.','Lactantes','Discap.','Electores'],
-        datasets: [{ label: 'Personas', data: [62,48,39,14,8,12,231],
-          backgroundColor: ['rgba(249,168,37,.85)','rgba(255,140,0,.85)','rgba(198,40,40,.85)','rgba(233,30,99,.85)','rgba(156,39,176,.85)','rgba(21,101,192,.85)','rgba(46,125,50,.85)'],
-          borderRadius: 6, borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1A2E1A', padding: 12, cornerRadius: 8 } },
-        scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' } }, x: { grid: { display: false } } }
-      }
-    });
-
-    // Line registros
-    var ctxR = document.getElementById('chartRegistros').getContext('2d');
-    var gR = ctxR.createLinearGradient(0,0,0,280);
-    gR.addColorStop(0,'rgba(67,160,71,.25)'); gR.addColorStop(1,'rgba(67,160,71,.02)');
-    new Chart(ctxR, {
-      type: 'line',
-      data: {
-        labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
-        datasets: [{ label: 'Nuevos registros', data: [45,38,52,41,36,28,22,18,25,20,12,10],
-          borderColor: '#43A047', backgroundColor: gR, borderWidth: 3, fill: true, tension: 0.4,
-          pointBackgroundColor: '#43A047', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 7
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1A2E1A', padding: 12, cornerRadius: 8, mode: 'index', intersect: false } },
-        scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' }, ticks: { callback: v => v+' hab.' } }, x: { grid: { display: false } } }
-      }
-    });
-  </script>
+  <!-- SICAG v5.0 Core Scripts -->
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/validators.js"></script>
+  
+  <script src="js/modules/dashboard.js"></script>
   <script src="js/layout-menu.js"></script>
   <script src="js/roles.js"></script>
 </body>

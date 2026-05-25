@@ -1,33 +1,38 @@
-/* js/roles.js — control de páginas según rol de usuario */
+/* js/roles.js — control de páginas según rol de usuario (Integrado con AuthManager v5.0) */
 (() => {
   const ROLE_RULES = {
-    Vocero: {
+    vocero: {
       allowedPages: ['dashboard.html', 'censo.html', 'censo_viviendas.html', 'cartografia.html', 'index.html'],
       redirectTo: 'censo.html'
     }
   };
 
-  const getCurrentRole = () => sessionStorage.getItem('sicag_rol') || null;
-
   const getCurrentPage = () => window.location.pathname.split('/').pop() || 'dashboard.html';
 
   const isPageAllowed = (role, page) => {
-    if (!role || !ROLE_RULES[role]) return true;
+    if (!role || role === 'admin' || !ROLE_RULES[role]) return true;
     return ROLE_RULES[role].allowedPages.includes(page);
   };
 
   const protectPage = () => {
-    const role = getCurrentRole();
-    const page = getCurrentPage();
-    if (!role) {
-      window.location.replace('login.html');
-      return;
+    // Usar el AuthManager en lugar de sessionStorage
+    if (!window.auth || !window.auth.isAuthenticated()) {
+      return; // auth.js ya se encarga de redirigir si no hay sesión
     }
-    if (!isPageAllowed(role, page)) {
+    
+    const user = window.auth.getUser();
+    const role = user ? user.rol : null;
+    const page = getCurrentPage();
+
+    if (role && !isPageAllowed(role, page)) {
       const destination = ROLE_RULES[role].redirectTo || 'dashboard.html';
       window.location.replace(destination);
     }
   };
 
-  window.addEventListener('DOMContentLoaded', protectPage);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', protectPage);
+  } else {
+    protectPage();
+  }
 })();

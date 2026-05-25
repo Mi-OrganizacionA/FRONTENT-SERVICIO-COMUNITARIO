@@ -1,131 +1,194 @@
-/* ============================================================
-   SICAG v3.0 — Component Loader Utility
-   Archivo: js/components.js
+/**
+ * Componentes reutilizables de SICAG v5.0 y utilidades de interfaz
+ * Archivo: js/components.js
+ */
 
-   Carga archivos HTML parciales (componentes) en placeholders
-   del DOM usando fetch(). Reemplaza la duplicación de código
-   en cada página.
+class Components {
+  // ─────────────────────────────────────────
+  // Toast notifications (Notificaciones flotantes)
+  // ─────────────────────────────────────────
+  static showToast(mensaje, tipo = 'info', duracion = 3000) {
+    const toastId = 'toast-' + Date.now();
+    const colores = {
+      success: '#2E7D32',
+      error: '#C62828',
+      warning: '#F9A825',
+      info: '#1565C0'
+    };
 
-   Uso básico:
-     await SICAG.loadComponent('sidebar-placeholder', '/components/sidebar-admin.html');
-   ============================================================ */
+    const toast = document.createElement('div');
+    toast.id = toastId;
+    toast.innerHTML = `
+      <div style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: ${colores[tipo] || colores.info};
+        color: white;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        font-size: 14px;
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      ">
+        <i class="fas fa-${tipo === 'success' ? 'check-circle' : tipo === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        ${mensaje}
+      </div>
+      <style>
+        @keyframes slideIn {
+          from { transform: translateX(400px); }
+          to { transform: translateX(0); }
+        }
+      </style>
+    `;
 
-'use strict';
+    document.body.appendChild(toast);
 
-const SICAG = (() => {
-
-  // ============================================================
-  // Caché de componentes ya descargados
-  // ============================================================
-  const _cache = {};
-
-  // ============================================================
-  // loadComponent(targetId, filePath, callback?)
-  //   targetId  — ID del elemento donde se inyectará el HTML
-  //   filePath  — Ruta al archivo .html del componente
-  //   callback  — Función opcional que se ejecuta al terminar
-  // ============================================================
-  async function loadComponent(targetId, filePath, callback) {
-    const target = document.getElementById(targetId);
-    if (!target) {
-      console.warn(`[SICAG Components] Elemento #${targetId} no encontrado.`);
-      return;
-    }
-
-    try {
-      // Usar caché para no repetir requests
-      if (!_cache[filePath]) {
-        const res = await fetch(filePath);
-        if (!res.ok) throw new Error(`HTTP ${res.status} — ${filePath}`);
-        _cache[filePath] = await res.text();
+    setTimeout(() => {
+      const el = document.getElementById(toastId);
+      if (el) {
+        el.style.animation = 'slideIn 0.3s ease-out reverse';
+        setTimeout(() => el.remove(), 300);
       }
-      target.innerHTML = _cache[filePath];
-
-      if (typeof callback === 'function') callback(target);
-    } catch (err) {
-      console.error(`[SICAG Components] Error al cargar ${filePath}:`, err);
-      target.innerHTML = `<p style="color:red;padding:1rem;">Error al cargar componente: ${filePath}</p>`;
-    }
+    }, duracion);
   }
 
-  // ============================================================
-  // loadPage(config)
-  //   Carga múltiples componentes de una sola vez.
-  //   config = [ { id, file, callback? }, ... ]
-  // ============================================================
-  async function loadPage(config) {
-    const promises = config.map(({ id, file, callback }) =>
-      loadComponent(id, file, callback)
-    );
-    await Promise.all(promises);
+  // ─────────────────────────────────────────
+  // Modal de confirmación dinámica
+  // ─────────────────────────────────────────
+  static confirmDialog(mensaje, onConfirm, onCancel = null) {
+    const modalId = 'modal-' + Date.now();
+    const modal = document.createElement('div');
+    modal.id = modalId;
+    
+    // Asignar funciones globales temporales para los botones en linea
+    window[`confirm_${modalId}`] = () => {
+      document.getElementById(modalId).remove();
+      delete window[`confirm_${modalId}`];
+      delete window[`cancel_${modalId}`];
+      if (typeof onConfirm === 'function') onConfirm();
+    };
+
+    window[`cancel_${modalId}`] = () => {
+      document.getElementById(modalId).remove();
+      delete window[`confirm_${modalId}`];
+      delete window[`cancel_${modalId}`];
+      if (typeof onCancel === 'function') onCancel();
+    };
+
+    modal.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      ">
+        <div style="
+          background: white;
+          border-radius: 12px;
+          padding: 24px;
+          width: 90%;
+          max-width: 400px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+          text-align: center;
+        ">
+          <div style="font-size: 48px; color: #F9A825; margin-bottom: 16px;">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <h3 style="margin-bottom: 16px; color: #1A1A1A; font-family: 'Poppins', sans-serif;">Confirmación Requerida</h3>
+          <p style="color: #666; margin-bottom: 24px;">${mensaje}</p>
+          <div style="display: flex; gap: 12px; justify-content: center;">
+            <button onclick="window['cancel_${modalId}']()" style="
+              padding: 10px 20px;
+              border: 1px solid #ddd;
+              background: white;
+              border-radius: 6px;
+              cursor: pointer;
+              font-weight: 500;
+              transition: background 0.2s;
+            " onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='white'">Cancelar</button>
+            
+            <button onclick="window['confirm_${modalId}']()" style="
+              padding: 10px 20px;
+              background: #2E7D32;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+              font-weight: 500;
+              transition: background 0.2s;
+            " onmouseover="this.style.background='#1B5E20'" onmouseout="this.style.background='#2E7D32'">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
   }
 
-  // ============================================================
-  // setActiveNav(linkSelector)
-  //   Marca el enlace activo en el sidebar o navbar
-  //   basado en el pathname actual.
-  // ============================================================
-  function setActiveNav(containerSelector = '.sidebar-nav') {
-    const currentPath = window.location.pathname;
-    const links = document.querySelectorAll(`${containerSelector} a`);
-    links.forEach(link => {
-      const href = link.getAttribute('href') || '';
-      if (href && currentPath.endsWith(href)) {
-        link.classList.add('active');
-        link.setAttribute('aria-current', 'page');
-      }
-    });
+  // ─────────────────────────────────────────
+  // Spinner de carga
+  // ─────────────────────────────────────────
+  static createLoadingSpinner() {
+    return `
+      <div style="display: flex; justify-content: center; align-items: center; padding: 40px; flex-direction: column; gap: 12px; color: #666;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: var(--primary);"></i>
+        <span>Cargando datos...</span>
+      </div>
+    `;
   }
 
-  // ============================================================
-  // getSession()
-  //   Devuelve la sesión simulada guardada en sessionStorage.
-  //   { user, rol } o null si no hay sesión.
-  // ============================================================
-  function getSession() {
-    const user = sessionStorage.getItem('sicag_user');
-    const rol  = sessionStorage.getItem('sicag_rol');
-    if (!user || !rol) return null;
-    return { user, rol };
+  // ─────────────────────────────────────────
+  // Badge de Estado
+  // ─────────────────────────────────────────
+  static createBadge(estado) {
+    const estilos = {
+      'Activo': { bg: 'rgba(76, 175, 80, 0.1)', color: '#2E7D32' },
+      'En Desarrollo': { bg: 'rgba(255, 152, 0, 0.1)', color: '#E65100' },
+      'Pendiente': { bg: 'rgba(158, 158, 158, 0.1)', color: '#616161' },
+      'Inactivo': { bg: 'rgba(244, 67, 54, 0.1)', color: '#C62828' }
+    };
+    
+    const estilo = estilos[estado] || estilos['Pendiente'];
+    
+    return `<span style="
+      background: ${estilo.bg};
+      color: ${estilo.color};
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    "><i class="fas fa-circle" style="font-size: 6px;"></i> ${estado}</span>`;
   }
+}
 
-  // ============================================================
-  // guardRol(requiredRol, redirectTo?)
-  //   Verifica el rol del usuario. Si no coincide, redirige.
-  // ============================================================
-  function guardRol(requiredRol, redirectTo = '../../login.html') {
-    const session = getSession();
-    if (!session || session.rol !== requiredRol) {
-      window.location.href = redirectTo;
-    }
-    return session;
+// ─────────────────────────────────────────
+// Funciones Legadas de compatibilidad (SICAG object)
+// ─────────────────────────────────────────
+const SICAG = {
+  loadComponent: async (targetId, filePath, callback) => {
+    // Si quedan referencias viejas
+    console.warn('SICAG.loadComponent is deprecated in v5.0.');
+  },
+  getSession: () => {
+    // Proxy al nuevo auth
+    return window.auth ? window.auth.getUser() : null;
+  },
+  logout: () => {
+    if (window.auth) window.auth.logout();
   }
+};
 
-  // ============================================================
-  // renderUserInfo(session)
-  //   Inyecta el nombre/rol del usuario en el header.
-  // ============================================================
-  function renderUserInfo(session) {
-    if (!session) return;
-    const nameEl   = document.getElementById('header-user-name');
-    const rolEl    = document.getElementById('header-user-rol');
-    const avatarEl = document.getElementById('header-user-avatar');
-    if (nameEl)   nameEl.textContent   = session.user.charAt(0).toUpperCase() + session.user.slice(1);
-    if (rolEl)    rolEl.textContent    = session.rol;
-    if (avatarEl) avatarEl.textContent = session.user.charAt(0).toUpperCase();
-  }
-
-  // ============================================================
-  // logout()
-  //   Elimina la sesión y redirige al login.
-  // ============================================================
-  function logout(redirectTo = '../../login.html') {
-    sessionStorage.removeItem('sicag_user');
-    sessionStorage.removeItem('sicag_rol');
-    window.location.href = redirectTo;
-  }
-
-  // API pública
-  return { loadComponent, loadPage, setActiveNav, getSession, guardRol, renderUserInfo, logout };
-
-})();
+window.Components = Components;
+window.SICAG = SICAG;

@@ -47,12 +47,17 @@
     return page || 'dashboard.html';
   };
 
-  const getUserRole = () => sessionStorage.getItem('sicag_rol') || null;
+  const getUserRole = () => {
+    if (window.auth && window.auth.getUser()) {
+      return window.auth.getUser().rol;
+    }
+    return null;
+  };
 
   const getSearchPlaceholder = () => document.body.dataset.searchPlaceholder || DEFAULT_PLACEHOLDER;
 
   const isMenuItemAllowed = (item, role) => {
-    if (role !== 'Vocero') return true;
+    if (role !== 'vocero') return true;
     return ROLE_PERMISSIONS.Vocero.allowedPages.includes(item.href);
   };
 
@@ -199,8 +204,17 @@
       if (!link) return;
       
       const href = link.getAttribute('href');
-      // No interceptar enlaces externos, modales o la página de login
-      if (!href || href.startsWith('http') || href.startsWith('#') || link.target === '_blank' || href === 'login.html') {
+      
+      // Manejar cierre de sesión usando AuthManager
+      if (href === 'login.html') {
+        e.preventDefault();
+        if (window.auth) window.auth.logout();
+        else window.location.href = 'login.html';
+        return;
+      }
+      
+      // No interceptar enlaces externos o modales
+      if (!href || href.startsWith('http') || href.startsWith('#') || link.target === '_blank') {
         return;
       }
       

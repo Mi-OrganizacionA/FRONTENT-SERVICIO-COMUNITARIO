@@ -146,62 +146,72 @@
   <!-- ══ MAIN ══ -->
   <main class="app-main" role="main">
 
-    <nav class="breadcrumb-nav" aria-label="Ruta de navegación">
-      <a href="dashboard.html">Inicio</a>
-      <span>/</span>
-      <span style="color:#1A2E1A">Cartografía Social</span>
-    </nav>
-
-    <div class="page-header fade-in">
-      <h1 class="page-title">
-        <i class="fas fa-map-marked-alt"></i> Cartografía Social
-      </h1>
-      <div class="page-actions">
-        <button class="btn-sicag btn-info" id="btnCentrar">
-          <i class="fas fa-crosshairs"></i> Centrar Mapa
-        </button>
-        <button class="btn-sicag btn-primary" id="btnFullscreen">
-          <i class="fas fa-expand"></i> Pantalla Completa
-        </button>
+    <!-- ══ PREMIUM HEADER ══ -->
+    <div class="ph-wrap fade-in">
+      <nav class="ph-breadcrumb" aria-label="Ruta de navegación">
+        <a href="dashboard.html"><i class="fas fa-home"></i></a>
+        <i class="fas fa-chevron-right ph-sep"></i>
+        <span class="ph-cur">Cartografía Social</span>
+      </nav>
+      <div class="ph-body">
+        <div class="ph-left">
+          <div class="ph-icon"><i class="fas fa-map-marked-alt"></i></div>
+          <div>
+            <div class="ph-module"><i class="fas fa-globe-americas"></i> Territorio Comunal</div>
+            <h1 class="ph-title">Cartografía Social Interactiva</h1>
+            <p class="ph-sub">Mapeo territorial · 9 Consejos Comunales · 850 Ha · Las Mercedes, San Felipe, Yaracuy</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:.6rem;align-self:center;flex-wrap:wrap">
+          <button class="ph-btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)" id="btnCentrar">
+            <i class="fas fa-crosshairs"></i> Centrar
+          </button>
+          <button class="ph-btn" id="btnFullscreen">
+            <i class="fas fa-expand"></i> Pantalla Completa
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- KPI rápidos de territorio -->
-    <div class="kpi-grid stagger fade-in-up"
-      style="grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); margin-bottom:1.25rem;">
-      <div class="kpi-card border-verde">
-        <div class="kpi-icon verde"><i class="fas fa-map"></i></div>
-        <div class="kpi-info">
-          <h3>Área Total</h3>
-          <div class="kpi-value" style="font-size:1.3rem;">850 Ha</div>
-          <span class="kpi-trend up">Vocación agrícola</span>
+    <div class="ph-kpi-float">
+      <div class="kpi-grid stagger fade-in-up"
+        style="grid-template-columns: repeat(auto-fit, minmax(160px,1fr));">
+        <div class="kpi-card border-verde">
+          <div class="kpi-icon verde"><i class="fas fa-map"></i></div>
+          <div class="kpi-info">
+            <h3>Área Total</h3>
+            <div class="kpi-value" style="font-size:1.3rem;">850 Ha</div>
+            <span class="kpi-trend up">Vocación agrícola</span>
+          </div>
         </div>
-      </div>
-      <div class="kpi-card border-amarillo">
-        <div class="kpi-icon amarillo"><i class="fas fa-home"></i></div>
-        <div class="kpi-info">
-          <h3>Consejos Comunales</h3>
-          <div class="kpi-value" style="font-size:1.3rem;">9</div>
-          <span class="kpi-trend up">Las Mercedes</span>
+        <div class="kpi-card border-amarillo">
+          <div class="kpi-icon amarillo"><i class="fas fa-home"></i></div>
+          <div class="kpi-info">
+            <h3>Consejos Comunales</h3>
+            <div class="kpi-value" style="font-size:1.3rem;">9</div>
+            <span class="kpi-trend up">Las Mercedes</span>
+          </div>
         </div>
-      </div>
-      <div class="kpi-card border-azul">
-        <div class="kpi-icon azul"><i class="fas fa-seedling"></i></div>
-        <div class="kpi-info">
-          <h3>Ha Cultivadas</h3>
-          <div class="kpi-value" style="font-size:1.3rem;">156</div>
-          <span class="kpi-trend up">6 tipos de cultivo</span>
+        <div class="kpi-card border-azul">
+          <div class="kpi-icon azul"><i class="fas fa-seedling"></i></div>
+          <div class="kpi-info">
+            <h3>Ha Cultivadas</h3>
+            <div class="kpi-value" style="font-size:1.3rem;">156</div>
+            <span class="kpi-trend up">6 tipos de cultivo</span>
+          </div>
         </div>
-      </div>
-      <div class="kpi-card border-rojo">
-        <div class="kpi-icon rojo"><i class="fas fa-users"></i></div>
-        <div class="kpi-info">
-          <h3>Familias</h3>
-          <div class="kpi-value" style="font-size:1.3rem;">790</div>
-          <span class="kpi-trend up">~6.000 personas</span>
+        <div class="kpi-card border-rojo">
+          <div class="kpi-icon rojo"><i class="fas fa-users"></i></div>
+          <div class="kpi-info">
+            <h3>Familias</h3>
+            <div class="kpi-value" style="font-size:1.3rem;">790</div>
+            <span class="kpi-trend up">~6.000 personas</span>
+          </div>
         </div>
       </div>
     </div>
+
 
     <!-- Leyenda del mapa -->
     <div class="map-legend-panel fade-in-up">
