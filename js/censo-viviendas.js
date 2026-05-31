@@ -1,6 +1,6 @@
-const STORAGE_KEY = 'sicag_censo_viviendas_t2';
+var STORAGE_KEY = 'sicag_censo_viviendas_t2';
 
-const personasSimuladas = [
+var personasSimuladas = [
   { cedula: 'V-12.345.678', nombre: 'María Pérez' },
   { cedula: 'V-24.876.543', nombre: 'José Ramírez' },
   { cedula: 'V-30.123.987', nombre: 'Ana Díaz' },
@@ -8,23 +8,23 @@ const personasSimuladas = [
   { cedula: 'V-15.222.111', nombre: 'Laura Martínez' }
 ];
 
-let viviendas = [];
-let nextId = 1;
-let editingId = null;
-let tableBody;
-let kpiTotal;
-let kpiRiesgo;
-let kpiSinGas;
-let toastContainer;
-let formVivienda;
-let modalVivienda;
-let cedulaJefe;
-let gasDomestico;
-let cantidadCilindrosGas;
-let rowCilindrosGas;
-let collapseOneInst;
-let collapseTwoInst;
-let collapseThreeInst;
+var viviendas = [];
+var nextId = 1;
+var editingId = null;
+var tableBody;
+var kpiTotal;
+var kpiRiesgo;
+var kpiSinGas;
+var toastContainer;
+var formVivienda;
+var modalVivienda;
+var cedulaJefe;
+var gasDomestico;
+var cantidadCilindrosGas;
+var rowCilindrosGas;
+var collapseOneInst;
+var collapseTwoInst;
+var collapseThreeInst;
 
 function loadViviendas() {
   const data = localStorage.getItem(STORAGE_KEY);

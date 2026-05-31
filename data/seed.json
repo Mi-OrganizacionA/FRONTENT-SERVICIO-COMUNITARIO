@@ -1,0 +1,89 @@
+{
+  "habitantes": [
+    {
+      "id": 1,
+      "cedula": "12345678",
+      "nombre": "Juan",
+      "apellido": "García",
+      "edad": 28,
+      "genero": "M",
+      "consejoComunal": "Jobito I",
+      "clasificacion": "adulto",
+      "elector": true,
+      "direccion": "Calle Principal 123",
+      "telefono": "+58414111111",
+      "fechaRegistro": "2026-05-01"
+    },
+    {
+      "id": 2,
+      "cedula": "87654321",
+      "nombre": "María",
+      "apellido": "López",
+      "edad": 35,
+      "genero": "F",
+      "consejoComunal": "Jobito II",
+      "clasificacion": "adulto",
+      "elector": true,
+      "direccion": "Av. Central 45",
+      "telefono": "+58412222222",
+      "fechaRegistro": "2026-05-02"
+    },
+    {
+      "id": 3,
+      "cedula": "23456789",
+      "nombre": "Carlos",
+      "apellido": "Pérez",
+      "edad": 65,
+      "genero": "M",
+      "consejoComunal": "Jobito I",
+      "clasificacion": "adulto_mayor",
+      "elector": true,
+      "direccion": "Callejón Sur",
+      "telefono": "+58416333333",
+      "fechaRegistro": "2026-05-03"
+    },
+    {
+      "id": 4,
+      "cedula": "34567890",
+      "nombre": "Ana",
+      "apellido": "Martínez",
+      "edad": 12,
+      "genero": "F",
+      "consejoComunal": "Jobito I",
+      "clasificacion": "niño",
+      "elector": false,
+      "direccion": "Calle Principal 123",
+      "telefono": "",
+      "fechaRegistro": "2026-05-04"
+    }
+  ],
+  "proyectos": [
+    {
+      "id": 1,
+      "nombre": "Cultivo de Cacao Orgánico",
+      "estado": "Activo",
+      "consejoComunal": "Jobito I",
+      "hectareas": 12.5,
+      "responsable": "María López"
+    },
+    {
+      "id": 2,
+      "nombre": "Reparación de Vías Agrícolas",
+      "estado": "Pendiente",
+      "consejoComunal": "Las Mercedes",
+      "hectareas": 0,
+      "responsable": "Juan García"
+    }
+  ],
+  "noticias": [
+    {
+      "id": 1,
+      "titulo": "Reparación de transformador en sector La Esperanza",
+      "tipo": "noticia",
+      "descripcion": "CORPOELEC realizó trabajos de mantenimiento eléctrico en el sector La Esperanza, restaurando el servicio a más de 120 familias del sector.",
+      "fecha": "2026-04-21",
+      "autor": "Sala de Autogobierno",
+      "destacada": true
+    }
+  ]
+}

@@ -3,419 +3,1636 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Censo de Viviendas — Módulo T2 Infraestructura y Servicios Básicos · SICAG">
   <title>Censo de Viviendas (Módulo T2) — SICAG</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="css/admin.css" rel="stylesheet">
+
   <style>
+    /* ══════════════════════════════════════════
+       TOKENS
+    ══════════════════════════════════════════ */
     :root {
-      --verde-agro: #4CAF50;
-      --verde-oscuro: #228B22;
-      --rojo-socialista: #C8102E;
-      --amarillo-patria: #FFD700;
-      --bg-card: #f8faf7;
+      --vd:  #1B5E20;
+      --vp:  #2E7D32;
+      --vv:  #43A047;
+      --vc:  #A5D6A7;
+      --vbg: #F1F8E9;
+      --au:  #F9A825;
+      --ru:  #C62828;
+      --az:  #1565C0;
+      --gray1: #F8FAF8;
+      --gray2: #F0F4F0;
+      --gray3: #E0E8E0;
+      --gray4: #9E9E9E;
+      --gray5: #424242;
+      --dark:  #0D1F0D;
+      --font: 'Poppins', sans-serif;
+      --r-sm: 8px;
+      --r-md: 14px;
+      --r-lg: 20px;
+      --sh-sm: 0 2px 12px rgba(0,0,0,.06);
+      --sh-md: 0 6px 28px rgba(0,0,0,.10);
+      --sh-v:  0 8px 32px rgba(46,125,50,.20);
+      --tr: .3s cubic-bezier(.4,0,.2,1);
     }
+
+    *, *::before, *::after { box-sizing: border-box; }
 
     body {
-      font-family: 'Poppins', sans-serif;
-      background: #f4f6f4;
-      color: #1a2e1a;
+      font-family: var(--font);
+      background: var(--gray1);
+      color: var(--gray5);
+      -webkit-font-smoothing: antialiased;
     }
 
-    .page-header {
-      padding: 1.5rem 0 1rem;
+    .app-main { min-height: calc(100vh - 70px); }
+
+    /* ── PAGE HEADER ── */
+    .cv-page-header {
+      background: linear-gradient(135deg, var(--vd) 0%, var(--vp) 60%, var(--vv) 100%);
+      padding: 2rem 2rem 3.5rem;
+      margin: calc(-1.75rem) -2rem 0 -2rem;
+      position: relative;
+      overflow: hidden;
     }
 
-    .page-title {
-      font-size: 1.9rem;
+    .cv-page-header::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 280px; height: 280px;
+      background: rgba(255,255,255,.05);
+      border-radius: 50%;
+    }
+
+    .cv-page-header::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: 30%;
+      width: 340px; height: 340px;
+      background: rgba(255,255,255,.04);
+      border-radius: 50%;
+    }
+
+    .cv-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .78rem;
+      color: rgba(255,255,255,.65);
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cv-breadcrumb a { color: rgba(255,255,255,.65); transition: color var(--tr); }
+    .cv-breadcrumb a:hover { color: #fff; }
+    .cv-breadcrumb .sep { opacity: .4; }
+    .cv-breadcrumb .current { color: rgba(255,255,255,.9); font-weight: 600; }
+
+    .cv-header-body {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cv-header-icon {
+      width: 56px; height: 56px;
+      background: rgba(255,255,255,.15);
+      border: 1.5px solid rgba(255,255,255,.25);
+      border-radius: var(--r-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #fff;
+      flex-shrink: 0;
+      backdrop-filter: blur(8px);
+    }
+
+    .cv-header-text { flex: 1; }
+    .cv-header-module {
+      font-size: .72rem;
       font-weight: 700;
-      color: var(--verde-oscuro);
-    }
-
-    .kpi-card {
-      background: #ffffff;
-      border: 1px solid rgba(34, 139, 34, 0.16);
-      border-radius: 1rem;
-      min-height: 140px;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.05);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-
-    .kpi-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 24px 45px rgba(0, 0, 0, 0.08);
-    }
-
-    .kpi-title {
-      font-size: 0.85rem;
-      color: #5f6d5f;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 0.5rem;
-      font-weight: 700;
+      color: var(--vc);
+      margin-bottom: .3rem;
     }
 
-    .kpi-value {
-      font-size: 2.4rem;
+    .cv-header-title {
+      font-size: clamp(1.35rem, 2.5vw, 1.9rem);
       font-weight: 800;
-      color: var(--verde-oscuro);
-      margin-bottom: 0.45rem;
-    }
-
-    .kpi-note {
-      font-size: 0.95rem;
-      color: #63796b;
-    }
-
-    .table thead {
-      background: var(--verde-oscuro);
       color: #fff;
+      line-height: 1.2;
+      letter-spacing: -.5px;
+      margin: 0 0 .4rem;
     }
 
-    .table thead th {
-      border: none;
-      font-weight: 600;
-      vertical-align: middle;
+    .cv-header-sub {
+      font-size: .85rem;
+      color: rgba(255,255,255,.72);
+      margin: 0;
     }
 
-    .table tbody tr {
+    .cv-btn-new {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
       background: #fff;
+      color: var(--vp);
+      font-weight: 700;
+      font-size: .88rem;
+      padding: .75rem 1.5rem;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      transition: all var(--tr);
+      box-shadow: 0 4px 16px rgba(0,0,0,.15);
+      white-space: nowrap;
+      align-self: center;
     }
 
-    .table tbody tr:hover {
-      background: #f3f8f2;
+    .cv-btn-new:hover {
+      background: var(--au);
+      color: var(--vd);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.20);
     }
 
-    .modal-header {
-      background: var(--verde-agro);
+    /* ── KPI CARDS ── */
+    .cv-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-top: -2rem;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .cv-kpi {
+      background: #fff;
+      border-radius: var(--r-lg);
+      padding: 1.5rem 1.75rem;
+      box-shadow: var(--sh-md);
+      display: flex;
+      align-items: center;
+      gap: 1.1rem;
+      border-left: 4px solid transparent;
+      transition: all var(--tr);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cv-kpi::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      opacity: .07;
+    }
+
+    .cv-kpi:hover { transform: translateY(-4px); box-shadow: var(--sh-v); }
+
+    .cv-kpi.green  { border-left-color: var(--vv); }
+    .cv-kpi.green  .cv-kpi-icon { background: var(--vbg); color: var(--vp); }
+    .cv-kpi.green::before  { background: var(--vv); }
+
+    .cv-kpi.red    { border-left-color: #EF5350; }
+    .cv-kpi.red    .cv-kpi-icon { background: #FFEBEE; color: #C62828; }
+    .cv-kpi.red::before    { background: #EF5350; }
+
+    .cv-kpi.yellow { border-left-color: #FFA726; }
+    .cv-kpi.yellow .cv-kpi-icon { background: #FFF8E1; color: #E65100; }
+    .cv-kpi.yellow::before { background: #FFA726; }
+
+    .cv-kpi.blue   { border-left-color: #42A5F5; }
+    .cv-kpi.blue   .cv-kpi-icon { background: #E3F2FD; color: #1565C0; }
+    .cv-kpi.blue::before   { background: #42A5F5; }
+
+    .cv-kpi-icon {
+      width: 50px; height: 50px;
+      border-radius: var(--r-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .cv-kpi-value {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--dark);
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .cv-kpi-label {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--gray4);
+      margin-top: .2rem;
+    }
+
+    .cv-kpi-note {
+      font-size: .78rem;
+      color: var(--gray4);
+      margin-top: .1rem;
+    }
+
+    /* ── CONTENT AREA ── */
+    .cv-content {
+      padding: 2rem;
+    }
+
+    /* ── TOOLBAR ── */
+    .cv-toolbar {
+      background: #fff;
+      border-radius: var(--r-lg);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--sh-sm);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--gray3);
+    }
+
+    .cv-search-wrap {
+      flex: 1;
+      min-width: 220px;
+      position: relative;
+    }
+
+    .cv-search-wrap i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray4);
+      font-size: .9rem;
+    }
+
+    .cv-search-input {
+      width: 100%;
+      padding: .65rem 1rem .65rem 2.6rem;
+      border: 1.5px solid var(--gray3);
+      border-radius: 50px;
+      font-family: var(--font);
+      font-size: .88rem;
+      outline: none;
+      transition: all var(--tr);
+      color: var(--gray5);
+    }
+
+    .cv-search-input:focus {
+      border-color: var(--vv);
+      box-shadow: 0 0 0 3px rgba(67,160,71,.12);
+    }
+
+    .cv-filter-group {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      flex-wrap: wrap;
+    }
+
+    .cv-filter-select {
+      padding: .6rem 1rem;
+      border: 1.5px solid var(--gray3);
+      border-radius: var(--r-sm);
+      font-family: var(--font);
+      font-size: .82rem;
+      color: var(--gray5);
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+      transition: border-color var(--tr);
+    }
+
+    .cv-filter-select:focus { border-color: var(--vv); }
+
+    .cv-toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .cv-icon-btn {
+      width: 38px; height: 38px;
+      border-radius: var(--r-sm);
+      border: 1.5px solid var(--gray3);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray4);
+      cursor: pointer;
+      transition: all var(--tr);
+      font-size: .9rem;
+    }
+
+    .cv-icon-btn:hover {
+      border-color: var(--vv);
+      color: var(--vp);
+      background: var(--vbg);
+    }
+
+    /* ── TABLE CARD ── */
+    .cv-table-card {
+      background: #fff;
+      border-radius: var(--r-lg);
+      box-shadow: var(--sh-sm);
+      border: 1px solid var(--gray3);
+      overflow: hidden;
+    }
+
+    .cv-table-head {
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--gray3);
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .cv-table-head h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .cv-table-head h2 i { color: var(--vv); }
+
+    .cv-count-badge {
+      display: inline-flex;
+      align-items: center;
+      background: var(--vbg);
+      color: var(--vp);
+      font-size: .75rem;
+      font-weight: 700;
+      padding: .2rem .65rem;
+      border-radius: 50px;
+      border: 1px solid rgba(67,160,71,.2);
+    }
+
+    /* Table */
+    .cv-table-wrap { overflow-x: auto; }
+
+    .cv-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .85rem;
+    }
+
+    .cv-table thead tr {
+      background: var(--gray1);
+      border-bottom: 2px solid var(--gray3);
+    }
+
+    .cv-table thead th {
+      padding: .85rem 1rem;
+      font-weight: 700;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--gray4);
+      white-space: nowrap;
+    }
+
+    .cv-table tbody tr {
+      border-bottom: 1px solid var(--gray2);
+      transition: background var(--tr);
+    }
+
+    .cv-table tbody tr:last-child { border-bottom: none; }
+
+    .cv-table tbody tr:hover { background: var(--vbg); }
+
+    .cv-table td {
+      padding: .9rem 1rem;
+      vertical-align: middle;
+      color: var(--gray5);
+    }
+
+    .cv-table td:first-child { font-weight: 600; color: var(--gray4); font-size: .78rem; }
+
+    /* Cedula cell */
+    .cv-cedula {
+      font-family: monospace;
+      font-weight: 700;
+      color: var(--vp);
+      font-size: .88rem;
+    }
+
+    /* Sector badge */
+    .cv-sector {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      background: var(--gray2);
+      color: var(--gray5);
+      font-size: .75rem;
+      font-weight: 600;
+      padding: .2rem .65rem;
+      border-radius: 50px;
+    }
+
+    /* Condition badges */
+    .cv-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      font-size: .73rem;
+      font-weight: 700;
+      padding: .28rem .75rem;
+      border-radius: 50px;
+      white-space: nowrap;
+    }
+
+    .cv-badge.buena       { background: #E8F5E9; color: #1B5E20; }
+    .cv-badge.regular     { background: #FFF8E1; color: #E65100; }
+    .cv-badge.mala        { background: #FFEBEE; color: #B71C1C; }
+    .cv-badge.alto-riesgo { background: #C62828; color: #fff; }
+    .cv-badge.gas-si      { background: #E8F5E9; color: #1B5E20; }
+    .cv-badge.gas-no      { background: #FFEBEE; color: #B71C1C; }
+
+    /* Action buttons */
+    .cv-act-btn {
+      width: 32px; height: 32px;
+      border-radius: var(--r-sm);
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      cursor: pointer;
+      transition: all var(--tr);
+    }
+
+    .cv-act-btn.view  { background: #E3F2FD; color: #1565C0; }
+    .cv-act-btn.edit  { background: var(--vbg); color: var(--vp); }
+    .cv-act-btn.del   { background: #FFEBEE; color: #C62828; }
+
+    .cv-act-btn:hover { opacity: .8; transform: scale(1.1); }
+
+    /* Empty state */
+    .cv-empty {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--gray4);
+    }
+
+    .cv-empty i { font-size: 3rem; opacity: .3; display: block; margin-bottom: 1rem; }
+    .cv-empty p { font-size: .9rem; margin: 0; }
+
+    /* ── PAGINATION ── */
+    .cv-pagination {
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--gray3);
+      font-size: .82rem;
+      color: var(--gray4);
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+
+    .cv-pag-btns { display: flex; gap: .3rem; }
+
+    .cv-pag-btn {
+      width: 34px; height: 34px;
+      border-radius: var(--r-sm);
+      border: 1.5px solid var(--gray3);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: .82rem;
+      color: var(--gray5);
+      font-weight: 600;
+      transition: all var(--tr);
+    }
+
+    .cv-pag-btn:hover, .cv-pag-btn.active {
+      background: var(--vp);
+      border-color: var(--vp);
       color: #fff;
     }
 
-    .modal-header .modal-title {
+    /* ══════════════════════════════════════════
+       MODAL — WIZARD CON PESTAÑAS
+    ══════════════════════════════════════════ */
+    .cv-modal .modal-dialog { max-width: 820px; }
+
+    .cv-modal .modal-content {
+      border-radius: var(--r-lg);
+      border: none;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,.18);
+    }
+
+    .cv-modal-header {
+      background: linear-gradient(135deg, var(--vd), var(--vp));
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cv-modal-header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .cv-modal-header-icon {
+      width: 46px; height: 46px;
+      background: rgba(255,255,255,.15);
+      border-radius: var(--r-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: #fff;
+    }
+
+    .cv-modal-title {
+      font-size: 1.05rem;
       font-weight: 700;
+      color: #fff;
+      margin: 0;
     }
 
-    .accordion-button:not(.collapsed) {
-      color: #1a2e1a;
-      background-color: rgba(76, 175, 80, 0.1);
-      box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .125);
+    .cv-modal-sub {
+      font-size: .75rem;
+      color: rgba(255,255,255,.7);
+      margin: .1rem 0 0;
     }
 
-    .form-label {
+    .cv-modal-close {
+      background: rgba(255,255,255,.15);
+      border: none;
+      color: #fff;
+      width: 36px; height: 36px;
+      border-radius: var(--r-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background var(--tr);
+    }
+
+    .cv-modal-close:hover { background: rgba(255,255,255,.25); }
+
+    /* Stepper */
+    .cv-stepper {
+      display: flex;
+      align-items: center;
+      padding: 1.25rem 2rem;
+      background: var(--gray1);
+      border-bottom: 1px solid var(--gray3);
+      gap: 0;
+    }
+
+    .cv-step {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      flex: 1;
+      position: relative;
+    }
+
+    .cv-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: calc(20px + .6rem);
+      right: 0;
+      top: 50%;
+      height: 2px;
+      background: var(--gray3);
+      z-index: 0;
+      transition: background var(--tr);
+    }
+
+    .cv-step.done:not(:last-child)::after { background: var(--vv); }
+
+    .cv-step-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--gray3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--gray4);
+      background: #fff;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+      transition: all var(--tr);
+    }
+
+    .cv-step.active .cv-step-num {
+      background: var(--vp);
+      border-color: var(--vp);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(46,125,50,.2);
+    }
+
+    .cv-step.done .cv-step-num {
+      background: var(--vv);
+      border-color: var(--vv);
+      color: #fff;
+    }
+
+    .cv-step-info { display: flex; flex-direction: column; }
+
+    .cv-step-label {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--gray4);
+      transition: color var(--tr);
+    }
+
+    .cv-step.active .cv-step-label { color: var(--vp); }
+    .cv-step.done .cv-step-label   { color: var(--vv); }
+
+    .cv-step-desc {
+      font-size: .68rem;
+      color: var(--gray4);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 120px;
+    }
+
+    /* Panels */
+    .cv-modal-body { padding: 2rem; }
+
+    .cv-panel { display: none; }
+    .cv-panel.active { display: block; animation: panelIn .28s ease; }
+
+    @keyframes panelIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .cv-panel-title {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding-bottom: .75rem;
+      border-bottom: 1px solid var(--gray3);
+    }
+
+    .cv-panel-title i { color: var(--vv); }
+
+    /* Form styles */
+    .cv-form-row { display: grid; gap: 1rem; }
+    .cv-form-row.cv-grid-2 { grid-template-columns: 1fr 1fr; }
+    .cv-form-row.cv-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+    .cv-form-group { display: flex; flex-direction: column; gap: .35rem; }
+
+    .cv-form-group label {
+      font-size: .8rem;
       font-weight: 600;
+      color: var(--gray5);
     }
 
-    .badge-regular {
-      background: var(--amarillo-patria);
-      color: #1f1f1f;
+    .cv-form-group label span.req { color: #C62828; margin-left: .15rem; }
+
+    .cv-form-control {
+      padding: .7rem 1rem;
+      border: 1.5px solid var(--gray3);
+      border-radius: var(--r-sm);
+      font-family: var(--font);
+      font-size: .88rem;
+      color: var(--gray5);
+      background: #fff;
+      outline: none;
+      transition: all var(--tr);
+      width: 100%;
     }
 
-    .toast-container {
-      z-index: 1080;
+    .cv-form-control:focus {
+      border-color: var(--vv);
+      box-shadow: 0 0 0 3px rgba(67,160,71,.12);
     }
 
-    .app-main {
-      min-height: calc(100vh - 70px);
+    .cv-form-hint {
+      font-size: .72rem;
+      color: var(--gray4);
+      margin-top: .15rem;
+    }
+
+    .cv-input-group {
+      display: flex;
+      gap: .5rem;
+    }
+
+    .cv-input-group .cv-form-control { flex: 1; }
+
+    .cv-btn-validate {
+      padding: .7rem 1.1rem;
+      background: var(--gray2);
+      border: 1.5px solid var(--gray3);
+      border-radius: var(--r-sm);
+      font-family: var(--font);
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--gray5);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--tr);
+    }
+
+    .cv-btn-validate:hover { background: var(--vbg); border-color: var(--vv); color: var(--vp); }
+
+    /* Service grid (checkcard style) */
+    .cv-service-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: .75rem;
+      margin-top: .5rem;
+    }
+
+    .cv-service-card {
+      background: var(--gray1);
+      border: 1.5px solid var(--gray3);
+      border-radius: var(--r-md);
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--tr);
+      position: relative;
+    }
+
+    .cv-service-card:hover { border-color: var(--vv); background: var(--vbg); }
+
+    .cv-service-card.checked {
+      border-color: var(--vv);
+      background: var(--vbg);
+    }
+
+    .cv-service-card input[type="checkbox"],
+    .cv-service-card input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+    }
+
+    .cv-service-card i {
+      font-size: 1.4rem;
+      color: var(--gray4);
+      display: block;
+      margin-bottom: .4rem;
+      transition: color var(--tr);
+    }
+
+    .cv-service-card.checked i { color: var(--vp); }
+
+    .cv-service-card span {
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--gray5);
+    }
+
+    .cv-check-mark {
+      position: absolute;
+      top: .5rem; right: .5rem;
+      width: 18px; height: 18px;
+      background: var(--vv);
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: .6rem;
+    }
+
+    .cv-service-card.checked .cv-check-mark { display: flex; }
+
+    /* Modal footer */
+    .cv-modal-footer {
+      padding: 1.25rem 2rem;
+      background: var(--gray1);
+      border-top: 1px solid var(--gray3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .cv-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      padding: .7rem 1.5rem;
+      border-radius: var(--r-sm);
+      font-family: var(--font);
+      font-size: .87rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all var(--tr);
+    }
+
+    .cv-btn-ghost {
+      background: transparent;
+      border: 1.5px solid var(--gray3);
+      color: var(--gray5);
+    }
+
+    .cv-btn-ghost:hover { background: var(--gray2); }
+
+    .cv-btn-primary {
+      background: var(--vp);
+      color: #fff;
+    }
+
+    .cv-btn-primary:hover {
+      background: var(--vd);
+      transform: translateY(-1px);
+      box-shadow: var(--sh-v);
+    }
+
+    .cv-btn-save {
+      background: linear-gradient(135deg, var(--vp), var(--vv));
+      color: #fff;
+      padding: .75rem 2rem;
+    }
+
+    .cv-btn-save:hover {
+      background: linear-gradient(135deg, var(--vd), var(--vp));
+      transform: translateY(-1px);
+      box-shadow: var(--sh-v);
+    }
+
+    /* Toast */
+    .cv-toast-wrap { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: .6rem; }
+
+    .cv-toast {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      background: #fff;
+      border-radius: var(--r-md);
+      padding: 1rem 1.25rem;
+      box-shadow: var(--sh-md);
+      font-size: .85rem;
+      color: var(--gray5);
+      min-width: 280px;
+      border-left: 4px solid var(--vv);
+      animation: toastIn .3s ease;
+    }
+
+    .cv-toast.error { border-left-color: #EF5350; }
+    .cv-toast i { font-size: 1.1rem; }
+    .cv-toast.success i { color: var(--vv); }
+    .cv-toast.error   i { color: #EF5350; }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(40px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .cv-kpi-row { padding: 0 1rem; grid-template-columns: 1fr 1fr; }
+      .cv-content { padding: 1.25rem 1rem; }
+      .cv-form-row.col-2,
+      .cv-form-row.col-3 { grid-template-columns: 1fr; }
+      .cv-stepper { padding: 1rem; gap: .5rem; }
+      .cv-step-desc { display: none; }
+      .cv-modal-body { padding: 1.25rem; }
+    }
+
+    @media (max-width: 500px) {
+      .cv-kpi-row { grid-template-columns: 1fr; }
+      .cv-page-header { padding: 1.5rem 1rem 3rem; }
     }
   </style>
 </head>
+
 <body data-search-placeholder="Buscar cédula, comunidad, servicio...">
   <div class="barra-tricolor" aria-hidden="true"></div>
   <div id="header-placeholder"></div>
   <div id="sidebar-placeholder"></div>
 
   <main class="app-main">
-    <div class="container-fluid py-4">
-      <div class="page-header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+
+    <!-- ══ PAGE HEADER ══ -->
+    <div class="cv-page-header">
+      <nav class="cv-breadcrumb" aria-label="Navegación">
+        <a href="dashboard.html"><i class="fas fa-home"></i></a>
+        <span class="sep"><i class="fas fa-chevron-right" style="font-size:.6rem"></i></span>
+        <a href="#">Módulos T</a>
+        <span class="sep"><i class="fas fa-chevron-right" style="font-size:.6rem"></i></span>
+        <span class="current">Censo de Viviendas</span>
+      </nav>
+
+      <div class="cv-header-body">
+        <div style="display:flex;align-items:flex-start;gap:1rem;flex:1">
+          <div class="cv-header-icon">
+            <i class="fas fa-house-chimney-crack"></i>
+          </div>
+          <div class="cv-header-text">
+            <div class="cv-header-module"><i class="fas fa-layer-group me-1"></i>Módulo T2 — Infraestructura</div>
+            <h1 class="cv-header-title">Gestión de Viviendas y Servicios Básicos</h1>
+            <p class="cv-header-sub">Registro único por Jefe de Familia · Regla 1:1 · 9 Consejos Comunales</p>
+          </div>
+        </div>
+        <button class="cv-btn-new" data-bs-toggle="modal" data-bs-target="#modalVivienda" id="btnNuevaVivienda">
+          <i class="fas fa-plus"></i> Registrar Vivienda
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ KPI CARDS ══ -->
+    <div class="cv-kpi-row">
+      <div class="cv-kpi green">
+        <div class="cv-kpi-icon"><i class="fas fa-house"></i></div>
         <div>
-          <h1 class="page-title"><i class="fas fa-home me-2"></i>Gestión de Infraestructura y Vivienda (Módulo T2)</h1>
-          <p class="text-muted mb-0">Registro único de viviendas por Jefe de Familia, según la regla 1:1 del censo.</p>
-        </div>
-        <button class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#modalVivienda"><i class="fas fa-plus me-2"></i>Registrar Nueva Vivienda</button>
-      </div>
-
-      <div class="row g-3 mt-3">
-        <div class="col-md-4">
-          <div class="kpi-card p-4 h-100">
-            <div class="kpi-title">Viviendas Censadas</div>
-            <div class="kpi-value" id="kpi-total">0</div>
-            <div class="kpi-note">Registros únicos en el sistema de la comunidad.</div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="kpi-card p-4 h-100">
-            <div class="kpi-title">Viviendas en Alto Riesgo</div>
-            <div class="kpi-value text-danger" id="kpi-riesgo">0</div>
-            <div class="kpi-note">Casos priorizados por infraestructura crítica.</div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="kpi-card p-4 h-100">
-            <div class="kpi-title">Sin servicio de Gas</div>
-            <div class="kpi-value text-warning" id="kpi-sin-gas">0</div>
-            <div class="kpi-note">Familias sin acceso a gas doméstico seguro.</div>
-          </div>
+          <div class="cv-kpi-value" id="kpi-total">0</div>
+          <div class="cv-kpi-label">Viviendas Censadas</div>
+          <div class="cv-kpi-note">Registros únicos en el sistema</div>
         </div>
       </div>
 
-      <div class="card mt-4 shadow-sm">
-        <div class="card-body">
-          <div class="d-flex align-items-center justify-content-between mb-3">
-            <h2 class="h5 mb-0">Listado de Viviendas</h2>
-            <small class="text-muted">Cada cédula reporta una sola vivienda.</small>
-          </div>
+      <div class="cv-kpi red">
+        <div class="cv-kpi-icon"><i class="fas fa-triangle-exclamation"></i></div>
+        <div>
+          <div class="cv-kpi-value" id="kpi-riesgo">0</div>
+          <div class="cv-kpi-label">Alto Riesgo</div>
+          <div class="cv-kpi-note">Infraestructura crítica</div>
+        </div>
+      </div>
 
-          <div class="table-responsive">
-            <table class="table table-hover table-bordered align-middle" id="tablaViviendas">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Cédula Jefe Familia</th>
-                  <th scope="col">Sector / Comunidad</th>
-                  <th scope="col">Habitantes</th>
-                  <th scope="col">Condición</th>
-                  <th scope="col">Gas</th>
-                  <th scope="col">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Filas generadas por JS -->
-              </tbody>
-            </table>
-          </div>
+      <div class="cv-kpi yellow">
+        <div class="cv-kpi-icon"><i class="fas fa-fire-burner"></i></div>
+        <div>
+          <div class="cv-kpi-value" id="kpi-sin-gas">0</div>
+          <div class="cv-kpi-label">Sin Gas Doméstico</div>
+          <div class="cv-kpi-note">Familias sin acceso seguro</div>
+        </div>
+      </div>
+
+      <div class="cv-kpi blue">
+        <div class="cv-kpi-icon"><i class="fas fa-droplet-slash"></i></div>
+        <div>
+          <div class="cv-kpi-value" id="kpi-sin-agua">0</div>
+          <div class="cv-kpi-label">Sin Agua Potable</div>
+          <div class="cv-kpi-note">Sin acueducto directo</div>
         </div>
       </div>
     </div>
+
+    <!-- ══ CONTENT ══ -->
+    <div class="cv-content">
+
+      <!-- Toolbar -->
+      <div class="cv-toolbar">
+        <div class="cv-search-wrap">
+          <i class="fas fa-search"></i>
+          <input type="text" class="cv-search-input" id="cvSearch"
+            placeholder="Buscar por cédula, sector, condición...">
+        </div>
+
+        <div class="cv-filter-group">
+          <select class="cv-filter-select" id="filterCC" aria-label="Filtrar por Consejo Comunal">
+            <option value="">Todos los Consejos</option>
+            <option value="Jobito I">Jobito I</option>
+            <option value="Jobito II">Jobito II</option>
+            <option value="Brisas del Yurubí">Brisas del Yurubí</option>
+            <option value="Cacique Tamanaco">Cacique Tamanaco</option>
+            <option value="La Esperanza">La Esperanza</option>
+            <option value="Tierra Viva">Tierra Viva</option>
+            <option value="Nueva Raíz">Nueva Raíz</option>
+            <option value="Arcoíris">Arcoíris</option>
+            <option value="Unidos en Madera">Unidos en Madera</option>
+          </select>
+
+          <select class="cv-filter-select" id="filterCondicion" aria-label="Filtrar por condición">
+            <option value="">Todas las condiciones</option>
+            <option value="Buena">Buena</option>
+            <option value="Regular">Regular</option>
+            <option value="Mala">Mala</option>
+            <option value="Alto Riesgo">Alto Riesgo</option>
+          </select>
+
+          <select class="cv-filter-select" id="filterGas" aria-label="Filtrar por gas">
+            <option value="">Gas: Todos</option>
+            <option value="Si">Con Gas</option>
+            <option value="No posee">Sin Gas</option>
+          </select>
+        </div>
+
+        <div class="cv-toolbar-actions">
+          <button class="cv-icon-btn" title="Exportar Excel" id="btnExport" aria-label="Exportar">
+            <i class="fas fa-file-excel"></i>
+          </button>
+          <button class="cv-icon-btn" title="Imprimir" onclick="window.print()" aria-label="Imprimir">
+            <i class="fas fa-print"></i>
+          </button>
+          <button class="cv-icon-btn" title="Recargar datos" id="btnRefresh" aria-label="Recargar">
+            <i class="fas fa-rotate-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Table card -->
+      <div class="cv-table-card">
+        <div class="cv-table-head">
+          <h2><i class="fas fa-table-list"></i> Listado de Viviendas</h2>
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <span class="cv-count-badge" id="cvCountBadge">0 registros</span>
+            <small style="color:var(--gray4);font-size:.75rem">Una cédula · una vivienda</small>
+          </div>
+        </div>
+
+        <div class="cv-table-wrap">
+          <table class="cv-table" id="tablaViviendas">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th><i class="fas fa-id-card" style="margin-right:.3rem;color:var(--vv)"></i>Cédula Jefe</th>
+                <th><i class="fas fa-map-pin" style="margin-right:.3rem;color:var(--vv)"></i>Consejo Comunal</th>
+                <th><i class="fas fa-users" style="margin-right:.3rem;color:var(--vv)"></i>Habitantes</th>
+                <th><i class="fas fa-house" style="margin-right:.3rem;color:var(--vv)"></i>Tipo</th>
+                <th><i class="fas fa-shield-halved" style="margin-right:.3rem;color:var(--vv)"></i>Condición</th>
+                <th><i class="fas fa-fire-burner" style="margin-right:.3rem;color:var(--vv)"></i>Gas</th>
+                <th><i class="fas fa-droplet" style="margin-right:.3rem;color:var(--vv)"></i>Agua</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="cvTableBody">
+              <!-- JS renders rows -->
+            </tbody>
+          </table>
+
+          <div class="cv-empty" id="cvEmpty">
+            <i class="fas fa-house-circle-xmark"></i>
+            <p>No hay viviendas registradas aún.<br>Presiona <strong>"Registrar Vivienda"</strong> para comenzar el censo.</p>
+          </div>
+        </div>
+
+        <div class="cv-pagination" id="cvPagination">
+          <span id="cvPagInfo">Mostrando 0 de 0</span>
+          <div class="cv-pag-btns" id="cvPagBtns"></div>
+        </div>
+      </div>
+
+    </div><!-- /cv-content -->
   </main>
 
-  <div class="modal fade" id="modalVivienda" tabindex="-1" aria-labelledby="modalViviendaLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
+
+  <!-- ══════════════════════════════════════════
+       MODAL — WIZARD REGISTRO VIVIENDA
+  ══════════════════════════════════════════ -->
+  <div class="modal fade cv-modal" id="modalVivienda" tabindex="-1"
+       aria-labelledby="modalViviendaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalViviendaLabel"><i class="fas fa-house-user me-2"></i>Registro de Vivienda - Planilla T2</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+
+        <!-- Modal header -->
+        <div class="cv-modal-header">
+          <div class="cv-modal-header-left">
+            <div class="cv-modal-header-icon"><i class="fas fa-house-user"></i></div>
+            <div>
+              <h5 class="cv-modal-title" id="modalViviendaLabel">Registro de Vivienda — Planilla T2</h5>
+              <p class="cv-modal-sub">Complete los 3 pasos para registrar correctamente la vivienda.</p>
+            </div>
+          </div>
+          <button type="button" class="cv-modal-close" data-bs-dismiss="modal" aria-label="Cerrar">
+            <i class="fas fa-xmark"></i>
+          </button>
         </div>
-        <form id="formVivienda">
-          <div class="modal-body">
-            <div class="accordion" id="wizardAccordion">
-              <div class="accordion-item">
-                <h2 class="accordion-header" id="headingOne">
-                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    SECCIÓN A: Ubicación y Datos Generales del Hogar
-                  </button>
-                </h2>
-                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#wizardAccordion">
-                  <div class="accordion-body">
-                    <div class="row g-3">
-                      <div class="col-md-6">
-                        <label for="cedulaJefe" class="form-label">Cédula Jefe de Familia</label>
-                        <div class="input-group">
-                          <input type="text" class="form-control" id="cedulaJefe" placeholder="Ej. V-12.345.678" required>
-                          <button class="btn btn-outline-secondary" type="button" id="btnValidarCedula">Buscar/Validar</button>
-                        </div>
-                        <div class="form-text">Esta cédula es la llave foránea única para la vivienda.</div>
-                      </div>
-                      <div class="col-md-6">
-                        <label for="sectorComunidad" class="form-label">Consejo Comunal</label>
-                        <select class="form-select" id="sectorComunidad" required>
-                          <option value="" selected>Seleccione consejo comunal</option>
-                          <option value="Jobito I">Jobito I</option>
-                          <option value="Jobito II">Jobito II</option>
-                          <option value="Brisas del Yurubí">Brisas del Yurubí</option>
-                          <option value="Cacique Tamanaco">Cacique Tamanaco</option>
-                          <option value="La Esperanza">La Esperanza</option>
-                          <option value="Tierra Viva">Tierra Viva</option>
-                          <option value="Nueva Raíz">Nueva Raíz</option>
-                          <option value="Arcoíris">Arcoíris</option>
-                          <option value="Unidos en Madera">Unidos en Madera</option>
-                        </select>
-                      </div>
-                      <div class="col-12">
-                        <label for="direccionExacta" class="form-label">Dirección Exacta</label>
-                        <textarea class="form-control" id="direccionExacta" rows="2" placeholder="Calle, casa, sector" required></textarea>
-                      </div>
-                      <div class="col-md-6">
-                        <label for="cantidadHabitantes" class="form-label">Cantidad de Habitantes</label>
-                        <input type="number" class="form-control" id="cantidadHabitantes" min="1" placeholder="Ej. 5" required>
-                      </div>
-                      <div class="col-md-6">
-                        <label for="condicionGeneral" class="form-label">Condición General</label>
-                        <select class="form-select" id="condicionGeneral" required>
-                          <option value="" selected>Seleccione condición</option>
-                          <option value="Buena">Buena</option>
-                          <option value="Regular">Regular</option>
-                          <option value="Mala">Mala</option>
-                          <option value="Alto Riesgo">Alto Riesgo</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="d-flex justify-content-end mt-4">
-                      <button type="button" class="btn btn-primary" id="btnNextA">Siguiente</button>
-                    </div>
+
+        <!-- Stepper -->
+        <div class="cv-stepper" id="cvStepper">
+          <div class="cv-step active" id="step-1">
+            <div class="cv-step-num">1</div>
+            <div class="cv-step-info">
+              <span class="cv-step-label">Sección A</span>
+              <span class="cv-step-desc">Datos del Hogar</span>
+            </div>
+          </div>
+          <div class="cv-step" id="step-2">
+            <div class="cv-step-num">2</div>
+            <div class="cv-step-info">
+              <span class="cv-step-label">Sección B</span>
+              <span class="cv-step-desc">Estructura</span>
+            </div>
+          </div>
+          <div class="cv-step" id="step-3">
+            <div class="cv-step-num">3</div>
+            <div class="cv-step-info">
+              <span class="cv-step-label">Sección C</span>
+              <span class="cv-step-desc">Servicios</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <form id="formVivienda" novalidate>
+          <div class="cv-modal-body">
+
+            <!-- ── PANEL A: Ubicación y Datos Generales ── -->
+            <div class="cv-panel active" id="panelA">
+              <div class="cv-panel-title">
+                <i class="fas fa-location-dot"></i>
+                Sección A — Ubicación y Datos Generales del Hogar
+              </div>
+
+              <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
+                <div class="cv-form-group">
+                  <label for="cedulaJefe">Cédula del Jefe de Familia <span class="req">*</span></label>
+                  <div class="cv-input-group">
+                    <input type="text" class="cv-form-control" id="cedulaJefe"
+                      placeholder="Ej. V-12.345.678" required>
+                    <button type="button" class="cv-btn-validate" id="btnValidarCedula">
+                      <i class="fas fa-magnifying-glass"></i> Validar
+                    </button>
                   </div>
+                  <span class="cv-form-hint">Llave única del registro — una cédula, una vivienda.</span>
+                </div>
+                <div class="cv-form-group">
+                  <label for="sectorComunidad">Consejo Comunal <span class="req">*</span></label>
+                  <select class="cv-form-control" id="sectorComunidad" required>
+                    <option value="">Seleccione consejo comunal</option>
+                    <option value="Jobito I">C.C. Jobito I</option>
+                    <option value="Jobito II">C.C. Jobito II</option>
+                    <option value="Brisas del Yurubí">C.C. Brisas del Yurubí</option>
+                    <option value="Cacique Tamanaco">C.C. Cacique Tamanaco</option>
+                    <option value="La Esperanza">C.C. La Esperanza</option>
+                    <option value="Tierra Viva">C.C. Tierra Viva</option>
+                    <option value="Nueva Raíz">C.C. Nueva Raíz</option>
+                    <option value="Arcoíris">C.C. Arcoíris</option>
+                    <option value="Unidos en Madera">C.C. Unidos en Madera</option>
+                  </select>
                 </div>
               </div>
 
-              <div class="accordion-item">
-                <h2 class="accordion-header" id="headingTwo">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                    SECCIÓN B: Situación Estructural de la Vivienda
-                  </button>
-                </h2>
-                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#wizardAccordion">
-                  <div class="accordion-body">
-                    <div class="row g-3">
-                      <div class="col-md-4">
-                        <label for="tipoVivienda" class="form-label">Tipo de Vivienda</label>
-                        <select class="form-select" id="tipoVivienda" required>
-                          <option value="" selected>Seleccione tipo</option>
-                          <option value="Quinta">Quinta</option>
-                          <option value="Casa">Casa</option>
-                          <option value="Apartamento">Apartamento</option>
-                          <option value="Rancho">Rancho</option>
-                          <option value="Barraca">Barraca</option>
-                          <option value="Habitación">Habitación</option>
-                        </select>
-                      </div>
-                      <div class="col-md-4">
-                        <label for="tenencia" class="form-label">Tenencia</label>
-                        <select class="form-select" id="tenencia" required>
-                          <option value="" selected>Seleccione tenencia</option>
-                          <option value="Propia">Propia</option>
-                          <option value="Alquilada">Alquilada</option>
-                          <option value="Compartida">Compartida</option>
-                          <option value="Invadida">Invadida</option>
-                          <option value="Prestada">Prestada</option>
-                        </select>
-                      </div>
-                      <div class="col-md-4">
-                        <label for="condicionesTerreno" class="form-label">Condiciones del Terreno</label>
-                        <select class="form-select" id="condicionesTerreno" required>
-                          <option value="" selected>Seleccione condición</option>
-                          <option value="Estable">Estable</option>
-                          <option value="Inestable">Inestable</option>
-                          <option value="Alto Riesgo">Alto Riesgo</option>
-                          <option value="Vulnerable">Vulnerable</option>
-                        </select>
-                      </div>
-                      <div class="col-md-6">
-                        <label for="materialParedes" class="form-label">Material de Paredes</label>
-                        <select class="form-select" id="materialParedes" required>
-                          <option value="" selected>Seleccione material</option>
-                          <option value="Frisadas">Frisadas</option>
-                          <option value="Sin Frisar">Sin Frisar</option>
-                          <option value="Tablas">Tablas</option>
-                          <option value="Bahareque/Adobe">Bahareque/Adobe</option>
-                          <option value="Zinc">Zinc</option>
-                          <option value="Cartón">Cartón</option>
-                        </select>
-                      </div>
-                      <div class="col-md-6">
-                        <label for="materialTecho" class="form-label">Material de Techo</label>
-                        <select class="form-select" id="materialTecho" required>
-                          <option value="" selected>Seleccione material</option>
-                          <option value="Platabanda">Platabanda</option>
-                          <option value="Asbesto">Asbesto</option>
-                          <option value="Teja">Teja</option>
-                          <option value="Zinc">Zinc</option>
-                          <option value="Machihembrado">Machihembrado</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="d-flex justify-content-between mt-4">
-                      <button type="button" class="btn btn-outline-secondary" id="btnPrevB">Anterior</button>
-                      <button type="button" class="btn btn-primary" id="btnNextB">Siguiente</button>
-                    </div>
-                  </div>
-                </div>
+              <div class="cv-form-group" style="margin-bottom:1rem">
+                <label for="direccionExacta">Dirección Exacta <span class="req">*</span></label>
+                <textarea class="cv-form-control" id="direccionExacta" rows="2"
+                  placeholder="Calle, Nº de casa, sector, referencia..." required></textarea>
               </div>
 
-              <div class="accordion-item">
-                <h2 class="accordion-header" id="headingThree">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                    SECCIÓN C: Servicios Básicos (Módulo T2)
-                  </button>
-                </h2>
-                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#wizardAccordion">
-                  <div class="accordion-body">
-                    <div class="row g-3">
-                      <div class="col-md-4">
-                        <label for="aguasBlancas" class="form-label">Aguas Blancas</label>
-                        <select class="form-select" id="aguasBlancas" required>
-                          <option value="" selected>Seleccione fuente</option>
-                          <option value="Acueducto">Acueducto</option>
-                          <option value="Pila pública">Pila pública</option>
-                          <option value="Camión cisterna">Camión cisterna</option>
-                          <option value="No tiene">No tiene</option>
-                        </select>
-                      </div>
-                      <div class="col-md-4">
-                        <label for="aguasServidas" class="form-label">Aguas Servidas</label>
-                        <select class="form-select" id="aguasServidas" required>
-                          <option value="" selected>Seleccione salida</option>
-                          <option value="Cloacas">Cloacas</option>
-                          <option value="Pozo séptico">Pozo séptico</option>
-                          <option value="Letrinas">Letrinas</option>
-                          <option value="Al aire libre">Al aire libre</option>
-                        </select>
-                      </div>
-                      <div class="col-md-4">
-                        <label for="gasDomestico" class="form-label">Gas Doméstico</label>
-                        <select class="form-select" id="gasDomestico" required>
-                          <option value="" selected>Seleccione servicio</option>
-                          <option value="Bombona">Bombona</option>
-                          <option value="Tubería">Tubería</option>
-                          <option value="No posee">No posee</option>
-                        </select>
-                      </div>
-                      <div class="col-md-4" id="rowCilindrosGas">
-                        <label for="cantidadCilindrosGas" class="form-label">Cantidad de Cilindros Gas</label>
-                        <input type="number" class="form-control" id="cantidadCilindrosGas" min="1" placeholder="Ej. 2" disabled>
-                      </div>
-                      <div class="col-md-4">
-                        <label for="sistemaElectrico" class="form-label">Sistema Eléctrico</label>
-                        <select class="form-select" id="sistemaElectrico" required>
-                          <option value="" selected>Seleccione opción</option>
-                          <option value="Pública">Pública</option>
-                          <option value="Planta eléctrica">Planta eléctrica</option>
-                          <option value="No tiene">No tiene</option>
-                        </select>
-                      </div>
-                      <div class="col-md-4">
-                        <label for="recoleccionBasura" class="form-label">Recolección de Basura</label>
-                        <select class="form-select" id="recoleccionBasura" required>
-                          <option value="" selected>Seleccione servicio</option>
-                          <option value="Aseo urbano">Aseo urbano</option>
-                          <option value="Contenedor">Contenedor</option>
-                          <option value="Quema">Quema</option>
-                          <option value="Al aire libre">Al aire libre</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="d-flex justify-content-start mt-4">
-                      <button type="button" class="btn btn-outline-secondary" id="btnPrevC">Anterior</button>
-                    </div>
-                  </div>
+              <div class="cv-form-row cv-grid-2">
+                <div class="cv-form-group">
+                  <label for="cantidadHabitantes">Cantidad de Habitantes <span class="req">*</span></label>
+                  <input type="number" class="cv-form-control" id="cantidadHabitantes"
+                    min="1" max="30" placeholder="Ej. 5" required>
+                </div>
+                <div class="cv-form-group">
+                  <label for="condicionGeneral">Condición General de la Vivienda <span class="req">*</span></label>
+                  <select class="cv-form-control" id="condicionGeneral" required>
+                    <option value="">Seleccione condición</option>
+                    <option value="Buena">✅ Buena</option>
+                    <option value="Regular">🟡 Regular</option>
+                    <option value="Mala">🟠 Mala</option>
+                    <option value="Alto Riesgo">🔴 Alto Riesgo</option>
+                  </select>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-success">Guardar Vivienda</button>
+
+            <!-- ── PANEL B: Situación Estructural ── -->
+            <div class="cv-panel" id="panelB">
+              <div class="cv-panel-title">
+                <i class="fas fa-screwdriver-wrench"></i>
+                Sección B — Situación Estructural de la Vivienda
+              </div>
+
+              <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
+                <div class="cv-form-group">
+                  <label for="tipoVivienda">Tipo de Vivienda <span class="req">*</span></label>
+                  <select class="cv-form-control" id="tipoVivienda" required>
+                    <option value="">Seleccione tipo</option>
+                    <option value="Quinta">🏡 Quinta</option>
+                    <option value="Casa">🏠 Casa</option>
+                    <option value="Apartamento">🏢 Apartamento</option>
+                    <option value="Rancho">🛖 Rancho</option>
+                    <option value="Barraca">⛺ Barraca</option>
+                    <option value="Habitación">🚪 Habitación</option>
+                  </select>
+                </div>
+                <div class="cv-form-group">
+                  <label for="tenencia">Régimen de Tenencia <span class="req">*</span></label>
+                  <select class="cv-form-control" id="tenencia" required>
+                    <option value="">Seleccione tenencia</option>
+                    <option value="Propia">Propia</option>
+                    <option value="Alquilada">Alquilada</option>
+                    <option value="Compartida">Compartida</option>
+                    <option value="Invadida">Invadida</option>
+                    <option value="Prestada">Prestada</option>
+                  </select>
+                </div>
+                <div class="cv-form-group">
+                  <label for="condicionesTerreno">Condiciones del Terreno <span class="req">*</span></label>
+                  <select class="cv-form-control" id="condicionesTerreno" required>
+                    <option value="">Seleccione condición</option>
+                    <option value="Estable">✅ Estable</option>
+                    <option value="Inestable">⚠️ Inestable</option>
+                    <option value="Vulnerable">🟡 Vulnerable</option>
+                    <option value="Alto Riesgo">🔴 Alto Riesgo</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
+                <div class="cv-form-group">
+                  <label for="materialParedes">Material de Paredes <span class="req">*</span></label>
+                  <select class="cv-form-control" id="materialParedes" required>
+                    <option value="">Seleccione material</option>
+                    <option value="Frisadas">Bloque / Frisadas</option>
+                    <option value="Sin Frisar">Bloque sin Frisar</option>
+                    <option value="Tablas">Tablas de madera</option>
+                    <option value="Bahareque/Adobe">Bahareque / Adobe</option>
+                    <option value="Zinc">Zinc</option>
+                    <option value="Cartón">Cartón / Material reciclado</option>
+                  </select>
+                </div>
+                <div class="cv-form-group">
+                  <label for="materialTecho">Material de Techo <span class="req">*</span></label>
+                  <select class="cv-form-control" id="materialTecho" required>
+                    <option value="">Seleccione material</option>
+                    <option value="Platabanda">Platabanda (concreto)</option>
+                    <option value="Asbesto">Asbesto / Eternit</option>
+                    <option value="Teja">Teja cerámica</option>
+                    <option value="Zinc">Zinc / Lámina</option>
+                    <option value="Machihembrado">Machihembrado</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="cv-form-row col-2">
+                <div class="cv-form-group">
+                  <label for="numCuartos">N° de Cuartos</label>
+                  <input type="number" class="cv-form-control" id="numCuartos" min="0" placeholder="Ej. 3">
+                </div>
+                <div class="cv-form-group">
+                  <label for="numBanos">N° de Baños</label>
+                  <input type="number" class="cv-form-control" id="numBanos" min="0" placeholder="Ej. 1">
+                </div>
+              </div>
+            </div>
+
+            <!-- ── PANEL C: Servicios Básicos ── -->
+            <div class="cv-panel" id="panelC">
+              <div class="cv-panel-title">
+                <i class="fas fa-bolt"></i>
+                Sección C — Servicios Básicos (Módulo T2)
+              </div>
+
+              <div class="cv-form-row col-3" style="margin-bottom:1.25rem">
+                <div class="cv-form-group">
+                  <label for="aguasBlancas">Aguas Blancas <span class="req">*</span></label>
+                  <select class="cv-form-control" id="aguasBlancas" required>
+                    <option value="">Seleccione fuente</option>
+                    <option value="Acueducto">💧 Acueducto</option>
+                    <option value="Pila pública">🚰 Pila pública</option>
+                    <option value="Camión cisterna">🚛 Camión cisterna</option>
+                    <option value="No tiene">🚫 No tiene</option>
+                  </select>
+                </div>
+                <div class="cv-form-group">
+                  <label for="aguasServidas">Aguas Servidas <span class="req">*</span></label>
+                  <select class="cv-form-control" id="aguasServidas" required>
+                    <option value="">Seleccione salida</option>
+                    <option value="Cloacas">Cloacas</option>
+                    <option value="Pozo séptico">Pozo séptico</option>
+                    <option value="Letrinas">Letrinas</option>
+                    <option value="Al aire libre">Al aire libre</option>
+                  </select>
+                </div>
+                <div class="cv-form-group">
+                  <label for="sistemaElectrico">Sistema Eléctrico <span class="req">*</span></label>
+                  <select class="cv-form-control" id="sistemaElectrico" required>
+                    <option value="">Seleccione opción</option>
+                    <option value="Pública">⚡ Red pública</option>
+                    <option value="Planta eléctrica">🔋 Planta eléctrica</option>
+                    <option value="No tiene">🚫 No tiene</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="cv-form-row col-3" style="margin-bottom:1.5rem">
+                <div class="cv-form-group">
+                  <label for="gasDomestico">Gas Doméstico <span class="req">*</span></label>
+                  <select class="cv-form-control" id="gasDomestico" required>
+                    <option value="">Seleccione servicio</option>
+                    <option value="Bombona">🔴 Bombona</option>
+                    <option value="Tubería">🟢 Tubería</option>
+                    <option value="No posee">🚫 No posee</option>
+                  </select>
+                </div>
+                <div class="cv-form-group" id="rowCilindrosGas">
+                  <label for="cantidadCilindrosGas">N° Cilindros de Gas</label>
+                  <input type="number" class="cv-form-control" id="cantidadCilindrosGas"
+                    min="1" placeholder="Ej. 2" disabled>
+                </div>
+                <div class="cv-form-group">
+                  <label for="recoleccionBasura">Recolección de Basura <span class="req">*</span></label>
+                  <select class="cv-form-control" id="recoleccionBasura" required>
+                    <option value="">Seleccione servicio</option>
+                    <option value="Aseo urbano">🗑️ Aseo urbano</option>
+                    <option value="Contenedor">📦 Contenedor</option>
+                    <option value="Quema">🔥 Quema</option>
+                    <option value="Al aire libre">⚠️ Al aire libre</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="cv-form-group">
+                <label for="observaciones">Observaciones adicionales</label>
+                <textarea class="cv-form-control" id="observaciones" rows="3"
+                  placeholder="Daños visibles, necesidades urgentes, situación especial de la familia..."></textarea>
+              </div>
+            </div>
+
+          </div><!-- /cv-modal-body -->
+
+          <!-- Modal footer -->
+          <div class="cv-modal-footer">
+            <div style="display:flex;align-items:center;gap:.5rem">
+              <button type="button" class="cv-btn cv-btn-ghost" id="btnPrev" style="display:none">
+                <i class="fas fa-arrow-left"></i> Anterior
+              </button>
+              <button type="button" class="cv-btn cv-btn-ghost" data-bs-dismiss="modal">
+                Cancelar
+              </button>
+            </div>
+            <div style="display:flex;align-items:center;gap:.5rem">
+              <span id="cvStepCounter" style="font-size:.78rem;color:var(--gray4);font-weight:600">Paso 1 de 3</span>
+              <button type="button" class="cv-btn cv-btn-primary" id="btnNext">
+                Siguiente <i class="fas fa-arrow-right"></i>
+              </button>
+              <button type="submit" class="cv-btn cv-btn-save" id="btnSave" style="display:none">
+                <i class="fas fa-floppy-disk"></i> Guardar Vivienda
+              </button>
+            </div>
           </div>
         </form>
+
       </div>
     </div>
   </div>
 
-  <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+  <!-- Toast container -->
+  <div class="cv-toast-wrap" id="cvToastWrap"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/layout-menu.js"></script>
   <script src="js/roles.js"></script>
-  <script src="js/censo-viviendas.js"></script>
+
+  <script>
+    /* ══════════════════════════════════════════
+       WIZARD LOGIC
+    ══════════════════════════════════════════ */
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    function goToStep(n) {
+      // Update panels
+      document.querySelectorAll('.cv-panel').forEach((p, i) => {
+        p.classList.toggle('active', i + 1 === n);
+      });
+      // Update stepper
+      document.querySelectorAll('.cv-step').forEach((s, i) => {
+        s.classList.remove('active', 'done');
+        if (i + 1 === n) s.classList.add('active');
+        if (i + 1 < n)  s.classList.add('done');
+        // Show checkmark on done
+        const num = s.querySelector('.cv-step-num');
+        if (i + 1 < n) num.innerHTML = '<i class="fas fa-check" style="font-size:.7rem"></i>';
+        else num.textContent = i + 1;
+      });
+      // Buttons
+      document.getElementById('btnPrev').style.display   = n > 1 ? 'inline-flex' : 'none';
+      document.getElementById('btnNext').style.display   = n < totalSteps ? 'inline-flex' : 'none';
+      document.getElementById('btnSave').style.display   = n === totalSteps ? 'inline-flex' : 'none';
+      document.getElementById('cvStepCounter').textContent = `Paso ${n} de ${totalSteps}`;
+      currentStep = n;
+    }
+
+    document.getElementById('btnNext').addEventListener('click', () => {
+      if (currentStep < totalSteps) goToStep(currentStep + 1);
+    });
+
+    document.getElementById('btnPrev').addEventListener('click', () => {
+      if (currentStep > 1) goToStep(currentStep - 1);
+    });
+
+    // Reset wizard on modal close
+    document.getElementById('modalVivienda').addEventListener('hidden.bs.modal', () => {
+      document.getElementById('formVivienda').reset();
+      goToStep(1);
+    });
+
+    /* ── Gas cylinders toggle ── */
+    document.getElementById('gasDomestico').addEventListener('change', function () {
+      const row = document.getElementById('rowCilindrosGas');
+      const inp = document.getElementById('cantidadCilindrosGas');
+      const useBombona = this.value === 'Bombona';
+      inp.disabled = !useBombona;
+      if (!useBombona) inp.value = '';
+    });
+
+    /* ══════════════════════════════════════════
+       TOAST
+    ══════════════════════════════════════════ */
+    function showToast(msg, type = 'success') {
+      const wrap = document.getElementById('cvToastWrap');
+      const t = document.createElement('div');
+      t.className = `cv-toast ${type}`;
+      t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark'}"></i> <span>${msg}</span>`;
+      wrap.appendChild(t);
+      setTimeout(() => t.remove(), 4000);
+    }
+
+    /* ══════════════════════════════════════════
+       DATA & TABLE (integra con censo-viviendas.js si existe)
+    ══════════════════════════════════════════ */
+    let viviendas = JSON.parse(localStorage.getItem('cv_viviendas') || '[]');
+
+    function getBadgeCondicion(c) {
+      const map = {
+        'Buena':      'buena',
+        'Regular':    'regular',
+        'Mala':       'mala',
+        'Alto Riesgo':'alto-riesgo'
+      };
+      const icons = {
+        'Buena': 'fa-circle-check',
+        'Regular': 'fa-circle-minus',
+        'Mala': 'fa-circle-exclamation',
+        'Alto Riesgo': 'fa-triangle-exclamation'
+      };
+      return `<span class="cv-badge ${map[c]||'regular'}"><i class="fas ${icons[c]||'fa-circle-minus'}"></i>${c||'—'}</span>`;
+    }
+
+    function getBadgeGas(g) {
+      const noGas = g === 'No posee' || !g;
+      return `<span class="cv-badge ${noGas ? 'gas-no' : 'gas-si'}">
+        <i class="fas ${noGas ? 'fa-xmark' : 'fa-check'}"></i>${g||'—'}</span>`;
+    }
+
+    function renderTable() {
+      const q   = (document.getElementById('cvSearch').value || '').toLowerCase();
+      const cc  = document.getElementById('filterCC').value;
+      const cond= document.getElementById('filterCondicion').value;
+      const gas = document.getElementById('filterGas').value;
+
+      let data = viviendas.filter(v => {
+        const matchQ  = !q || (v.cedula||'').toLowerCase().includes(q) || (v.sector||'').toLowerCase().includes(q);
+        const matchCC = !cc   || v.sector === cc;
+        const matchC  = !cond || v.condicion === cond;
+        const matchG  = !gas  || v.gas === gas || (gas === 'Si' && v.gas !== 'No posee');
+        return matchQ && matchCC && matchC && matchG;
+      });
+
+      const body  = document.getElementById('cvTableBody');
+      const empty = document.getElementById('cvEmpty');
+      document.getElementById('cvCountBadge').textContent = `${data.length} registros`;
+
+      if (!data.length) {
+        body.innerHTML = '';
+        empty.style.display = 'block';
+        updateKPIs();
+        return;
+      }
+
+      empty.style.display = 'none';
+      body.innerHTML = data.map((v, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td><span class="cv-cedula">${v.cedula || '—'}</span></td>
+          <td><span class="cv-sector"><i class="fas fa-map-pin"></i>${v.sector || '—'}</span></td>
+          <td style="font-weight:600;color:var(--dark)">${v.habitantes || '—'}</td>
+          <td style="color:var(--gray5)">${v.tipo || '—'}</td>
+          <td>${getBadgeCondicion(v.condicion)}</td>
+          <td>${getBadgeGas(v.gas)}</td>
+          <td><span class="cv-badge ${v.agua === 'Acueducto' ? 'gas-si' : 'gas-no'}">
+            <i class="fas ${v.agua === 'Acueducto' ? 'fa-check' : 'fa-xmark'}"></i>${v.agua || '—'}
+          </span></td>
+          <td>
+            <div style="display:flex;gap:.3rem">
+              <button class="cv-act-btn view" title="Ver detalle" onclick="verVivienda(${i})" aria-label="Ver">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="cv-act-btn edit" title="Editar" onclick="editarVivienda(${i})" aria-label="Editar">
+                <i class="fas fa-pencil"></i>
+              </button>
+              <button class="cv-act-btn del" title="Eliminar" onclick="eliminarVivienda(${i})" aria-label="Eliminar">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      updateKPIs();
+    }
+
+    function updateKPIs() {
+      document.getElementById('kpi-total').textContent = viviendas.length;
+      document.getElementById('kpi-riesgo').textContent = viviendas.filter(v => v.condicion === 'Alto Riesgo').length;
+      document.getElementById('kpi-sin-gas').textContent = viviendas.filter(v => v.gas === 'No posee').length;
+      document.getElementById('kpi-sin-agua').textContent = viviendas.filter(v => v.agua === 'No tiene' || !v.agua).length;
+    }
+
+    function verVivienda(i) { showToast(`Detalle vivienda: ${viviendas[i]?.cedula || i}`); }
+    function editarVivienda(i) { showToast('Función de edición próximamente.', 'error'); }
+    function eliminarVivienda(i) {
+      if (!confirm('¿Eliminar esta vivienda del registro?')) return;
+      viviendas.splice(i, 1);
+      localStorage.setItem('cv_viviendas', JSON.stringify(viviendas));
+      renderTable();
+      showToast('Vivienda eliminada del registro.');
+    }
+
+    /* ── Form submit ── */
+    document.getElementById('formVivienda').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const v = {
+        cedula:     document.getElementById('cedulaJefe').value.trim(),
+        sector:     document.getElementById('sectorComunidad').value,
+        direccion:  document.getElementById('direccionExacta').value.trim(),
+        habitantes: document.getElementById('cantidadHabitantes').value,
+        condicion:  document.getElementById('condicionGeneral').value,
+        tipo:       document.getElementById('tipoVivienda').value,
+        tenencia:   document.getElementById('tenencia').value,
+        terreno:    document.getElementById('condicionesTerreno').value,
+        paredes:    document.getElementById('materialParedes').value,
+        techo:      document.getElementById('materialTecho').value,
+        agua:       document.getElementById('aguasBlancas').value,
+        servidas:   document.getElementById('aguasServidas').value,
+        gas:        document.getElementById('gasDomestico').value,
+        electrico:  document.getElementById('sistemaElectrico').value,
+        basura:     document.getElementById('recoleccionBasura').value,
+        obs:        document.getElementById('observaciones').value,
+        fecha:      new Date().toLocaleDateString('es-VE')
+      };
+      if (!v.cedula || !v.sector) {
+        showToast('Complete los campos obligatorios.', 'error');
+        return;
+      }
+      viviendas.push(v);
+      localStorage.setItem('cv_viviendas', JSON.stringify(viviendas));
+      bootstrap.Modal.getInstance(document.getElementById('modalVivienda')).hide();
+      renderTable();
+      showToast(`Vivienda de ${v.cedula} registrada correctamente. ✅`);
+    });
+
+    /* ── Search & filters ── */
+    ['cvSearch','filterCC','filterCondicion','filterGas'].forEach(id => {
+      document.getElementById(id).addEventListener('input', renderTable);
+      document.getElementById(id).addEventListener('change', renderTable);
+    });
+
+    document.getElementById('btnRefresh').addEventListener('click', () => {
+      viviendas = JSON.parse(localStorage.getItem('cv_viviendas') || '[]');
+      renderTable();
+      showToast('Datos actualizados.');
+    });
+
+    /* ── Init ── */
+    renderTable();
+  </script>
+
+  <script src="js/censo-viviendas.js" defer></script>
 </body>
 </html>

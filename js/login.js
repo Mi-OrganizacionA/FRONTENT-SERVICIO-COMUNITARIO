@@ -1,140 +1,152 @@
-0/* ============================================================
-   SICAG v3.0 — Login JavaScript
+/* ============================================================
+   SICAG v5.0 — Login Refactorizado (Usa AuthManager)
    Archivo: js/login.js
    ============================================================ */
 
 'use strict';
 
-// ============================================================
-// DATOS SIMULADOS — Usuarios del sistema
-// ============================================================
-const USUARIOS_DEMO = {
-  'admin': { pass: 'admin123', rol: 'Administrador', redirect: 'dashboard.html' },
-  'v-admin': { pass: 'admin123', rol: 'Administrador', redirect: 'dashboard.html' },
-  'vocero': { pass: 'vocero123', rol: 'Vocero', redirect: 'dashboard.html' }
-};
+class LoginController {
+  constructor() {
+    this.loginForm = document.getElementById('loginForm');
+    this.userInput = document.getElementById('loginUser');
+    this.passInput = document.getElementById('loginPass');
+    this.submitBtn = document.getElementById('loginBtn');
+    this.alertBox = document.getElementById('loginAlert');
+    this.alertMsg = document.getElementById('loginAlertMsg');
 
-// ============================================================
-// PARTÍCULAS DECORATIVAS DE FONDO
-// ============================================================
-(function crearParticulas() {
-  const container = document.getElementById('particles');
-  if (!container) return;
-  const colores = ['#4CAF50', '#FFD700', '#D2691E', '#228B22', '#FF8C00'];
-  for (let i = 0; i < 18; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    const size = Math.random() * 80 + 20;
-    p.style.cssText = `
-      width:${size}px; height:${size}px;
-      left:${Math.random() * 100}%;
-      background:${colores[Math.floor(Math.random() * colores.length)]};
-      animation-duration:${Math.random() * 20 + 15}s;
-      animation-delay:${Math.random() * 15}s;
-    `;
-    container.appendChild(p);
+    if (this.loginForm) {
+      this.loginForm.addEventListener('submit', (e) => this.handleSubmit(e));
+    }
+
+    this._setupUI();
   }
-})();
 
-// ============================================================
-// TOGGLE CONTRASEÑA VISIBLE/OCULTA
-// ============================================================
-const togglePassBtn = document.getElementById('togglePass');
-const loginPassInput = document.getElementById('loginPass');
-const togglePassIcon = document.getElementById('togglePassIcon');
+  _setupUI() {
+    // Toggle Password Visibility
+    const toggleBtn = document.getElementById('togglePass');
+    const toggleIcon = document.getElementById('togglePassIcon');
+    if (toggleBtn && this.passInput) {
+      toggleBtn.addEventListener('click', () => {
+        const isText = this.passInput.type === 'text';
+        this.passInput.type = isText ? 'password' : 'text';
+        toggleIcon.className = isText ? 'fas fa-eye' : 'fas fa-eye-slash';
+      });
+    }
 
-if (togglePassBtn) {
-  togglePassBtn.addEventListener('click', () => {
-    const visible = loginPassInput.type === 'text';
-    loginPassInput.type = visible ? 'password' : 'text';
-    togglePassIcon.className = visible ? 'fas fa-eye' : 'fas fa-eye-slash';
-  });
-}
+    // Hide alerts on typing
+    [this.userInput, this.passInput].forEach(el => {
+      if (el) el.addEventListener('input', () => this.ocultarError());
+    });
 
-// ============================================================
-// ACCESO RÁPIDO DE DEMOSTRACIÓN
-// ============================================================
-function fillDemo(user, pass) {
-  document.getElementById('loginUser').value = user;
-  document.getElementById('loginPass').value = pass;
-  document.getElementById('loginAlert').classList.remove('show');
-}
+    // Partículas de fondo
+    this._crearParticulas();
+  }
 
-// Exponer globalmente para los onclick del HTML
-window.fillDemo = fillDemo;
-
-// ============================================================
-// OCULTAR ALERTA AL ESCRIBIR
-// ============================================================
-['loginUser', 'loginPass'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('input', () => {
-    document.getElementById('loginAlert').classList.remove('show');
-  });
-});
-
-// ============================================================
-// SUBMIT DEL FORMULARIO
-// ============================================================
-const loginForm = document.getElementById('loginForm');
-
-if (loginForm) {
-  loginForm.addEventListener('submit', function (e) {
+  async handleSubmit(e) {
     e.preventDefault();
+    const usuario = this.userInput.value.trim().toLowerCase();
+    const password = this.passInput.value.trim();
 
-    const userInput = document.getElementById('loginUser').value.trim().toLowerCase();
-    const passInput = document.getElementById('loginPass').value.trim();
-    const btn = document.getElementById('loginBtn');
-    const alertBox = document.getElementById('loginAlert');
-    const alertMsg = document.getElementById('loginAlertMsg');
-
-    // --- Validar campos vacíos ---
-    if (!userInput || !passInput) {
-      alertMsg.textContent = 'Por favor, completa todos los campos.';
-      alertBox.classList.add('show');
+    if (!usuario || !password) {
+      this.mostrarError('Por favor, completa todos los campos.');
       return;
     }
 
-    // --- Simular carga ---
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>VERIFICANDO...';
-    btn.disabled = true;
+    try {
+      this.setLoading(true);
+      
+      // Llamada al AuthManager centralizado
+      const userData = await window.auth.login(usuario, password);
+      
+      this.mostrarExito('¡BIENVENIDO!');
 
-    setTimeout(() => {
-      // First check localStorage accounts created by admin (voceros)
-      const accountsRaw = localStorage.getItem('sicag_accounts');
-      const ACCOUNTS = accountsRaw ? JSON.parse(accountsRaw) : {};
-      const cuenta = ACCOUNTS[userInput];
+      // Redirección centralizada
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 900);
 
-      const usuario = USUARIOS_DEMO[userInput] || cuenta;
+    } catch (error) {
+      this.mostrarError(error.message);
+      this.setLoading(false);
+      this._shakeCard();
+    }
+  }
 
-      if (usuario && usuario.pass === passInput) {
-        // ✅ Credenciales correctas — guardar sesión simulada
-        sessionStorage.setItem('sicag_user', userInput);
-        sessionStorage.setItem('sicag_rol', usuario.rol);
-        sessionStorage.setItem('sicag_pass', passInput);
+  setLoading(isLoading) {
+    if (!this.submitBtn) return;
+    this.submitBtn.disabled = isLoading;
+    if (isLoading) {
+      this.submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>VERIFICANDO...';
+    } else {
+      this.submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>ENTRAR AL SISTEMA';
+      this.submitBtn.style.background = '';
+    }
+  }
 
-        btn.innerHTML = '<i class="fas fa-check me-2"></i>¡BIENVENIDO!';
-        btn.style.background = 'linear-gradient(135deg, #1B5E20, #2E7D32)';
+  mostrarExito(mensaje) {
+    if (!this.submitBtn) return;
+    this.submitBtn.innerHTML = `<i class="fas fa-check me-2"></i>${mensaje}`;
+    this.submitBtn.style.background = 'linear-gradient(135deg, #1B5E20, #2E7D32)';
+  }
 
-        setTimeout(() => {
-          window.location.href = usuario.redirect;
-        }, 900);
+  mostrarError(mensaje) {
+    if (!this.alertBox || !this.alertMsg) return;
+    this.alertMsg.textContent = mensaje;
+    this.alertBox.classList.add('show');
+  }
 
-      } else {
-        // ❌ Credenciales incorrectas
-        alertMsg.textContent = 'Credenciales incorrectas. Verifique su cédula y contraseña.';
-        alertBox.classList.add('show');
-        btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>ENTRAR AL SISTEMA';
-        btn.disabled = false;
-        btn.style.background = '';
+  ocultarError() {
+    if (this.alertBox) this.alertBox.classList.remove('show');
+  }
 
-        // Efecto shake en la tarjeta de login
-        const panel = document.querySelector('.login-card');
-        if (panel) {
-          panel.style.animation = 'shake 0.4s ease';
-          setTimeout(() => { panel.style.animation = ''; }, 400);
-        }
-      }
-    }, 1400);
-  });
+  _shakeCard() {
+    const panel = document.querySelector('.login-card');
+    if (panel) {
+      panel.style.animation = 'shake 0.4s ease';
+      setTimeout(() => { panel.style.animation = ''; }, 400);
+    }
+  }
+
+  _crearParticulas() {
+    const container = document.getElementById('particles');
+    if (!container) return;
+    const colores = ['#4CAF50', '#FFD700', '#D2691E', '#228B22', '#FF8C00'];
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 80 + 20;
+      p.style.cssText = `
+        width:${size}px; height:${size}px;
+        left:${Math.random() * 100}%;
+        background:${colores[Math.floor(Math.random() * colores.length)]};
+        animation-duration:${Math.random() * 20 + 15}s;
+        animation-delay:${Math.random() * 15}s;
+      `;
+      container.appendChild(p);
+    }
+  }
 }
+
+// Inicializar asegurando que el DOM esté listo o ya cargado
+function initLogin() {
+  if (document.getElementById('loginForm')) {
+    window.loginCtrl = new LoginController();
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initLogin);
+} else {
+  initLogin();
+}
+
+// Función global para demo (mantenida por compatibilidad visual)
+window.fillDemo = function(user, pass) {
+  const userInput = document.getElementById('loginUser');
+  const passInput = document.getElementById('loginPass');
+  if (userInput && passInput) {
+    userInput.value = user;
+    passInput.value = pass;
+    document.getElementById('loginAlert')?.classList.remove('show');
+  }
+};

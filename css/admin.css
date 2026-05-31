@@ -45,21 +45,14 @@ body {
 
 /* ── TRICOLOR ── */
 .barra-tricolor {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 1100;
-  height: 4px; display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  height: 4px;
+  background: linear-gradient(to right, var(--au) 0%, var(--au) 33.33%, var(--az) 33.33%, var(--az) 66.66%, var(--ru) 66.66%, var(--ru) 100%);
 }
-.barra-tricolor::before  { content:''; flex:1; background: var(--au); }
-.barra-tricolor::after   { content:''; flex:1; background: var(--az); }
-.barra-tricolor { background: var(--ru); }
-.barra-tricolor::before, .barra-tricolor::after,
-.barra-tricolor-seg { flex: 1; display: block; }
-.barra-tricolor span { flex: 1; display: block; }
-
-/* Truco: usar 3 spans dentro */
-.barra-tricolor span:nth-child(1) { background: var(--au); flex:1; }
-.barra-tricolor span:nth-child(2) { background: var(--az); flex:1; }
-.barra-tricolor span:nth-child(3) { background: var(--ru); flex:1; }
-.barra-tricolor { display: flex; height: 4px; }
 
 /* ── HEADER ── */
 .app-header {
@@ -623,3 +616,143 @@ body {
 @media (max-width: 400px) {
   .kpi-grid { grid-template-columns: 1fr; }
 }
+
+/* ══════════════════════════════════════════════════
+   PREMIUM PAGE HEADER — Compartido entre módulos
+══════════════════════════════════════════════════ */
+.ph-wrap {
+  background: linear-gradient(135deg, var(--vd) 0%, var(--vp) 60%, var(--vv) 100%);
+  padding: 1.75rem 2rem 2.75rem;
+  margin: calc(-1.75rem) -2rem 0 -2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.ph-wrap::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 260px; height: 260px;
+  background: rgba(255,255,255,.05);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.ph-wrap::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: 28%;
+  width: 300px; height: 300px;
+  background: rgba(255,255,255,.04);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.ph-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .75rem;
+  color: rgba(255,255,255,.6);
+  margin-bottom: .9rem;
+  position: relative;
+  z-index: 1;
+}
+
+.ph-breadcrumb a {
+  color: rgba(255,255,255,.6);
+  text-decoration: none;
+  transition: color .2s;
+}
+
+.ph-breadcrumb a:hover { color: #fff; }
+.ph-breadcrumb .ph-sep { opacity: .4; font-size: .6rem; }
+.ph-breadcrumb .ph-cur { color: rgba(255,255,255,.9); font-weight: 600; }
+
+.ph-body {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.ph-left { display: flex; align-items: flex-start; gap: .9rem; flex: 1; }
+
+.ph-icon {
+  width: 52px; height: 52px;
+  background: rgba(255,255,255,.14);
+  border: 1.5px solid rgba(255,255,255,.22);
+  border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.35rem; color: #fff; flex-shrink: 0;
+  backdrop-filter: blur(8px);
+}
+
+.ph-module {
+  font-size: .68rem; font-weight: 700;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: rgba(165,214,167,.9);
+  margin-bottom: .25rem;
+}
+
+.ph-title {
+  font-size: clamp(1.2rem, 2.2vw, 1.75rem);
+  font-weight: 800; color: #fff;
+  line-height: 1.2; letter-spacing: -.4px;
+  margin: 0 0 .3rem;
+}
+
+.ph-sub {
+  font-size: .82rem;
+  color: rgba(255,255,255,.7);
+  margin: 0;
+}
+
+.ph-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  background: #fff;
+  color: var(--vp);
+  font-weight: 700;
+  font-size: .84rem;
+  padding: .65rem 1.35rem;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  transition: all .28s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 4px 14px rgba(0,0,0,.14);
+  white-space: nowrap;
+  text-decoration: none;
+  align-self: center;
+}
+
+.ph-btn:hover {
+  background: var(--au);
+  color: var(--vd);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0,0,0,.18);
+}
+
+@media (max-width: 640px) {
+  .ph-wrap { padding: 1.25rem 1rem 2.25rem; margin: -1.75rem -1rem 0 -1rem; }
+  .ph-icon { width: 42px; height: 42px; font-size: 1.1rem; }
+  .ph-title { font-size: 1.15rem; }
+}
+
+/* ── KPI Float sobre el header premium ── */
+.ph-kpi-float {
+  margin-top: -2rem;
+  position: relative;
+  z-index: 10;
+  margin-bottom: 1.75rem;
+}
+
+.ph-kpi-float .kpi-grid,
+.ph-kpi-float .status-summary {
+  margin-bottom: 0;
+}
+
