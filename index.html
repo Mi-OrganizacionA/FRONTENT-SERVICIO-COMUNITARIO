@@ -8,12 +8,11 @@
     content="Portal público de la Comuna Socialista Agrícola Simón Rodríguez — Consulta habitantes, proyectos agroecológicos, cartelera digital y mapa de los 9 consejos comunales. Las Mercedes, San Felipe, Yaracuy.">
   <title>Comuna Simón Rodríguez — Gestión Digital Comunal · SICAG</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link href="css/public.css" rel="stylesheet">
-  <!-- Anime.js v3 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
 </head>
 
 <body class="public-page">
@@ -500,6 +499,8 @@
     <i class="fas fa-chevron-up"></i>
   </button>
 
+  <!-- Anime.js v3 — async para no bloquear render -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" async></script>
   <script src="js/public.js" defer></script>
   <script src="js/animations.js" defer></script>
 </body>

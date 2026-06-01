@@ -16,16 +16,38 @@
   const burger = document.getElementById('pubBurger');
   const navLinks = document.getElementById('pubNavLinks');
   const navCtas = document.getElementById('pubNavCtas');
-  burger.addEventListener('click', () => {
-    burger.classList.toggle('open');
-    navLinks.classList.toggle('mobile-open');
-    navCtas.classList.toggle('mobile-open');
-  });
-  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+
+  function closeMobileMenu() {
     burger.classList.remove('open');
     navLinks.classList.remove('mobile-open');
     navCtas.classList.remove('mobile-open');
-  }));
+    burger.setAttribute('aria-expanded', 'false');
+  }
+
+  function openMobileMenu() {
+    burger.classList.add('open');
+    navLinks.classList.add('mobile-open');
+    navCtas.classList.add('mobile-open');
+    burger.setAttribute('aria-expanded', 'true');
+  }
+
+  burger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    burger.classList.contains('open') ? closeMobileMenu() : openMobileMenu();
+  });
+
+  // Close menu when a nav link is clicked
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobileMenu));
+
+  // Close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!nav.contains(e.target)) closeMobileMenu();
+  });
+
+  // Auto-close on resize to desktop
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768) closeMobileMenu();
+  }, { passive: true });
 
   /* ── PARALLAX HERO ── */
   const heroBg = document.querySelector('.pub-hero-bg');
@@ -80,12 +102,18 @@
   let slideInterval;
   const visibleCards = () => window.innerWidth < 768 ? 1 : window.innerWidth < 1024 ? 2 : 3;
 
+  function getCardWidth() {
+    const cards = track ? track.querySelectorAll('.pub-news-card') : [];
+    if (!cards[0]) return 0;
+    const gap = parseFloat(getComputedStyle(track).gap) || 24;
+    return cards[0].offsetWidth + gap;
+  }
+
   function goToSlide(n) {
     const cards = track ? track.querySelectorAll('.pub-news-card') : [];
     const max = Math.max(0, cards.length - visibleCards());
     currentSlide = Math.max(0, Math.min(n, max));
-    const cardW = cards[0] ? cards[0].offsetWidth + 24 : 0;
-    if (track) track.style.transform = `translateX(-${currentSlide * cardW}px)`;
+    if (track) track.style.transform = `translateX(-${currentSlide * getCardWidth()}px)`;
     dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
   }
   function nextSlide() {
@@ -98,6 +126,13 @@
   dots.forEach((d, i) => d.addEventListener('click', () => { goToSlide(i); resetInterval(); }));
   function resetInterval() { clearInterval(slideInterval); slideInterval = setInterval(nextSlide, 4500); }
   slideInterval = setInterval(nextSlide, 4500);
+
+  // Reset carousel on resize (e.g. phone rotation)
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => goToSlide(0), 200);
+  }, { passive: true });
 
   /* ── CONTACT FORM ── */
   const contactForm = document.getElementById('contactForm');

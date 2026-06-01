@@ -947,15 +947,17 @@
 
 <body data-search-placeholder="Buscar cédula, comunidad, servicio...">
   <div class="barra-tricolor" aria-hidden="true"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div id="header-placeholder"></div>
-  <div id="sidebar-placeholder"></div>
+  <nav id="sidebar-placeholder"></nav>
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral"><i class="fas fa-bars"></i></button>
 
   <main class="app-main">
 
     <!-- ══ PAGE HEADER ══ -->
     <div class="cv-page-header">
       <nav class="cv-breadcrumb" aria-label="Navegación">
-        <a href="dashboard.html"><i class="fas fa-home"></i></a>
+      <a href="dashboard.html"><i class="fas fa-house-chimney"></i></a>
         <span class="sep"><i class="fas fa-chevron-right" style="font-size:.6rem"></i></span>
         <a href="#">Módulos T</a>
         <span class="sep"><i class="fas fa-chevron-right" style="font-size:.6rem"></i></span>
@@ -1415,6 +1417,7 @@
   <div class="cv-toast-wrap" id="cvToastWrap"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/layout-menu.js"></script>
   <script src="js/roles.js"></script>
 

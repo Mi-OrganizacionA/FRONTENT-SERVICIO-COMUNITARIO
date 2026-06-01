@@ -756,3 +756,85 @@ body {
   margin-bottom: 0;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   ROL-AWARE STYLES — diferenciación visual Admin vs Vocero
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Sidebar: badge de rol ── */
+.sidebar-role-badge {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: .45rem 1.25rem;
+  border-top: 1px solid rgba(255,255,255,.07);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  margin-bottom: .5rem;
+}
+
+.sidebar-role-badge.admin {
+  background: rgba(46,125,50,.18);
+  color: var(--vc);
+}
+
+.sidebar-role-badge.vocero {
+  background: rgba(249,168,37,.15);
+  color: #FFD54F;
+  border-top-color: rgba(249,168,37,.2);
+  border-bottom-color: rgba(249,168,37,.2);
+}
+
+/* ── Sidebar: info consejo comunal ── */
+.sidebar-cc-info {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .72rem;
+  color: rgba(255,255,255,.5);
+  padding: .3rem 1.25rem .6rem;
+}
+.sidebar-cc-info i { color: #FFD54F; font-size: .7rem; }
+
+/* ── Sidebar: branding vocero ── */
+.sidebar-brand-vocero { border-bottom-color: rgba(249,168,37,.2) !important; }
+.sidebar-brand-vocero .sidebar-brand-text small { color: rgba(255,213,79,.65); }
+.sidebar-brand-icon.vocero-icon {
+  background: linear-gradient(135deg, #F9A825, #E65100) !important;
+  box-shadow: 0 4px 12px rgba(249,168,37,.4) !important;
+}
+
+/* ── Header: badge de rol ── */
+.header-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .7rem;
+  font-weight: 700;
+  padding: .3rem .8rem;
+  border-radius: 50px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-right: .25rem;
+}
+.header-role-badge-admin {
+  background: rgba(46,125,50,.12);
+  color: var(--vp);
+  border: 1px solid rgba(46,125,50,.2);
+}
+.header-role-badge-vocero {
+  background: rgba(249,168,37,.15);
+  color: #E65100;
+  border: 1px solid rgba(249,168,37,.3);
+}
+
+/* ── Header: avatar vocero ── */
+.header-user-avatar.avatar-vocero {
+  background: linear-gradient(135deg, #F9A825, #E65100);
+}
+
+@media (max-width: 640px) {
+  .header-role-badge { display: none; }
+}

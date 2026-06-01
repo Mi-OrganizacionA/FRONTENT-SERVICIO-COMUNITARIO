@@ -1607,170 +1607,714 @@ ul {
   animation: none !important;
 }
 
-/* ── RESPONSIVE ── */
-@media(max-width:1024px) {
-  .pub-grid-4 {
-    grid-template-columns: repeat(2, 1fr)
-  }
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE SYSTEM — SICAG Portal Público
+   Breakpoints: 1400 · 1200 · 1024 · 768 · 600 · 480 · 360
+   ═══════════════════════════════════════════════════════════════ */
 
-  .pub-stats-grid {
-    grid-template-columns: repeat(2, 1fr)
+/* ── Ultrawide / Large Desktop: ≤ 1400px ── */
+@media (max-width: 1400px) {
+  .pub-container {
+    max-width: 1100px;
   }
 
   .pub-footer-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem
-  }
-
-  .pub-7t-grid {
-    grid-template-columns: 1fr
-  }
-
-  .pub-contact-grid {
-    grid-template-columns: 1fr
+    max-width: 1100px;
   }
 }
 
-@media(max-width:768px) {
+/* ── Desktop medium: ≤ 1200px ── */
+@media (max-width: 1200px) {
+  .pub-container {
+    max-width: 960px;
+    padding: 0 1.5rem;
+  }
+
+  .pub-footer-grid {
+    max-width: 960px;
+    grid-template-columns: 1.3fr 1fr 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .pub-nav {
+    padding: 0 1.5rem;
+  }
+
+  .pub-nav-links a {
+    padding: .5rem .7rem;
+  }
+
+  .pub-stats-grid {
+    max-width: 780px;
+  }
+
+  .pub-stat-num {
+    font-size: 2.4rem;
+  }
+}
+
+/* ── Tablet Landscape: ≤ 1024px ── */
+@media (max-width: 1024px) {
+  .pub-container {
+    max-width: 100%;
+    padding: 0 2rem;
+  }
+
+  /* Nav */
+  .pub-nav {
+    padding: 0 1.5rem;
+  }
+
+  .pub-nav-links {
+    gap: 0;
+  }
+
+  .pub-nav-links a {
+    padding: .45rem .65rem;
+    font-size: .82rem;
+  }
+
+  /* Grid system */
+  .pub-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .pub-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Stats */
+  .pub-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+
+  .pub-stat-num {
+    font-size: 2.4rem;
+  }
+
+  /* Footer */
+  .pub-footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+  }
+
+  /* 7T grid */
+  .pub-7t-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  /* Contact */
+  .pub-contact-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .pub-contact-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .pub-contact-info h3 {
+    grid-column: 1 / -1;
+    margin-bottom: .5rem;
+  }
+
+  /* Map */
+  .pub-map-wrap {
+    height: 400px;
+  }
+
+  /* Search */
+  .pub-search-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pub-search-inner input {
+    min-width: unset;
+  }
+
+  .pub-search-btn {
+    justify-content: center;
+  }
+
+  /* Section */
+  .pub-section {
+    padding: 5rem 2rem;
+  }
+}
+
+/* ── Tablet Portrait: ≤ 768px ── */
+@media (max-width: 768px) {
+
+  /* ─ Nav Mobile ─ */
+  .pub-nav {
+    padding: 0 1.25rem;
+    height: 64px;
+  }
 
   .pub-nav-links,
   .pub-nav-ctas {
     display: none;
     position: fixed;
-    top: 76px;
+    top: 68px; /* 4px tricolor + 64px nav */
     left: 0;
     right: 0;
-    background: rgba(27, 94, 32, .98);
+    background: rgba(13, 31, 13, .98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     flex-direction: column;
-    padding: 1.5rem;
+    padding: 1.25rem 1.5rem;
     gap: .25rem;
-    backdrop-filter: blur(16px)
+    border-top: 1px solid rgba(255,255,255,.08);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    z-index: 1998;
   }
 
   .pub-nav-links.mobile-open,
   .pub-nav-ctas.mobile-open {
-    display: flex
+    display: flex;
+  }
+
+  .pub-nav-links a {
+    padding: .85rem 1rem;
+    border-radius: var(--r-sm);
+    font-size: .95rem;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+
+  .pub-nav-ctas {
+    padding: 1rem 1.5rem 1.5rem;
+    border-top: none;
+    top: auto; /* stacks below links when both open */
+  }
+
+  .pub-btn-cta {
+    display: block;
+    text-align: center;
+    padding: .85rem 1.5rem;
+    font-size: .95rem;
   }
 
   .pub-hamburger {
-    display: flex
+    display: flex;
   }
 
-  .pub-grid-3 {
-    grid-template-columns: 1fr
+  /* ─ Hero ─ */
+  .pub-hero {
+    min-height: 560px;
   }
 
-  .pub-grid-4 {
-    grid-template-columns: 1fr
+  .pub-hero-content {
+    padding: 0 1.25rem;
   }
 
-  .pub-cc-list {
-    grid-template-columns: 1fr 1fr
+  .pub-hero-badge {
+    font-size: .72rem;
+    padding: .4rem .9rem;
   }
 
-  .pub-news-card {
-    flex: 0 0 calc(100% - .75rem)
+  .pub-hero h1 {
+    font-size: clamp(1.9rem, 7vw, 2.8rem);
+    letter-spacing: -1px;
   }
 
-  .pub-form-row {
-    grid-template-columns: 1fr
+  .pub-hero p {
+    font-size: .95rem;
+    margin-bottom: 2rem;
   }
 
-  .pub-section {
-    padding: 4rem 1.25rem
-  }
-
-  .pub-footer-grid {
-    grid-template-columns: 1fr
-  }
-
-  .pub-modal-info {
-    grid-template-columns: 1fr
-  }
-
-  .pub-7t-grid {
-    grid-template-columns: 1fr
-  }
-}
-
-@media(max-width:480px) {
   .pub-hero-btns {
-    flex-direction: column;
-    align-items: center
+    gap: .6rem;
+  }
+
+  .pub-hero-btns .btn-prim,
+  .pub-hero-btns .btn-sec {
+    padding: .8rem 1.5rem;
+    font-size: .88rem;
+  }
+
+  /* ─ Stats ─ */
+  .pub-stats {
+    padding: 2.5rem 1.25rem;
   }
 
   .pub-stats-grid {
-    grid-template-columns: repeat(2, 1fr)
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+
+  .pub-stat-item {
+    padding: .5rem 1rem;
+  }
+
+  .pub-stat-num {
+    font-size: 2rem;
+    letter-spacing: -1px;
+  }
+
+  .pub-stat-label {
+    font-size: .65rem;
+  }
+
+  /* ─ Sections ─ */
+  .pub-section {
+    padding: 4rem 1.25rem;
+  }
+
+  .pub-section-title {
+    font-size: clamp(1.5rem, 5.5vw, 2.2rem);
+  }
+
+  .pub-section-sub {
+    font-size: .92rem;
+    margin-bottom: 2rem;
+  }
+
+  /* ─ Search ─ */
+  .pub-search-wrap {
+    padding: 1.5rem 1.25rem;
+    border-radius: var(--r-lg);
+  }
+
+  .pub-search-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: .75rem;
+  }
+
+  .pub-search-inner input,
+  .pub-search-inner select {
+    min-width: unset;
+    width: 100%;
+    font-size: .9rem;
+    padding: .875rem 1rem;
+  }
+
+  .pub-search-btn {
+    justify-content: center;
+    padding: .875rem 1.5rem;
+  }
+
+  /* ─ Grid 3/4 ─ */
+  .pub-grid-3,
+  .pub-grid-4 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .pub-hab-card {
+    padding: 1.5rem 1.25rem;
+  }
+
+  /* ─ Carousel ─ */
+  .pub-news-card {
+    flex: 0 0 calc(100% - .75rem);
+  }
+
+  /* ─ 7T Grid ─ */
+  .pub-7t-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .pub-7t-card {
+    padding: 1.5rem;
+  }
+
+  .pub-7t-stats {
+    gap: 1.5rem;
+  }
+
+  /* ─ Map ─ */
+  .pub-map-wrap {
+    height: 300px;
+    border-radius: var(--r-lg);
   }
 
   .pub-cc-list {
-    grid-template-columns: 1fr
+    grid-template-columns: 1fr 1fr;
+    gap: .6rem;
+    margin-top: 1.5rem;
+  }
+
+  /* ─ Contact ─ */
+  .pub-contact-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .pub-contact-info {
+    display: block;
+    padding: 2rem 1.5rem;
+  }
+
+  .pub-contact-form-card {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .pub-form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  /* ─ Modal ─ */
+  .pub-modal-info {
+    grid-template-columns: 1fr;
+  }
+
+  .pub-modal-body {
+    padding: 1.5rem;
+  }
+
+  /* ─ Footer ─ */
+  .pub-footer {
+    padding: 3.5rem 1.25rem 0;
+  }
+
+  .pub-footer-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .pub-footer-desc {
+    max-width: 100%;
+  }
+
+  .pub-footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: .4rem;
+    padding: 1.25rem 0;
+  }
+
+  /* ─ Scroll to top ─ */
+  .pub-scroll-top {
+    bottom: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+}
+
+/* ── Large Mobile: ≤ 600px ── */
+@media (max-width: 600px) {
+  .pub-hero {
+    min-height: 520px;
+  }
+
+  .pub-hero h1 {
+    font-size: clamp(1.65rem, 8vw, 2.2rem);
+  }
+
+  .pub-hero-badge span {
+    display: none; /* Show only the icon on very small screens */
+  }
+
+  .pub-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .pub-stat-num {
+    font-size: 1.75rem;
+  }
+
+  .pub-stat-icon {
+    font-size: 1.4rem;
+    margin-bottom: .4rem;
+  }
+
+  .pub-7t-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: .75rem;
+  }
+
+  .pub-cc-list {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .pub-search-wrap {
+    padding: 1.25rem 1rem;
+  }
+}
+
+/* ── Standard Mobile: ≤ 480px ── */
+@media (max-width: 480px) {
+  /* Hero */
+  .pub-hero {
+    min-height: 100svh;
+  }
+
+  .pub-hero-content {
+    padding: 0 1rem;
+  }
+
+  .pub-hero h1 {
+    font-size: clamp(1.55rem, 9vw, 2rem);
+    letter-spacing: -.5px;
+  }
+
+  .pub-hero p {
+    font-size: .88rem;
+  }
+
+  .pub-hero-btns {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pub-hero-btns .btn-prim,
+  .pub-hero-btns .btn-sec {
+    justify-content: center;
+    width: 100%;
+  }
+
+  /* Stats: stack to 3 columns still but smaller */
+  .pub-stats {
+    padding: 2rem 1rem;
+  }
+
+  .pub-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .pub-stat-item {
+    padding: .5rem .5rem;
+  }
+
+  .pub-stat-item:not(:last-child)::after {
+    top: 10%;
+    height: 80%;
+  }
+
+  .pub-stat-num {
+    font-size: 1.5rem;
+    letter-spacing: -.5px;
+  }
+
+  .pub-stat-label {
+    font-size: .6rem;
+    letter-spacing: .5px;
+  }
+
+  /* Section */
+  .pub-section {
+    padding: 3rem 1rem;
+  }
+
+  .pub-section-label {
+    font-size: .68rem;
+  }
+
+  /* Cards */
+  .pub-hab-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .pub-hab-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
+
+  /* 7T */
+  .pub-7t-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .pub-7t-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  /* Map */
+  .pub-map-wrap {
+    height: 250px;
+    border-radius: var(--r-md);
+  }
+
+  .pub-cc-list {
+    grid-template-columns: 1fr;
+  }
+
+  /* Contact */
+  .pub-contact-info {
+    padding: 1.5rem 1rem;
+  }
+
+  .pub-contact-form-card {
+    padding: 1.25rem 1rem;
+  }
+
+  /* Search */
+  .pub-search-wrap {
+    padding: 1rem;
+    border-radius: var(--r-lg);
+  }
+
+  /* Nav brand — hide subtitle on narrow mobile */
+  .pub-nav-brand .brand-sub {
+    display: none;
+  }
+
+  .pub-nav-brand {
+    font-size: .95rem;
+    gap: .5rem;
+  }
+
+  .pub-nav-brand img {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* Footer */
+  .pub-footer {
+    padding: 2.5rem 1rem 0;
+  }
+
+  /* Form */
+  .pub-contact-form-card h3,
+  .pub-contact-info h3 {
+    font-size: 1.15rem;
+  }
+}
+
+/* ── Small Mobile: ≤ 360px ── */
+@media (max-width: 360px) {
+  html {
+    font-size: 14px;
+  }
+
+  .pub-hero h1 {
+    font-size: 1.55rem;
+    letter-spacing: -.3px;
+  }
+
+  .pub-hero-badge {
+    font-size: .65rem;
+    padding: .35rem .75rem;
+  }
+
+  .pub-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .pub-stat-item:not(:last-child)::after {
+    display: none;
+  }
+
+  .pub-stat-item {
+    padding: .75rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+  }
+
+  .pub-stat-num {
+    font-size: 2.2rem;
+    letter-spacing: -1px;
+  }
+
+  .pub-stat-label {
+    font-size: .72rem;
+  }
+
+  .pub-nav {
+    height: 60px;
+  }
+
+  .pub-nav-links,
+  .pub-nav-ctas {
+    top: 64px;
+  }
+
+  .pub-section {
+    padding: 2.5rem .875rem;
+  }
+
+  .pub-search-wrap {
+    padding: .875rem;
+  }
+
+  .pub-7t-stats {
+    justify-content: flex-start;
+  }
+
+  .pub-footer-grid {
+    gap: 1.5rem;
   }
 }
 
 /* ══════════════════════════════════════════════════════
-   ANIME.JS — Estados iniciales (REQUERIDO para ver las animaciones)
-   Los elementos empiezan ocultos y Anime.js los revela
+   ANIME.JS — ESTADO VISIBLE POR DEFECTO (SAFE FALLBACK)
+   Los elementos SON visibles sin JS. El JS los oculta y luego
+   los anima. Si Anime.js falla o tarda, nada queda invisible.
    ══════════════════════════════════════════════════════ */
 
-/* Nav empieza desplazado hacia arriba */
-.pub-nav {
+/* Cuando JS ha marcado el body con esta clase, se ocultan los elementos
+   preparados para animar. Sin esa clase (JS deshabilitado o fallback),
+   todo sigue visible. */
+.js-anime-ready .pub-nav {
   opacity: 0;
   transform: translateY(-80px);
 }
 
-/* Tricolor empieza colapsado */
-.pub-tricolor {
+.js-anime-ready .pub-tricolor {
   transform: scaleX(0);
   transform-origin: left center;
 }
 
-/* Hero content empieza invisible */
-.pub-hero-badge {
+.js-anime-ready .pub-hero-badge {
   opacity: 0;
   transform: translateY(30px);
 }
 
-.pub-hero h1 {
+.js-anime-ready .pub-hero h1 {
   opacity: 0;
   transform: translateY(40px);
 }
 
-.pub-hero-content>p {
+.js-anime-ready .pub-hero-content > p {
   opacity: 0;
   transform: translateY(25px);
 }
 
-.pub-hero-btns .btn-prim,
-.pub-hero-btns .btn-sec {
+.js-anime-ready .pub-hero-btns .btn-prim,
+.js-anime-ready .pub-hero-btns .btn-sec {
   opacity: 0;
   transform: translateY(20px);
 }
 
-.pub-hero-scroll {
+.js-anime-ready .pub-hero-scroll {
   opacity: 0;
-  /* Sobrescribir la animación CSS bounce — Anime.js la maneja */
   animation: none !important;
 }
 
-.pub-hero-scroll i {
+.js-anime-ready .pub-hero-scroll i {
   animation: none !important;
 }
 
-/* Stat items empiezan ocultos */
-.pub-stat-item {
+.js-anime-ready .pub-stat-item {
   opacity: 0;
   transform: translateY(50px);
 }
 
-/* Hab cards empiezan ocultos */
-.pub-hab-card {
+.js-anime-ready .pub-hab-card {
   opacity: 0;
   transform: translateY(45px);
 }
 
-/* 7T cards empiezan ocultos */
-.pub-7t-card {
+.js-anime-ready .pub-7t-card {
   opacity: 0;
   transform: translateX(-40px);
 }

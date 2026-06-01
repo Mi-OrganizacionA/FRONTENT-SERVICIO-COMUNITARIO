@@ -11,12 +11,39 @@
     else document.addEventListener('DOMContentLoaded', fn);
   }
 
+  /* ──────────────────────────────────────────────────────────────
+     SAFE ANIME SYSTEM
+     Anime.js oculta elementos vía la clase .js-anime-ready en body.
+     Si Anime.js no carga en 2.5s, se quita la clase → todo visible.
+  ────────────────────────────────────────────────────────────── */
+  let animeActivated = false;
+
+  function activateAnimeReady() {
+    if (typeof anime === 'undefined') return false;
+    document.body.classList.add('js-anime-ready');
+    return true;
+  }
+
+  function deactivateAnimeReady() {
+    document.body.classList.remove('js-anime-ready');
+  }
+
+  // Failsafe: si en 2500ms no se activó Anime.js, liberar todo
+  const failsafeTimer = setTimeout(function() {
+    if (!animeActivated) deactivateAnimeReady();
+  }, 2500);
+
   /* ────────────────────────────────────────────────────────────
      ANIMACIONES DE INDEX.HTML — PORTAL PÚBLICO
   ──────────────────────────────────────────────────────────── */
 
   function initPublicAnimations() {
     if (!document.querySelector('.pub-hero')) return; // No es index
+
+    // Verificar que Anime.js esté disponible antes de ocultar nada
+    if (!activateAnimeReady()) return;
+    animeActivated = true;
+    clearTimeout(failsafeTimer);
 
     /* ── 1. TRICOLOR BAR — wipe de izquierda a derecha ── */
     const tricolorEl = document.querySelector('.pub-tricolor');
@@ -754,10 +781,38 @@
   } // end initLoginAnimations
 
 
-  /* ── Inicializar según la página detectada ── */
-  ready(function () {
+  /* ── Inicializar con manejo de carga async de Anime.js ── */
+  function tryInit() {
     initPublicAnimations();
     initLoginAnimations();
+  }
+
+  ready(function () {
+    if (typeof anime !== 'undefined') {
+      // Anime.js ya está disponible (cacheado o cargado antes)
+      tryInit();
+    } else {
+      // Anime.js aún no cargó (carga async) — esperar window load
+      window.addEventListener('load', function() {
+        if (typeof anime !== 'undefined') {
+          tryInit();
+        }
+        // Si anime sigue sin cargar en 'load', el failsafe ya lo maneja
+      }, { once: true });
+
+      // También escuchar si anime llega un poco después via polling corto
+      var pollCount = 0;
+      var poll = setInterval(function() {
+        pollCount++;
+        if (typeof anime !== 'undefined') {
+          clearInterval(poll);
+          tryInit();
+        } else if (pollCount > 25) { // 25 * 100ms = 2.5s
+          clearInterval(poll);
+          // failsafe timer se encarga de mostrar todo
+        }
+      }, 100);
+    }
   });
 
 })();

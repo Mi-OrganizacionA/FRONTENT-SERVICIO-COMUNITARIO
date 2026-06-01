@@ -1,44 +1,64 @@
-/* js/layout-menu.js — plantilla común del panel administrativo */
+/* js/layout-menu.js — plantilla común del panel — con soporte de roles Admin / Vocero */
 (() => {
-  const MENU_SECTIONS = [
+
+  /* ─── MENÚ COMPLETO (Admin) ─────────────────────────────── */
+  const MENU_ADMIN = [
     {
       title: 'Gestión Principal',
       items: [
-        { href: 'dashboard.html', icon: 'tachometer-alt', label: 'Dashboard' },
-        { href: 'censo.html', icon: 'users', label: 'Censo Comunitario', badge: '347' },
-        { href: 'censo_viviendas.html', icon: 'house', label: 'Censo Viviendas' },
-        { href: 'noticias.html', icon: 'newspaper', label: 'Cartelera Digital', badge: '12' }
+        { href: 'dashboard.html',      icon: 'gauge-high',           label: 'Dashboard' },
+        { href: 'censo.html',          icon: 'users',                label: 'Censo Comunitario', badge: '347' },
+        { href: 'censo_viviendas.html',icon: 'house-chimney-crack',  label: 'Censo Viviendas' },
+        { href: 'noticias.html',       icon: 'newspaper',            label: 'Cartelera Digital', badge: '12' }
       ]
     },
     {
       title: 'Análisis y Reportes',
       items: [
-        { href: 'reportes.html', icon: 'chart-bar', label: 'Reportes' },
-        { href: 'cartografia.html', icon: 'map-marked-alt', label: 'Cartografía Social' }
+        { href: 'reportes.html',    icon: 'chart-column',       label: 'Reportes' },
+        { href: 'cartografia.html', icon: 'map-location-dot',   label: 'Cartografía Social' }
       ]
     },
     {
-      title: 'Información Comunal',
+      title: 'Administración',
       items: [
-        { href: 'institucional.html', icon: 'landmark', label: 'Info Institucional' }
+        { href: 'voceros.html',      icon: 'users-gear',   label: 'Gestión de Voceros' },
+        { href: 'institucional.html',icon: 'landmark',     label: 'Info Institucional' },
+        { href: 'configuracion.html',icon: 'gear',         label: 'Configuración' }
       ]
     },
     {
-      title: 'Sistema',
+      title: 'Acceso Rápido',
       items: [
-        { href: 'configuracion.html', icon: 'cog', label: 'Configuración' },
         { href: 'index.html', icon: 'globe', label: 'Portal Público', target: '_blank' },
-        { href: 'login.html', icon: 'sign-out-alt', label: 'Cerrar Sesión', style: 'color:rgba(255,100,100,.8);' }
+        { href: 'login.html', icon: 'right-from-bracket', label: 'Cerrar Sesión', style: 'color:rgba(255,100,100,.85);' }
       ]
     }
   ];
 
-  const ROLE_PERMISSIONS = {
-    Vocero: {
-      allowedPages: ['dashboard.html', 'censo.html', 'censo_viviendas.html', 'cartografia.html', 'index.html'],
-      redirectPage: 'censo.html'
+  /* ─── MENÚ VOCERO (sólo sus páginas) ────────────────────── */
+  const MENU_VOCERO = [
+    {
+      title: 'Mi Trabajo',
+      items: [
+        { href: 'censo_viviendas.html', icon: 'house-chimney-crack', label: 'Censo de Viviendas' },
+        { href: 'censo.html',           icon: 'users',               label: 'Consultar Habitantes' }
+      ]
+    },
+    {
+      title: 'Recursos',
+      items: [
+        { href: 'cartografia.html', icon: 'map-location-dot', label: 'Mapa Comunal' },
+        { href: 'index.html',       icon: 'globe',             label: 'Portal Público', target: '_blank' }
+      ]
+    },
+    {
+      title: 'Sesión',
+      items: [
+        { href: 'login.html', icon: 'right-from-bracket', label: 'Cerrar Sesión', style: 'color:rgba(255,130,100,.9);' }
+      ]
     }
-  };
+  ];
 
   const DEFAULT_PLACEHOLDER = 'Buscar...';
 
@@ -47,22 +67,20 @@
     return page || 'dashboard.html';
   };
 
-  const getUserRole = () => {
-    if (window.auth && window.auth.getUser()) {
-      return window.auth.getUser().rol;
-    }
+  const getUserData = () => {
+    if (window.auth && window.auth.getUser()) return window.auth.getUser();
     return null;
+  };
+
+  const getUserRole = () => {
+    const u = getUserData();
+    return u ? u.rol : null;
   };
 
   const getSearchPlaceholder = () => document.body.dataset.searchPlaceholder || DEFAULT_PLACEHOLDER;
 
-  const isMenuItemAllowed = (item, role) => {
-    if (role !== 'vocero') return true;
-    return ROLE_PERMISSIONS.Vocero.allowedPages.includes(item.href);
-  };
-
-  const buildSidebarItem = (item, currentPage, role) => {
-    if (!isMenuItemAllowed(item, role)) return '';
+  /* ── Build sidebar item ── */
+  const buildSidebarItem = (item, currentPage) => {
     const isActive = item.href === currentPage;
     const ariaCurrent = isActive ? ' aria-current="page"' : '';
     const target = item.target ? ` target="${item.target}"` : '';
@@ -79,29 +97,49 @@
       </li>`;
   };
 
+  /* ── Build sidebar HTML según rol ── */
   const buildSidebarHtml = () => {
     const currentPage = getCurrentPage();
-    const role = getUserRole();
+    const role        = getUserRole();
+    const user        = getUserData();
+    const isVocero    = role === 'vocero';
+    const menuSections = isVocero ? MENU_VOCERO : MENU_ADMIN;
 
-    const sections = MENU_SECTIONS.map(section => {
+    const sections = menuSections.map(section => {
       const itemsHtml = section.items
-        .map(item => buildSidebarItem(item, currentPage, role))
+        .map(item => buildSidebarItem(item, currentPage))
         .filter(Boolean)
         .join('');
-
       return itemsHtml ? `
         <span class="sidebar-section-title">${section.title}</span>
         <ul class="sidebar-nav">${itemsHtml}</ul>` : '';
     }).join('');
 
+    /* Branding diferenciado por rol */
+    const brandIcon  = isVocero ? 'house-user'  : 'seedling';
+    const brandTitle = isVocero ? 'SICAG'        : 'SICAG';
+    const brandSub   = isVocero ? 'Módulo Vocero · Censo'  : 'Panel Administrativo v3.0';
+
+    /* Etiqueta de rol para el sidebar */
+    const roleBadgeHtml = isVocero
+      ? `<div class="sidebar-role-badge vocero"><i class="fas fa-id-badge"></i> Vocero Comunal</div>`
+      : `<div class="sidebar-role-badge admin"><i class="fas fa-shield-halved"></i> Administrador</div>`;
+
+    /* Info del consejo comunal del vocero */
+    const ccInfoHtml = (isVocero && user && user.consejoComunal)
+      ? `<div class="sidebar-cc-info"><i class="fas fa-map-pin"></i> ${user.consejoComunal}</div>`
+      : '';
+
     return `
-      <div class="sidebar-brand">
-        <div class="sidebar-brand-icon"><i class="fas fa-seedling"></i></div>
+      <div class="sidebar-brand ${isVocero ? 'sidebar-brand-vocero' : ''}">
+        <div class="sidebar-brand-icon ${isVocero ? 'vocero-icon' : ''}"><i class="fas fa-${brandIcon}"></i></div>
         <div class="sidebar-brand-text">
-          <strong>SICAG</strong>
-          <small>Panel Administrativo v3.0</small>
+          <strong>${brandTitle}</strong>
+          <small>${brandSub}</small>
         </div>
       </div>
+      ${roleBadgeHtml}
+      ${ccInfoHtml}
       ${sections}
       <div class="sidebar-footer">
         <small>SICAG v3.0 · Sala de Autogobierno · 2026</small>
@@ -110,26 +148,40 @@
 
   const buildHeaderHtml = () => {
     const placeholder = getSearchPlaceholder();
+    const user     = getUserData();
+    const role     = getUserRole();
+    const isVocero = role === 'vocero';
+
+    /* Iniciales del avatar */
+    const nombre = user ? user.nombre : 'Sala Autogobierno';
+    const initials = nombre.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'SA';
+
+    /* Badge de rol en el header */
+    const rolLabel   = isVocero ? 'Vocero' : 'Admin';
+    const rolClass   = isVocero ? 'header-role-badge-vocero' : 'header-role-badge-admin';
+    const roleBadge  = `<span class="header-role-badge ${rolClass}"><i class="fas fa-${isVocero ? 'id-badge' : 'shield-halved'}"></i> ${rolLabel}</span>`;
+
     return `
       <div class="header-brand">
         <img src="assets/img/logo_comuna.png" alt="Logo SICAG">
         <span>SICAG</span>
       </div>
       <div class="header-search">
-        <i class="fas fa-search"></i>
+        <i class="fas fa-magnifying-glass"></i>
         <label for="globalSearch" class="sr-only">Buscar</label>
         <input type="search" id="globalSearch" placeholder="${placeholder}">
       </div>
       <div class="header-actions">
+        ${roleBadge}
         <button class="header-action-btn" type="button" aria-label="Notificaciones">
           <i class="fas fa-bell"></i><span class="badge-notif">5</span>
         </button>
         <button class="header-action-btn" type="button" aria-label="Ayuda">
-          <i class="fas fa-question-circle"></i>
+          <i class="fas fa-circle-question"></i>
         </button>
-        <button class="header-user" type="button" aria-label="Menú de usuario">
-          <div class="header-user-avatar">SA</div>
-          <span>Sala Autogobierno</span>
+        <button class="header-user" type="button" aria-label="Menú de usuario" title="${nombre}">
+          <div class="header-user-avatar ${isVocero ? 'avatar-vocero' : ''}">${initials}</div>
+          <span>${nombre}</span>
           <i class="fas fa-chevron-down"></i>
         </button>
       </div>`;
@@ -311,6 +363,9 @@
           
           window.history.pushState(null, '', href);
           window.scrollTo(0, 0);
+
+          // Re-render sidebar para actualizar el enlace activo
+          renderSidebar();
           
           // Trigger evento personalizado por si otros módulos lo necesitan
           document.dispatchEvent(new Event('spa-navigated'));
