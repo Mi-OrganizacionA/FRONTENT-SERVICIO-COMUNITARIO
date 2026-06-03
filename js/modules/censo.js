@@ -149,7 +149,13 @@ class CensoController {
         elector: document.getElementById('electoralStatus').value.includes('Elector')
       });
 
-      if (window.Components) Components.showToast('Habitante registrado con éxito', 'success');
+      if (window.Components) {
+        if (nuevoHabitante && nuevoHabitante.status === 'pendiente') {
+          Components.showToast('Solicitud enviada al administrador para revisión.', 'info');
+        } else {
+          Components.showToast('Habitante registrado con éxito', 'success');
+        }
+      }
       
       this.cerrarModalCenso();
       await this.cargarDatos(); // Recargar la tabla

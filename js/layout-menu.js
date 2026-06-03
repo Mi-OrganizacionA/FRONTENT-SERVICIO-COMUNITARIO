@@ -23,7 +23,7 @@
       title: 'Administración',
       items: [
         { href: 'voceros.html',      icon: 'users-gear',   label: 'Gestión de Voceros' },
-        { href: 'institucional.html',icon: 'landmark',     label: 'Info Institucional' },
+        { href: 'notificaciones.html', icon: 'bell', label: 'Centro de Notificaciones' },
         { href: 'configuracion.html',icon: 'gear',         label: 'Configuración' }
       ]
     },

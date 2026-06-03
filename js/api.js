@@ -58,11 +58,101 @@ class APIManager {
   async crearHabitante(datos) {
     await this.waitForMockData();
     if (this.isDevelopment) {
+      const usuario = window.auth?.getUser();
       const nuevoId = this.mockData.habitantes.length > 0 ? Math.max(...this.mockData.habitantes.map(h => h.id)) + 1 : 1;
-      const nuevo = { id: nuevoId, ...datos, fechaRegistro: new Date().toISOString() };
-      this.mockData.habitantes.push(nuevo);
-      return nuevo;
+      const registro = { id: nuevoId, ...datos, fechaRegistro: new Date().toISOString() };
+
+      if (usuario?.rol === 'vocero') {
+        const notificacion = await this.crearNotificacion({
+          tipo: 'registro_habitante',
+          titulo: 'Solicitud de registro de habitante',
+          mensaje: `El vocero ${usuario.nombre} solicitó validación del nuevo habitante.`,
+          status: 'pendiente',
+          vocero: usuario.nombre,
+          consejoComunal: usuario.consejoComunal,
+          fechaSolicitud: new Date().toISOString(),
+          datosHabitante: registro,
+          nota: ''
+        });
+        return notificacion;
+      }
+
+      this.mockData.habitantes.push(registro);
+      return registro;
     }
+  }
+
+  async registrarHabitante(datos) {
+    await this.waitForMockData();
+    if (this.isDevelopment) {
+      const nuevoId = this.mockData.habitantes.length > 0 ? Math.max(...this.mockData.habitantes.map(h => h.id)) + 1 : 1;
+      const registro = { id: nuevoId, ...datos, fechaRegistro: new Date().toISOString() };
+      this.mockData.habitantes.push(registro);
+      return registro;
+    }
+  }
+
+  async getNotificaciones() {
+    if (!this.isDevelopment) return [];
+    const raw = localStorage.getItem('sicag_notificaciones');
+    if (!raw) {
+      const iniciales = [
+        {
+          id: 1,
+          tipo: 'registro_habitante',
+          titulo: 'Solicitud de registro de habitante',
+          mensaje: 'El vocero Jobito I envió un nuevo registro de habitante para revisión.',
+          status: 'pendiente',
+          vocero: 'Vocero Jobito I',
+          consejoComunal: 'Jobito I',
+          fechaSolicitud: '2026-06-02T10:45:00Z',
+          datosHabitante: {
+            cedula: '99887766',
+            nombre: 'Lucía',
+            apellido: 'Rubio',
+            edad: 34,
+            genero: 'F',
+            consejoComunal: 'Jobito I',
+            clasificacion: 'adulto',
+            elector: true,
+            direccion: 'Av. Los Pinos 12',
+            telefono: '+58412345678'
+          },
+          nota: ''
+        }
+      ];
+      localStorage.setItem('sicag_notificaciones', JSON.stringify(iniciales));
+      return iniciales;
+    }
+    try {
+      return JSON.parse(raw);
+    } catch (error) {
+      console.error('Error parseando notificaciones:', error);
+      return [];
+    }
+  }
+
+  async saveNotificaciones(notificaciones) {
+    if (!this.isDevelopment) return;
+    localStorage.setItem('sicag_notificaciones', JSON.stringify(notificaciones));
+  }
+
+  async crearNotificacion(notificacion) {
+    const existentes = await this.getNotificaciones();
+    const nuevoId = existentes.length > 0 ? Math.max(...existentes.map(n => n.id)) + 1 : 1;
+    const nueva = { id: nuevoId, ...notificacion, createdAt: new Date().toISOString() };
+    existentes.unshift(nueva);
+    await this.saveNotificaciones(existentes);
+    return nueva;
+  }
+
+  async actualizarNotificacion(id, cambios) {
+    const existentes = await this.getNotificaciones();
+    const index = existentes.findIndex(n => n.id === id);
+    if (index === -1) throw new Error('Notificación no encontrada');
+    existentes[index] = { ...existentes[index], ...cambios, updatedAt: new Date().toISOString() };
+    await this.saveNotificaciones(existentes);
+    return existentes[index];
   }
 
   async eliminarHabitante(id) {

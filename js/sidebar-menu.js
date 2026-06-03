@@ -19,7 +19,7 @@
     {
       title: 'Información Comunal',
       items: [
-        { href: 'institucional.html', icon: 'landmark', label: 'Info Institucional' }
+        { href: 'notificaciones.html', icon: 'bell', label: 'Centro de Notificaciones' }
       ]
     },
     {
