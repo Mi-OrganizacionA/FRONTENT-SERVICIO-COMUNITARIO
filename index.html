@@ -56,8 +56,20 @@
        HERO SECTION
        ══════════════════════════════════════════════════════ -->
   <section class="pub-hero" id="inicio" aria-label="Sección principal">
-    <div class="pub-hero-bg" id="heroBg" role="img" aria-label="Paisaje agrícola Las Mercedes"></div>
+    <div class="pub-hero-bg" id="heroBg" role="img" aria-label="Paisaje agrícola Las Mercedes" style="background-size:cover;background-position:center center;"></div>
     <div class="pub-hero-overlay"></div>
+
+    <!-- Controles para cambiar imágenes (verticales a la derecha) -->
+    <div class="pub-hero-controls" aria-hidden="false" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:6">
+      <button id="heroPrev" class="hero-btn" aria-label="Anterior" style="background:rgba(0,0,0,.35);border:none;color:#fff;padding:8px;border-radius:6px"><i class="fas fa-chevron-up"></i></button>
+      <div id="heroDots" class="hero-dots" style="display:flex;flex-direction:column;gap:6px">
+        <button class="hero-dot active" data-index="0" style="width:12px;height:12px;border-radius:50%;border:none;background:rgba(255,255,255,.9)"></button>
+        <button class="hero-dot" data-index="1" style="width:12px;height:12px;border-radius:50%;border:none;background:rgba(255,255,255,.5)"></button>
+        <button class="hero-dot" data-index="2" style="width:12px;height:12px;border-radius:50%;border:none;background:rgba(255,255,255,.5)"></button>
+        <button class="hero-dot" data-index="3" style="width:12px;height:12px;border-radius:50%;border:none;background:rgba(255,255,255,.5)"></button>
+      </div>
+      <button id="heroNext" class="hero-btn" aria-label="Siguiente" style="background:rgba(0,0,0,.35);border:none;color:#fff;padding:8px;border-radius:6px"><i class="fas fa-chevron-down"></i></button>
+    </div>
 
     <div class="pub-hero-content">
       <div class="pub-hero-badge">
@@ -82,6 +94,29 @@
       <span>Explorar</span>
       <i class="fas fa-chevron-down"></i>
     </div>
+
+    <script>
+    (function(){
+      const images = ['assets/img/hero1.svg','assets/img/hero2.svg','assets/img/hero3.svg','assets/img/hero4.svg'];
+      let idx = 0;
+      const heroBg = document.getElementById('heroBg');
+      const dots = () => Array.from(document.querySelectorAll('.hero-dot'));
+      function setImage(i){
+        idx = (i + images.length) % images.length;
+        heroBg.style.backgroundImage = `url('${images[idx]}')`;
+        dots().forEach(d=>{
+          d.classList.toggle('active', Number(d.dataset.index)===idx);
+          d.style.background = Number(d.dataset.index)===idx ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.5)';
+        });
+      }
+      setImage(0);
+      let timer = setInterval(()=> setImage(idx+1), 5000);
+      function resetTimer(){ clearInterval(timer); timer = setInterval(()=> setImage(idx+1), 5000); }
+      document.getElementById('heroPrev').addEventListener('click', ()=>{ setImage(idx-1); resetTimer(); });
+      document.getElementById('heroNext').addEventListener('click', ()=>{ setImage(idx+1); resetTimer(); });
+      document.getElementById('heroDots').addEventListener('click', (e)=>{ if(e.target && e.target.classList.contains('hero-dot')){ setImage(Number(e.target.dataset.index)); resetTimer(); } });
+    })();
+    </script>
   </section>
 
   <!-- ══════════════════════════════════════════════════════
