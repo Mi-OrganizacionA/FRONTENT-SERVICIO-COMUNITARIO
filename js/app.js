@@ -1,3 +1,23 @@
+import { authService } from './services/auth-service.js';
+import { habitantesService } from './services/habitantes-service.js';
+import { produccionService } from './services/produccion-service.js';
+import { gruposService } from './services/grupos-service.js';
+import { censoService } from './services/censo-service.js';
+
+window.authService = authService;
+window.habitantesService = habitantesService;
+window.produccionService = produccionService;
+window.gruposService = gruposService;
+window.censoService = censoService;
+
+authService.onAuthChange(user => {
+  if (user) {
+    console.log('Firebase authenticated user:', user.uid);
+  } else {
+    console.log('Firebase session closed.');
+  }
+});
+
 /**
  * ============================================================
  * SICAG — Sistema de Información Comunal Agroecológica
