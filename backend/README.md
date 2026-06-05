@@ -17,3 +17,15 @@ npm install
 npm run dev
 ```
 
+4. Ejecutar migraciones antes de iniciar el servidor en producción o desarrollo:
+
+```bash
+npm run migrate
+```
+
+5. Revertir la última migración si necesitas retroceder:
+
+```bash
+npm run migrate:undo
+```
+

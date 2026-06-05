@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const env = require('./config/environment');
 const { initDatabase } = require('./config/database');
+const { runMigrations } = require('./migrate');
 const logger = require('./utils/logger');
 
 const authRoutes = require('./routes/auth');
@@ -64,7 +65,7 @@ async function start() {
       NoticiasController.setModel(models.Noticia);
       ReportesController.setModel(models.Reporte7T);
 
-      await sequelize.sync();
+      await runMigrations(sequelize);
     }
 
     const server = app.listen(env.port, env.host, () => {
