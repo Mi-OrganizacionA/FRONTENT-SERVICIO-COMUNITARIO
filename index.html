@@ -13,6 +13,7 @@
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link href="css/public.css" rel="stylesheet">
+  <link rel="preload" href="assets/img/hero_banner.png" as="image">
 </head>
 
 <body class="public-page">
@@ -62,11 +63,11 @@
     <!-- Controles para cambiar imágenes (verticales a la derecha) -->
     <div class="pub-hero-controls" aria-hidden="false" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:6">
       <button id="heroPrev" class="hero-btn" aria-label="Anterior" style="background:rgba(0,0,0,.35);border:none;color:#fff;padding:8px;border-radius:6px"><i class="fas fa-chevron-up"></i></button>
-      <div id="heroDots" class="hero-dots" style="display:flex;flex-direction:column;gap:6px">
-        <button class="hero-dot active" data-index="0" style="width:12px;height:12px;border-radius:50%;border:none;background:rgba(255,255,255,.9)"></button>
-        <button class="hero-dot" data-index="1" style="width:12px;height:12px;border-radius:50%;border:none;background:rgba(255,255,255,.5)"></button>
-        <button class="hero-dot" data-index="2" style="width:12px;height:12px;border-radius:50%;border:none;background:rgba(255,255,255,.5)"></button>
-        <button class="hero-dot" data-index="3" style="width:12px;height:12px;border-radius:50%;border:none;background:rgba(255,255,255,.5)"></button>
+      <div id="heroDots" class="hero-dots" style="display:flex;flex-direction:column;gap:2px;align-items:center;">
+        <button class="hero-dot active" data-index="0" style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.9);background-clip:padding-box;box-sizing:border-box;cursor:pointer;" aria-label="Ver imagen 1"></button>
+        <button class="hero-dot" data-index="1" style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.5);background-clip:padding-box;box-sizing:border-box;cursor:pointer;" aria-label="Ver imagen 2"></button>
+        <button class="hero-dot" data-index="2" style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.5);background-clip:padding-box;box-sizing:border-box;cursor:pointer;" aria-label="Ver imagen 3"></button>
+        <button class="hero-dot" data-index="3" style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.5);background-clip:padding-box;box-sizing:border-box;cursor:pointer;" aria-label="Ver imagen 4"></button>
       </div>
       <button id="heroNext" class="hero-btn" aria-label="Siguiente" style="background:rgba(0,0,0,.35);border:none;color:#fff;padding:8px;border-radius:6px"><i class="fas fa-chevron-down"></i></button>
     </div>
@@ -108,6 +109,10 @@
           d.classList.toggle('active', Number(d.dataset.index)===idx);
           d.style.background = Number(d.dataset.index)===idx ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.5)';
         });
+        
+        // Pre-carga diferida (lazy load) de la siguiente imagen
+        const nextImg = new Image();
+        nextImg.src = images[(idx + 1) % images.length];
       }
       setImage(0);
       let timer = setInterval(()=> setImage(idx+1), 5000);
@@ -155,9 +160,11 @@
       <!-- Buscador prominente -->
       <div class="pub-search-wrap fade-up">
         <div class="pub-search-inner">
-          <input type="text" id="habSearch" placeholder="🔍 Nombre completo o número de cédula..."
-            aria-label="Buscar habitante">
-          <select id="habCC" aria-label="Seleccionar Consejo Comunal">
+          <label for="habSearch" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Buscar habitante</label>
+          <input type="text" id="habSearch" placeholder="🔍 Nombre completo o número de cédula...">
+          
+          <label for="habCC" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Seleccionar Consejo Comunal</label>
+          <select id="habCC">
             <option value="">Todos los Consejos</option>
             <option value="jobito1">C.C. Jobito I</option>
             <option value="jobito2">C.C. Jobito II</option>

@@ -779,7 +779,7 @@ body {
    PREMIUM PAGE HEADER — Compartido entre módulos
 ══════════════════════════════════════════════════ */
 .ph-wrap {
-  background: linear-gradient(135deg, var(--vd) 0%, var(--vp) 60%, var(--vv) 100%);
+  background: linear-gradient(140deg, #0d3311 0%, #1B5E20 40%, #2E7D32 75%, #388E3C 100%);
   padding: 1.75rem 2rem 2.75rem;
   margin: calc(-1.75rem) -2rem 0 -2rem;
   position: relative;
@@ -789,9 +789,9 @@ body {
 .ph-wrap::before {
   content: '';
   position: absolute;
-  top: -60px; right: -60px;
-  width: 260px; height: 260px;
-  background: rgba(255,255,255,.05);
+  top: -70px; right: -70px;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(255,255,255,.07) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -799,10 +799,20 @@ body {
 .ph-wrap::after {
   content: '';
   position: absolute;
-  bottom: -80px; left: 28%;
-  width: 300px; height: 300px;
-  background: rgba(255,255,255,.04);
+  bottom: -90px; left: 25%;
+  width: 340px; height: 340px;
+  background: radial-gradient(circle, rgba(255,255,255,.04) 0%, transparent 70%);
   border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Textura de puntos decorativos */
+.ph-deco-dots {
+  position: absolute;
+  top: 1.25rem; left: 50%;
+  width: 180px; height: 55px;
+  background-image: radial-gradient(circle, rgba(255,255,255,.08) 1.5px, transparent 1.5px);
+  background-size: 16px 16px;
   pointer-events: none;
 }
 
@@ -840,13 +850,14 @@ body {
 .ph-left { display: flex; align-items: flex-start; gap: .9rem; flex: 1; }
 
 .ph-icon {
-  width: 52px; height: 52px;
-  background: rgba(255,255,255,.14);
-  border: 1.5px solid rgba(255,255,255,.22);
+  width: 54px; height: 54px;
+  background: rgba(255,255,255,.13);
+  border: 1.5px solid rgba(255,255,255,.2);
   border-radius: var(--r-md);
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.35rem; color: #fff; flex-shrink: 0;
-  backdrop-filter: blur(8px);
+  font-size: 1.4rem; color: #fff; flex-shrink: 0;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0,0,0,.12);
 }
 
 .ph-module {
@@ -873,32 +884,45 @@ body {
   display: inline-flex;
   align-items: center;
   gap: .5rem;
-  background: #fff;
+  background: rgba(255,255,255,.95);
   color: var(--vp);
   font-weight: 700;
   font-size: .84rem;
-  padding: .65rem 1.35rem;
+  padding: .7rem 1.4rem;
   border-radius: 50px;
   border: none;
   cursor: pointer;
-  transition: all .28s cubic-bezier(.4,0,.2,1);
-  box-shadow: 0 4px 14px rgba(0,0,0,.14);
+  transition: all .25s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 4px 18px rgba(0,0,0,.16);
   white-space: nowrap;
   text-decoration: none;
   align-self: center;
+  letter-spacing: .1px;
 }
 
 .ph-btn:hover {
   background: var(--au);
   color: var(--vd);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(0,0,0,.18);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(0,0,0,.2);
+}
+
+@media (max-width: 768px) {
+  .ph-wrap { padding: 1.25rem 1.25rem 2.25rem; margin: calc(-1.75rem) -1.75rem 0 -1.75rem; }
+  .ph-body  { flex-direction: column; align-items: flex-start; gap: .9rem; }
+  .ph-btn   { width: 100%; justify-content: center; }
 }
 
 @media (max-width: 640px) {
-  .ph-wrap { padding: 1.25rem 1rem 2.25rem; margin: -1.75rem -1rem 0 -1rem; }
+  .ph-wrap { padding: 1.1rem 1rem 2rem; margin: -1.75rem -1rem 0 -1rem; }
   .ph-icon { width: 42px; height: 42px; font-size: 1.1rem; }
   .ph-title { font-size: 1.15rem; }
+  .ph-sub   { font-size: .76rem; }
+}
+
+@media (max-width: 360px) {
+  .ph-title  { font-size: 1rem; }
+  .ph-module { display: none; }
 }
 
 /* ── KPI Float sobre el header premium ── */

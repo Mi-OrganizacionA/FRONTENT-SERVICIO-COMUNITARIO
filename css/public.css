@@ -42,7 +42,9 @@
 
 html {
   scroll-behavior: smooth;
-  font-size: 16px
+  font-size: 16px;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body.public-page {
@@ -50,7 +52,8 @@ body.public-page {
   color: var(--gray5);
   background: #fff;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 a {
@@ -1815,23 +1818,18 @@ ul {
     height: 64px;
   }
 
+  /* ─ Menu Fullscreen Inmersivo Corrección FINAL (Bulletproof) ─ */
   .pub-nav-links,
   .pub-nav-ctas {
     display: none;
-    position: fixed;
-    top: 68px; /* 4px tricolor + 64px nav */
-    left: 0;
-    right: 0;
-    background: rgba(13, 31, 13, .98);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    flex-direction: column;
-    padding: 1.25rem 1.5rem;
-    gap: .25rem;
-    border-top: 1px solid rgba(255,255,255,.08);
-    border-bottom: 1px solid rgba(255,255,255,.08);
-    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    position: absolute; /* Usar siempre absolute. Fixed se rompe por el backdrop-filter (bug de Chrome Mobile). */
     z-index: 1998;
+    animation: fadeInMenu .3s cubic-bezier(.4, 0, .2, 1) forwards;
+  }
+
+  @keyframes fadeInMenu {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .pub-nav-links.mobile-open,
@@ -1839,24 +1837,64 @@ ul {
     display: flex;
   }
 
-  .pub-nav-links a {
-    padding: .85rem 1rem;
-    border-radius: var(--r-sm);
-    font-size: .95rem;
-    border-bottom: 1px solid rgba(255,255,255,.06);
+  /* Fondo Fullscreen de Enlaces a prueba de balas */
+  .pub-nav-links {
+    top: 64px; /* Pegado debajo de los 64px del nav */
+    left: -5vw;
+    width: 110vw; /* Cubrir extra ancho por seguridad */
+    height: 150vh; /* Altura masiva que asegura tapar todo si se hace scroll hacia abajo */
+    background: rgba(18, 40, 18, .98); /* Verde ultra oscuro */
+    flex-direction: column;
+    padding: 2.5rem 5vw;
+    gap: .75rem;
+    border: none;
+    border-top: 1px solid rgba(255,255,255,.05);
   }
 
+  .pub-nav-links li {
+    width: 100%;
+  }
+
+  .pub-nav-links a {
+    display: block;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border-radius: var(--r-md);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: rgba(255,255,255,.9);
+    background: rgba(255,255,255,.05);
+    text-align: center;
+    border: 1px solid rgba(255,255,255,.05);
+    transition: all var(--tr);
+  }
+
+  .pub-nav-links a.active {
+    background: var(--vv);
+    color: #fff;
+    border-color: rgba(255,255,255,.15);
+  }
+
+  /* Botón CTA Fijo abajo calculado */
   .pub-nav-ctas {
-    padding: 1rem 1.5rem 1.5rem;
-    border-top: none;
-    top: auto; /* stacks below links when both open */
+    top: calc(100vh - 7.5rem) !important; /* Top matemático anclado al fondo visual, ignorando su contenedor de 64px */
+    left: 1.5rem;
+    right: 1.5rem;
+    bottom: auto; /* Resetear bottom para evitar bugs de caja */
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    z-index: 1999;
   }
 
   .pub-btn-cta {
-    display: block;
-    text-align: center;
-    padding: .85rem 1.5rem;
-    font-size: .95rem;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 1.15rem;
+    font-size: 1.05rem;
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(249, 168, 37, .3);
   }
 
   .pub-hamburger {
