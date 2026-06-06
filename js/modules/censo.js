@@ -1,5 +1,5 @@
-/**
- * Módulo de Censo Comunitario (SICAG v5.0)
+﻿/**
+ * Modulo de Censo Comunitario (SICAG v5.0)
  * Archivo: js/modules/censo.js
  */
 
@@ -16,56 +16,44 @@ class CensoController {
       await this.cargarDatos();
     } catch (error) {
       console.error('Error inicializando Censo:', error);
-      if (window.Components) Components.showToast('Error al cargar módulo de Censo', 'error');
+      if (window.Components) Components.showToast('Error al cargar modulo de Censo', 'error');
     }
   }
 
   _setupUI() {
-    // Calculo automático de edad y estatus
     const fechaNacInput = document.getElementById('habFechaNac');
     if (fechaNacInput) {
       fechaNacInput.addEventListener('change', () => this.calcularDatosNacimiento(fechaNacInput.value));
     }
 
-    // Toggle para rubro productor
     const productorSelect = document.getElementById('habProductor');
     if (productorSelect) {
       productorSelect.addEventListener('change', () => this.toggleRubroProduccion());
     }
 
-    // Escuchar el evento de formulario válido de FormValidator
     const formElement = document.getElementById('formCenso');
     if (formElement) {
       formElement.addEventListener('validSubmit', (e) => this.guardarHabitante(e.detail));
     }
 
-    // Exponer métodos globalmente para botones onClick en HTML (legacy support temporal)
-    window.abrirModalCenso = (id) => this.abrirModalCenso(id);
-    window.cerrarModalCenso = () => this.cerrarModalCenso();
-    window.confirmarEliminarHab = (id) => this.confirmarEliminarHab(id);
-    window.filtrarCenso = (e) => this.filtrarCenso(e);
-    window.exportarExcelCenso = () => this.exportarExcelCenso();
-    window.cerrarModalElimHab = () => this.cerrarModalElimHab();
+    // Ya no sobrescribimos abrirModalCenso porque censo.html tiene la logica correcta con stepper
   }
 
   async cargarDatos() {
-    const tbody = document.getElementById('censoBody');
-    if (!tbody) return;
-    
-    // Mostramos un spinner inicial si la tabla está vacía
-    if (tbody.innerHTML.trim() === '') {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">${Components.createLoadingSpinner()}</td></tr>`;
-    }
-
     try {
-      this.habitantes = await window.api.getHabitantes();
-      this.renderizarTabla();
-    } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:red;">Error cargando datos</td></tr>`;
+      // Simular fetch de API local
+      this.habitantes = await window.api.obtenerHabitantes();
+      this.renderTabla();
+    } catch (error) {
+      console.error('Error cargando habitantes:', error);
+      const tbody = document.getElementById('censoBody');
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#C62828;">Error cargando datos del censo.</td></tr>`;
+      }
     }
   }
 
-  renderizarTabla() {
+  renderTabla() {
     const tbody = document.getElementById('censoBody');
     if (!tbody) return;
 
@@ -93,104 +81,13 @@ class CensoController {
         <td>${h.elector ? '<span class="status-indicator active">Sí</span>' : '<span class="status-indicator inactive">No</span>'}</td>
         <td>
           <div class="table-actions">
-            <button class="btn-action view" title="Ver Expediente" onclick="abrirModalCenso(${h.id})"><i class="fas fa-file-alt"></i></button>
+            <button class="btn-action view" title="Ver Expediente"><i class="fas fa-file-alt"></i></button>
             <button class="btn-action edit" title="Editar" onclick="abrirModalCenso(${h.id})"><i class="fas fa-edit"></i></button>
             <button class="btn-action delete" title="Eliminar" onclick="confirmarEliminarHab(${h.id})"><i class="fas fa-trash-alt"></i></button>
           </div>
         </td>
       </tr>
     `).join('');
-  }
-
-  abrirModalCenso(id) {
-    const modal = document.getElementById('modalCenso');
-    const title = document.getElementById('modalCensoTitle');
-    const formElement = document.getElementById('formCenso');
-    
-    if (id) {
-      title.innerHTML = '<i class="fas fa-user-edit" style="color:var(--au);"></i> Editar Habitante #' + id;
-      // TODO: Cargar datos en el formulario
-    } else {
-      title.innerHTML = '<i class="fas fa-user-plus" style="color:var(--vv);"></i> Registrar Habitante';
-      if (formElement) {
-        formElement.reset();
-        this.form.limpiarErrores();
-      }
-      this.toggleRubroProduccion();
-    }
-    
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-  }
-
-  cerrarModalCenso() {
-    document.getElementById('modalCenso').classList.remove('show');
-    document.body.style.overflow = '';
-  }
-
-  async guardarHabitante(datosForm) {
-    const btn = document.querySelector('#modalCenso .modal-footer-sicag .btn-primary');
-    if (btn) {
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-      btn.disabled = true;
-    }
-
-    try {
-      // Simular guardado a API
-      const nuevoHabitante = await window.api.crearHabitante({
-        cedula: datosForm.cedula,
-        nombre: datosForm.nombre_completo.split(' ')[0],
-        apellido: datosForm.nombre_completo.split(' ').slice(1).join(' '),
-        edad: parseInt(document.getElementById('habEdad').value) || 0,
-        genero: datosForm.genero,
-        consejoComunal: document.getElementById('habCC').options[document.getElementById('habCC').selectedIndex]?.text || 'Desconocido',
-        telefono: datosForm.telefono,
-        clasificacion: document.getElementById('t4Status').value.toLowerCase().replace(' ', '_'),
-        elector: document.getElementById('electoralStatus').value.includes('Elector')
-      });
-
-      if (window.Components) {
-        if (nuevoHabitante && nuevoHabitante.status === 'pendiente') {
-          Components.showToast('Solicitud enviada al administrador para revisión.', 'info');
-        } else {
-          Components.showToast('Habitante registrado con éxito', 'success');
-        }
-      }
-      
-      this.cerrarModalCenso();
-      await this.cargarDatos(); // Recargar la tabla
-    } catch (error) {
-      console.error(error);
-      if (window.Components) Components.showToast('Error al guardar habitante', 'error');
-    } finally {
-      if (btn) {
-        btn.innerHTML = '<i class="fas fa-save"></i> Guardar Habitante';
-        btn.disabled = false;
-      }
-    }
-  }
-
-  confirmarEliminarHab(id) {
-    Components.confirmDialog(
-      `¿Está seguro de que desea eliminar al habitante con ID #${id}? Esta acción no se puede deshacer.`,
-      async () => {
-        try {
-          await window.api.eliminarHabitante(id);
-          Components.showToast('Habitante eliminado correctamente', 'success');
-          await this.cargarDatos();
-        } catch(e) {
-          Components.showToast('Error al eliminar', 'error');
-        }
-      }
-    );
-  }
-
-  cerrarModalElimHab() {
-    const modal = document.getElementById('modalEliminarHab');
-    if (modal) {
-      modal.classList.remove('show');
-      document.body.style.overflow = '';
-    }
   }
 
   calcularDatosNacimiento(fechaStr) {
@@ -231,33 +128,6 @@ class CensoController {
     }
   }
 
-  filtrarCenso(e) {
-    const btn = (e && e.target) ? e.target.closest('.btn-sicag') : null;
-    if (!btn) return;
-    const oldHtml = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Filtrando...';
-    setTimeout(() => { 
-      btn.innerHTML = oldHtml;
-      Components.showToast('Filtros aplicados (Simulación)', 'info');
-    }, 600);
-  }
-
-  exportarExcelCenso() {
-    const btn = document.getElementById('btnExportCenso');
-    if (btn) {
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
-      btn.disabled = true;
-      setTimeout(() => {
-        btn.innerHTML = '<i class="fas fa-check"></i> ¡Listo!';
-        Components.showToast('Descargando archivo Excel...', 'success');
-        setTimeout(() => {
-          btn.innerHTML = '<i class="fas fa-file-pdf"></i> Exportar Censo';
-          btn.disabled = false;
-        }, 1500);
-      }, 1500);
-    }
-  }
-
   _getColorClasificacion(clasif) {
     const map = { 'adulto_mayor': 'badge-danger', 'niño': 'badge-warning', 'adulto': 'badge-primary' };
     return map[clasif] || 'badge-secondary';
@@ -269,7 +139,6 @@ class CensoController {
   }
 }
 
-// Inicialización vía SPA Router o recarga directa
 document.addEventListener('DOMContentLoaded', () => {
   window.censoCtrl = new CensoController();
 });

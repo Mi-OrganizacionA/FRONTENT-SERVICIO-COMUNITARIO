@@ -1,4 +1,4 @@
-const path = require('path');
+﻿const path = require('path');
 const { Umzug, SequelizeStorage } = require('umzug');
 const { Sequelize } = require('sequelize');
 const { initDatabase } = require('./config/database');

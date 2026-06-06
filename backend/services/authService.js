@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+﻿const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const env = require('../config/environment');
 const logger = require('../utils/logger');

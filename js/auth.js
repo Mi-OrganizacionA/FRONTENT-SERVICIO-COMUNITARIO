@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Módulo de Autenticación Centralizado (SICAG v5.0)
  * Gestiona tokens JWT (simulados), roles y permisos.
  */

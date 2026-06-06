@@ -1030,18 +1030,15 @@
 
       /* Modal footer */
       .cv-modal-footer {
-        padding: .9rem 1rem;
-        flex-wrap: wrap;
-        gap: .6rem;
+        padding: 1rem;
+        flex-direction: column;
+        align-items: stretch;
+        gap: .85rem;
       }
-      .cv-modal-footer .cv-footer-left  { order: 2; gap: .4rem; width: 100%; }
-      .cv-modal-footer .cv-footer-right { order: 1; width: 100%; justify-content: flex-end; }
-      #cvStepCounter     { font-size: .7rem; }
-
-      /* Botones del footer más compactos */
-      .cv-btn            { padding: .6rem 1rem; font-size: .82rem; }
-      .cv-btn-save       { padding: .65rem 1.25rem; width: 100%; justify-content: center; }
-      .cv-btn-primary    { flex: 1; justify-content: center; }
+      .cv-modal-footer .cv-footer-left { order: 2; width: 100%; justify-content: center; flex-wrap: wrap; }
+      .cv-modal-footer .cv-footer-right { order: 1; width: 100%; flex-direction: column; align-items: stretch; gap: .85rem; }
+      .cv-modal-footer .cv-footer-right > div { align-items: center !important; margin-right: 0 !important; }
+      .cv-btn-primary, .cv-btn-save { width: 100%; justify-content: center; }
 
       /* Grids del formulario */
       .cv-form-row.cv-grid-2,
@@ -1295,16 +1292,16 @@
         <div class="cv-stepper-wrapper">
           <button type="button" class="cv-stepper-btn cv-stepper-left" id="stepperLeftBtn" aria-label="Pasos anteriores"><i class="fas fa-chevron-left"></i></button>
           <div class="cv-stepper" id="cvStepper">
-            <div class="cv-step active" id="step-1"><div class="cv-step-num">1</div></div>
-            <div class="cv-step" id="step-2"><div class="cv-step-num">2</div></div>
-            <div class="cv-step" id="step-3"><div class="cv-step-num">3</div></div>
-            <div class="cv-step" id="step-4"><div class="cv-step-num">4</div></div>
-            <div class="cv-step" id="step-5"><div class="cv-step-num">5</div></div>
-            <div class="cv-step" id="step-6"><div class="cv-step-num">6</div></div>
-            <div class="cv-step" id="step-7"><div class="cv-step-num">7</div></div>
-            <div class="cv-step" id="step-8"><div class="cv-step-num">8</div></div>
-            <div class="cv-step" id="step-9"><div class="cv-step-num">9</div></div>
-            <div class="cv-step" id="step-10"><div class="cv-step-num">10</div></div>
+            <div class="cv-step active" id="step-1" onclick="navigateToStep(1)"><div class="cv-step-num">1</div></div>
+            <div class="cv-step" id="step-2" onclick="navigateToStep(2)"><div class="cv-step-num">2</div></div>
+            <div class="cv-step" id="step-3" onclick="navigateToStep(3)"><div class="cv-step-num">3</div></div>
+            <div class="cv-step" id="step-4" onclick="navigateToStep(4)"><div class="cv-step-num">4</div></div>
+            <div class="cv-step" id="step-5" onclick="navigateToStep(5)"><div class="cv-step-num">5</div></div>
+            <div class="cv-step" id="step-6" onclick="navigateToStep(6)"><div class="cv-step-num">6</div></div>
+            <div class="cv-step" id="step-7" onclick="navigateToStep(7)"><div class="cv-step-num">7</div></div>
+            <div class="cv-step" id="step-8" onclick="navigateToStep(8)"><div class="cv-step-num">8</div></div>
+            <div class="cv-step" id="step-9" onclick="navigateToStep(9)"><div class="cv-step-num">9</div></div>
+            <div class="cv-step" id="step-10" onclick="navigateToStep(10)"><div class="cv-step-num">10</div></div>
           </div>
           <button type="button" class="cv-stepper-btn cv-stepper-right" id="stepperRightBtn" aria-label="Pasos siguientes"><i class="fas fa-chevron-right"></i></button>
         </div>
@@ -2300,6 +2297,26 @@
       { badge: 'Sec. IX',   name: 'Participación Comunitaria'             },
       { badge: 'Sec. X',    name: 'Diagnóstico y Situación de la Comunidad'},
     ];
+
+    function navigateToStep(n) {
+      if (n === currentStep) return;
+      if (n < currentStep) {
+        currentStep = n;
+        goToStep(currentStep);
+        saveDraft();
+      } else {
+        if (validateCurrentPanel()) {
+          const targetStepEl = document.getElementById('step-' + n);
+          if (targetStepEl && (targetStepEl.classList.contains('done') || n === currentStep + 1)) {
+             currentStep = n;
+             goToStep(currentStep);
+             saveDraft();
+          } else {
+             showToast('Debe completar los pasos anteriores antes de avanzar a este paso.', 'error');
+          }
+        }
+      }
+    }
 
     function goToStep(n) {
       // Update panels

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Componentes reutilizables de SICAG v5.0 y utilidades de interfaz
  * Archivo: js/components.js
  */

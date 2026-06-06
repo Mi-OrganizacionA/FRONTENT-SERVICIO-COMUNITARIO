@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Módulo centralizado de API (SICAG v5.0)
  * Gestiona todas las llamadas a datos (simulado con seed.json local en desarrollo)
  */

@@ -1,4 +1,4 @@
-var STORAGE_KEY = 'sicag_censo_viviendas_t2';
+﻿var STORAGE_KEY = 'sicag_censo_viviendas_t2';
 
 var personasSimuladas = [
   { cedula: 'V-12.345.678', nombre: 'María Pérez' },

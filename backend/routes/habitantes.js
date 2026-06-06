@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 const habitantesController = require('../controllers/habitantesController');
 const { verifyToken, requireRole, restrictToConsejo } = require('../middleware/auth');

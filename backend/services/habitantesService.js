@@ -1,4 +1,4 @@
-class HabitantesService {
+﻿class HabitantesService {
   static async list(habitanteModel, filters = {}) {
     const where = { activo: true, ...filters };
     return await habitanteModel.findAll({ where, limit: 100 });

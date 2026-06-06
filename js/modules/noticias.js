@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Módulo de Cartelera Digital (Noticias) - SICAG v5.0
  * Archivo: js/modules/noticias.js
  */

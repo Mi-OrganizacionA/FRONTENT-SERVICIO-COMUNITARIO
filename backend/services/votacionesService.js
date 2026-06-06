@@ -1,4 +1,4 @@
-class VotacionesService {
+﻿class VotacionesService {
   static async list(votacionModel, consejo_id = null) {
     const where = {};
     if (consejo_id) where.consejo_comunal_id = consejo_id;

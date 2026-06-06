@@ -1,4 +1,4 @@
-/* Sidebar compartido para todas las páginas administrativas de SICAG */
+﻿/* Sidebar compartido para todas las páginas administrativas de SICAG */
 (function() {
   const menuSections = [
     {

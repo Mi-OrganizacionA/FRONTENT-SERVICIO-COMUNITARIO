@@ -1,4 +1,4 @@
-/* js/roles.js — control de páginas según rol de usuario (Integrado con AuthManager v5.0) */
+﻿/* js/roles.js — control de páginas según rol de usuario (Integrado con AuthManager v5.0) */
 (() => {
   const ROLE_RULES = {
     vocero: {

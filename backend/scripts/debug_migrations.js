@@ -1,4 +1,4 @@
-const { createRequire } = require('module');
+﻿const { createRequire } = require('module');
 const path = require('path');
 const { Umzug, SequelizeStorage } = require('umzug');
 const { initDatabase } = require('../config/database');

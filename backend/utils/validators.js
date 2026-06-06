@@ -1,4 +1,4 @@
-const Joi = require('joi');
+﻿const Joi = require('joi');
 
 const authLoginSchema = Joi.object({
   usuario: Joi.string().min(3).max(50).required(),

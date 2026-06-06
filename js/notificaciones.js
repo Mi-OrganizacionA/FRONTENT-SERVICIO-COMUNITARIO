@@ -1,4 +1,4 @@
-class NotificacionesController {
+﻿class NotificacionesController {
   constructor() {
     this.notificaciones = [];
     this.activeId = null;

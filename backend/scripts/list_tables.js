@@ -1,4 +1,4 @@
-const { initDatabase } = require('../config/database');
+﻿const { initDatabase } = require('../config/database');
 
 (async () => {
   try {

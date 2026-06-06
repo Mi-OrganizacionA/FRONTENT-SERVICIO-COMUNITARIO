@@ -1,4 +1,4 @@
-/* js/voceros.js — gestión de voceros y creación de cuentas en localStorage */
+﻿/* js/voceros.js — gestión de voceros y creación de cuentas en localStorage */
 (() => {
   const STORAGE_KEY = 'sicag_voceros';
   const accountKey = 'sicag_accounts';

@@ -1,4 +1,4 @@
-const logger = require('../utils/logger');
+﻿const logger = require('../utils/logger');
 const AuditService = require('../services/auditService');
 const NoticiasService = require('../services/noticiasService');
 let NoticiaModel = null;

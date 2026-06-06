@@ -1,4 +1,4 @@
-module.exports = {
+﻿module.exports = {
   up: async (queryInterface, Sequelize) => {
     // Extender tabla habitantes
     await queryInterface.addColumn('habitantes', 'nacionalidad', { type: Sequelize.STRING(50) });

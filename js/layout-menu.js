@@ -1,4 +1,4 @@
-/* js/layout-menu.js — plantilla común del panel — con soporte de roles Admin / Vocero */
+﻿/* js/layout-menu.js — plantilla común del panel — con soporte de roles Admin / Vocero */
 (() => {
 
   /* ─── MENÚ COMPLETO (Admin) ─────────────────────────────── */

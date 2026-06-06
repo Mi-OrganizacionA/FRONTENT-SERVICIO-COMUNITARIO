@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 const noticiasController = require('../controllers/noticiasController');
 const { verifyToken, requireRole } = require('../middleware/auth');

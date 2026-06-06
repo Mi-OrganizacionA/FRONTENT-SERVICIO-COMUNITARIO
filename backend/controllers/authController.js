@@ -1,4 +1,4 @@
-const AuthService = require('../services/authService');
+﻿const AuthService = require('../services/authService');
 let UsuarioModel = null;
 const logger = require('../utils/logger');
 

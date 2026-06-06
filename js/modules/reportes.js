@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Módulo de Reportes - SICAG v5.0
  * Archivo: js/modules/reportes.js
  */

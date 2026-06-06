@@ -914,13 +914,13 @@ body {
 }
 
 @media (max-width: 768px) {
-  .ph-wrap { padding: 1.25rem 1.25rem 2.25rem; margin: calc(-1.75rem) -1.75rem 0 -1.75rem; }
-  .ph-body  { flex-direction: column; align-items: flex-start; gap: .9rem; }
+  .ph-wrap { padding: 1.25rem 1.25rem 3.5rem; margin: calc(-1.75rem) -1.75rem 0 -1.75rem; }
+  .ph-body  { flex-direction: column; align-items: stretch; gap: 1.1rem; }
   .ph-btn   { width: 100%; justify-content: center; }
 }
 
 @media (max-width: 640px) {
-  .ph-wrap { padding: 1.1rem 1rem 2rem; margin: -1.75rem -1rem 0 -1rem; }
+  .ph-wrap { padding: 1.1rem 1rem 3.5rem; margin: -1.75rem -1rem 0 -1rem; }
   .ph-icon { width: 42px; height: 42px; font-size: 1.1rem; }
   .ph-title { font-size: 1.15rem; }
   .ph-sub   { font-size: .76rem; }
