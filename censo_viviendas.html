@@ -2123,7 +2123,12 @@
               </button>
             </div>
             <div class="cv-footer-right">
-              <span id="cvStepCounter" style="font-size:.78rem;color:var(--gray4);font-weight:600">Paso 1 de 10</span>
+              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:.25rem; margin-right: .5rem;">
+                <span id="cvStepCounter" style="font-size:.75rem;color:var(--gray4);font-weight:600">Paso 1 de 10 (10%)</span>
+                <div style="width: 100px; height: 6px; background: rgba(46,125,50,.15); border-radius: 4px; overflow: hidden;">
+                  <div id="cvProgressBar" style="width: 10%; height: 100%; background: var(--vp); transition: width .3s ease;"></div>
+                </div>
+              </div>
               <button type="button" class="cv-btn cv-btn-primary" id="btnNext">
                 <i class="fas fa-floppy-disk"></i> Guardar y Continuar
               </button>
@@ -2153,18 +2158,65 @@
     let currentStep = 1;
     const totalSteps = 10;
 
-    /* ── Validación por panel ── */
+    /* ── Auto-save y Recuperación ── */
+    function saveDraft() {
+      const form = document.getElementById('formVivienda');
+      const data = { _currentStep: currentStep };
+      const elements = form.querySelectorAll('input, select, textarea');
+      elements.forEach(el => {
+        if (!el.id) return;
+        if (el.type === 'checkbox' || el.type === 'radio') {
+          data[el.id] = el.checked;
+        } else {
+          data[el.id] = el.value;
+        }
+      });
+      localStorage.setItem('borradorCensoVivienda', JSON.stringify(data));
+    }
+
+    function loadDraft() {
+      const draftStr = localStorage.getItem('borradorCensoVivienda');
+      if (!draftStr) return;
+      try {
+        const data = JSON.parse(draftStr);
+        Object.keys(data).forEach(key => {
+          if (key === '_currentStep') return;
+          const el = document.getElementById(key);
+          if (el) {
+            if (el.type === 'checkbox' || el.type === 'radio') {
+              el.checked = !!data[key];
+            } else {
+              el.value = data[key];
+            }
+          }
+        });
+
+        // Disparar changes para lógica encadenada
+        const triggers = ['gasDomestico', 'jefIncapacitado'];
+        triggers.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.dispatchEvent(new Event('change'));
+        });
+
+        if (data._currentStep) {
+          goToStep(parseInt(data._currentStep, 10));
+        }
+        showToast('Borrador recuperado con éxito.', 'success');
+      } catch(e) { console.error('Error restaurando borrador', e); }
+    }
+
+    function clearDraft() {
+      localStorage.removeItem('borradorCensoVivienda');
+    }
+
+    /* ── Validación dinámica por panel ── */
     function validateCurrentPanel() {
       const panel = document.getElementById(`panel${currentStep}`);
-      const requiredAttr = panel.dataset.required || '';
-      const requiredIds = requiredAttr.split(',').map(s => s.trim()).filter(Boolean);
-
       let valid = true;
       const errors = [];
+      const requiredInputs = panel.querySelectorAll('input[required], select[required], textarea[required]');
 
-      requiredIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
+      requiredInputs.forEach(el => {
         const val = el.value ? el.value.trim() : '';
         if (!val) {
           valid = false;
@@ -2221,7 +2273,11 @@
       document.getElementById('btnPrev').style.display = n > 1 ? 'inline-flex' : 'none';
       document.getElementById('btnNext').style.display = n < totalSteps ? 'inline-flex' : 'none';
       document.getElementById('btnSave').style.display = n === totalSteps ? 'inline-flex' : 'none';
-      document.getElementById('cvStepCounter').textContent = `Paso ${n} de ${totalSteps}`;
+      
+      const pct = Math.round((n / totalSteps) * 100);
+      document.getElementById('cvStepCounter').textContent = `Paso ${n} de ${totalSteps} (${pct}%)`;
+      const pBar = document.getElementById('cvProgressBar');
+      if (pBar) pBar.style.width = pct + '%';
       // Scroll modal body to top on step change
       const body = document.getElementById('cvModalBody');
       if (body) body.scrollTop = 0;
@@ -2260,10 +2316,21 @@
       document.getElementById('cvStepper').scrollBy({ left: 150, behavior: 'smooth' });
     });
 
-    document.getElementById('modalVivienda').addEventListener('shown.bs.modal', updateStepperArrows);
+    document.getElementById('modalVivienda').addEventListener('shown.bs.modal', () => {
+      updateStepperArrows();
+      const draftStr = localStorage.getItem('borradorCensoVivienda');
+      if (draftStr) {
+        if (confirm('Se ha detectado un censo sin terminar. ¿Deseas recuperar los datos y continuar donde lo dejaste?')) {
+          loadDraft();
+        } else {
+          clearDraft();
+        }
+      }
+    });
 
     document.getElementById('btnNext').addEventListener('click', () => {
       if (!validateCurrentPanel()) return;
+      saveDraft(); // Guardar avance al hacer siguiente
       if (currentStep < totalSteps) goToStep(currentStep + 1);
     });
 
@@ -2271,15 +2338,29 @@
       if (currentStep > 1) goToStep(currentStep - 1);
     });
 
-    // Reset wizard on modal close
+    // Reset wizard on modal close (Cancelar)
     document.getElementById('modalVivienda').addEventListener('hidden.bs.modal', () => {
       document.getElementById('formVivienda').reset();
+      clearDraft();
       // Clear validation styles
       document.querySelectorAll('.cv-form-control').forEach(el => {
         el.style.borderColor = '';
         el.style.boxShadow = '';
       });
       goToStep(1);
+    });
+
+    // Guardado manual al avanzar de paso ya se maneja en btnNext.click
+
+    // Limpiar al guardar exitosamente
+    document.getElementById('formVivienda').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!validateCurrentPanel()) return;
+      // Simulamos que guardó
+      clearDraft();
+      showToast('Censo de Vivienda guardado exitosamente', 'success');
+      const mod = bootstrap.Modal.getInstance(document.getElementById('modalVivienda'));
+      if (mod) mod.hide();
     });
 
     /* ── Gas cylinders toggle ── */
