@@ -7,11 +7,92 @@
   <meta name="description" content="Censo Comunitario — Sistema de Gestión Comunal SICAG.">
   <title>Censo Comunitario — SICAG</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-    rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+  <link rel="preload" href="css/admin.css" as="style">
   <link href="css/admin.css" rel="stylesheet">
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"></noscript>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
   <style>
+    /* ══ Variables del sistema verde (compatibilidad con cv-modal) ══ */
+    :root {
+      --vd: #1B5E20; --vp: #2E7D32; --vv: #43A047;
+      --vc: #A5D6A7; --vbg: #F1F8E9;
+      --au: #F9A825; --ru: #C62828; --az: #1565C0;
+      --gray1: #F8FAF8; --gray2: #EEF3EE; --gray3: #DDE8DD;
+      --gray4: #8A9A8A; --gray5: #2E3B2E;
+      --txt: #263026; --dark: #0D1F0D;
+      --tr: .25s cubic-bezier(.4,0,.2,1);
+      --r-sm: 10px; --r-md: 16px; --r-lg: 22px;
+      --sh-v: 0 12px 40px rgba(46,125,50,.22);
+    }
+    /* ══ Modal Premium (cv-*) ══ */
+    .cv-modal .modal-content { border-radius: var(--r-lg); border: none; overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,.18); }
+    #modalCenso .modal-content, #modalEliminarHab .modal-content { max-height:90vh; display:flex; flex-direction:column; }
+    #formCenso { display:flex; flex-direction:column; flex:1; overflow:hidden; }
+    .cv-modal-header { background:linear-gradient(135deg,var(--vd),var(--vp)); padding:1.5rem 2rem; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .cv-modal-header-left { display:flex; align-items:center; gap:1rem; }
+    .cv-modal-header-icon { width:46px; height:46px; background:rgba(255,255,255,.15); border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; font-size:1.2rem; color:#fff; }
+    .cv-modal-title { font-size:1.05rem; font-weight:700; color:#fff; margin:0; }
+    .cv-modal-sub   { font-size:.75rem; color:rgba(255,255,255,.7); margin:.1rem 0 0; }
+    .cv-modal-close { background:rgba(255,255,255,.15); border:none; color:#fff; width:36px; height:36px; border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1rem; transition:background var(--tr); }
+    .cv-modal-close:hover { background:rgba(255,255,255,.25); }
+    /* Stepper */
+    .cv-stepper-wrapper { position:relative; display:flex; align-items:stretch; background:var(--gray1); border-bottom:2px solid var(--gray3); overflow:hidden; flex-shrink:0; }
+    .cv-stepper-btn { position:absolute; top:0; bottom:0; width:40px; border:none; cursor:pointer; z-index:10; display:flex; align-items:center; justify-content:center; font-size:.85rem; color:var(--vp); opacity:0; pointer-events:none; transition:opacity var(--tr); }
+    .cv-stepper-btn.visible { opacity:1; pointer-events:auto; }
+    .cv-stepper-left { left:0; background:linear-gradient(to right,var(--gray1) 60%,transparent); }
+    .cv-stepper-right{ right:0; background:linear-gradient(to left, var(--gray1) 60%,transparent); }
+    .cv-stepper { display:flex; align-items:center; padding:.85rem 1rem; gap:0; overflow-x:auto; scroll-behavior:smooth; scrollbar-width:none; width:100%; }
+    .cv-stepper::-webkit-scrollbar { display:none; }
+    .cv-step { display:flex; align-items:center; gap:0; position:relative; flex-shrink:0; }
+    .cv-step:not(:last-child)::after { content:''; display:block; width:40px; height:2px; background:var(--gray3); flex-shrink:0; transition:background var(--tr); margin:0 4px; }
+    .cv-step.done:not(:last-child)::after { background:var(--vv); }
+    .cv-step-num { width:34px; height:34px; border-radius:50%; border:2px solid var(--gray3); display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:700; color:var(--gray4); background:#fff; flex-shrink:0; z-index:1; transition:all var(--tr); }
+    .cv-step.active .cv-step-num { background:var(--vp); border-color:var(--vp); color:#fff; box-shadow:0 0 0 5px rgba(46,125,50,.16); transform:scale(1.1); }
+    .cv-step.done  .cv-step-num { background:var(--vv); border-color:var(--vv); color:#fff; }
+    /* Paneles */
+    .cv-modal-body { padding:2rem; overflow-y:auto; flex:1; }
+    .cv-panel { display:none; }
+    .cv-panel.active { display:block; animation:panelIn .28s ease; }
+    @keyframes panelIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .cv-panel-title { font-size:.9rem; font-weight:700; color:var(--dark); margin-bottom:1.25rem; display:flex; align-items:flex-start; gap:.6rem; padding-bottom:.75rem; border-bottom:1px solid var(--gray3); }
+    .cv-panel-title i { color:var(--vv); margin-top:.15rem; flex-shrink:0; }
+    /* Form */
+    .cv-form-row { display:grid; gap:1rem; }
+    .cv-form-row.cv-grid-2 { grid-template-columns:1fr 1fr; }
+    .cv-form-row.cv-grid-3 { grid-template-columns:1fr 1fr 1fr; }
+    .cv-form-group { display:flex; flex-direction:column; gap:.35rem; }
+    .cv-form-group label { font-size:.8rem; font-weight:600; color:var(--gray5); }
+    .cv-form-group label span.req { color:#C62828; margin-left:.15rem; }
+    .cv-form-control { padding:.72rem 1rem; border:1.5px solid var(--gray3); border-radius:var(--r-sm); font-family:inherit; font-size:.88rem; color:var(--txt); background:#fff; outline:none; transition:all var(--tr); width:100%; }
+    .cv-form-control:hover { border-color:var(--vc); }
+    .cv-form-control:focus { border-color:var(--vv); box-shadow:0 0 0 3px rgba(67,160,71,.12); }
+    textarea.cv-form-control { resize:vertical; }
+    .cv-form-hint { font-size:.72rem; color:var(--gray4); }
+    /* Modal footer */
+    .cv-modal-footer { padding:1.25rem 2rem; background:var(--gray1); border-top:1px solid var(--gray3); display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-shrink:0; }
+    .cv-footer-left,.cv-footer-right { display:flex; align-items:center; gap:.5rem; flex-shrink:0; }
+    .cv-btn { display:inline-flex; align-items:center; gap:.45rem; padding:.7rem 1.5rem; border-radius:var(--r-sm); font-family:inherit; font-size:.87rem; font-weight:600; border:none; cursor:pointer; transition:all var(--tr); }
+    .cv-btn-ghost  { background:transparent; border:1.5px solid var(--gray3); color:var(--gray5); }
+    .cv-btn-ghost:hover { background:var(--gray2); }
+    .cv-btn-primary{ background:var(--vp); color:#fff; }
+    .cv-btn-primary:hover { background:var(--vd); transform:translateY(-1px); box-shadow:var(--sh-v); }
+    .cv-btn-save   { background:linear-gradient(135deg,var(--vp),var(--vv)); color:#fff; padding:.75rem 2rem; }
+    .cv-btn-save:hover { background:linear-gradient(135deg,var(--vd),var(--vp)); transform:translateY(-1px); box-shadow:var(--sh-v); }
+    /* Responsive */
+    @media(max-width:640px){
+      .cv-form-row.cv-grid-2, .cv-form-row.cv-grid-3 { grid-template-columns:1fr; }
+      .cv-modal-header { padding:1rem 1.25rem; }
+      .cv-modal-body   { padding:1rem; }
+      .cv-modal-footer { padding:.9rem 1rem; flex-wrap:wrap; }
+      .cv-modal-footer .cv-footer-right { width:100%; justify-content:flex-end; }
+      .cv-btn-save { width:100%; justify-content:center; }
+    }
     .form-grid {
       display: grid;
       gap: 1rem;
@@ -502,168 +583,270 @@
         <button class="page-btn">35</button>
         <button class="page-btn" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
       </div>
-    </div>
-  </main>
-
-  <script src="js/roles.js"></script>
-
-  <div class="modal-overlay" id="modalCenso" role="dialog" aria-modal="true" aria-labelledby="modalCensoTitle">
-    <div class="modal-content-sicag" style="max-width:780px;">
-      <div class="modal-header-sicag">
-        <h3 id="modalCensoTitle"><i class="fas fa-user-plus" style="color:var(--vv);"></i> Registrar Habitante</h3>
-        <button class="modal-close" onclick="cerrarModalCenso()" aria-label="Cerrar modal">&times;</button>
       </div>
-      <div class="modal-body-sicag">
-        <form id="formCenso">
-          <div class="form-section-header form-section-verde">
-            <i class="fas fa-id-card"></i> Datos Personales
-          </div>
-          <div class="form-grid">
-            <div class="form-group-sicag">
-              <label class="form-label-sicag" for="habCedula">Cédula de Identidad *</label>
-              <input type="text" class="form-control-sicag" id="habCedula" name="cedula_identidad"
-                placeholder="V-12.345.678" required>
-              <small class="text-gris">Llave fuerte para consultas y validación en encuestas.</small>
-            </div>
-            <div class="form-group-sicag" style="grid-column: span 2;">
-              <label class="form-label-sicag" for="habNombre">Nombres y Apellidos *</label>
-              <input type="text" class="form-control-sicag" id="habNombre" name="nombres_apellidos"
-                placeholder="Nombre y Apellido" required>
-            </div>
-            <div class="form-group-sicag">
-              <label class="form-label-sicag" for="habFechaNac">Fecha de Nacimiento *</label>
-              <input type="date" class="form-control-sicag" id="habFechaNac" name="fecha_nacimiento" required>
-              <small class="text-gris">Campo maestro: calcula edad, clasificación T4 y estado electoral.</small>
-            </div>
-            <div class="form-group-sicag">
-              <label class="form-label-sicag" for="habEdad">Edad</label>
-              <input type="number" class="form-control-sicag" id="habEdad" name="edad" readonly
-                placeholder="Se calcula automáticamente">
-            </div>
-            <div class="form-group-sicag">
-              <label class="form-label-sicag" for="habGenero">Género *</label>
-              <select class="form-control-sicag" id="habGenero" name="genero" required>
-                <option value="">Seleccionar...</option>
-                <option value="M">Masculino</option>
-                <option value="F">Femenino</option>
-              </select>
-            </div>
-            <div class="form-group-sicag">
-              <label class="form-label-sicag" for="habTelefono">Teléfono</label>
-              <input type="tel" class="form-control-sicag" id="habTelefono" name="telefono" placeholder="0412-1234567">
-            </div>
-          </div>
+    </div>
 
-          <div class="form-section-header form-section-terracota">
-            <i class="fas fa-map-marker-alt"></i> Ubicación Comunal
-          </div>
-          <div class="form-grid">
-            <div class="form-group-sicag">
-              <label class="form-label-sicag" for="habCC">Consejo Comunal / Comunidad *</label>
-              <select class="form-control-sicag" id="habCC" name="id_comunidad" required>
-                <option value="">Seleccionar...</option>
-                <option value="1">C.C. Jobito I</option>
-                <option value="2">C.C. Jobito II</option>
-                <option value="3">C.C. Brisas del Yurubí</option>
-                <option value="4">C.C. Andrés Eloy Blanco</option>
-                <option value="5">C.C. Mercedes I</option>
-                <option value="6">C.C. Mercedes II</option>
-                <option value="7">C.C. Santa Cruz de las Mercedes</option>
-                <option value="8">C.C. Fortaleza del Corozo</option>
-                <option value="9">C.C. Vencedores del Corozo</option>
-              </select>
-              <small class="text-gris">FK obligatoria para control por territorio.</small>
-            </div>
-            <div class="form-group-sicag" style="grid-column: span 2;">
-              <label class="form-label-sicag" for="habDireccion">Dirección</label>
-              <input type="text" class="form-control-sicag" id="habDireccion" name="direccion"
-                placeholder="Sector, calle, casa...">
-            </div>
-          </div>
+  <!-- ══════════════════════════════════════════
+       MODAL PREMIUM — REGISTRO DE HABITANTE
+  ══════════════════════════════════════════ -->
+  <div class="modal fade cv-modal" id="modalCenso" tabindex="-1"
+       aria-labelledby="modalCensoTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width:820px;">
+      <div class="modal-content">
 
-          <div class="form-section-header form-section-rojo">
-            <i class="fas fa-clipboard-list"></i> Clasificaciones y Productores
-          </div>
-          <div class="form-grid">
-            <div class="form-group-sicag">
-              <label class="form-label-sicag" for="habProductor">Es productor</label>
-              <select class="form-control-sicag" id="habProductor" name="es_productor">
-                <option value="no">No</option>
-                <option value="si">Sí</option>
-              </select>
-            </div>
-            <div class="form-group-sicag" id="rubroProduccionGroup" style="display:none;">
-              <label class="form-label-sicag" for="rubroProduccion">Rubro de producción</label>
-              <input type="text" class="form-control-sicag" id="rubroProduccion" name="rubro_produccion"
-                placeholder="Café, Cacao, Hortalizas...">
-              <small class="text-gris">Solo se completa si es productor.</small>
-            </div>
-            <div class="form-group-sicag">
-              <label class="form-label-sicag" for="condicionSalud">Condición de Salud</label>
-              <select class="form-control-sicag" id="condicionSalud" name="condicion_salud">
-                <option value="Ninguna">Ninguna</option>
-                <option value="Discapacidad Física">Discapacidad Física</option>
-                <option value="Discapacidad Cognitiva">Discapacidad Cognitiva</option>
-                <option value="Encamado">Encamado</option>
-              </select>
-            </div>
-            <div class="form-group-sicag">
-              <label class="form-label-sicag" for="t4Status">Clasificación T4</label>
-              <input type="text" class="form-control-sicag" id="t4Status" name="clasificacion_t4" readonly
-                placeholder="Se determina por fecha de nacimiento">
-            </div>
-            <div class="form-group-sicag">
-              <label class="form-label-sicag" for="electoralStatus">Estado Electoral</label>
-              <input type="text" class="form-control-sicag" id="electoralStatus" name="estado_electoral" readonly
-                placeholder="Se determina por fecha de nacimiento">
+        <!-- Cabecera gradiente verde (igual a censo_viviendas) -->
+        <div class="cv-modal-header">
+          <div class="cv-modal-header-left">
+            <div class="cv-modal-header-icon"><i class="fas fa-user-plus"></i></div>
+            <div>
+              <h5 class="cv-modal-title" id="modalCensoTitle">Registro de Habitante</h5>
+              <p class="cv-modal-sub">Complete los 3 pasos para registrar al habitante correctamente.</p>
             </div>
           </div>
+          <button type="button" class="cv-modal-close" data-bs-dismiss="modal" aria-label="Cerrar">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
 
-          <div class="form-group-sicag">
-            <label class="form-label-sicag" for="habFoto">Foto del Habitante</label>
-            <input type="file" class="form-control-sicag" id="habFoto" name="foto" accept="image/*">
-            <small style="color:var(--muted); font-size:0.75rem;">Opcional. Formatos: JPG, PNG. Máximo 5MB.</small>
+        <!-- Stepper 3 pasos -->
+        <div class="cv-stepper-wrapper">
+          <button type="button" class="cv-stepper-btn cv-stepper-left" id="habStepperLeft" aria-label="Pasos anteriores"><i class="fas fa-chevron-left"></i></button>
+          <div class="cv-stepper" id="habStepper">
+            <div class="cv-step active" id="hab-step-1"><div class="cv-step-num">1</div></div>
+            <div class="cv-step"        id="hab-step-2"><div class="cv-step-num">2</div></div>
+            <div class="cv-step"        id="hab-step-3"><div class="cv-step-num">3</div></div>
+          </div>
+          <button type="button" class="cv-stepper-btn cv-stepper-right" id="habStepperRight" aria-label="Pasos siguientes"><i class="fas fa-chevron-right"></i></button>
+        </div>
+
+        <!-- Form con paneles -->
+        <form id="formCenso" novalidate>
+          <div class="cv-modal-body" id="habModalBody">
+
+            <!-- ══ PANEL 1: Datos Personales ══ -->
+            <div class="cv-panel active" id="hab-panel1">
+              <div class="cv-panel-title">
+                <i class="fas fa-id-card"></i>
+                Paso 1 — Datos Personales del Habitante
+              </div>
+
+              <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
+                <div class="cv-form-group">
+                  <label for="habCedula">Cédula de Identidad <span class="req">*</span></label>
+                  <input type="text" class="cv-form-control" id="habCedula" name="cedula_identidad"
+                    placeholder="V-12.345.678" required>
+                  <span class="cv-form-hint">Llave única para consultas y encuestas.</span>
+                </div>
+                <div class="cv-form-group">
+                  <label for="habNombre">Nombres y Apellidos <span class="req">*</span></label>
+                  <input type="text" class="cv-form-control" id="habNombre" name="nombres_apellidos"
+                    placeholder="Nombre completo" required>
+                </div>
+              </div>
+
+              <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
+                <div class="cv-form-group">
+                  <label for="habFechaNac">Fecha de Nacimiento <span class="req">*</span></label>
+                  <input type="date" class="cv-form-control" id="habFechaNac" name="fecha_nacimiento" required>
+                  <span class="cv-form-hint">Calcula edad, T4 y estado electoral.</span>
+                </div>
+                <div class="cv-form-group">
+                  <label for="habEdad">Edad (calculada)</label>
+                  <input type="number" class="cv-form-control" id="habEdad" name="edad" readonly
+                    placeholder="Automático" tabindex="-1"
+                    style="background:var(--gray1);font-weight:700;color:var(--vp);border-style:dashed;">
+                </div>
+                <div class="cv-form-group">
+                  <label for="habGenero">Género <span class="req">*</span></label>
+                  <select class="cv-form-control" id="habGenero" name="genero" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="cv-form-row cv-grid-3">
+                <div class="cv-form-group">
+                  <label for="habTelefono">Teléfono</label>
+                  <input type="tel" class="cv-form-control" id="habTelefono" name="telefono" placeholder="0412-1234567">
+                </div>
+                <div class="cv-form-group">
+                  <label for="habEmail">Correo Electrónico</label>
+                  <input type="email" class="cv-form-control" id="habEmail" name="email" placeholder="ejemplo@correo.com">
+                </div>
+                <div class="cv-form-group">
+                  <label for="habOcupacion">Ocupación / Oficio</label>
+                  <input type="text" class="cv-form-control" id="habOcupacion" name="ocupacion" placeholder="Estudiante, Albañil...">
+                </div>
+              </div>
+            </div>
+
+            <!-- ══ PANEL 2: Ubicación y Educación ══ -->
+            <div class="cv-panel" id="hab-panel2">
+              <div class="cv-panel-title">
+                <i class="fas fa-map-location-dot"></i>
+                Paso 2 — Ubicación Comunal y Nivel Educativo
+              </div>
+
+              <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
+                <div class="cv-form-group">
+                  <label for="habCC">Consejo Comunal <span class="req">*</span></label>
+                  <select class="cv-form-control" id="habCC" name="id_comunidad" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="1">C.C. Jobito I</option>
+                    <option value="2">C.C. Jobito II</option>
+                    <option value="3">C.C. Brisas del Yurubí</option>
+                    <option value="4">C.C. Andrés Eloy Blanco</option>
+                    <option value="5">C.C. Mercedes I</option>
+                    <option value="6">C.C. Mercedes II</option>
+                    <option value="7">C.C. Santa Cruz de las Mercedes</option>
+                    <option value="8">C.C. Fortaleza del Corozo</option>
+                    <option value="9">C.C. Vencedores del Corozo</option>
+                  </select>
+                  <span class="cv-form-hint">FK obligatoria para control territorial.</span>
+                </div>
+                <div class="cv-form-group">
+                  <label for="habNivelEducativo">Nivel Educativo</label>
+                  <select class="cv-form-control" id="habNivelEducativo" name="nivel_educativo">
+                    <option value="">Seleccionar...</option>
+                    <option value="Primaria">Primaria</option>
+                    <option value="Bachiller">Bachiller</option>
+                    <option value="Técnico Medio">Técnico Medio</option>
+                    <option value="Técnico Superior">Técnico Superior (TSU)</option>
+                    <option value="Universitario">Universitario</option>
+                    <option value="Postgrado">Postgrado / Maestría</option>
+                    <option value="Ninguno">Ninguno</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="cv-form-group">
+                <label for="habDireccion">Dirección de Residencia</label>
+                <textarea class="cv-form-control" id="habDireccion" name="direccion" rows="2"
+                  placeholder="Sector, calle, número de casa, referencia..."></textarea>
+              </div>
+            </div>
+
+            <!-- ══ PANEL 3: Salud, Estatus y Archivo ══ -->
+            <div class="cv-panel" id="hab-panel3">
+              <div class="cv-panel-title">
+                <i class="fas fa-clipboard-list"></i>
+                Paso 3 — Salud, Estatus Electoral y Documentos
+              </div>
+
+              <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
+                <div class="cv-form-group">
+                  <label for="condicionSalud">Condición de Salud <span class="req">*</span></label>
+                  <select class="cv-form-control" id="condicionSalud" name="condicion_salud" required>
+                    <option value="saludable">Saludable</option>
+                    <option value="enfermedad_cronica">Enfermedad Crónica</option>
+                    <option value="discapacidad">Discapacidad</option>
+                    <option value="encamado">Encamado</option>
+                  </select>
+                </div>
+                <div class="cv-form-group">
+                  <label for="t4Status">Clasificación T4</label>
+                  <input type="text" class="cv-form-control" id="t4Status" name="clasificacion_t4" readonly
+                    placeholder="Por fecha de nacimiento"
+                    style="background:var(--gray1);font-weight:700;color:var(--vp);border-style:dashed;" tabindex="-1">
+                </div>
+                <div class="cv-form-group">
+                  <label for="electoralStatus">Estado Electoral</label>
+                  <input type="text" class="cv-form-control" id="electoralStatus" name="estado_electoral" readonly
+                    placeholder="Por fecha de nacimiento"
+                    style="background:var(--gray1);font-weight:700;color:var(--az);border-style:dashed;" tabindex="-1">
+                </div>
+              </div>
+
+              <div class="cv-form-row cv-grid-2">
+                <div class="cv-form-group">
+                  <label for="habFoto">Fotografía del Habitante</label>
+                  <input type="file" class="cv-form-control" id="habFoto" name="fotografia_cedula_url" accept="image/*">
+                  <span class="cv-form-hint">Opcional. Formatos JPG / PNG (máx. 5MB).</span>
+                </div>
+                <div class="cv-form-group" style="justify-content:flex-end;padding-bottom:.25rem;">
+                  <label style="display:flex;align-items:center;gap:10px;font-size:.87rem;cursor:pointer;color:var(--gray5);font-weight:600;padding-top:1.6rem;">
+                    <input type="checkbox" id="tieneCedulaAmpliada" name="tiene_cedula_ampliada"
+                      style="accent-color:var(--vp);width:18px;height:18px">
+                    ¿Entregó Cédula Ampliada?
+                  </label>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /cv-modal-body -->
+
+          <!-- Footer de navegación -->
+          <div class="cv-modal-footer">
+            <div class="cv-footer-left">
+              <span id="habStepCounter" style="font-size:.82rem;color:var(--gray4);font-weight:600;">Paso 1 de 3</span>
+            </div>
+            <div class="cv-footer-right">
+              <button type="button" class="cv-btn cv-btn-ghost" id="habBtnCancel" data-bs-dismiss="modal">
+                <i class="fas fa-times"></i> Cancelar
+              </button>
+              <button type="button" class="cv-btn cv-btn-ghost" id="habBtnPrev" style="display:none" onclick="habPrev()">
+                <i class="fas fa-chevron-left"></i> Anterior
+              </button>
+              <button type="button" class="cv-btn cv-btn-primary" id="habBtnNext" onclick="habNext()">
+                Siguiente <i class="fas fa-chevron-right"></i>
+              </button>
+              <button type="button" class="cv-btn cv-btn-save" id="habBtnSave" style="display:none" onclick="guardarHabitante()">
+                <i class="fas fa-save"></i> Guardar Habitante
+              </button>
+            </div>
           </div>
         </form>
-      </div>
-      <div class="modal-footer-sicag">
-        <button class="btn-sicag btn-outline-verde" onclick="cerrarModalCenso()">
-          <i class="fas fa-times"></i> Cancelar
-        </button>
-        <button class="btn-sicag btn-primary" onclick="guardarHabitante()">
-          <i class="fas fa-save"></i> Guardar Habitante
-        </button>
+
       </div>
     </div>
   </div>
 
-  <div class="modal-overlay" id="modalEliminarHab" role="dialog" aria-modal="true" aria-labelledby="modalElimHabTitle">
-    <div class="modal-content-sicag" style="max-width:450px;">
-      <div class="modal-header-sicag">
-        <h3 id="modalElimHabTitle" style="color:var(--ru);"><i class="fas fa-exclamation-triangle"></i> Confirmar
-          Eliminación</h3>
-        <button class="modal-close" onclick="cerrarModalElimHab()" aria-label="Cerrar">&times;</button>
-      </div>
-      <div class="modal-body-sicag" style="text-align:center;">
-        <div
-          style="width:70px;height:70px;border-radius:50%;background:rgba(198,40,40,0.08);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:2rem;color:var(--ru);">
-          <i class="fas fa-user-times"></i>
+  <!-- ══════════════════════════════════════════
+       MODAL — CONFIRMAR ELIMINACIÓN
+  ══════════════════════════════════════════ -->
+  <div class="modal fade cv-modal" id="modalEliminarHab" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:430px;">
+      <div class="modal-content">
+        <div class="cv-modal-header" style="background:linear-gradient(135deg,#7f1d1d,#C62828);">
+          <div class="cv-modal-header-left">
+            <div class="cv-modal-header-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div>
+              <h5 class="cv-modal-title">Eliminar Habitante</h5>
+              <p class="cv-modal-sub">Esta acción no se puede deshacer.</p>
+            </div>
+          </div>
+          <button type="button" class="cv-modal-close" data-bs-dismiss="modal" aria-label="Cerrar">
+            <i class="fas fa-xmark"></i>
+          </button>
         </div>
-        <p style="font-size:1rem; margin-bottom:0.65rem;">¿Está seguro de eliminar este habitante del censo?</p>
-        <p style="font-size:0.875rem; color:var(--muted);">Esta acción no se puede deshacer.</p>
-      </div>
-      <div class="modal-footer-sicag" style="justify-content:center;">
-        <button class="btn-sicag btn-outline-verde" onclick="cerrarModalElimHab()">
-          <i class="fas fa-times"></i> Cancelar
-        </button>
-        <button class="btn-sicag btn-danger" onclick="eliminarHabitante()">
-          <i class="fas fa-trash-alt"></i> Sí, Eliminar
-        </button>
+        <div class="cv-modal-body" style="text-align:center;padding:2rem;">
+          <div style="width:72px;height:72px;border-radius:50%;background:rgba(198,40,40,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:2rem;color:#C62828">
+            <i class="fas fa-user-times"></i>
+          </div>
+          <p style="font-size:1rem;font-weight:600;margin-bottom:.5rem">¿Eliminar este habitante del censo?</p>
+          <p style="font-size:.875rem;color:var(--gray4)">El registro será removido permanentemente del padrón poblacional y no podrá recuperarse.</p>
+        </div>
+        <div class="cv-modal-footer" style="justify-content:center;gap:.75rem;">
+          <button class="cv-btn cv-btn-ghost" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
+          <button class="cv-btn" style="background:#C62828;color:#fff;" onclick="eliminarHabitante()">
+            <i class="fas fa-trash-alt"></i> Sí, Eliminar
+          </button>
+        </div>
       </div>
     </div>
   </div>
+
+  </main>
 
   <!-- SICAG v5.0 Core Scripts -->
+  <script src="js/roles.js"></script>
+
+
+  <!-- SICAG v5.0 Core Scripts -->
+  <script src="js/roles.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/api.js"></script>
   <script src="js/components.js"></script>
@@ -671,6 +854,88 @@
 
   <script src="js/modules/censo.js"></script>
   <script src="js/layout-menu.js"></script>
+  <script>
+  /* ── Stepper de 3 pasos del modal Registro Habitante ── */
+  (function() {
+    const TOTAL = 3;
+    let current = 1;
+
+    function goTo(step) {
+      // Actualizar step activo / done
+      for (let i = 1; i <= TOTAL; i++) {
+        const el = document.getElementById('hab-step-' + i);
+        if (!el) return;
+        el.classList.remove('active','done');
+        if (i < step)  el.classList.add('done');
+        if (i === step) el.classList.add('active');
+      }
+      // Mostrar panel correcto
+      document.querySelectorAll('.cv-panel').forEach(p => p.classList.remove('active'));
+      const panel = document.getElementById('hab-panel' + step);
+      if (panel) panel.classList.add('active');
+      // Botones
+      const prev = document.getElementById('habBtnPrev');
+      const next = document.getElementById('habBtnNext');
+      const save = document.getElementById('habBtnSave');
+      const ctr  = document.getElementById('habStepCounter');
+      if (prev) prev.style.display = step > 1 ? '' : 'none';
+      if (next) next.style.display = step < TOTAL ? '' : 'none';
+      if (save) save.style.display = step === TOTAL ? '' : 'none';
+      if (ctr)  ctr.textContent = 'Paso ' + step + ' de ' + TOTAL;
+      current = step;
+    }
+
+    window.habNext = function() { if (current < TOTAL) goTo(current + 1); };
+    window.habPrev = function() { if (current > 1)    goTo(current - 1); };
+
+    // Reiniciar stepper cuando se abre el modal
+    document.addEventListener('show.bs.modal', function(e) {
+      if (e.target && e.target.id === 'modalCenso') goTo(1);
+    });
+
+    // Abrir modal con Bootstrap API (compatible con SPA)
+    window.abrirModalCenso = function(id) {
+      const modalEl = document.getElementById('modalCenso');
+      if (!modalEl) return;
+      goTo(1);
+      const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      bsModal.show();
+    };
+
+    window.confirmarEliminarHab = function(id) {
+      const modalEl = document.getElementById('modalEliminarHab');
+      if (!modalEl) return;
+      bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    };
+
+    // Calcular edad / T4 / electoral automáticamente
+    document.addEventListener('change', function(e) {
+      if (e.target && e.target.id === 'habFechaNac') {
+        const val = e.target.value;
+        if (!val) return;
+        const hoy  = new Date();
+        const nac  = new Date(val);
+        let age = hoy.getFullYear() - nac.getFullYear();
+        const m = hoy.getMonth() - nac.getMonth();
+        if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) age--;
+        const edadEl = document.getElementById('habEdad');
+        if (edadEl) edadEl.value = age;
+        // Clasificación T4
+        let t4 = '';
+        if      (age <= 2)  t4 = 'Lactante (0-2)';
+        else if (age <= 11) t4 = 'Niño (3-11)';
+        else if (age <= 17) t4 = 'Adolescente (12-17)';
+        else if (age <= 59) t4 = 'Adulto (18-59)';
+        else                t4 = 'Adulto Mayor (60+)';
+        const t4El = document.getElementById('t4Status');
+        if (t4El) t4El.value = t4;
+        // Estado electoral
+        const elEl = document.getElementById('electoralStatus');
+        if (elEl) elEl.value = age >= 18 ? 'Habilitado para votar' : 'No habilitado (menor de edad)';
+      }
+    });
+  })();
+  </script>
 </body>
 
 </html>

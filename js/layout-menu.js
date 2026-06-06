@@ -303,17 +303,26 @@
           
           document.title = doc.title;
           
-          // Asegurar que si la nueva página requiere Bootstrap CSS, se inyecte
-          const currentLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map(l => l.getAttribute('href'));
-          doc.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+          // Limpiar estilos inyectados en navegaciones anteriores
+          document.querySelectorAll('.spa-dynamic-style').forEach(el => el.remove());
+
+          // Asegurar que si la nueva página requiere CSS o Preloads, se inyecte
+          const currentLinks = Array.from(document.querySelectorAll('link')).map(l => l.getAttribute('href'));
+          doc.querySelectorAll('link[rel="stylesheet"], link[rel="preload"]').forEach(link => {
             const hrefAttr = link.getAttribute('href');
             if (hrefAttr && !currentLinks.includes(hrefAttr)) {
-              const newLink = document.createElement('link');
-              newLink.rel = 'stylesheet';
-              newLink.href = hrefAttr;
+              const newLink = link.cloneNode();
               newLink.className = 'spa-dynamic-style';
               document.head.appendChild(newLink);
             }
+          });
+
+          // INYECTAR LAS ETIQUETAS <style> INTERNAS DE LA NUEVA PÁGINA (CRÍTICO)
+          doc.querySelectorAll('style').forEach(styleBlock => {
+            const newStyle = document.createElement('style');
+            newStyle.textContent = styleBlock.textContent;
+            newStyle.className = 'spa-dynamic-style';
+            document.head.appendChild(newStyle);
           });
           
           // Sincronizar y ejecutar scripts
