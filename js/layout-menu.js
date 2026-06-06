@@ -132,7 +132,7 @@
 
     return `
       <div class="sidebar-brand ${isVocero ? 'sidebar-brand-vocero' : ''}">
-        <div class="sidebar-brand-icon ${isVocero ? 'vocero-icon' : ''}"><i class="fas fa-${brandIcon}"></i></div>
+        <img src="assets/img/logo_comuna.png" alt="Logo SICAG" width="42" height="42" style="object-fit: cover; border-radius: 50%; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,.15);">
         <div class="sidebar-brand-text">
           <strong>${brandTitle}</strong>
           <small>${brandSub}</small>
@@ -162,10 +162,6 @@
     const roleBadge  = `<span class="header-role-badge ${rolClass}"><i class="fas fa-${isVocero ? 'id-badge' : 'shield-halved'}"></i> ${rolLabel}</span>`;
 
     return `
-      <div class="header-brand">
-        <img src="assets/img/logo_comuna.png" alt="Logo SICAG">
-        <span>SICAG</span>
-      </div>
       <div class="header-search">
         <i class="fas fa-magnifying-glass"></i>
         <label for="globalSearch" class="sr-only">Buscar</label>
@@ -242,11 +238,16 @@
     toggle.addEventListener('click', () => {
       sidebar.classList.toggle('open');
       overlay.classList.toggle('show');
+      const isOpen = sidebar.classList.contains('open');
+      toggle.style.opacity = isOpen ? '0' : '1';
+      toggle.style.pointerEvents = isOpen ? 'none' : 'auto';
     });
 
     overlay.addEventListener('click', () => {
       sidebar.classList.remove('open');
       overlay.classList.remove('show');
+      toggle.style.opacity = '1';
+      toggle.style.pointerEvents = 'auto';
     });
   };
 
@@ -356,9 +357,14 @@
           // Cerrar sidebar en móviles tras navegar
           const sidebar = document.getElementById('sidebar');
           const overlay = document.getElementById('sidebarOverlay');
+          const toggle = document.getElementById('sidebarToggle');
           if (sidebar && overlay) {
             sidebar.classList.remove('open');
             overlay.classList.remove('show');
+          }
+          if (toggle) {
+            toggle.style.opacity = '1';
+            toggle.style.pointerEvents = 'auto';
           }
           
           window.history.pushState(null, '', href);

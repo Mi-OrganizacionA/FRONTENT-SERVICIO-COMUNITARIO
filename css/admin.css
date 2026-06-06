@@ -762,11 +762,14 @@ body {
   .sidebar-overlay.show { display: block; }
 }
 @media (max-width: 640px) {
+  .app-header { padding-left: 3.6rem; padding-right: 1rem; gap: 0.5rem; }
   .app-main { padding: 1rem; }
   .page-title { font-size: 1.2rem; }
   .kpi-grid   { grid-template-columns: 1fr 1fr; }
   .charts-grid { grid-template-columns: 1fr; }
-  .header-search { display: none; }
+  .header-search { flex: 1; min-width: 0; }
+  .header-search input { padding: .5rem .8rem .5rem 2.2rem; font-size: .8rem; }
+  .header-search i { left: .8rem; }
 }
 @media (max-width: 400px) {
   .kpi-grid { grid-template-columns: 1fr; }

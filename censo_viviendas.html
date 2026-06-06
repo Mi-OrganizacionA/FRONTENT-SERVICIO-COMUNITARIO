@@ -732,35 +732,9 @@
       color: #fff;
     }
 
-    /* Info: sólo visible en el paso activo */
-    .cv-step-info {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      max-width: 0;
-      opacity: 0;
-      margin-left: 0;
-      transition: max-width .3s ease, opacity .25s ease, margin-left .3s ease;
-    }
-    .cv-step.active .cv-step-info {
-      max-width: 120px;
-      opacity: 1;
-      margin-left: .45rem;
-    }
+    /* Info del paso: oculta */
+    .cv-step-info { display: none; }
 
-    .cv-step-label {
-      font-size: .68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .4px;
-      color: var(--vp);
-      white-space: nowrap;
-    }
-    .cv-step-desc {
-      font-size: .6rem;
-      color: var(--gray4);
-      white-space: nowrap;
-    }
 
     /* Panels */
     .cv-modal-body { padding: 2rem; }
@@ -779,13 +753,18 @@
       color: var(--dark);
       margin-bottom: 1.25rem;
       display: flex;
-      align-items: center;
-      gap: .5rem;
+      align-items: flex-start;
+      gap: .6rem;
       padding-bottom: .75rem;
       border-bottom: 1px solid var(--gray3);
+      line-height: 1.3;
     }
 
-    .cv-panel-title i { color: var(--vv); }
+    .cv-panel-title i { 
+      color: var(--vv); 
+      margin-top: .15rem; 
+      flex-shrink: 0; 
+    }
 
     /* Form styles */
     .cv-form-row { display: grid; gap: 1rem; }
@@ -1269,76 +1248,16 @@
         <div class="cv-stepper-wrapper">
           <button type="button" class="cv-stepper-btn cv-stepper-left" id="stepperLeftBtn" aria-label="Pasos anteriores"><i class="fas fa-chevron-left"></i></button>
           <div class="cv-stepper" id="cvStepper">
-            <div class="cv-step active" id="step-1">
-              <div class="cv-step-num">1</div>
-              <div class="cv-step-info">
-                <span class="cv-step-label">Sec. I</span>
-                <span class="cv-step-desc">Encuestador</span>
-              </div>
-            </div>
-            <div class="cv-step" id="step-2">
-              <div class="cv-step-num">2</div>
-              <div class="cv-step-info">
-                <span class="cv-step-label">Sec. II</span>
-                <span class="cv-step-desc">Ubicación</span>
-              </div>
-            </div>
-            <div class="cv-step" id="step-3">
-              <div class="cv-step-num">3</div>
-              <div class="cv-step-info">
-                <span class="cv-step-label">Sec. III</span>
-                <span class="cv-step-desc">Jefe Familia</span>
-              </div>
-            </div>
-            <div class="cv-step" id="step-4">
-              <div class="cv-step-num">4</div>
-              <div class="cv-step-info">
-                <span class="cv-step-label">Sec. IV</span>
-                <span class="cv-step-desc">Grupo Familiar</span>
-              </div>
-            </div>
-            <div class="cv-step" id="step-5">
-              <div class="cv-step-num">5</div>
-              <div class="cv-step-info">
-                <span class="cv-step-label">Sec. V</span>
-                <span class="cv-step-desc">Economía</span>
-              </div>
-            </div>
-            <div class="cv-step" id="step-6">
-              <div class="cv-step-num">6</div>
-              <div class="cv-step-info">
-                <span class="cv-step-label">Sec. VI</span>
-                <span class="cv-step-desc">Vivienda</span>
-              </div>
-            </div>
-            <div class="cv-step" id="step-7">
-              <div class="cv-step-num">7</div>
-              <div class="cv-step-info">
-                <span class="cv-step-label">Sec. VII</span>
-                <span class="cv-step-desc">Servicios</span>
-              </div>
-            </div>
-            <div class="cv-step" id="step-8">
-              <div class="cv-step-num">8</div>
-              <div class="cv-step-info">
-                <span class="cv-step-label">Sec. VIII</span>
-                <span class="cv-step-desc">Salud</span>
-              </div>
-            </div>
-            <div class="cv-step" id="step-9">
-              <div class="cv-step-num">9</div>
-              <div class="cv-step-info">
-                <span class="cv-step-label">Sec. IX</span>
-                <span class="cv-step-desc">Comunidad</span>
-              </div>
-            </div>
-            <div class="cv-step" id="step-10">
-              <div class="cv-step-num">10</div>
-              <div class="cv-step-info">
-                <span class="cv-step-label">Sec. X</span>
-                <span class="cv-step-desc">Diagnóstico</span>
-              </div>
-            </div>
+            <div class="cv-step active" id="step-1"><div class="cv-step-num">1</div></div>
+            <div class="cv-step" id="step-2"><div class="cv-step-num">2</div></div>
+            <div class="cv-step" id="step-3"><div class="cv-step-num">3</div></div>
+            <div class="cv-step" id="step-4"><div class="cv-step-num">4</div></div>
+            <div class="cv-step" id="step-5"><div class="cv-step-num">5</div></div>
+            <div class="cv-step" id="step-6"><div class="cv-step-num">6</div></div>
+            <div class="cv-step" id="step-7"><div class="cv-step-num">7</div></div>
+            <div class="cv-step" id="step-8"><div class="cv-step-num">8</div></div>
+            <div class="cv-step" id="step-9"><div class="cv-step-num">9</div></div>
+            <div class="cv-step" id="step-10"><div class="cv-step-num">10</div></div>
           </div>
           <button type="button" class="cv-stepper-btn cv-stepper-right" id="stepperRightBtn" aria-label="Pasos siguientes"><i class="fas fa-chevron-right"></i></button>
         </div>
@@ -2270,12 +2189,25 @@
       return valid;
     }
 
+    const stepMeta = [
+      { badge: 'Sec. I',    name: 'Datos del Encuestador y Planilla'      },
+      { badge: 'Sec. II',   name: 'Ubicación Geográfica'                  },
+      { badge: 'Sec. III',  name: 'Datos del Jefe del Grupo Familiar'     },
+      { badge: 'Sec. IV',   name: 'Grupo Familiar e Integrantes'          },
+      { badge: 'Sec. V',    name: 'Situación Económica'                   },
+      { badge: 'Sec. VI',   name: 'Condiciones de la Vivienda'            },
+      { badge: 'Sec. VII',  name: 'Servicios Básicos'                     },
+      { badge: 'Sec. VIII', name: 'Salud y Condición del Hogar'           },
+      { badge: 'Sec. IX',   name: 'Participación Comunitaria'             },
+      { badge: 'Sec. X',    name: 'Diagnóstico y Situación de la Comunidad'},
+    ];
+
     function goToStep(n) {
       // Update panels
       document.querySelectorAll('.cv-panel').forEach((p, i) => {
         p.classList.toggle('active', i + 1 === n);
       });
-      // Update stepper
+      // Update stepper circles
       document.querySelectorAll('.cv-step').forEach((s, i) => {
         s.classList.remove('active', 'done');
         if (i + 1 === n) s.classList.add('active');
@@ -2284,6 +2216,7 @@
         if (i + 1 < n) num.innerHTML = '<i class="fas fa-check" style="font-size:.65rem"></i>';
         else num.textContent = i + 1;
       });
+      // Update subtitle (removed — panel already shows the title)
       // Buttons
       document.getElementById('btnPrev').style.display = n > 1 ? 'inline-flex' : 'none';
       document.getElementById('btnNext').style.display = n < totalSteps ? 'inline-flex' : 'none';
