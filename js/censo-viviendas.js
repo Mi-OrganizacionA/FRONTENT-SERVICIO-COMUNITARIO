@@ -1,4 +1,4 @@
-﻿var STORAGE_KEY = 'sicag_censo_viviendas_t2';
+var STORAGE_KEY = 'sicag_censo_viviendas_t2';
 
 var personasSimuladas = [
   { cedula: 'V-12.345.678', nombre: 'María Pérez' },
@@ -26,86 +26,17 @@ var collapseOneInst;
 var collapseTwoInst;
 var collapseThreeInst;
 
-function loadViviendas() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  if (data) {
-    try {
-      const parsed = JSON.parse(data);
-      if (Array.isArray(parsed)) {
-        viviendas = parsed;
-        nextId = viviendas.reduce((max, item) => Math.max(max, item.id), 0) + 1;
-        return;
-      }
-    } catch (error) {
-      console.warn('No se pudo cargar datos previos:', error);
-    }
+async function loadViviendas() {
+  try {
+    viviendas = await window.api.getViviendas();
+  } catch (error) {
+    console.error('Error al cargar viviendas:', error);
+    viviendas = [];
   }
-
-  viviendas = [
-    {
-      id: 1,
-      cedula_jefe_familia: 'V-12.345.678',
-      sector_comunidad: 'Jobito I',
-      direccion_exacta: 'Sector La Esperanza, Calle 5',
-      cantidad_habitantes: 5,
-      condicion_general: 'Buena',
-      tipo_vivienda: 'Casa',
-      tenencia: 'Propia',
-      condiciones_terreno: 'Estable',
-      material_paredes: 'Frisadas',
-      material_techo: 'Zinc',
-      aguas_blancas: 'Acueducto',
-      aguas_servidas: 'Cloacas',
-      gas_domestico: 'Tubería',
-      cantidad_cilindros_gas: 0,
-      sistema_electrico: 'Pública',
-      recoleccion_basura: 'Aseo urbano'
-    },
-    {
-      id: 2,
-      cedula_jefe_familia: 'V-24.876.543',
-      sector_comunidad: 'Brisas del Yurubí',
-      direccion_exacta: 'Barrio San José, Casa 12',
-      cantidad_habitantes: 6,
-      condicion_general: 'Regular',
-      tipo_vivienda: 'Rancho',
-      tenencia: 'Alquilada',
-      condiciones_terreno: 'Inestable',
-      material_paredes: 'Tablas',
-      material_techo: 'Teja',
-      aguas_blancas: 'Pila pública',
-      aguas_servidas: 'Pozo séptico',
-      gas_domestico: 'Bombona',
-      cantidad_cilindros_gas: 2,
-      sistema_electrico: 'Planta eléctrica',
-      recoleccion_basura: 'Contenedor'
-    },
-    {
-      id: 3,
-      cedula_jefe_familia: 'V-30.123.987',
-      sector_comunidad: 'Cacique Tamanaco',
-      direccion_exacta: 'Urbanización El Valle, Manzana 4',
-      cantidad_habitantes: 8,
-      condicion_general: 'Alto Riesgo',
-      tipo_vivienda: 'Barraca',
-      tenencia: 'Invadida',
-      condiciones_terreno: 'Alto Riesgo',
-      material_paredes: 'Bahareque/Adobe',
-      material_techo: 'Asbesto',
-      aguas_blancas: 'No tiene',
-      aguas_servidas: 'Letrinas',
-      gas_domestico: 'No posee',
-      cantidad_cilindros_gas: 0,
-      sistema_electrico: 'No tiene',
-      recoleccion_basura: 'Al aire libre'
-    }
-  ];
-  nextId = viviendas.length + 1;
-  persistData();
 }
 
 function persistData() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(viviendas));
+  // Ya no es necesario con el backend
 }
 
 function createBadge(condicion) {
@@ -242,13 +173,17 @@ function editarVivienda(id) {
   abrirModalEdicion(id);
 }
 
-function eliminarVivienda(id) {
+async function eliminarVivienda(id) {
   if (!confirm('¿Seguro que desea eliminar esta vivienda del censo?')) return;
-  viviendas = viviendas.filter(item => item.id !== id);
-  persistData();
-  renderTable();
-  renderKPIs();
-  showToast('Vivienda eliminada correctamente.', 'success');
+  try {
+    await window.api.eliminarVivienda(id);
+    viviendas = viviendas.filter(item => item.id !== id);
+    renderTable();
+    renderKPIs();
+    showToast('Vivienda eliminada correctamente.', 'success');
+  } catch(e) {
+    showToast('Error al eliminar la vivienda.', 'danger');
+  }
 }
 
 function validarFormulario() {
@@ -305,27 +240,30 @@ function validarFormulario() {
   };
 }
 
-function guardarVivienda(event) {
+async function guardarVivienda(event) {
   event.preventDefault();
   const registro = validarFormulario();
   if (!registro) return;
 
-  if (editingId) {
-    viviendas = viviendas.map(item => item.id === editingId ? { ...item, ...registro } : item);
-    showToast('Registro actualizado correctamente.', 'success');
-  } else {
-    viviendas.push({ id: nextId++, ...registro });
-    showToast('Vivienda registrada correctamente.', 'success');
+  try {
+    if (editingId) {
+      await window.api.actualizarVivienda(editingId, registro);
+      showToast('Registro actualizado correctamente.', 'success');
+    } else {
+      await window.api.crearVivienda(registro);
+      showToast('Vivienda registrada correctamente.', 'success');
+    }
+    await loadViviendas();
+    renderTable();
+    renderKPIs();
+    modalVivienda.hide();
+    resetForm();
+  } catch(e) {
+    showToast('Error al guardar la vivienda.', 'danger');
   }
-
-  persistData();
-  renderTable();
-  renderKPIs();
-  modalVivienda.hide();
-  resetForm();
 }
 
-function initPage() {
+async function initPage() {
   tableBody = document.querySelector('#tablaViviendas tbody');
   kpiTotal = document.getElementById('kpi-total');
   kpiRiesgo = document.getElementById('kpi-riesgo');
@@ -342,7 +280,7 @@ function initPage() {
   collapseTwoInst = new bootstrap.Collapse(document.getElementById('collapseTwo'), { toggle: false });
   collapseThreeInst = new bootstrap.Collapse(document.getElementById('collapseThree'), { toggle: false });
 
-  loadViviendas();
+  await loadViviendas();
   renderTable();
   renderKPIs();
   toggleCilindrosGas();

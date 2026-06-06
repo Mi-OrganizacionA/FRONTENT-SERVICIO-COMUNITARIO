@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Organizaciones Sociales — Directorio de agrupaciones y movimientos en la Comuna Socialista Simón Rodríguez — SICAG.">
+  <title>Organizaciones Sociales — SICAG</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"></noscript>
+  <link rel="preload" href="css/admin.css" as="style">
+  <link href="css/admin.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+
+  <style>
+    /* ══════════════════════════════════════════════
+       ORGANIZACIONES SOCIALES — Premium Styles
+    ══════════════════════════════════════════════ */
+
+    .org-toolbar {
+      background: var(--card); border-radius: var(--r-md);
+      padding: .9rem 1.25rem; display: flex; align-items: center;
+      gap: .85rem; flex-wrap: wrap; margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+    }
+    .org-search { position: relative; flex: 1; min-width: 200px; }
+    .org-search i { position: absolute; left: .9rem; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: .85rem; pointer-events: none; }
+    .org-search input {
+      width: 100%; padding: .55rem .75rem .55rem 2.5rem;
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      font-size: .84rem; font-family: inherit; background: var(--bg);
+      color: var(--txt); outline: none;
+      transition: border-color var(--tr), box-shadow var(--tr);
+    }
+    .org-search input:focus { border-color: var(--vv); box-shadow: 0 0 0 3px rgba(67,160,71,.1); }
+
+    /* ── Org Cards Grid ── */
+    .org-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem; margin-bottom: 1.75rem;
+    }
+    .org-card {
+      background: var(--card); border-radius: var(--r-lg);
+      border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+      overflow: hidden; transition: transform var(--tr), box-shadow var(--tr);
+      display: flex; flex-direction: column;
+    }
+    .org-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+
+    /* Accent bar */
+    .org-bar { height: 5px; background: linear-gradient(90deg, #F57C00, #FFB74D); }
+
+    .org-card-body { padding: 1.25rem; flex: 1; display: flex; flex-direction: column; }
+    .org-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; margin-bottom: .8rem; }
+
+    .org-badge {
+      display: inline-flex; align-items: center; gap: .28rem;
+      font-size: .66rem; font-weight: 700; padding: .22rem .65rem;
+      border-radius: 20px; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap;
+      background: rgba(245,124,0,.1); color: #E65100;
+    }
+
+    .org-card-title { font-size: .95rem; font-weight: 700; color: var(--txt); line-height: 1.45; margin-bottom: .45rem; }
+    .org-card-desc  { font-size: .79rem; color: var(--muted); line-height: 1.65; flex: 1; margin-bottom: .9rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+    .org-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: .8rem; border-top: 1px solid var(--border); gap: .5rem; flex-wrap: wrap;
+    }
+    .org-meta-info { display: flex; flex-direction: column; gap: .2rem; }
+    .org-meta-row  { display: flex; align-items: center; gap: .35rem; font-size: .73rem; color: var(--muted); }
+    .org-meta-row i { color: var(--vv); font-size: .68rem; width: 12px; text-align: center; }
+    .org-card-btns { display: flex; gap: .3rem; flex-shrink: 0; }
+
+    .section-row  { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1.1rem; flex-wrap:wrap; }
+    .section-label { font-size:.8rem; font-weight:700; color:var(--sub); text-transform:uppercase; letter-spacing:.06em; display:flex; align-items:center; gap:.5rem; }
+    .section-label i { color:var(--vp); }
+    .count-badge { background:rgba(46,125,50,.1); color:var(--vp); font-size:.68rem; font-weight:700; padding:2px 9px; border-radius:10px; }
+
+    .org-empty { text-align:center; padding:3.5rem 1rem; background:var(--card); border-radius:var(--r-lg); border:2px dashed var(--border); color:var(--muted); }
+    .org-empty i { font-size:2.5rem; opacity:.3; display:block; margin-bottom:1rem; }
+    .org-empty strong { display:block; font-size:.95rem; color:var(--sub); margin-bottom:.4rem; }
+
+    .mfg-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
+    .mfg-2 .form-group-sicag { margin-bottom:0; }
+
+    @media (max-width: 640px) {
+      .org-grid { grid-template-columns:1fr; }
+      .mfg-2 { grid-template-columns:1fr; }
+      .org-toolbar { flex-direction:column; align-items:stretch; }
+    }
+  </style>
+</head>
+<body data-search-placeholder="Buscar organizaciones, tipos o contactos...">
+
+  <div class="barra-tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div id="header-placeholder"></div>
+  <nav id="sidebar-placeholder"></nav>
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral"><i class="fas fa-bars"></i></button>
+
+  <main class="app-main" role="main">
+
+    <!-- ══ PREMIUM HEADER ══ -->
+    <div class="ph-wrap fade-in">
+      <div class="ph-deco-dots" aria-hidden="true"></div>
+      <nav class="ph-breadcrumb" aria-label="Ruta de navegación">
+        <a href="dashboard.html"><i class="fas fa-home"></i></a>
+        <i class="fas fa-chevron-right ph-sep"></i>
+        <span class="ph-cur">Organizaciones Sociales</span>
+      </nav>
+      <div class="ph-body">
+        <div class="ph-left">
+          <div class="ph-icon"><i class="fas fa-hands-holding-circle"></i></div>
+          <div>
+            <div class="ph-module"><i class="fas fa-users"></i> Módulo de Participación Popular</div>
+            <h1 class="ph-title">Organizaciones Sociales</h1>
+            <p class="ph-sub">Directorio de frentes, comités y agrupaciones que hacen vida en la Comuna.</p>
+          </div>
+        </div>
+        <div class="ph-actions" style="display:flex;gap:.6rem;flex-wrap:wrap;">
+          <button class="ph-btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)" onclick="exportarOrganizaciones()">
+            <i class="fas fa-file-excel"></i> Exportar
+          </button>
+          <button class="ph-btn" onclick="abrirModalOrganizacion()">
+            <i class="fas fa-plus"></i> Nueva Organización
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ KPI FLOAT ══ -->
+    <div class="ph-kpi-float">
+      <div class="kpi-grid stagger fade-in-up">
+        <div class="kpi-card border-verde">
+          <div class="kpi-icon verde"><i class="fas fa-hands-holding-circle"></i></div>
+          <div class="kpi-info">
+            <h3>Organizaciones</h3>
+            <div class="kpi-value" id="kpiOrganizaciones">0</div>
+            <span class="kpi-trend up">Registradas</span>
+          </div>
+        </div>
+        <div class="kpi-card border-azul">
+          <div class="kpi-icon azul"><i class="fas fa-users"></i></div>
+          <div class="kpi-info">
+            <h3>Movimientos Sociales</h3>
+            <div class="kpi-value" id="kpiMovimientos">0</div>
+            <span class="kpi-trend up">Activos</span>
+          </div>
+        </div>
+        <div class="kpi-card border-terracota">
+          <div class="kpi-icon terracota"><i class="fas fa-address-book"></i></div>
+          <div class="kpi-info">
+            <h3>Con Contacto</h3>
+            <div class="kpi-value" id="kpiContacto">0</div>
+            <span class="kpi-trend up">Teléfono o Email</span>
+          </div>
+        </div>
+        <div class="kpi-card border-amarillo">
+          <div class="kpi-icon amarillo"><i class="fas fa-network-wired"></i></div>
+          <div class="kpi-info">
+            <h3>Comités</h3>
+            <div class="kpi-value" id="kpiComites">0</div>
+            <span class="kpi-trend up">De Trabajo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TOOLBAR ══ -->
+    <div class="org-toolbar fade-in-up">
+      <div class="org-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="orgSearchInput" placeholder="Buscar por nombre de organización...">
+      </div>
+    </div>
+
+    <!-- ══ SECTION ROW ══ -->
+    <div class="section-row fade-in-up">
+      <div class="section-label">
+        <i class="fas fa-list"></i>
+        Directorio de Organizaciones
+        <span class="count-badge" id="orgCount">0</span>
+      </div>
+    </div>
+
+    <!-- ══ GRID ══ -->
+    <div class="org-grid" id="orgGrid"></div>
+
+    <!-- ══ EMPTY STATE ══ -->
+    <div class="org-empty" id="orgEmpty" style="display:none">
+      <i class="fas fa-hands-holding-circle"></i>
+      <strong>No hay organizaciones que coincidan</strong>
+      <span>Registra una nueva organización social o comité en el sistema.</span>
+    </div>
+
+  </main>
+
+  <!-- ════════════════════════════════════════
+       MODAL: Nuevo / Editar Organización
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modalOrganizacion" role="dialog" aria-modal="true" aria-labelledby="modalOrgTitle">
+    <div class="modal-content-sicag" style="max-width:680px;">
+      <div class="modal-header-sicag" style="background:linear-gradient(135deg,#0D3311,#2E7D32);color:#fff;border-bottom:none;">
+        <h3 id="modalOrgTitle" style="color:#fff;">
+          <i class="fas fa-hands-holding-circle" style="color:rgba(165,214,167,.9)"></i>
+          <span id="modalOrgTitleText">Nueva Organización</span>
+        </h3>
+        <button class="modal-close" style="background:rgba(255,255,255,.15);color:#fff;" onclick="cerrarModalOrganizacion()" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body-sicag">
+        <form id="formOrganizacion" novalidate>
+          <input type="hidden" id="orgId" value="">
+
+          <div class="form-section-header form-section-verde" style="margin-bottom:1.1rem;">
+            <i class="fas fa-info-circle"></i> Información General
+          </div>
+
+          <div class="form-group-sicag" style="margin-bottom:1rem;">
+            <label class="form-label-sicag" for="orgNombre">Nombre de la Organización *</label>
+            <input type="text" class="form-control-sicag" id="orgNombre" placeholder="Ej: Frente de Mujeres Josefa Camejo" required>
+          </div>
+
+          <div class="form-group-sicag" style="margin-bottom:1rem;">
+            <label class="form-label-sicag" for="orgTipo">Tipo de Organización *</label>
+            <select class="form-control-sicag" id="orgTipo" required>
+              <option value="">Seleccionar...</option>
+              <option value="Movimiento Social">Movimiento Social</option>
+              <option value="Comité de Trabajo">Comité de Trabajo</option>
+              <option value="Frente de Masas">Frente de Masas</option>
+              <option value="Cooperativa">Cooperativa</option>
+              <option value="Fundación">Fundación</option>
+              <option value="Misión">Misión Social</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+
+          <div class="form-group-sicag" style="margin-bottom:1rem;">
+            <label class="form-label-sicag" for="orgMision">Misión / Objetivo de la Organización</label>
+            <textarea class="form-control-sicag" id="orgMision" rows="3" placeholder="Describe brevemente a qué se dedica la organización o su propósito en la comunidad..."></textarea>
+          </div>
+
+          <div class="form-section-header form-section-verde" style="margin-bottom:1.1rem;margin-top:.25rem;">
+            <i class="fas fa-address-book"></i> Datos de Contacto
+          </div>
+
+          <div class="mfg-2">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="orgTelefono">Teléfono Principal</label>
+              <input type="text" class="form-control-sicag" id="orgTelefono" placeholder="Ej: +58 412 1234567">
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="orgEmail">Correo Electrónico</label>
+              <input type="email" class="form-control-sicag" id="orgEmail" placeholder="correo@ejemplo.com">
+            </div>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer-sicag">
+        <button class="btn-sicag btn-outline-verde" onclick="cerrarModalOrganizacion()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button class="btn-sicag btn-primary" onclick="guardarOrganizacion()">
+          <i class="fas fa-save"></i> <span id="btnGuardarText">Guardar Registro</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/layout-menu.js"></script>
+  <script src="js/roles.js"></script>
+
+  <script>
+  let organizaciones = [];
+
+  async function init() {
+    try {
+      organizaciones = await window.api.getOrganizaciones();
+    } catch (error) {
+      console.error(error);
+      if(window.Components) Components.showToast('Error al cargar organizaciones', 'error');
+    }
+    renderKPIs();
+    renderGrid();
+  }
+
+  function renderKPIs() {
+    document.getElementById('kpiOrganizaciones').textContent = organizaciones.length;
+    document.getElementById('kpiMovimientos').textContent = organizaciones.filter(o => o.tipo_organizacion === 'Movimiento Social' || o.tipo_organizacion === 'Frente de Masas').length;
+    document.getElementById('kpiContacto').textContent = organizaciones.filter(o => o.contacto_telefono || o.contacto_email).length;
+    document.getElementById('kpiComites').textContent = organizaciones.filter(o => o.tipo_organizacion === 'Comité de Trabajo').length;
+  }
+
+  function renderGrid() {
+    const q = (document.getElementById('orgSearchInput')?.value || '').toLowerCase();
+    const list = organizaciones.filter(o => 
+      !q || o.nombre_organizacion.toLowerCase().includes(q) || o.tipo_organizacion.toLowerCase().includes(q)
+    );
+
+    const grid = document.getElementById('orgGrid');
+    const empty = document.getElementById('orgEmpty');
+    const count = document.getElementById('orgCount');
+    if (count) count.textContent = list.length;
+
+    if (list.length === 0) {
+      grid.innerHTML = '';
+      if (empty) empty.style.display = '';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+
+    grid.innerHTML = list.map(o => `
+      <div class="org-card fade-in-up" data-id="${o.id}">
+        <div class="org-bar"></div>
+        <div class="org-card-body">
+          <div class="org-card-top">
+            <span class="org-badge"><i class="fas fa-sitemap"></i> ${escapeHtml(o.tipo_organizacion)}</span>
+          </div>
+          <div class="org-card-title">${escapeHtml(o.nombre_organizacion)}</div>
+          <div class="org-card-desc">${escapeHtml(o.mision || 'Sin descripción detallada.')}</div>
+          <div class="org-card-footer">
+            <div class="org-meta-info">
+              ${o.contacto_telefono ? `<div class="org-meta-row"><i class="fas fa-phone"></i> ${escapeHtml(o.contacto_telefono)}</div>` : ''}
+              ${o.contacto_email ? `<div class="org-meta-row"><i class="fas fa-envelope"></i> ${escapeHtml(o.contacto_email)}</div>` : ''}
+              ${!o.contacto_telefono && !o.contacto_email ? `<div class="org-meta-row"><i class="fas fa-comment-slash"></i> Sin contacto registrado</div>` : ''}
+            </div>
+            <div class="org-card-btns">
+              <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalOrganizacion(${o.id})"><i class="fas fa-pencil-alt"></i></button>
+              <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="eliminarOrganizacion(${o.id})"><i class="fas fa-trash-alt"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function abrirModalOrganizacion(id = null) {
+    const modal = document.getElementById('modalOrganizacion');
+    limpiarForm();
+    if(id) {
+      const o = organizaciones.find(x => x.id === id);
+      if(!o) return;
+      document.getElementById('orgId').value = o.id;
+      document.getElementById('orgNombre').value = o.nombre_organizacion;
+      document.getElementById('orgTipo').value = o.tipo_organizacion;
+      document.getElementById('orgMision').value = o.mision || '';
+      document.getElementById('orgTelefono').value = o.contacto_telefono || '';
+      document.getElementById('orgEmail').value = o.contacto_email || '';
+      document.getElementById('modalOrgTitleText').textContent = 'Editar Organización';
+      document.getElementById('btnGuardarText').textContent = 'Guardar Cambios';
+    } else {
+      document.getElementById('modalOrgTitleText').textContent = 'Nueva Organización';
+      document.getElementById('btnGuardarText').textContent = 'Guardar Registro';
+    }
+    modal.classList.add('show');
+  }
+
+  function cerrarModalOrganizacion() {
+    document.getElementById('modalOrganizacion').classList.remove('show');
+  }
+
+  function limpiarForm() {
+    ['orgId','orgNombre','orgTipo','orgMision','orgTelefono','orgEmail'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+  }
+
+  async function guardarOrganizacion() {
+    const nombre = document.getElementById('orgNombre').value.trim();
+    const tipo = document.getElementById('orgTipo').value;
+    if(!nombre || !tipo) {
+      if(window.Components) Components.showToast('Por favor, completa los campos obligatorios.', 'error');
+      return;
+    }
+    const id = document.getElementById('orgId').value;
+    const data = {
+      nombre_organizacion: nombre, tipo_organizacion: tipo,
+      mision: document.getElementById('orgMision').value.trim(),
+      contacto_telefono: document.getElementById('orgTelefono').value.trim(),
+      contacto_email: document.getElementById('orgEmail').value.trim()
+    };
+
+    try {
+      if(id) {
+        await window.api.actualizarOrganizacion(id, data);
+        if(window.Components) Components.showToast('Organización actualizada.', 'success');
+      } else {
+        await window.api.crearOrganizacion(data);
+        if(window.Components) Components.showToast('Organización guardada.', 'success');
+      }
+      cerrarModalOrganizacion();
+      await init();
+    } catch(err) {
+      if(window.Components) Components.showToast('Error al guardar.', 'error');
+    }
+  }
+
+  async function eliminarOrganizacion(id) {
+    if(confirm('¿Eliminar esta organización del registro?')) {
+      try {
+        await window.api.eliminarOrganizacion(id);
+        if(window.Components) Components.showToast('Registro eliminado.', 'success');
+        await init();
+      } catch(err) {
+        if(window.Components) Components.showToast('Error al eliminar.', 'error');
+      }
+    }
+  }
+
+  function exportarOrganizaciones() {
+    if(window.Components) Components.showToast('Exportación de organizaciones próxima a implementar.', 'info');
+  }
+
+  function escapeHtml(str) { return str ? str.toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('orgSearchInput').addEventListener('input', renderGrid);
+    init();
+  });
+  </script>
+</body>
+</html>

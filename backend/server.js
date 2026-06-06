@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
@@ -13,7 +13,11 @@ const votacionesRoutes = require('./routes/votaciones');
 const proyectosRoutes = require('./routes/proyectos');
 const noticiasRoutes = require('./routes/noticias');
 const reportesRoutes = require('./routes/reportes');
-
+const produccionRoutes = require('./routes/produccion_agricola');
+const organizacionesRoutes = require('./routes/organizaciones');
+const viviendasRoutes = require('./routes/viviendas');
+const notificacionesRoutes = require('./routes/notificaciones');
+const vocerosRoutes = require('./routes/voceros');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -32,7 +36,11 @@ app.use('/api/votaciones', votacionesRoutes);
 app.use('/api/proyectos', proyectosRoutes);
 app.use('/api/noticias', noticiasRoutes);
 app.use('/api/reportes', reportesRoutes);
-
+app.use('/api/produccion_agricola', produccionRoutes);
+app.use('/api/organizaciones', organizacionesRoutes);
+app.use('/api/viviendas', viviendasRoutes);
+app.use('/api/notificaciones', notificacionesRoutes);
+app.use('/api/voceros', vocerosRoutes);
 app.use((req, res) => res.status(404).json({ error: 'Ruta no encontrada', path: req.path }));
 app.use(errorHandler);
 
@@ -57,6 +65,11 @@ async function start() {
       const ProyectosController = require('./controllers/proyectosController');
       const NoticiasController = require('./controllers/noticiasController');
       const ReportesController = require('./controllers/reportesController');
+      const ProduccionAgricolaController = require('./controllers/produccionAgricolaController');
+      const OrganizacionesController = require('./controllers/organizacionesController');
+      const ViviendasController = require('./controllers/viviendasController');
+      const ValidacionesController = require('./controllers/validacionesController');
+      const VocerosController = require('./controllers/vocerosController');
 
       AuthController.setUsuarioModel(models.Usuario);
       HabitantesController.setModel(models.Habitante);
@@ -64,6 +77,11 @@ async function start() {
       ProyectosController.setModel(models.Proyecto);
       NoticiasController.setModel(models.Noticia);
       ReportesController.setModel(models.Reporte7T);
+      ProduccionAgricolaController.setModel(models.ProduccionAgricola);
+      OrganizacionesController.setModel(models.OrganizacionSocial);
+      ViviendasController.setModel(models.Vivienda);
+      ValidacionesController.setModel(models.BandejaValidaciones);
+      VocerosController.setModel(models.Usuario);
 
       await runMigrations(sequelize);
     }

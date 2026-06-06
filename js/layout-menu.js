@@ -1,4 +1,4 @@
-﻿/* js/layout-menu.js — plantilla común del panel — con soporte de roles Admin / Vocero */
+/* js/layout-menu.js — plantilla común del panel — con soporte de roles Admin / Vocero */
 (() => {
 
   /* ─── MENÚ COMPLETO (Admin) ─────────────────────────────── */
@@ -9,7 +9,10 @@
         { href: 'dashboard.html',      icon: 'gauge-high',           label: 'Dashboard' },
         { href: 'censo.html',          icon: 'users',                label: 'Censo Comunitario', badge: '347' },
         { href: 'censo_viviendas.html',icon: 'house-chimney-crack',  label: 'Censo Viviendas' },
-        { href: 'noticias.html',       icon: 'newspaper',            label: 'Cartelera Digital', badge: '12' }
+        { href: 'noticias.html',       icon: 'newspaper',            label: 'Cartelera Digital', badge: '12' },
+        { href: 'proyectos.html',      icon: 'seedling',             label: 'Proyectos Agroecológicos' },
+        { href: 'produccion_agricola.html', icon: 'tractor',         label: 'Producción Agrícola' },
+        { href: 'organizaciones.html', icon: 'hands-holding-circle', label: 'Organizaciones Sociales' }
       ]
     },
     {

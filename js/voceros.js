@@ -1,4 +1,4 @@
-﻿/* js/voceros.js — gestión de voceros y creación de cuentas en localStorage */
+/* js/voceros.js — gestión de voceros y creación de cuentas en localStorage */
 (() => {
   const STORAGE_KEY = 'sicag_voceros';
   const accountKey = 'sicag_accounts';
@@ -15,13 +15,13 @@
     feedback: document.getElementById('buscarResult')
   };
 
-  const getStoredVoceros = () => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  };
-
-  const setStoredVoceros = (voceros) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(voceros));
+  const getVoceros = async () => {
+    try {
+      return await window.api.getVoceros();
+    } catch(e) {
+      console.error(e);
+      return [];
+    }
   };
 
   const getAccountStore = () => {
@@ -33,30 +33,33 @@
     localStorage.setItem(accountKey, JSON.stringify(store));
   };
 
-  const renderVocerosTable = () => {
+  const renderVocerosTable = async () => {
     if (!elements.tableBody) return;
-    const voceros = getStoredVoceros();
+    const voceros = await getVoceros();
     elements.tableBody.innerHTML = '';
 
     voceros.forEach((vocero) => {
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>${vocero.cedula}</td>
+        <td>${vocero.cedula || vocero.nombre_usuario}</td>
         <td>${vocero.nombre}</td>
-        <td>${vocero.comunidad}</td>
+        <td>${vocero.consejoComunal || vocero.comunidad || 'N/D'}</td>
         <td>
-          <button class="btn-sicag btn-danger btn-sm" type="button" data-cedula="${vocero.cedula}">Eliminar</button>
+          <button class="btn-sicag btn-danger btn-sm" type="button" data-id="${vocero.id}">Eliminar</button>
         </td>`;
       elements.tableBody.appendChild(row);
     });
 
-    elements.tableBody.querySelectorAll('button[data-cedula]').forEach((button) => {
-      button.addEventListener('click', () => {
-        const cedula = button.dataset.cedula;
-        if (!cedula || !confirm(`Eliminar vocero ${cedula}?`)) return;
-        const remaining = getStoredVoceros().filter((item) => item.cedula !== cedula);
-        setStoredVoceros(remaining);
-        renderVocerosTable();
+    elements.tableBody.querySelectorAll('button[data-id]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const id = button.dataset.id;
+        if (!id || !confirm(`¿Eliminar este vocero?`)) return;
+        try {
+          await window.api.eliminarVocero(id);
+          renderVocerosTable();
+        } catch(e) {
+          alert('Error eliminando vocero');
+        }
       });
     });
   };
@@ -100,7 +103,7 @@
     }
   };
 
-  const handleFormSubmit = (event) => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
     if (!elements.form) return;
 
@@ -116,26 +119,18 @@
       return alert('Contraseña de administrador incorrecta.');
     }
 
-    const habitante = findHabitanteByCedula(cedula);
-    if (!habitante) {
-      return alert('No se encontró habitante con esa cédula en los registros de viviendas.');
+    try {
+      await window.api.crearVocero({
+        cedula,
+        nombre: 'Vocero ' + cedula, // En un caso real buscaríamos en Habitantes o Viviendas para cruzar la data
+        comunidad
+      });
+      createVoceroAccount(cedula);
+      closeModal();
+      renderVocerosTable();
+    } catch(e) {
+      alert('Error creando vocero o la cédula ya existe');
     }
-
-    const voceros = getStoredVoceros();
-    if (voceros.some((item) => item.cedula === cedula)) {
-      return alert('Esta cédula ya está registrada como vocero.');
-    }
-
-    voceros.push({
-      cedula,
-      nombre: habitante.nombre_jefe_familia || habitante.nombre || 'N/D',
-      comunidad
-    });
-
-    setStoredVoceros(voceros);
-    createVoceroAccount(cedula);
-    closeModal();
-    renderVocerosTable();
   };
 
   if (elements.addButton) {

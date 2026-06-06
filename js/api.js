@@ -1,12 +1,12 @@
-﻿/**
+/**
  * Módulo centralizado de API (SICAG v5.0)
  * Gestiona todas las llamadas a datos (simulado con seed.json local en desarrollo)
  */
 class APIManager {
   constructor() {
-    this.baseURL = 'http://localhost:3000/api'; // URL para futuro backend real
+    this.baseURL = 'http://localhost:3000/api'; // URL del backend real en Node.js
     this.mockData = null;
-    this.isDevelopment = true; // Forzamos true para prototipo sin node env
+    this.isDevelopment = false; // Desactivado para conectar al backend
     this.initMockData();
   }
 
@@ -80,20 +80,27 @@ class APIManager {
       this.mockData.habitantes.push(registro);
       return registro;
     }
+    
+    // En producción:
+    const response = await fetch(`${this.baseURL}/habitantes`, {
+      method: 'POST',
+      ...this._getHeaders(),
+      body: JSON.stringify(datos)
+    });
+    if (!response.ok) throw new Error('Error al crear habitante');
+    return response.json();
   }
 
   async registrarHabitante(datos) {
-    await this.waitForMockData();
-    if (this.isDevelopment) {
-      const nuevoId = this.mockData.habitantes.length > 0 ? Math.max(...this.mockData.habitantes.map(h => h.id)) + 1 : 1;
-      const registro = { id: nuevoId, ...datos, fechaRegistro: new Date().toISOString() };
-      this.mockData.habitantes.push(registro);
-      return registro;
-    }
+    return this.crearHabitante(datos); // Alias para crearHabitante
   }
 
   async getNotificaciones() {
-    if (!this.isDevelopment) return [];
+    if (!this.isDevelopment) {
+      const response = await fetch(`${this.baseURL}/notificaciones`, this._getHeaders());
+      if (!response.ok) throw new Error('Error al obtener notificaciones');
+      return response.json();
+    }
     const raw = localStorage.getItem('sicag_notificaciones');
     if (!raw) {
       const iniciales = [
@@ -138,6 +145,15 @@ class APIManager {
   }
 
   async crearNotificacion(notificacion) {
+    if (!this.isDevelopment) {
+      const response = await fetch(`${this.baseURL}/notificaciones`, {
+        method: 'POST',
+        ...this._getHeaders(),
+        body: JSON.stringify(notificacion)
+      });
+      if (!response.ok) throw new Error('Error al crear notificación');
+      return response.json();
+    }
     const existentes = await this.getNotificaciones();
     const nuevoId = existentes.length > 0 ? Math.max(...existentes.map(n => n.id)) + 1 : 1;
     const nueva = { id: nuevoId, ...notificacion, createdAt: new Date().toISOString() };
@@ -147,6 +163,15 @@ class APIManager {
   }
 
   async actualizarNotificacion(id, cambios) {
+    if (!this.isDevelopment) {
+      const response = await fetch(`${this.baseURL}/notificaciones/${id}`, {
+        method: 'PUT',
+        ...this._getHeaders(),
+        body: JSON.stringify(cambios)
+      });
+      if (!response.ok) throw new Error('Error al actualizar notificación');
+      return response.json();
+    }
     const existentes = await this.getNotificaciones();
     const index = existentes.findIndex(n => n.id === id);
     if (index === -1) throw new Error('Notificación no encontrada');
@@ -161,6 +186,12 @@ class APIManager {
       this.mockData.habitantes = this.mockData.habitantes.filter(h => h.id !== id);
       return { success: true };
     }
+    const response = await fetch(`${this.baseURL}/habitantes/${id}`, {
+      method: 'DELETE',
+      ...this._getHeaders()
+    });
+    if (!response.ok) throw new Error('Error al eliminar habitante');
+    return response.json();
   }
 
   // ─────────────────────────────────────────
@@ -171,6 +202,131 @@ class APIManager {
     if (this.isDevelopment) {
       return this._filterProyectos(this.mockData.proyectos, filtros);
     }
+    const params = new URLSearchParams(filtros);
+    const response = await fetch(`${this.baseURL}/proyectos?${params}`, this._getHeaders());
+    if (!response.ok) throw new Error('Error fetching proyectos');
+    return response.json();
+  }
+
+  // ─────────────────────────────────────────
+  // PRODUCCIÓN AGRÍCOLA
+  // ─────────────────────────────────────────
+  async getProduccion(filtros = {}) {
+    if (this.isDevelopment) return [];
+    const params = new URLSearchParams(filtros);
+    const response = await fetch(`${this.baseURL}/produccion_agricola?${params}`, this._getHeaders());
+    if (!response.ok) throw new Error('Error fetching produccion agricola');
+    return response.json();
+  }
+
+  async crearProduccion(datos) {
+    if (this.isDevelopment) return datos;
+    const response = await fetch(`${this.baseURL}/produccion_agricola`, { method: 'POST', ...this._getHeaders(), body: JSON.stringify(datos) });
+    if (!response.ok) throw new Error('Error creando produccion agricola');
+    return response.json();
+  }
+
+  async actualizarProduccion(id, cambios) {
+    if (this.isDevelopment) return cambios;
+    const response = await fetch(`${this.baseURL}/produccion_agricola/${id}`, { method: 'PUT', ...this._getHeaders(), body: JSON.stringify(cambios) });
+    if (!response.ok) throw new Error('Error actualizando produccion agricola');
+    return response.json();
+  }
+
+  async eliminarProduccion(id) {
+    if (this.isDevelopment) return { success: true };
+    const response = await fetch(`${this.baseURL}/produccion_agricola/${id}`, { method: 'DELETE', ...this._getHeaders() });
+    if (!response.ok) throw new Error('Error eliminando produccion agricola');
+    return response.json();
+  }
+
+  // ─────────────────────────────────────────
+  // ORGANIZACIONES SOCIALES
+  // ─────────────────────────────────────────
+  async getOrganizaciones(filtros = {}) {
+    if (this.isDevelopment) return [];
+    const params = new URLSearchParams(filtros);
+    const response = await fetch(`${this.baseURL}/organizaciones?${params}`, this._getHeaders());
+    if (!response.ok) throw new Error('Error fetching organizaciones');
+    return response.json();
+  }
+
+  async crearOrganizacion(datos) {
+    if (this.isDevelopment) return datos;
+    const response = await fetch(`${this.baseURL}/organizaciones`, { method: 'POST', ...this._getHeaders(), body: JSON.stringify(datos) });
+    if (!response.ok) throw new Error('Error creando organizacion');
+    return response.json();
+  }
+
+  async actualizarOrganizacion(id, cambios) {
+    if (this.isDevelopment) return cambios;
+    const response = await fetch(`${this.baseURL}/organizaciones/${id}`, { method: 'PUT', ...this._getHeaders(), body: JSON.stringify(cambios) });
+    if (!response.ok) throw new Error('Error actualizando organizacion');
+    return response.json();
+  }
+
+  async eliminarOrganizacion(id) {
+    if (this.isDevelopment) return { success: true };
+    const response = await fetch(`${this.baseURL}/organizaciones/${id}`, { method: 'DELETE', ...this._getHeaders() });
+    if (!response.ok) throw new Error('Error eliminando organizacion');
+    return response.json();
+  }
+
+  // ─────────────────────────────────────────
+  // VIVIENDAS
+  // ─────────────────────────────────────────
+  async getViviendas(filtros = {}) {
+    if (this.isDevelopment) return [];
+    const params = new URLSearchParams(filtros);
+    const response = await fetch(`${this.baseURL}/viviendas?${params}`, this._getHeaders());
+    if (!response.ok) throw new Error('Error fetching viviendas');
+    return response.json();
+  }
+
+  async crearVivienda(datos) {
+    if (this.isDevelopment) return datos;
+    const response = await fetch(`${this.baseURL}/viviendas`, { method: 'POST', ...this._getHeaders(), body: JSON.stringify(datos) });
+    if (!response.ok) throw new Error('Error creando vivienda');
+    return response.json();
+  }
+
+  async actualizarVivienda(id, cambios) {
+    if (this.isDevelopment) return cambios;
+    const response = await fetch(`${this.baseURL}/viviendas/${id}`, { method: 'PUT', ...this._getHeaders(), body: JSON.stringify(cambios) });
+    if (!response.ok) throw new Error('Error actualizando vivienda');
+    return response.json();
+  }
+
+  async eliminarVivienda(id) {
+    if (this.isDevelopment) return { success: true };
+    const response = await fetch(`${this.baseURL}/viviendas/${id}`, { method: 'DELETE', ...this._getHeaders() });
+    if (!response.ok) throw new Error('Error eliminando vivienda');
+    return response.json();
+  }
+
+  // ─────────────────────────────────────────
+  // VOCEROS
+  // ─────────────────────────────────────────
+  async getVoceros(filtros = {}) {
+    if (this.isDevelopment) return [];
+    const params = new URLSearchParams(filtros);
+    const response = await fetch(`${this.baseURL}/voceros?${params}`, this._getHeaders());
+    if (!response.ok) throw new Error('Error fetching voceros');
+    return response.json();
+  }
+
+  async crearVocero(datos) {
+    if (this.isDevelopment) return datos;
+    const response = await fetch(`${this.baseURL}/voceros`, { method: 'POST', ...this._getHeaders(), body: JSON.stringify(datos) });
+    if (!response.ok) throw new Error('Error creando vocero');
+    return response.json();
+  }
+
+  async eliminarVocero(id) {
+    if (this.isDevelopment) return { success: true };
+    const response = await fetch(`${this.baseURL}/voceros/${id}`, { method: 'DELETE', ...this._getHeaders() });
+    if (!response.ok) throw new Error('Error eliminando vocero');
+    return response.json();
   }
 
   // ─────────────────────────────────────────
