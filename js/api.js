@@ -6,24 +6,36 @@ class APIManager {
   constructor() {
     this.baseURL = 'http://localhost:3000/api'; // URL del backend real en Node.js
     this.mockData = null;
-    this.isDevelopment = false; // Desactivado para conectar al backend
+    this.isDevelopment = false; // Desactivado para conectar a producción
     this.initMockData();
   }
 
   // Cargar datos de ejemplo
   async initMockData() {
     try {
-      // Cargamos el json local (fetch debe funcionar si servimos con LiveServer u otro server estático)
+      const localData = localStorage.getItem('sicag_mockData');
+      if (localData) {
+        this.mockData = JSON.parse(localData);
+        return;
+      }
+      
       const response = await fetch('data/seed.json');
       if (response.ok) {
         this.mockData = await response.json();
+        this.saveMockData();
       } else {
         console.warn('No se pudo cargar seed.json (¿Estás abriendo el archivo localmente sin servidor?)');
-        this.mockData = { habitantes: [], proyectos: [], noticias: [] };
+        this.mockData = { habitantes: [], proyectos: [], noticias: [], config: {} };
       }
     } catch (error) {
       console.error('Error cargando datos de prueba:', error);
-      this.mockData = { habitantes: [], proyectos: [], noticias: [] };
+      this.mockData = { habitantes: [], proyectos: [], noticias: [], config: {} };
+    }
+  }
+
+  saveMockData() {
+    if (this.mockData) {
+      localStorage.setItem('sicag_mockData', JSON.stringify(this.mockData));
     }
   }
 
@@ -38,6 +50,17 @@ class APIManager {
         }
       }, 50);
     });
+  }
+
+  // Helper para headers
+  _getHeaders() {
+    const token = localStorage.getItem('token');
+    return {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : ''
+      }
+    };
   }
 
   // ─────────────────────────────────────────
@@ -57,17 +80,62 @@ class APIManager {
     return data;
   }
 
-  // ─────────────────────────────────────────
-  // CONFIGURACIÓN GLOBALES
-  // ─────────────────────────────────────────
-  async saveConfig(nombre, estado) {
+  async requestCode(email) {
     if (this.isDevelopment) {
-      return new Promise(r => setTimeout(() => r({ success: true }), 500));
+      console.log('Simulando envío de correo a:', email);
+      return { success: true, message: 'Código simulado' };
+    }
+    const response = await fetch(`${this.baseURL}/auth/request-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error);
+    return data;
+  }
+
+  async resetPassword(email, code, newPassword) {
+    if (this.isDevelopment) {
+      console.log('Simulando reset de contraseña para:', email);
+      return { success: true, message: 'Contraseña cambiada simulada' };
+    }
+    const response = await fetch(`${this.baseURL}/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code, newPassword })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error);
+    return data;
+  }
+
+  // ─────────────────────────────────────────
+  // CONFIGURACIÓN DEL SISTEMA Y RECOVERY PASS
+  // ─────────────────────────────────────────
+
+  async getSystemConfig() {
+    await this.waitForMockData();
+    if (this.isDevelopment) {
+      return this.mockData.config || {};
+    }
+    const response = await fetch(`${this.baseURL}/system/config`, this._getHeaders());
+    const data = await response.json();
+    return data.config || {};
+  }
+
+  async saveSystemConfig(configKey, value) {
+    await this.waitForMockData();
+    if (this.isDevelopment) {
+      if (!this.mockData.config) this.mockData.config = {};
+      this.mockData.config[configKey] = value;
+      this.saveMockData();
+      return { success: true };
     }
     const response = await fetch(`${this.baseURL}/system/config`, {
       method: 'POST',
       ...this._getHeaders(),
-      body: JSON.stringify({ nombre, estado })
+      body: JSON.stringify({ nombre: configKey, estado: value })
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
@@ -139,6 +207,7 @@ class APIManager {
       }
 
       this.mockData.habitantes.push(registro);
+      this.saveMockData();
       return registro;
     }
     
@@ -162,6 +231,7 @@ class APIManager {
       const index = this.mockData.habitantes.findIndex(h => h.id === id);
       if (index !== -1) {
         this.mockData.habitantes[index] = { ...this.mockData.habitantes[index], ...cambios };
+        this.saveMockData();
         return this.mockData.habitantes[index];
       }
       throw new Error('Habitante no encontrado');
@@ -177,93 +247,44 @@ class APIManager {
 
   async getNotificaciones() {
     if (!this.isDevelopment) {
-      const response = await fetch(`${this.baseURL}/notificaciones`, this._getHeaders());
+      const response = await fetch(`${this.baseURL}/bandeja_validaciones/pendientes`, this._getHeaders());
       if (!response.ok) throw new Error('Error al obtener notificaciones');
       return response.json();
     }
-    const raw = localStorage.getItem('sicag_notificaciones');
-    if (!raw) {
-      const iniciales = [
-        {
-          id: 1,
-          tipo: 'registro_habitante',
-          titulo: 'Solicitud de registro de habitante',
-          mensaje: 'El vocero Jobito I envió un nuevo registro de habitante para revisión.',
-          status: 'pendiente',
-          vocero: 'Vocero Jobito I',
-          consejoComunal: 'Jobito I',
-          fechaSolicitud: '2026-06-02T10:45:00Z',
-          datosHabitante: {
-            cedula: '99887766',
-            nombre: 'Lucía',
-            apellido: 'Rubio',
-            edad: 34,
-            genero: 'F',
-            consejoComunal: 'Jobito I',
-            clasificacion: 'adulto',
-            elector: true,
-            direccion: 'Av. Los Pinos 12',
-            telefono: '+58412345678'
-          },
-          nota: ''
-        }
-      ];
-      localStorage.setItem('sicag_notificaciones', JSON.stringify(iniciales));
-      return iniciales;
-    }
-    try {
-      return JSON.parse(raw);
-    } catch (error) {
-      console.error('Error parseando notificaciones:', error);
-      return [];
-    }
+    return [];
   }
 
-  async saveNotificaciones(notificaciones) {
-    if (!this.isDevelopment) return;
-    localStorage.setItem('sicag_notificaciones', JSON.stringify(notificaciones));
-  }
-
-  async crearNotificacion(notificacion) {
+  async aprobarNotificacion(id, comentarios) {
     if (!this.isDevelopment) {
-      const response = await fetch(`${this.baseURL}/notificaciones`, {
-        method: 'POST',
-        ...this._getHeaders(),
-        body: JSON.stringify(notificacion)
-      });
-      if (!response.ok) throw new Error('Error al crear notificación');
-      return response.json();
-    }
-    const existentes = await this.getNotificaciones();
-    const nuevoId = existentes.length > 0 ? Math.max(...existentes.map(n => n.id)) + 1 : 1;
-    const nueva = { id: nuevoId, ...notificacion, createdAt: new Date().toISOString() };
-    existentes.unshift(nueva);
-    await this.saveNotificaciones(existentes);
-    return nueva;
-  }
-
-  async actualizarNotificacion(id, cambios) {
-    if (!this.isDevelopment) {
-      const response = await fetch(`${this.baseURL}/notificaciones/${id}`, {
+      const response = await fetch(`${this.baseURL}/bandeja_validaciones/${id}/aprobar`, {
         method: 'PUT',
         ...this._getHeaders(),
-        body: JSON.stringify(cambios)
+        body: JSON.stringify({ comentarios })
       });
-      if (!response.ok) throw new Error('Error al actualizar notificación');
+      if (!response.ok) throw new Error('Error al aprobar notificación');
       return response.json();
     }
-    const existentes = await this.getNotificaciones();
-    const index = existentes.findIndex(n => n.id === id);
-    if (index === -1) throw new Error('Notificación no encontrada');
-    existentes[index] = { ...existentes[index], ...cambios, updatedAt: new Date().toISOString() };
-    await this.saveNotificaciones(existentes);
-    return existentes[index];
+    return { success: true };
+  }
+
+  async rechazarNotificacion(id, motivo) {
+    if (!this.isDevelopment) {
+      const response = await fetch(`${this.baseURL}/bandeja_validaciones/${id}/rechazar`, {
+        method: 'PUT',
+        ...this._getHeaders(),
+        body: JSON.stringify({ motivo })
+      });
+      if (!response.ok) throw new Error('Error al rechazar notificación');
+      return response.json();
+    }
+    return { success: true };
   }
 
   async eliminarHabitante(id) {
     await this.waitForMockData();
     if (this.isDevelopment) {
       this.mockData.habitantes = this.mockData.habitantes.filter(h => h.id !== id);
+      this.saveMockData();
       return { success: true };
     }
     const response = await fetch(`${this.baseURL}/habitantes/${id}`, {
@@ -294,6 +315,7 @@ class APIManager {
       const nuevoId = this.mockData.proyectos.length > 0 ? Math.max(...this.mockData.proyectos.map(p => p.id)) + 1 : 1;
       const registro = { id: nuevoId, ...datos, fecha_registro: new Date().toISOString() };
       this.mockData.proyectos.push(registro);
+      this.saveMockData();
       return registro;
     }
     const response = await fetch(`${this.baseURL}/proyectos`, {
@@ -311,6 +333,7 @@ class APIManager {
       const index = this.mockData.proyectos.findIndex(p => p.id === id);
       if (index !== -1) {
         this.mockData.proyectos[index] = { ...this.mockData.proyectos[index], ...cambios };
+        this.saveMockData();
         return this.mockData.proyectos[index];
       }
       throw new Error('Proyecto no encontrado');
@@ -328,6 +351,7 @@ class APIManager {
     await this.waitForMockData();
     if (this.isDevelopment) {
       this.mockData.proyectos = this.mockData.proyectos.filter(p => p.id !== id);
+      this.saveMockData();
       return { success: true };
     }
     const response = await fetch(`${this.baseURL}/proyectos/${id}`, {
@@ -478,6 +502,7 @@ class APIManager {
       const registro = { id: nuevoId, ...datos, fecha_publicacion: new Date().toISOString() };
       if(!this.mockData.noticias) this.mockData.noticias = [];
       this.mockData.noticias.push(registro);
+      this.saveMockData();
       return registro;
     }
     const response = await fetch(`${this.baseURL}/noticias`, {
@@ -495,6 +520,7 @@ class APIManager {
       const index = this.mockData.noticias.findIndex(n => n.id === id);
       if (index !== -1) {
         this.mockData.noticias[index] = { ...this.mockData.noticias[index], ...cambios };
+        this.saveMockData();
         return this.mockData.noticias[index];
       }
       throw new Error('Noticia no encontrada');
@@ -512,6 +538,7 @@ class APIManager {
     await this.waitForMockData();
     if (this.isDevelopment) {
       this.mockData.noticias = this.mockData.noticias.filter(n => n.id !== id);
+      this.saveMockData();
       return { success: true };
     }
     const response = await fetch(`${this.baseURL}/noticias/${id}`, {
@@ -526,7 +553,15 @@ class APIManager {
   // DASHBOARD Y ESTADÍSTICAS
   // ─────────────────────────────────────────
   async getDashboardStats() {
-    if (this.isDevelopment) return { habitantes: 0, viviendas: 0, proyectos: 0, consejos: 0 };
+    await this.waitForMockData();
+    if (this.isDevelopment) {
+      return { 
+        habitantes: this.mockData?.habitantes?.length || 0, 
+        viviendas: 0, 
+        proyectos: this.mockData?.proyectos?.length || 0, 
+        consejos: 8 
+      };
+    }
     
     // Obtenemos los totales haciendo llamadas a los endpoints
     try {

@@ -76,19 +76,41 @@ class BandejaValidacionesController {
 
       const validacion = await BandejaModel.findByPk(id);
       if (!validacion) return res.status(404).json({ error: 'Validación no encontrada' });
+      if (validacion.estado_tramite !== 'Pendiente') return res.status(400).json({ error: 'La solicitud ya fue procesada' });
+
+      const models = BandejaModel.sequelize.models;
+      const tabla = validacion.tabla_afectada;
+      const datos = validacion.datos_temporales;
+      let nuevoRegistro;
+
+      // Inserción en la tabla real según corresponda
+      if (tabla === 'habitantes') {
+        nuevoRegistro = await models.Habitante.create(datos);
+      } else if (tabla === 'noticias') {
+        nuevoRegistro = await models.Noticia.create(datos);
+      } else if (tabla === 'proyectos') {
+        nuevoRegistro = await models.Proyecto.create(datos);
+      } else if (tabla === 'organizaciones_sociales') {
+        nuevoRegistro = await models.OrganizacionSocial.create(datos);
+      } else if (tabla === 'reportes_7t') {
+        nuevoRegistro = await models.Reporte7T.create(datos);
+      } else {
+        throw new Error(`Tabla afectada desconocida o no soportada: ${tabla}`);
+      }
 
       await validacion.update({
         estado_tramite: 'Aprobado',
         id_validador: req.user.id,
         comentarios_validador: comentarios,
-        fecha_validacion: new Date()
+        fecha_validacion: new Date(),
+        registro_id: nuevoRegistro.id // Actualizamos con el ID real insertado
       });
 
-      await AuditService.log(req.user.id, 'VALIDACION', 'bandeja_validaciones', id, 
-        { estado: 'Pendiente' }, { estado: 'Aprobado' });
+      await AuditService.log(req.user.id, 'VALIDACION_APROBADA', 'bandeja_validaciones', id, 
+        { estado: 'Pendiente' }, { estado: 'Aprobado', nuevoRegistroId: nuevoRegistro.id });
 
       res.json({ 
-        mensaje: 'Solicitud aprobada',
+        mensaje: 'Solicitud aprobada e insertada en el sistema',
         validacion 
       });
     } catch (error) {

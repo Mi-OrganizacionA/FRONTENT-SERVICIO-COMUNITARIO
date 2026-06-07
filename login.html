@@ -833,7 +833,7 @@
             <label class="remember-label">
               <input type="checkbox" id="rememberMe"> Recordarme
             </label>
-            <a href="#" class="forgot-link">¿Olvidó su clave?</a>
+            <a href="#" id="forgotPasswordBtn" style="color: var(--primary); text-decoration: none; font-size: 0.9rem;">¿Olvidaste tu contraseña?</a>
           </div>
 
           <!-- Botón ingresar -->
@@ -862,6 +862,37 @@
 
   </div>
 
+  <!-- Modal Recuperar Contraseña -->
+  <div id="recoveryModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+      <span class="close" id="closeRecovery">&times;</span>
+      <h2>Recuperar Contraseña</h2>
+      
+      <div id="stepEmail">
+        <p>Ingresa tu correo electrónico para recibir un código de verificación.</p>
+        <div class="form-group">
+          <label>Correo Electrónico</label>
+          <input type="email" id="recoveryEmail" required>
+        </div>
+        <button class="btn btn-primary" id="btnRequestCode" style="width: 100%;">Enviar Código</button>
+      </div>
+
+      <div id="stepCode" style="display: none;">
+        <p>Ingresa el código que enviamos a tu correo y tu nueva contraseña.</p>
+        <div class="form-group">
+          <label>Código de Verificación (6 dígitos)</label>
+          <input type="text" id="recoveryCode" required maxlength="6" style="text-align: center; letter-spacing: 5px; font-weight: bold; font-size: 1.2rem;">
+        </div>
+        <div class="form-group">
+          <label>Nueva Contraseña</label>
+          <input type="password" id="recoveryNewPassword" required>
+        </div>
+        <button class="btn btn-primary" id="btnResetPassword" style="width: 100%;">Cambiar Contraseña</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/login.js"></script>
   <script type="module" src="js/app.js"></script>

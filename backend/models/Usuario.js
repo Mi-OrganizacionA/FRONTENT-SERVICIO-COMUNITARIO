@@ -1,4 +1,4 @@
-﻿const { DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
   const Usuario = sequelize.define('Usuario', {
@@ -12,6 +12,8 @@ module.exports = (sequelize) => {
       references: { model: 'consejos_comunales', key: 'id' },
       allowNull: true // NULL si es admin
     },
+    codigo_verificacion: { type: DataTypes.STRING(10), allowNull: true },
+    codigo_expiracion: { type: DataTypes.DATE, allowNull: true },
     fecha_creacion: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     ultimo_login: DataTypes.DATE,
     activo: { type: DataTypes.BOOLEAN, defaultValue: true }

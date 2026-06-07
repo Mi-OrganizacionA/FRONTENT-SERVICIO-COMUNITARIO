@@ -1,48 +1,94 @@
 const { initSQLite } = require('../config/database');
-const Usuario = require('../models/Usuario');
-const Habitante = require('../models/Habitante');
-const ConsejoComunal = require('../models/ConsejoComunal');
-const bcrypt = require('bcrypt');
+const { initModels } = require('../models');
+const bcrypt = require('bcryptjs');
 
 async function seed() {
   console.log('Iniciando semilla de base de datos...');
   const sequelize = await initSQLite();
+  const models = await initModels(sequelize);
+  const { Usuario, Habitante, ConsejoComunal, Configuracion } = models;
 
   try {
+    console.log('Sincronizando modelos con la base de datos...');
+    await sequelize.sync({ alter: true });
+    
     // 1. Semilla de Consejos Comunales (Idempotente)
     const consejos = ['Jobito I', 'Jobito II', 'Brisas del Yurubí', 'Cacique Tamanaco', 'La Esperanza'];
     console.log('--- Verificando Consejos Comunales ---');
     for (const nombre of consejos) {
       const [cc, created] = await ConsejoComunal.findOrCreate({
-        where: { nombre },
+        where: { nombre_comunidad: nombre },
         defaults: {
-          codigo_registro: `CC-${nombre.substring(0, 3).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
-          comunidad: nombre,
-          vocero_principal: null,
-          fecha_fundacion: '2020-01-01',
-          estatus: 'activo'
+          descripcion: `Consejo comunal de ${nombre}`,
+          ubicacion: 'San Felipe, Yaracuy',
+          responsable: 'Por asignar',
+          activo: true
         }
       });
       if (created) console.log(`[+] Consejo Comunal creado: ${nombre}`);
     }
 
-    // 2. Semilla de Usuarios Administradores (Idempotente)
+    // 2. Semilla de Usuarios Administradores y Voceros
     console.log('\n--- Verificando Usuarios ---');
     const adminEmail = 'admin@sicag.com';
     let admin = await Usuario.findOne({ where: { email: adminEmail } });
     if (!admin) {
-      const hashedPassword = await bcrypt.hash('admin123', 10);
+      const hashedPassword = await bcrypt.hash('alvaro.09', 10);
       admin = await Usuario.create({
-        nombres: 'Administrador',
-        apellidos: 'Sistema',
+        nombre: 'Administrador Principal',
         email: adminEmail,
-        password: hashedPassword,
+        credenciales: hashedPassword,
         rol: 'admin',
+        id_comunidad_asignada: null,
         activo: true
       });
-      console.log(`[+] Usuario admin creado: ${adminEmail} (Clave: admin123)`);
+      console.log(`[+] Usuario admin creado: ${adminEmail} (Clave: alvaro.09)`);
     } else {
       console.log(`[=] Usuario admin ya existe: ${adminEmail}`);
+    }
+
+    // Voceros de prueba
+    const voceros = [
+      { email: 'vocero_jobito1@sicag.com', nombre: 'Vocero Jobito I', id_comunidad: 1 },
+      { email: 'vocero_jobito2@sicag.com', nombre: 'Vocero Jobito II', id_comunidad: 2 }
+    ];
+
+    for (const v of voceros) {
+      let vocero = await Usuario.findOne({ where: { email: v.email } });
+      if (!vocero) {
+        const hash = await bcrypt.hash('vocero.09', 10);
+        await Usuario.create({
+          nombre: v.nombre,
+          email: v.email,
+          credenciales: hash,
+          rol: 'vocero',
+          id_comunidad_asignada: v.id_comunidad,
+          activo: true
+        });
+        console.log(`[+] Vocero creado: ${v.email} (Clave: vocero.09)`);
+      } else {
+        console.log(`[=] Vocero ya existe: ${v.email}`);
+      }
+    }
+
+    // 2.5 Semilla de Configuración
+    console.log('\n--- Verificando Configuración del Sistema ---');
+    const configs = [
+      { clave: 'Aprobación Automática Global', valor: 'false', descripcion: 'Master switch para omitir validaciones.' },
+      { clave: 'Aprobación Automática Habitantes', valor: 'false', descripcion: 'Auto aprobar nuevos habitantes.' },
+      { clave: 'Aprobación Automática Noticias', valor: 'false', descripcion: 'Auto aprobar noticias en cartelera.' },
+      { clave: 'Aprobación Automática Proyectos', valor: 'false', descripcion: 'Auto aprobar proyectos de infraestructura.' },
+      { clave: 'Aprobación Automática Organizaciones', valor: 'false', descripcion: 'Auto aprobar agrupaciones sociales.' },
+      { clave: 'Aprobación Automática Reportes', valor: 'false', descripcion: 'Auto aprobar reportes globales inter-comunales.' },
+      { clave: 'Censo', valor: 'true', descripcion: 'Activa o desactiva el censo comunitario.' }
+    ];
+
+    for (const c of configs) {
+      const [conf, created] = await Configuracion.findOrCreate({
+        where: { clave: c.clave },
+        defaults: c
+      });
+      if (created) console.log(`[+] Configuración creada: ${c.clave}`);
     }
 
     // 3. Semilla de Habitantes (Datos para pruebas de autocompletado)

@@ -22,25 +22,47 @@ class OrganizacionesController {
   static async getById(req, res, next) {
     try {
       const data = await OrganizacionSocial.findByPk(req.params.id);
-      if (!data) return res.status(404).json({ error: "Organizaci�n no encontrada" });
+      if (!data) return res.status(404).json({ error: "Organizacin no encontrada" });
       res.json(data);
     } catch (error) { next(error); }
   }
 
-  static async create(req, res, next) {
+  static async create(req, res) {
     try {
-      const data = await OrganizacionSocial.create(req.body);
-      if (req.user) {
-        await AuditService.log(req.user.id, "CREATE", "organizaciones_sociales", data.id, null, data.toJSON());
+      const Configuracion = OrganizacionSocial.sequelize.models.Configuracion;
+      const BandejaValidaciones = OrganizacionSocial.sequelize.models.BandejaValidaciones;
+      
+      const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Organizaciones' } });
+      const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+      
+      const autoApprove = (globalConfig && globalConfig.valor === 'true') || 
+                          (config && config.valor === 'true') || 
+                          req.user?.rol === 'admin';
+
+      if (!autoApprove) {
+        await BandejaValidaciones.create({
+          id_vocero: req.user.id,
+          tabla_afectada: 'organizaciones_sociales',
+          tipo_accion: 'CREATE',
+          datos_temporales: req.body,
+          estado_tramite: 'Pendiente'
+        });
+        return res.status(202).json({ mensaje: 'Solicitud enviada a la bandeja de validaciones.' });
       }
-      res.status(201).json(data);
-    } catch (error) { next(error); }
+
+      const organizacion = await OrganizacionesService.create(OrganizacionSocial, req.body);
+      await AuditService.log(req.user.id, 'CREATE', 'organizaciones', organizacion.id, null, organizacion);
+      res.status(201).json(organizacion);
+    } catch (error) {
+      logger.error('Error creando organización:', error);
+      res.status(400).json({ error: error.message });
+    }
   }
 
   static async update(req, res, next) {
     try {
       const data = await OrganizacionSocial.findByPk(req.params.id);
-      if (!data) return res.status(404).json({ error: "Organizaci�n no encontrada" });
+      if (!data) return res.status(404).json({ error: "Organizacin no encontrada" });
       const datosAntiguos = data.toJSON();
       await data.update(req.body);
       if (req.user) {

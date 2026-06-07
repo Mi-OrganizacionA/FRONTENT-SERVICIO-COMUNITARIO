@@ -92,6 +92,7 @@ async function start() {
       const PersonaGrupoSocialController = require('./controllers/personaGrupoSocialController');
       const EstudioDemograficoController = require('./controllers/estudioDemograficoController');
       const AuditService = require('./services/auditService');
+      const SystemController = require('./controllers/systemController');
 
       AuthController.setUsuarioModel(models.Usuario);
       HabitantesController.setModel(models.Habitante);
@@ -110,6 +111,7 @@ async function start() {
       EstudioDemograficoController.setModel(models.EstudioDemografico);
       CensoReportesController.setModels(models);
       AuditService.setModel(models.LogAuditoria);
+      SystemController.setConfiguracionModel(models.Configuracion);
 
       await runMigrations(sequelize);
     }

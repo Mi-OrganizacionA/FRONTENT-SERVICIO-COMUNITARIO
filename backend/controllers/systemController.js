@@ -3,25 +3,38 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const env = require('../config/environment');
 const logger = require('../utils/logger');
-
-// Memoria temporal para las configuraciones globales simuladas en backend
-const globalConfig = {
-  'Censo': true,
-  'Aprobación Automática': false
-};
+let ConfiguracionModel = null;
 
 class SystemController {
   
+  static setConfiguracionModel(model) {
+    ConfiguracionModel = model;
+  }
+
+  static async getConfig(req, res) {
+    try {
+      const configs = await ConfiguracionModel.findAll();
+      const configMap = {};
+      configs.forEach(c => { configMap[c.clave] = c.valor === 'true'; });
+      res.json({ success: true, config: configMap });
+    } catch (error) {
+      logger.error('Error fetching config:', error);
+      res.status(500).json({ error: 'Error al obtener configuración' });
+    }
+  }
+
   static async saveConfig(req, res) {
     try {
       const { nombre, estado } = req.body;
-      
-      // Aquí se guardaría en una base de datos o archivo JSON. 
-      // Por ahora lo guardamos en memoria.
-      globalConfig[nombre] = estado;
-      
+      const config = await ConfiguracionModel.findOne({ where: { clave: nombre } });
+      if (config) {
+        config.valor = estado ? 'true' : 'false';
+        await config.save();
+      } else {
+        await ConfiguracionModel.create({ clave: nombre, valor: estado ? 'true' : 'false' });
+      }
       logger.info(`Configuración actualizada: ${nombre} -> ${estado}`);
-      res.json({ success: true, config: globalConfig });
+      res.json({ success: true, message: 'Configuración guardada' });
     } catch (error) {
       logger.error('Error saving config:', error);
       res.status(500).json({ error: 'Error interno del servidor' });

@@ -12,4 +12,7 @@ router.get('/perfil', verifyToken, authController.getPerfil);
 router.post('/verify-password', verifyToken, authController.verifyPassword);
 router.put('/password', verifyToken, authController.changePassword);
 
+router.post('/request-code', authController.requestCode);
+router.post('/reset-password', authController.resetPasswordWithCode);
+
 module.exports = router;

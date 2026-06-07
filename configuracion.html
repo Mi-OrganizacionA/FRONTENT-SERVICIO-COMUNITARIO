@@ -218,24 +218,77 @@
             <div class="switch-container">
               <div class="switch-info">
                 <h4>Apertura del Censo Comunitario</h4>
-                <p>Permitir a los Voceros registrar nuevos habitantes y viviendas. Si se apaga, el censo se bloquea
-                  (Solo lectura).</p>
+                <p>Permitir a los Voceros registrar nuevos habitantes y viviendas. Si se apaga, el censo se bloquea (Solo lectura).</p>
               </div>
               <label class="switch">
-                <input type="checkbox" id="toggleCenso" checked onchange="toggleSetting('Censo', this.checked)">
+                <input type="checkbox" id="toggleCenso" onchange="toggleSetting('Censo', this.checked)">
                 <span class="slider"></span>
               </label>
             </div>
 
             <div class="switch-container" style="border-left: 4px solid var(--ru);">
               <div class="switch-info">
-                <h4>Aprobación Automática (Modo Peligroso)</h4>
-                <p>Si se activa, los registros de los voceros NO pasarán por la bandeja de validaciones y se guardarán
-                  de inmediato.</p>
+                <h4>Aprobación Automática (Global)</h4>
+                <p>Interruptor MAESTRO. Si se activa, anula el resto de bloqueos y permite guardar TODO directamente en la BD.</p>
               </div>
               <label class="switch">
-                <input type="checkbox" class="danger" id="toggleAutoAprob"
-                  onchange="toggleSetting('Aprobación Automática', this.checked, true)">
+                <input type="checkbox" class="danger" id="toggleAutoGlobal"
+                  onchange="toggleSetting('Aprobación Automática Global', this.checked, true)">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="switch-container">
+              <div class="switch-info">
+                <h4>Aprobación Habitantes</h4>
+                <p>Auto aprobar censos de habitantes.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggleAutoHabitantes" onchange="toggleSetting('Aprobación Automática Habitantes', this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="switch-container">
+              <div class="switch-info">
+                <h4>Aprobación Noticias</h4>
+                <p>Auto aprobar artículos y encuestas.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggleAutoNoticias" onchange="toggleSetting('Aprobación Automática Noticias', this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="switch-container">
+              <div class="switch-info">
+                <h4>Aprobación Proyectos</h4>
+                <p>Auto aprobar obras de infraestructura.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggleAutoProyectos" onchange="toggleSetting('Aprobación Automática Proyectos', this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="switch-container">
+              <div class="switch-info">
+                <h4>Aprobación Organizaciones</h4>
+                <p>Auto aprobar agrupaciones y grupos.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggleAutoOrganizaciones" onchange="toggleSetting('Aprobación Automática Organizaciones', this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="switch-container">
+              <div class="switch-info">
+                <h4>Aprobación Reportes Inter-comunales</h4>
+                <p>Auto aprobar reportes que abarcan varias comunas.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggleAutoReportes" onchange="toggleSetting('Aprobación Automática Reportes', this.checked)">
                 <span class="slider"></span>
               </label>
             </div>
@@ -328,18 +381,33 @@
   <script src="js/layout-menu.js"></script>
 
   <script>
-    // Validar acceso solo para administradores (protección frontal)
-    document.addEventListener('DOMContentLoaded', () => {
+    // Cargar configuraciones al inicio
+    document.addEventListener('DOMContentLoaded', async () => {
       const user = window.auth ? window.auth.getUser() : null;
       if (user && user.rol !== 'admin') {
         document.body.innerHTML = '<h2 style="text-align:center; margin-top:50px; color:var(--ru);">Acceso Denegado. Se requiere nivel de Administrador Global.</h2>';
+        return;
+      }
+      
+      try {
+        if (!window.api) return;
+        const config = await window.api.getSystemConfig();
+        if (config['Censo'] !== undefined) document.getElementById('toggleCenso').checked = config['Censo'];
+        if (config['Aprobación Automática Global'] !== undefined) document.getElementById('toggleAutoGlobal').checked = config['Aprobación Automática Global'];
+        if (config['Aprobación Automática Habitantes'] !== undefined) document.getElementById('toggleAutoHabitantes').checked = config['Aprobación Automática Habitantes'];
+        if (config['Aprobación Automática Noticias'] !== undefined) document.getElementById('toggleAutoNoticias').checked = config['Aprobación Automática Noticias'];
+        if (config['Aprobación Automática Proyectos'] !== undefined) document.getElementById('toggleAutoProyectos').checked = config['Aprobación Automática Proyectos'];
+        if (config['Aprobación Automática Organizaciones'] !== undefined) document.getElementById('toggleAutoOrganizaciones').checked = config['Aprobación Automática Organizaciones'];
+        if (config['Aprobación Automática Reportes'] !== undefined) document.getElementById('toggleAutoReportes').checked = config['Aprobación Automática Reportes'];
+      } catch (err) {
+        console.error('Error cargando config:', err);
       }
     });
 
     // Lógica para los switches conectada al API
     async function toggleSetting(nombre, estado, esPeligroso = false) {
       if (esPeligroso && estado === true) {
-        const confirmar = confirm('¡ADVERTENCIA! Activar la Aprobación Automática permite que los voceros guarden datos directamente sin revisión. ¿Estás seguro de asumir este riesgo de seguridad?');
+        const confirmar = confirm('¡ADVERTENCIA! Activar la Aprobación Automática MAESTRA permite que los voceros guarden datos de TODOS los módulos sin revisión. ¿Estás seguro?');
         if (!confirmar) {
           event.target.checked = false;
           return;
@@ -347,9 +415,9 @@
       }
       try {
         if (!window.api) throw new Error("API no disponible");
-        await window.api.saveConfig(nombre, estado);
+        await window.api.saveSystemConfig(nombre, estado);
         const accion = estado ? 'Activado' : 'Desactivado';
-        Components.showToast(`Ajuste guardado en BD: ${nombre} -> ${accion}`, estado ? 'success' : 'info');
+        Components.showToast(`Ajuste guardado: ${nombre} -> ${accion}`, estado ? 'success' : 'info');
       } catch (err) {
         console.error(err);
         Components.showToast(`Error al guardar la configuración: ${err.message}`, 'error');

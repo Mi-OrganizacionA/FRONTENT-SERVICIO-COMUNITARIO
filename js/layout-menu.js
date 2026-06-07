@@ -26,7 +26,7 @@
       title: 'Administración',
       items: [
         { href: 'voceros.html',      icon: 'users-gear',   label: 'Gestión de Voceros' },
-        { href: 'notificaciones.html', icon: 'bell', label: 'Centro de Notificaciones' },
+        { title: 'Validaciones', icon: 'fas fa-bell', link: 'notificaciones.html', roles: ['admin'] },
         { href: 'configuracion.html',icon: 'gear',         label: 'Configuración' }
       ]
     },
@@ -301,7 +301,7 @@
         try {
           if (!window.api) throw new Error("API no disponible");
           const notifs = await window.api.getNotificaciones();
-          const pendientes = notifs.filter(n => n.status === 'pendiente');
+          const count = notifs.length;
           
           if (badge) {
             badge.textContent = pendientes.length;
@@ -368,10 +368,12 @@
     // Initial fetch to set the badge count
     if (window.api && badge) {
       window.api.getNotificaciones().then(notifs => {
-        const p = notifs.filter(n => n.status === 'pendiente').length;
-        badge.textContent = p;
-        badge.style.display = p > 0 ? 'block' : 'none';
-      }).catch(() => {});
+        const count = notifs.length;
+        if (count > 0) {
+          const mItem = document.querySelector('.mobile-menu-item[href="notificaciones.html"]');
+          if (mItem) mItem.innerHTML += `<span class="mobile-badge">${count > 99 ? '99+' : count}</span>`;
+        }
+      });
     }
   };
 

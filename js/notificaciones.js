@@ -1,4 +1,4 @@
-﻿class NotificacionesController {
+class NotificacionesController {
   constructor() {
     this.notificaciones = [];
     this.activeId = null;
@@ -35,7 +35,7 @@
   }
 
   renderCount() {
-    const count = this.notificaciones.filter(n => n.status === 'pendiente').length;
+    const count = this.notificaciones.length; // En pendientes todos son pendientes
     const badge = document.getElementById('notificationCount');
     if (!badge) return;
     badge.textContent = `${count} pendiente${count === 1 ? '' : 's'}`;
@@ -59,14 +59,9 @@
 
   getSummaryStats() {
     const total = this.notificaciones.length;
-    const pendientes = this.notificaciones.filter(n => n.status === 'pendiente').length;
-    const aceptados = this.notificaciones.filter(n => n.status === 'aceptado').length;
-    const reenvios = this.notificaciones.filter(n => n.status === 'reenvio').length;
-
     return [
-      { label: 'Solicitudes totales', value: total, subtitle: 'Todas las entradas recientes', color: 'azul', trendClass: 'up' },
-      { label: 'Pendientes', value: pendientes, subtitle: 'Requieren tu revisión', color: 'amarillo', trendClass: pendientes > 0 ? 'down' : 'up' },
-      { label: 'Devoluciones', value: reenvios, subtitle: 'Solicitudes reenviadas', color: 'rojo', trendClass: reenvios > 0 ? 'down' : 'up' }
+      { label: 'Solicitudes en cola', value: total, subtitle: 'Pendientes por revisión', color: 'azul', trendClass: 'up' },
+      { label: 'Acción requerida', value: total, subtitle: 'Aprobar o rechazar', color: 'amarillo', trendClass: total > 0 ? 'down' : 'up' }
     ];
   }
 
@@ -79,22 +74,32 @@
       return;
     }
 
-    this.notificaciones.sort((a, b) => new Date(b.createdAt || b.fechaSolicitud) - new Date(a.createdAt || a.fechaSolicitud));
+    this.notificaciones.sort((a, b) => new Date(b.fecha_solicitud) - new Date(a.fecha_solicitud));
     list.innerHTML = this.notificaciones.map(n => {
-      const registro = n.datosHabitante || {};
       const isActive = n.id === this.activeId;
+      const titulo = `Registro en ${this.capitalize(n.tabla_afectada.replace('_', ' '))}`;
+      let subtitulo = `Acción: ${n.tipo_accion}`;
+      
+      // Intentar extraer algún dato identificativo del JSON
+      if (n.datos_temporales) {
+        if (n.datos_temporales.nombres) subtitulo = `Habitante: ${n.datos_temporales.nombres} ${n.datos_temporales.apellidos}`;
+        if (n.datos_temporales.titulo) subtitulo = `Noticia: ${n.datos_temporales.titulo}`;
+        if (n.datos_temporales.nombre_proyecto) subtitulo = `Proyecto: ${n.datos_temporales.nombre_proyecto}`;
+        if (n.datos_temporales.nombre) subtitulo = `Organización: ${n.datos_temporales.nombre}`;
+      }
+
       return `
         <article class="notification-card ${isActive ? 'active' : ''}" onclick="window.notificaciones.selectNotification(${n.id})">
           <div class="notification-card-title">
             <div>
-              <strong>${this.escapeHtml(registro.nombre ? registro.nombre + ' ' + registro.apellido : n.titulo)}</strong>
-              <div class="notification-card-subtitle">C.I. V-${this.escapeHtml(registro.cedula || '---')} · Añadido por ${this.escapeHtml(n.vocero || 'Vocero')}</div>
+              <strong>${this.escapeHtml(titulo)}</strong>
+              <div class="notification-card-subtitle">${this.escapeHtml(subtitulo)}</div>
             </div>
-            <span class="badge-sicag ${this.getStatusBadgeClass(n.status)}">${this.capitalize(n.status)}</span>
+            <span class="badge-sicag badge-pendiente">Pendiente</span>
           </div>
           <div class="notification-card-meta">
-            <span><i class="fas fa-user-tie"></i> ${this.escapeHtml(n.vocero || 'Vocero')}</span>
-            <span><i class="fas fa-map-marker-alt"></i> ${this.escapeHtml(n.consejoComunal || 'Sin consejo')}</span>
+            <span><i class="fas fa-clock"></i> ${this.formatDate(n.fecha_solicitud)}</span>
+            <span><i class="fas fa-database"></i> ${this.escapeHtml(n.tabla_afectada)}</span>
           </div>
         </article>
       `;
@@ -114,76 +119,51 @@
     }
 
     if (statusBadge) {
-      statusBadge.textContent = this.capitalize(notification.status);
-      statusBadge.className = `badge-sicag ${this.getStatusBadgeClass(notification.status)}`;
+      statusBadge.textContent = 'Pendiente';
+      statusBadge.className = `badge-sicag badge-pendiente`;
     }
 
-    const notas = notification.nota ? this.escapeHtml(notification.nota) : 'Sin observaciones.';
-    const puedeEditar = notification.tipo === 'registro_habitante';
-    const formDisabled = !this.editMode ? 'disabled' : '';
-    const registro = notification.datosHabitante || {};
+    const registro = notification.datos_temporales || {};
+    let detallesHtml = '';
+    
+    // Renderizar todas las claves del JSON de forma genérica
+    for (const [key, value] of Object.entries(registro)) {
+      if (key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
+        detallesHtml += this.renderDetailRow(this.capitalize(key.replace(/_/g, ' ')), value);
+      }
+    }
 
     detail.innerHTML = `
       <div class="notification-detail-card">
         <div class="notification-detail-header">
           <div>
-            <h2>${this.escapeHtml(notification.titulo)}</h2>
-            <p>${this.escapeHtml(notification.mensaje)}</p>
+            <h2>Solicitud de ${notification.tipo_accion}</h2>
+            <p>Tabla afectada: <strong>${notification.tabla_afectada}</strong></p>
           </div>
-          <span class="status-pill status-${notification.status}">${this.capitalize(notification.status)}</span>
+          <span class="status-pill status-pendiente">Pendiente</span>
         </div>
 
         <div class="notification-detail-top">
           <div class="notification-detail-top-item">
-            <strong>Vocero</strong>
-            <span>${this.escapeHtml(notification.vocero || 'Desconocido')}</span>
-          </div>
-          <div class="notification-detail-top-item">
-            <strong>Consejo Comunal</strong>
-            <span>${this.escapeHtml(notification.consejoComunal || 'Sin dato')}</span>
+            <strong>ID Vocero</strong>
+            <span>${notification.id_vocero}</span>
           </div>
           <div class="notification-detail-top-item">
             <strong>Fecha de solicitud</strong>
-            <span>${this.formatDate(notification.fechaSolicitud || notification.createdAt)}</span>
-          </div>
-          <div class="notification-detail-top-item">
-            <strong>Última nota</strong>
-            <span>${notas}</span>
+            <span>${this.formatDate(notification.fecha_solicitud)}</span>
           </div>
         </div>
 
-        ${puedeEditar ? `
-          <form id="notificationEditForm" class="notification-form">
-            <fieldset ${formDisabled}>
-              ${this.renderHabitanteFields(registro)}
-            </fieldset>
-          </form>
-        ` : ''}
-
-        ${notification.tipo === 'registro_habitante' ? `
-          <div class="notification-detail-group">
-            <h3>Resumen del solicitante</h3>
-            <div class="notification-detail-grid">
-              ${this.renderDetailRow('Cédula', registro.cedula)}
-              ${this.renderDetailRow('Nombre completo', `${registro.nombre || ''} ${registro.apellido || ''}`)}
-              ${this.renderDetailRow('Edad', registro.edad ? `${registro.edad} años` : 'No definido')}
-              ${this.renderDetailRow('Género', registro.genero || 'No definido')}
-              ${this.renderDetailRow('Clasificación', this.formatClasificacion(registro.clasificacion))}
-              ${this.renderDetailRow('Elector', registro.elector ? 'Sí' : 'No')}
-              ${this.renderDetailRow('Teléfono', registro.telefono || 'N/A')}
-              ${this.renderDetailRow('Dirección', registro.direccion || 'N/A')}
-            </div>
+        <div class="notification-detail-group">
+          <h3>Datos del Registro a Insertar</h3>
+          <div class="notification-detail-grid">
+            ${detallesHtml}
           </div>
-        ` : ''}
+        </div>
 
-        <div class="detail-actions">
-          ${this.editMode && puedeEditar ? `<button class="btn-sicag btn-primary" onclick="window.notificaciones.saveNotification(${notification.id})"><i class="fas fa-save"></i> Guardar cambios</button>
-          <button class="btn-sicag btn-outline-verde" onclick="window.notificaciones.cancelEdit()"><i class="fas fa-times"></i> Cancelar</button>` : ''}
-
-          ${!this.editMode && puedeEditar && notification.status !== 'aceptado' ? `<button class="btn-sicag btn-info" onclick="window.notificaciones.editNotification(${notification.id})"><i class="fas fa-edit"></i> Editar datos</button>` : ''}
-          ${notification.status !== 'aceptado' ? `<button class="btn-sicag btn-primary" onclick="window.notificaciones.acceptNotification(${notification.id})"><i class="fas fa-check"></i> Aceptar registro</button>` : ''}
-          ${notification.status !== 'rechazado' ? `<button class="btn-sicag btn-danger" onclick="window.notificaciones.rejectNotification(${notification.id})"><i class="fas fa-trash-alt"></i> Borrar registro</button>` : ''}
-          ${notification.status !== 'aceptado' ? `<button class="btn-sicag btn-warning" onclick="window.notificaciones.resendNotification(${notification.id})"><i class="fas fa-undo"></i> Reenviar al vocero</button>` : ''}
+        <div class="detail-actions" style="margin-top: 1.5rem;">
+          <button class="btn-sicag btn-primary" onclick="window.notificaciones.acceptNotification(${notification.id})"><i class="fas fa-check"></i> Aprobar Inserción</button>
+          <button class="btn-sicag btn-danger" onclick="window.notificaciones.rejectNotification(${notification.id})"><i class="fas fa-times"></i> Rechazar Solicitud</button>
         </div>
       </div>
     `;
@@ -260,40 +240,28 @@
   }
 
   async acceptNotification(id) {
-    const notification = this.notificaciones.find(n => n.id === id);
-    if (!notification) return;
-
-    if (notification.tipo === 'registro_habitante') {
-      await window.api.registrarHabitante(notification.datosHabitante);
+    try {
+      await window.api.aprobarNotificacion(id, 'Aprobado por el administrador general');
+      Components.showToast('Solicitud aprobada y registrada en el sistema.', 'success');
+      this.activeId = null;
+      await this.refresh();
+    } catch (e) {
+      Components.showToast('Error al aprobar: ' + e.message, 'error');
     }
-
-    await window.api.actualizarNotificacion(id, {
-      status: 'aceptado',
-      nota: 'Registro aceptado por administrador.'
-    });
-
-    await this.refresh();
-    Components.showToast('Registro aceptado y agregado a la base de datos.', 'success');
   }
 
   async rejectNotification(id) {
-    await window.api.actualizarNotificacion(id, {
-      status: 'rechazado',
-      nota: 'Registro rechazado por el administrador.'
-    });
+    const motivo = prompt('Por favor ingrese el motivo del rechazo:');
+    if (!motivo) return;
 
-    await this.refresh();
-    Components.showToast('Solicitud rechazada y marcada como no permitida.', 'error');
-  }
-
-  async resendNotification(id) {
-    await window.api.actualizarNotificacion(id, {
-      status: 'reenvio',
-      nota: 'El administrador devolvió la solicitud al vocero para corrección.'
-    });
-
-    await this.refresh();
-    Components.showToast('Solicitud enviada al vocero para corrección.', 'info');
+    try {
+      await window.api.rechazarNotificacion(id, motivo);
+      Components.showToast('Solicitud rechazada.', 'success');
+      this.activeId = null;
+      await this.refresh();
+    } catch (e) {
+      Components.showToast('Error al rechazar: ' + e.message, 'error');
+    }
   }
 
   selectNotification(id) {

@@ -1,4 +1,4 @@
-﻿const logger = require('../utils/logger');
+const logger = require('../utils/logger');
 const AuditService = require('../services/auditService');
 const ProyectosService = require('../services/proyectosService');
 let ProyectoModel = null;
@@ -28,6 +28,27 @@ class ProyectosController {
 
   static async create(req, res) {
     try {
+      const Configuracion = ProyectoModel.sequelize.models.Configuracion;
+      const BandejaValidaciones = ProyectoModel.sequelize.models.BandejaValidaciones;
+      
+      const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Proyectos' } });
+      const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+      
+      const autoApprove = (globalConfig && globalConfig.valor === 'true') || 
+                          (config && config.valor === 'true') || 
+                          req.user?.rol === 'admin';
+
+      if (!autoApprove) {
+        await BandejaValidaciones.create({
+          id_vocero: req.user.id,
+          tabla_afectada: 'proyectos',
+          tipo_accion: 'CREATE',
+          datos_temporales: req.body,
+          estado_tramite: 'Pendiente'
+        });
+        return res.status(202).json({ mensaje: 'Solicitud enviada a la bandeja de validaciones.' });
+      }
+
       const proyecto = await ProyectosService.create(ProyectoModel, req.body);
       await AuditService.log(req.user.id, 'CREATE', 'proyectos', proyecto.id, null, proyecto);
       res.status(201).json(proyecto);

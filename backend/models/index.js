@@ -18,6 +18,7 @@ async function initModels(sequelize) {
   const BandejaValidaciones = require('./BandejaValidaciones')(sequelize);
   const CarteleraDigital = require('./CarteleraDigital')(sequelize);
   const LogAuditoria = require('./LogAuditoria')(sequelize);
+  const Configuracion = require('./Configuracion')(sequelize);
 
   // Modelos del Censo Desglosados
   const CensoCaracteristicaFamiliar = require('./CensoCaracteristicaFamiliar')(sequelize);
@@ -93,7 +94,7 @@ async function initModels(sequelize) {
     BandejaValidaciones, CarteleraDigital, LogAuditoria,
     CensoCaracteristicaFamiliar, CensoSituacionEconomica, CensoSituacionVivienda,
     CensoSalud, CensoServicios, CensoParticipacionComunitaria, CensoSituacionComunidad,
-    CensoOpcionMultiple
+    CensoOpcionMultiple, Configuracion
   };
 }
 

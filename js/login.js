@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    SICAG v5.0 — Login Refactorizado (Usa AuthManager)
    Archivo: js/login.js
    ============================================================ */
@@ -19,6 +19,7 @@ class LoginController {
     }
 
     this._setupUI();
+    this._setupRecoveryModal();
   }
 
   _setupUI() {
@@ -124,6 +125,88 @@ class LoginController {
       `;
       container.appendChild(p);
     }
+  }
+
+  // --- Recuperación de Contraseña ---
+  _setupRecoveryModal() {
+    const modal = document.getElementById('recoveryModal');
+    const btnOpen = document.getElementById('forgotPasswordBtn');
+    const btnClose = document.getElementById('closeRecovery');
+    
+    if (!modal || !btnOpen) return;
+
+    btnOpen.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.style.display = 'block';
+    });
+
+    btnClose.addEventListener('click', () => {
+      modal.style.display = 'none';
+      this._resetRecoveryModal();
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+        this._resetRecoveryModal();
+      }
+    });
+
+    const btnRequestCode = document.getElementById('btnRequestCode');
+    const btnResetPassword = document.getElementById('btnResetPassword');
+
+    if (btnRequestCode) {
+      btnRequestCode.addEventListener('click', async () => {
+        const email = document.getElementById('recoveryEmail').value.trim();
+        if (!email) return alert('Por favor, ingresa tu correo.');
+        
+        btnRequestCode.disabled = true;
+        btnRequestCode.textContent = 'Enviando...';
+        try {
+          await window.api.requestCode(email);
+          alert('¡Código enviado! Revisa tu correo electrónico.');
+          document.getElementById('stepEmail').style.display = 'none';
+          document.getElementById('stepCode').style.display = 'block';
+        } catch (error) {
+          alert('Error: ' + error.message);
+        } finally {
+          btnRequestCode.disabled = false;
+          btnRequestCode.textContent = 'Enviar Código';
+        }
+      });
+    }
+
+    if (btnResetPassword) {
+      btnResetPassword.addEventListener('click', async () => {
+        const email = document.getElementById('recoveryEmail').value.trim();
+        const code = document.getElementById('recoveryCode').value.trim();
+        const newPassword = document.getElementById('recoveryNewPassword').value.trim();
+
+        if (!code || !newPassword) return alert('Por favor, completa todos los campos.');
+
+        btnResetPassword.disabled = true;
+        btnResetPassword.textContent = 'Cambiando...';
+        try {
+          await window.api.resetPassword(email, code, newPassword);
+          alert('¡Contraseña cambiada exitosamente! Ya puedes iniciar sesión.');
+          modal.style.display = 'none';
+          this._resetRecoveryModal();
+        } catch (error) {
+          alert('Error: ' + error.message);
+        } finally {
+          btnResetPassword.disabled = false;
+          btnResetPassword.textContent = 'Cambiar Contraseña';
+        }
+      });
+    }
+  }
+
+  _resetRecoveryModal() {
+    document.getElementById('stepEmail').style.display = 'block';
+    document.getElementById('stepCode').style.display = 'none';
+    document.getElementById('recoveryEmail').value = '';
+    document.getElementById('recoveryCode').value = '';
+    document.getElementById('recoveryNewPassword').value = '';
   }
 }
 
