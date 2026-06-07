@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Modulo de Censo Comunitario (SICAG v5.0)
  * Archivo: js/modules/censo.js
  */
@@ -41,8 +41,30 @@ class CensoController {
 
   async cargarDatos() {
     try {
-      // Simular fetch de API local
-      this.habitantes = await window.api.obtenerHabitantes();
+      const data = await window.api.getHabitantes();
+      this.habitantes = data.map(h => {
+         let age = 0;
+         if (h.fecha_nacimiento) {
+            const today = new Date();
+            const fnac = new Date(h.fecha_nacimiento);
+            age = today.getFullYear() - fnac.getFullYear();
+            if (today.getMonth() < fnac.getMonth() || (today.getMonth() === fnac.getMonth() && today.getDate() < fnac.getDate())) age--;
+         }
+         return {
+            id: h.id_habitante,
+            nombre: h.nombres,
+            apellido: h.apellidos,
+            cedula: h.cedula,
+            edad: age,
+            genero: h.genero,
+            consejoComunal: h.consejo ? h.consejo.nombre_comunidad : 'No asignado',
+            telefono: h.telefono,
+            clasificacion: age >= 60 ? 'adulto_mayor' : age <= 11 ? 'niño' : 'adulto',
+            elector: age >= 18
+         };
+      });
+
+      this.actualizarKpis();
       this.renderTabla();
     } catch (error) {
       console.error('Error cargando habitantes:', error);
@@ -51,6 +73,21 @@ class CensoController {
         tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#C62828;">Error cargando datos del censo.</td></tr>`;
       }
     }
+  }
+
+  actualizarKpis() {
+     const total = this.habitantes.length;
+     const electores = this.habitantes.filter(h => h.elector).length;
+     
+     const elTotal = document.getElementById('kpiHabitantes');
+     const elElec = document.getElementById('kpiElectores');
+     
+     if (elTotal) elTotal.textContent = total;
+     if (elElec) elElec.textContent = electores;
+     
+     // Para "Consejos Comunales" dejaremos en 9 fijo de momento si es la comuna.
+     const elCC = document.getElementById('kpiConsejos');
+     if (elCC) elCC.textContent = 9;
   }
 
   renderTabla() {

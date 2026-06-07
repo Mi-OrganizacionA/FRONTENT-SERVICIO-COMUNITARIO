@@ -95,6 +95,25 @@ class APIManager {
     return this.crearHabitante(datos); // Alias para crearHabitante
   }
 
+  async actualizarHabitante(id, cambios) {
+    await this.waitForMockData();
+    if (this.isDevelopment) {
+      const index = this.mockData.habitantes.findIndex(h => h.id === id);
+      if (index !== -1) {
+        this.mockData.habitantes[index] = { ...this.mockData.habitantes[index], ...cambios };
+        return this.mockData.habitantes[index];
+      }
+      throw new Error('Habitante no encontrado');
+    }
+    const response = await fetch(`${this.baseURL}/habitantes/${id}`, {
+      method: 'PUT',
+      ...this._getHeaders(),
+      body: JSON.stringify(cambios)
+    });
+    if (!response.ok) throw new Error('Error al actualizar habitante');
+    return response.json();
+  }
+
   async getNotificaciones() {
     if (!this.isDevelopment) {
       const response = await fetch(`${this.baseURL}/notificaciones`, this._getHeaders());
@@ -205,6 +224,56 @@ class APIManager {
     const params = new URLSearchParams(filtros);
     const response = await fetch(`${this.baseURL}/proyectos?${params}`, this._getHeaders());
     if (!response.ok) throw new Error('Error fetching proyectos');
+    return response.json();
+  }
+
+  async crearProyecto(datos) {
+    await this.waitForMockData();
+    if (this.isDevelopment) {
+      const nuevoId = this.mockData.proyectos.length > 0 ? Math.max(...this.mockData.proyectos.map(p => p.id)) + 1 : 1;
+      const registro = { id: nuevoId, ...datos, fecha_registro: new Date().toISOString() };
+      this.mockData.proyectos.push(registro);
+      return registro;
+    }
+    const response = await fetch(`${this.baseURL}/proyectos`, {
+      method: 'POST',
+      ...this._getHeaders(),
+      body: JSON.stringify(datos)
+    });
+    if (!response.ok) throw new Error('Error al crear proyecto');
+    return response.json();
+  }
+
+  async actualizarProyecto(id, cambios) {
+    await this.waitForMockData();
+    if (this.isDevelopment) {
+      const index = this.mockData.proyectos.findIndex(p => p.id === id);
+      if (index !== -1) {
+        this.mockData.proyectos[index] = { ...this.mockData.proyectos[index], ...cambios };
+        return this.mockData.proyectos[index];
+      }
+      throw new Error('Proyecto no encontrado');
+    }
+    const response = await fetch(`${this.baseURL}/proyectos/${id}`, {
+      method: 'PUT',
+      ...this._getHeaders(),
+      body: JSON.stringify(cambios)
+    });
+    if (!response.ok) throw new Error('Error al actualizar proyecto');
+    return response.json();
+  }
+
+  async eliminarProyecto(id) {
+    await this.waitForMockData();
+    if (this.isDevelopment) {
+      this.mockData.proyectos = this.mockData.proyectos.filter(p => p.id !== id);
+      return { success: true };
+    }
+    const response = await fetch(`${this.baseURL}/proyectos/${id}`, {
+      method: 'DELETE',
+      ...this._getHeaders()
+    });
+    if (!response.ok) throw new Error('Error al eliminar proyecto');
     return response.json();
   }
 
@@ -327,6 +396,99 @@ class APIManager {
     const response = await fetch(`${this.baseURL}/voceros/${id}`, { method: 'DELETE', ...this._getHeaders() });
     if (!response.ok) throw new Error('Error eliminando vocero');
     return response.json();
+  }
+
+  // ─────────────────────────────────────────
+  // NOTICIAS (CARTELERA DIGITAL)
+  // ─────────────────────────────────────────
+  async getNoticias(filtros = {}) {
+    await this.waitForMockData();
+    if (this.isDevelopment) return this.mockData?.noticias || [];
+    const params = new URLSearchParams(filtros);
+    const response = await fetch(`${this.baseURL}/noticias?${params}`, this._getHeaders());
+    if (!response.ok) throw new Error('Error fetching noticias');
+    return response.json();
+  }
+
+  async crearNoticia(datos) {
+    await this.waitForMockData();
+    if (this.isDevelopment) {
+      const nuevoId = (this.mockData.noticias && this.mockData.noticias.length > 0) ? Math.max(...this.mockData.noticias.map(n => n.id)) + 1 : 1;
+      const registro = { id: nuevoId, ...datos, fecha_publicacion: new Date().toISOString() };
+      if(!this.mockData.noticias) this.mockData.noticias = [];
+      this.mockData.noticias.push(registro);
+      return registro;
+    }
+    const response = await fetch(`${this.baseURL}/noticias`, {
+      method: 'POST',
+      ...this._getHeaders(),
+      body: JSON.stringify(datos)
+    });
+    if (!response.ok) throw new Error('Error al crear noticia');
+    return response.json();
+  }
+
+  async actualizarNoticia(id, cambios) {
+    await this.waitForMockData();
+    if (this.isDevelopment) {
+      const index = this.mockData.noticias.findIndex(n => n.id === id);
+      if (index !== -1) {
+        this.mockData.noticias[index] = { ...this.mockData.noticias[index], ...cambios };
+        return this.mockData.noticias[index];
+      }
+      throw new Error('Noticia no encontrada');
+    }
+    const response = await fetch(`${this.baseURL}/noticias/${id}`, {
+      method: 'PUT',
+      ...this._getHeaders(),
+      body: JSON.stringify(cambios)
+    });
+    if (!response.ok) throw new Error('Error al actualizar noticia');
+    return response.json();
+  }
+
+  async eliminarNoticia(id) {
+    await this.waitForMockData();
+    if (this.isDevelopment) {
+      this.mockData.noticias = this.mockData.noticias.filter(n => n.id !== id);
+      return { success: true };
+    }
+    const response = await fetch(`${this.baseURL}/noticias/${id}`, {
+      method: 'DELETE',
+      ...this._getHeaders()
+    });
+    if (!response.ok) throw new Error('Error al eliminar noticia');
+    return response.json();
+  }
+
+  // ─────────────────────────────────────────
+  // DASHBOARD Y ESTADÍSTICAS
+  // ─────────────────────────────────────────
+  async getDashboardStats() {
+    if (this.isDevelopment) return { habitantes: 0, viviendas: 0, proyectos: 0, consejos: 0 };
+    
+    // Obtenemos los totales haciendo llamadas a los endpoints
+    try {
+      const [habRes, vivRes, proyRes] = await Promise.all([
+        fetch(`${this.baseURL}/habitantes`, this._getHeaders()),
+        fetch(`${this.baseURL}/viviendas`, this._getHeaders()),
+        fetch(`${this.baseURL}/proyectos`, this._getHeaders())
+      ]);
+      
+      const habitantes = habRes.ok ? await habRes.json() : [];
+      const viviendas = vivRes.ok ? await vivRes.json() : [];
+      const proyectos = proyRes.ok ? await proyRes.json() : [];
+      
+      return {
+        habitantes: habitantes.length || 0,
+        viviendas: viviendas.length || 0,
+        proyectos: proyectos.length || 0,
+        consejos: 8 // Valor base
+      };
+    } catch (e) {
+      console.error("Error obteniendo stats del dashboard", e);
+      return { habitantes: 0, viviendas: 0, proyectos: 0, consejos: 0 };
+    }
   }
 
   // ─────────────────────────────────────────

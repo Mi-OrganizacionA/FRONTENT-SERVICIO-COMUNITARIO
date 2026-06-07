@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -186,7 +186,7 @@
           <div class="kpi-icon verde"><i class="fas fa-map"></i></div>
           <div class="kpi-info">
             <h3>Área Total</h3>
-            <div class="kpi-value" style="font-size:1.3rem;">850 Ha</div>
+            <div class="kpi-value" id="cartKpiArea" style="font-size:1.3rem;">850 Ha</div>
             <span class="kpi-trend up">Vocación agrícola</span>
           </div>
         </div>
@@ -194,7 +194,7 @@
           <div class="kpi-icon amarillo"><i class="fas fa-home"></i></div>
           <div class="kpi-info">
             <h3>Consejos Comunales</h3>
-            <div class="kpi-value" style="font-size:1.3rem;">9</div>
+            <div class="kpi-value" id="cartKpiCc" style="font-size:1.3rem;">9</div>
             <span class="kpi-trend up">Las Mercedes</span>
           </div>
         </div>
@@ -202,7 +202,7 @@
           <div class="kpi-icon azul"><i class="fas fa-seedling"></i></div>
           <div class="kpi-info">
             <h3>Ha Cultivadas</h3>
-            <div class="kpi-value" style="font-size:1.3rem;">156</div>
+            <div class="kpi-value" id="cartKpiHa" style="font-size:1.3rem;">156</div>
             <span class="kpi-trend up">6 tipos de cultivo</span>
           </div>
         </div>
@@ -210,7 +210,7 @@
           <div class="kpi-icon rojo"><i class="fas fa-users"></i></div>
           <div class="kpi-info">
             <h3>Familias</h3>
-            <div class="kpi-value" style="font-size:1.3rem;">790</div>
+            <div class="kpi-value" id="cartKpiFamilias" style="font-size:1.3rem;">790</div>
             <span class="kpi-trend up">~6.000 personas</span>
           </div>
         </div>
@@ -397,8 +397,34 @@
         btn.classList.add('active');
       });
     });
+
+    // Populate KPIs using API
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        if (window.api && window.api.getHabitantes) {
+          const habitantes = await window.api.getHabitantes();
+          const countHab = habitantes.length;
+          document.querySelector('.kpi-trend.up:last-child').textContent = `~${countHab.toLocaleString()} personas`;
+        }
+        if (window.api && window.api.getViviendas) {
+          const viviendas = await window.api.getViviendas();
+          document.getElementById('cartKpiFamilias').textContent = viviendas.length.toLocaleString();
+        }
+        if (window.api && window.api.getProduccion) {
+          const prod = await window.api.getProduccion();
+          const haProd = prod.reduce((sum, p) => sum + (parseFloat(p.hectareas) || 0), 0);
+          document.getElementById('cartKpiHa').textContent = haProd.toFixed(1);
+          // To reflect dynamic rubros
+          const rubros = new Set(prod.map(p => p.rubro).filter(Boolean));
+          document.querySelector('#cartKpiHa + .kpi-trend').textContent = `${rubros.size || 0} tipos de cultivo`;
+        }
+      } catch(e) {
+        console.error('Error fetching data for cartografia KPIs', e);
+      }
+    });
   </script>
   <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/layout-menu.js"></script>
   <script src="js/roles.js"></script>
 </body>

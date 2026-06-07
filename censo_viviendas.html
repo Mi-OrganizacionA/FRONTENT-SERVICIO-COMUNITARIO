@@ -2905,7 +2905,33 @@
     /* ══════════════════════════════════════════
        DATA & TABLE (integra con censo-viviendas.js si existe)
     ══════════════════════════════════════════ */
-    let viviendas = JSON.parse(localStorage.getItem('cv_viviendas') || '[]');
+    let viviendas = [];
+    async function loadViviendasData() {
+      try {
+        if (window.api && window.api.getViviendas) {
+          const data = await window.api.getViviendas();
+          viviendas = data.map(v => ({
+            id: v.id_vivienda,
+            cedula: v.cedula_jefe_familia,
+            sector: v.sector_comunidad,
+            habitantes: v.cantidad_habitantes,
+            condicion: v.condicion_general,
+            tipo: v.tipo_vivienda,
+            tenencia: v.tenencia,
+            paredes: v.material_paredes,
+            techo: v.material_techo,
+            agua: v.aguas_blancas,
+            gas: v.gas_domestico,
+            direccion: v.direccion_exacta,
+            fechaCenso: v.fecha_registro
+          }));
+        }
+        renderTable();
+      } catch (err) {
+        console.error('Error al cargar viviendas:', err);
+        showToast('Error de conexión al obtener viviendas.', 'error');
+      }
+    }
 
     function getBadgeCondicion(c) {
       const map = {
@@ -3204,11 +3230,35 @@
         showToast('La cédula del jefe de familia es obligatoria.', 'error');
         return;
       }
-      viviendas.push(v);
-      localStorage.setItem('cv_viviendas', JSON.stringify(viviendas));
-      bootstrap.Modal.getInstance(document.getElementById('modalVivienda')).hide();
-      renderTable();
-      showToast(`Vivienda de ${v.cedula} registrada correctamente. ✅`);
+      try {
+        if (window.api && window.api.crearVivienda) {
+          const registroBD = {
+            cedula_jefe_familia: v.cedula,
+            sector_comunidad: v.sector,
+            direccion_exacta: v.direccion,
+            cantidad_habitantes: v.habitantes,
+            condicion_general: v.condicion,
+            tipo_vivienda: v.tipo,
+            tenencia: v.tenencia,
+            condiciones_terreno: v.terreno,
+            material_paredes: v.paredes,
+            material_techo: v.techo,
+            aguas_blancas: v.agua,
+            aguas_servidas: v.servidas,
+            gas_domestico: v.gas,
+            cantidad_cilindros_gas: v.gas === 'Bombona' ? 1 : 0,
+            sistema_electrico: v.electrico,
+            recoleccion_basura: v.basura
+          };
+          await window.api.crearVivienda(registroBD);
+        }
+        await loadViviendasData();
+        bootstrap.Modal.getInstance(document.getElementById('modalVivienda')).hide();
+        showToast(`Vivienda de ${v.cedula} registrada correctamente. ✅`);
+      } catch (err) {
+        console.error(err);
+        showToast('Error al guardar la vivienda en el servidor', 'error');
+      }
     });
 
     /* ── Search & filters ── */
@@ -3228,14 +3278,13 @@
       renderTable();
     });
 
-    document.getElementById('btnRefresh').addEventListener('click', () => {
-      viviendas = JSON.parse(localStorage.getItem('cv_viviendas') || '[]');
-      renderTable();
+    document.getElementById('btnRefresh').addEventListener('click', async () => {
+      await loadViviendasData();
       showToast('Datos actualizados.');
     });
 
     /* ── Init ── */
-    renderTable();
+    loadViviendasData();
   </script>
 
   <script src="js/habitante-autocomplete.js" defer></script>

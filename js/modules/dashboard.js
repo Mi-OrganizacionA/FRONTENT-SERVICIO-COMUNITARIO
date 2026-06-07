@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Módulo de Dashboard (SICAG v5.0)
  * Archivo: js/dashboard.js
  */
@@ -30,23 +30,82 @@ class DashboardController {
 
   async cargarDatos() {
     try {
-      // Cargamos todos los habitantes y proyectos
+      // Cargamos stats y habitantes desde la API real
+      this.stats = await window.api.getDashboardStats();
       this.habitantes = await window.api.getHabitantes();
-      this.proyectos = await window.api.getProyectos();
+      this.noticias = await window.api.getNoticias();
     } catch (err) {
       throw err;
     }
   }
 
   actualizarKPIs() {
-    // Si tenemos elementos para actualizar (este prototipo asume que los KPIs están fijos,
-    // pero demostramos cómo actualizarlos con datos reales)
+    // Actualizar tarjetas numéricas
+    const totalHab = document.getElementById('kpiTotalHab');
+    if (totalHab) totalHab.textContent = this.stats?.habitantes || 0;
+
+    const elNoticias = document.getElementById('kpiNoticias');
+    if (elNoticias) elNoticias.textContent = this.noticias?.length || 0;
+
+    // Calcular electores ficticios o reales si vienen en el array
+    const elElectores = document.getElementById('kpiElectores');
+    const elNinos = document.getElementById('kpiNinos');
     
-    // Contar Familias (aproximado usando cedulas unicas para el demo)
-    const totalHabitantes = this.habitantes.length;
+    if (this.habitantes && this.habitantes.length > 0) {
+      let electores = 0;
+      let ninos = 0;
+      const today = new Date();
+      this.habitantes.forEach(h => {
+        if (h.fecha_nacimiento) {
+          const fnac = new Date(h.fecha_nacimiento);
+          let age = today.getFullYear() - fnac.getFullYear();
+          if (today.getMonth() < fnac.getMonth() || (today.getMonth() === fnac.getMonth() && today.getDate() < fnac.getDate())) {
+            age--;
+          }
+          if (age >= 18) electores++;
+          if (age <= 11) ninos++;
+        }
+      });
+      if (elElectores) elElectores.textContent = electores;
+      if (elNinos) elNinos.textContent = ninos;
+    } else {
+      if (elElectores) elElectores.textContent = 0;
+      if (elNinos) elNinos.textContent = 0;
+    }
+
+    // Actualizar tabla recientes
+    const tbody = document.querySelector('#recentTable tbody');
+    if (tbody && this.habitantes) {
+      tbody.innerHTML = '';
+      // Tomamos los ultimos 5
+      const recientes = [...this.habitantes].slice(-5).reverse();
+      if (recientes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#666;">Sin registros recientes.</td></tr>';
+      } else {
+        recientes.forEach(h => {
+          let age = '-';
+          if (h.fecha_nacimiento) {
+            const today = new Date();
+            const fnac = new Date(h.fecha_nacimiento);
+            age = today.getFullYear() - fnac.getFullYear();
+            if (today.getMonth() < fnac.getMonth() || (today.getMonth() === fnac.getMonth() && today.getDate() < fnac.getDate())) age--;
+          }
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${h.cedula || 'S/C'}</td>
+            <td>${h.nombres || ''} ${h.apellidos || ''}</td>
+            <td>${age}</td>
+            <td>${h.genero || '-'}</td>
+            <td>${h.consejo?.nombre_comunidad || 'No asignado'}</td>
+            <td><span class="badge ${age >= 18 ? 'bg-verde' : 'bg-amarillo'}">${age >= 18 ? 'Adulto' : 'Menor'}</span></td>
+            <td>${age >= 18 ? '<i class="fas fa-check-circle text-success"></i>' : '-'}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
     
-    // En este punto, solo notificamos en consola para el demo
-    console.log(`[Dashboard] Datos cargados: ${totalHabitantes} habitantes, ${this.proyectos?.length || 0} proyectos.`);
+    console.log(`[Dashboard] Datos cargados: ${this.stats?.habitantes} habitantes.`);
     
     // Animación de los botones de reload
     document.querySelectorAll('.kpi-reload').forEach(btn => {
@@ -54,10 +113,7 @@ class DashboardController {
         e.preventDefault();
         const icon = this.querySelector('i');
         icon.classList.add('fa-spin');
-        
-        // Simular recarga
         await new Promise(r => setTimeout(r, 1000));
-        
         icon.classList.remove('fa-spin');
         if (window.Components) Components.showToast('Datos actualizados', 'success');
       });

@@ -571,11 +571,37 @@
     renderGrid();
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const inp = document.getElementById('projSearchInput');
-    if (inp) inp.addEventListener('input', renderGrid);
+  async function cargarProyectos() {
+    try {
+      if (window.api && window.api.getProyectos) {
+        const data = await window.api.getProyectos();
+        proyectos = data.map(p => ({
+          id: p.id_proyecto || p.id,
+          titulo: p.nombre_proyecto || p.titulo || '',
+          descripcion: p.descripcion || '',
+          estado: (p.estado || 'propuesto').toLowerCase(),
+          consejo: p.consejo_comunal || p.consejo || '',
+          presupuesto: p.presupuesto_estimado || p.presupuesto || 0,
+          avance: p.avance || 0,
+          tipo: p.tipo_proyecto || p.tipo || '',
+          fechaInicio: p.fecha_inicio ? p.fecha_inicio.split('T')[0] : (p.fechaInicio || null),
+          fechaFin: p.fecha_fin ? p.fecha_fin.split('T')[0] : (p.fechaFin || null),
+          responsable: p.responsable || '',
+          observaciones: p.observaciones || ''
+        }));
+      }
+    } catch (err) {
+      console.error('Error cargando proyectos', err);
+      proyectos = [];
+    }
     renderKPIs();
     renderGrid();
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const inp = document.getElementById('projSearchInput');
+    if (inp) inp.addEventListener('input', renderGrid);
+    await cargarProyectos();
   });
 
   // ── MODAL NUEVO / EDITAR ──
@@ -628,7 +654,7 @@
     });
   }
 
-  function guardarProyecto() {
+  async function guardarProyecto() {
     const titulo = document.getElementById('projTitulo').value.trim();
     const desc   = document.getElementById('projDescripcion').value.trim();
     const estado = document.getElementById('projEstado').value;
@@ -641,32 +667,33 @@
 
     const id  = document.getElementById('projId').value;
     const data = {
-      titulo,
+      nombre_proyecto: titulo,
       descripcion: desc,
       estado,
-      consejo,
-      presupuesto: parseFloat(document.getElementById('projPresupuesto').value) || 0,
-      avance:      parseInt(document.getElementById('projAvance').value) || 0,
-      tipo:        document.getElementById('projTipo').value,
+      consejo_comunal: consejo,
+      presupuesto_estimado: parseFloat(document.getElementById('projPresupuesto').value) || 0,
+      avance: parseInt(document.getElementById('projAvance').value) || 0,
+      tipo_proyecto: document.getElementById('projTipo').value,
       responsable: document.getElementById('projResponsable').value.trim(),
-      fechaInicio: document.getElementById('projFechaInicio').value,
-      fechaFin:    document.getElementById('projFechaFin').value,
+      fecha_inicio: document.getElementById('projFechaInicio').value,
+      fecha_fin: document.getElementById('projFechaFin').value,
       observaciones: document.getElementById('projObservaciones').value.trim()
     };
 
-    if (id) {
-      const idx = proyectos.findIndex(p => p.id === parseInt(id));
-      if (idx >= 0) proyectos[idx] = { ...proyectos[idx], ...data };
-      if (window.Components) Components.showToast('Proyecto actualizado correctamente.', 'success');
-    } else {
-      const newId = proyectos.length > 0 ? Math.max(...proyectos.map(p => p.id)) + 1 : 1;
-      proyectos.push({ id: newId, ...data });
-      if (window.Components) Components.showToast('Proyecto registrado correctamente.', 'success');
+    try {
+      if (id) {
+        await window.api.actualizarProyecto(id, data);
+        if (window.Components) Components.showToast('Proyecto actualizado correctamente.', 'success');
+      } else {
+        await window.api.crearProyecto(data);
+        if (window.Components) Components.showToast('Proyecto registrado correctamente.', 'success');
+      }
+      cerrarModalProyecto();
+      await cargarProyectos();
+    } catch(err) {
+      console.error(err);
+      if (window.Components) Components.showToast('Error al guardar proyecto.', 'error');
     }
-
-    cerrarModalProyecto();
-    renderKPIs();
-    renderGrid();
   }
 
   // ── ELIMINACIÓN ──
@@ -683,13 +710,17 @@
     if (modal) modal.classList.remove('show');
   }
 
-  function eliminarProyectoConfirmado() {
+  async function eliminarProyectoConfirmado() {
     if (!projEliminarId) return;
-    proyectos = proyectos.filter(p => p.id !== projEliminarId);
-    cerrarModalElimProj();
-    renderKPIs();
-    renderGrid();
-    if (window.Components) Components.showToast('Proyecto eliminado del registro.', 'error');
+    try {
+      await window.api.eliminarProyecto(projEliminarId);
+      cerrarModalElimProj();
+      await cargarProyectos();
+      if (window.Components) Components.showToast('Proyecto eliminado del registro.', 'success');
+    } catch(err) {
+      console.error(err);
+      if (window.Components) Components.showToast('Error al eliminar proyecto.', 'error');
+    }
   }
 
   // ── VER DETALLE ──

@@ -29,14 +29,14 @@
       <img src="assets/img/logo_comuna.png" alt="Logo SICAG" width="42" height="42">
       <div>
         <span>SICAG</span>
-        <span class="brand-sub">Comuna Simón Rodríguez</span>
+        <span class="brand-sub">Sistema Informativo para la Comuna Agroecológica</span>
       </div>
     </a>
 
     <ul class="pub-nav-links" id="pubNavLinks" role="list">
       <li><a href="#inicio" class="active">Inicio</a></li>
       <li><a href="#habitantes">Habitantes</a></li>
-
+      <li><a href="#proyectos">Proyectos</a></li>
       <li><a href="#cartelera">Cartelera</a></li>
       <li><a href="#mapa">Mapa</a></li>
       <li><a href="#contacto">Contacto</a></li>
@@ -57,19 +57,33 @@
        HERO SECTION
        ══════════════════════════════════════════════════════ -->
   <section class="pub-hero" id="inicio" aria-label="Sección principal">
-    <div class="pub-hero-bg" id="heroBg" role="img" aria-label="Paisaje agrícola Las Mercedes" style="background-size:cover;background-position:center center;"></div>
+    <div class="pub-hero-bg" id="heroBg" role="img" aria-label="Paisaje agrícola Las Mercedes"
+      style="background-size:cover;background-position:center center;"></div>
     <div class="pub-hero-overlay"></div>
 
     <!-- Controles para cambiar imágenes (verticales a la derecha) -->
-    <div class="pub-hero-controls" aria-hidden="false" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:6">
-      <button id="heroPrev" class="hero-btn" aria-label="Anterior" style="background:rgba(0,0,0,.35);border:none;color:#fff;padding:8px;border-radius:6px"><i class="fas fa-chevron-up"></i></button>
+    <div class="pub-hero-controls" aria-hidden="false"
+      style="position:absolute;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:6">
+      <button id="heroPrev" class="hero-btn" aria-label="Anterior"
+        style="background:rgba(0,0,0,.35);border:none;color:#fff;padding:8px;border-radius:6px"><i
+          class="fas fa-chevron-up"></i></button>
       <div id="heroDots" class="hero-dots" style="display:flex;flex-direction:column;gap:2px;align-items:center;">
-        <button class="hero-dot active" data-index="0" style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.9);background-clip:padding-box;box-sizing:border-box;cursor:pointer;" aria-label="Ver imagen 1"></button>
-        <button class="hero-dot" data-index="1" style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.5);background-clip:padding-box;box-sizing:border-box;cursor:pointer;" aria-label="Ver imagen 2"></button>
-        <button class="hero-dot" data-index="2" style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.5);background-clip:padding-box;box-sizing:border-box;cursor:pointer;" aria-label="Ver imagen 3"></button>
-        <button class="hero-dot" data-index="3" style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.5);background-clip:padding-box;box-sizing:border-box;cursor:pointer;" aria-label="Ver imagen 4"></button>
+        <button class="hero-dot active" data-index="0"
+          style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.9);background-clip:padding-box;box-sizing:border-box;cursor:pointer;"
+          aria-label="Ver imagen 1"></button>
+        <button class="hero-dot" data-index="1"
+          style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.5);background-clip:padding-box;box-sizing:border-box;cursor:pointer;"
+          aria-label="Ver imagen 2"></button>
+        <button class="hero-dot" data-index="2"
+          style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.5);background-clip:padding-box;box-sizing:border-box;cursor:pointer;"
+          aria-label="Ver imagen 3"></button>
+        <button class="hero-dot" data-index="3"
+          style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.5);background-clip:padding-box;box-sizing:border-box;cursor:pointer;"
+          aria-label="Ver imagen 4"></button>
       </div>
-      <button id="heroNext" class="hero-btn" aria-label="Siguiente" style="background:rgba(0,0,0,.35);border:none;color:#fff;padding:8px;border-radius:6px"><i class="fas fa-chevron-down"></i></button>
+      <button id="heroNext" class="hero-btn" aria-label="Siguiente"
+        style="background:rgba(0,0,0,.35);border:none;color:#fff;padding:8px;border-radius:6px"><i
+          class="fas fa-chevron-down"></i></button>
     </div>
 
     <div class="pub-hero-content">
@@ -97,30 +111,30 @@
     </div>
 
     <script>
-    (function(){
-      const images = ['assets/img/hero_banner.png','assets/img/proyecto_siembra.png','assets/img/proyecto_maiz.png','assets/img/proyecto_hortalizas.png'];
-      let idx = 0;
-      const heroBg = document.getElementById('heroBg');
-      const dots = () => Array.from(document.querySelectorAll('.hero-dot'));
-      function setImage(i){
-        idx = (i + images.length) % images.length;
-        heroBg.style.backgroundImage = `url('${images[idx]}')`;
-        dots().forEach(d=>{
-          d.classList.toggle('active', Number(d.dataset.index)===idx);
-          d.style.background = Number(d.dataset.index)===idx ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.5)';
-        });
-        
-        // Pre-carga diferida (lazy load) de la siguiente imagen
-        const nextImg = new Image();
-        nextImg.src = images[(idx + 1) % images.length];
-      }
-      setImage(0);
-      let timer = setInterval(()=> setImage(idx+1), 5000);
-      function resetTimer(){ clearInterval(timer); timer = setInterval(()=> setImage(idx+1), 5000); }
-      document.getElementById('heroPrev').addEventListener('click', ()=>{ setImage(idx-1); resetTimer(); });
-      document.getElementById('heroNext').addEventListener('click', ()=>{ setImage(idx+1); resetTimer(); });
-      document.getElementById('heroDots').addEventListener('click', (e)=>{ if(e.target && e.target.classList.contains('hero-dot')){ setImage(Number(e.target.dataset.index)); resetTimer(); } });
-    })();
+      (function () {
+        const images = ['assets/img/hero_banner.png', 'assets/img/proyecto_siembra.png', 'assets/img/proyecto_maiz.png', 'assets/img/proyecto_hortalizas.png'];
+        let idx = 0;
+        const heroBg = document.getElementById('heroBg');
+        const dots = () => Array.from(document.querySelectorAll('.hero-dot'));
+        function setImage(i) {
+          idx = (i + images.length) % images.length;
+          heroBg.style.backgroundImage = `url('${images[idx]}')`;
+          dots().forEach(d => {
+            d.classList.toggle('active', Number(d.dataset.index) === idx);
+            d.style.background = Number(d.dataset.index) === idx ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.5)';
+          });
+
+          // Pre-carga diferida (lazy load) de la siguiente imagen
+          const nextImg = new Image();
+          nextImg.src = images[(idx + 1) % images.length];
+        }
+        setImage(0);
+        let timer = setInterval(() => setImage(idx + 1), 5000);
+        function resetTimer() { clearInterval(timer); timer = setInterval(() => setImage(idx + 1), 5000); }
+        document.getElementById('heroPrev').addEventListener('click', () => { setImage(idx - 1); resetTimer(); });
+        document.getElementById('heroNext').addEventListener('click', () => { setImage(idx + 1); resetTimer(); });
+        document.getElementById('heroDots').addEventListener('click', (e) => { if (e.target && e.target.classList.contains('hero-dot')) { setImage(Number(e.target.dataset.index)); resetTimer(); } });
+      })();
     </script>
   </section>
 
@@ -160,10 +174,14 @@
       <!-- Buscador prominente -->
       <div class="pub-search-wrap fade-up">
         <div class="pub-search-inner">
-          <label for="habSearch" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Buscar habitante</label>
+          <label for="habSearch" class="sr-only"
+            style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Buscar
+            habitante</label>
           <input type="text" id="habSearch" placeholder="🔍 Nombre completo o número de cédula...">
-          
-          <label for="habCC" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Seleccionar Consejo Comunal</label>
+
+          <label for="habCC" class="sr-only"
+            style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Seleccionar
+            Consejo Comunal</label>
           <select id="habCC">
             <option value="">Todos los Consejos</option>
             <option value="jobito1">C.C. Jobito I</option>
@@ -184,33 +202,47 @@
 
       <!-- Cards de acceso -->
       <div class="pub-grid-4">
-        <div class="pub-hab-card fade-up fade-up-d1" role="button" tabindex="0" aria-label="Buscar por nombre o cédula">
+        <div class="pub-hab-card fade-up fade-up-d1" aria-label="Buscar por nombre o cédula">
           <div class="pub-hab-icon verde"><i class="fas fa-id-card"></i></div>
           <h3>Buscar por Nombre / Cédula</h3>
           <p>Consulta los datos de cualquier habitante registrado en la plataforma SICAG.</p>
-          <span class="pub-hab-link">Consultar ahora <i class="fas fa-arrow-right"></i></span>
         </div>
-        <div class="pub-hab-card fade-up fade-up-d2" role="button" tabindex="0" aria-label="Mi consejo comunal">
+        <div class="pub-hab-card fade-up fade-up-d2" aria-label="Mi consejo comunal">
           <div class="pub-hab-icon amarillo"><i class="fas fa-house-chimney"></i></div>
           <h3>Mi Consejo Comunal</h3>
           <p>Jobito I/II · Brisas del Yurubí · Andrés Eloy Blanco · Mercedes I/II y más.</p>
-          <span class="pub-hab-link">Ver directorio <i class="fas fa-arrow-right"></i></span>
         </div>
-        <div class="pub-hab-card fade-up fade-up-d3" role="button" tabindex="0" aria-label="Estadísticas demográficas">
+        <div class="pub-hab-card fade-up fade-up-d3" aria-label="Estadísticas demográficas">
           <div class="pub-hab-icon azul"><i class="fas fa-chart-pie"></i></div>
           <h3>Estadísticas Demográficas</h3>
           <p>Niños 0–10 años, adultos mayores, personas con discapacidad, distribución por género.</p>
-          <span class="pub-hab-link">Ver estadísticas <i class="fas fa-arrow-right"></i></span>
         </div>
-        <div class="pub-hab-card fade-up fade-up-d4" role="button" tabindex="0" aria-label="Control electoral">
+        <div class="pub-hab-card fade-up fade-up-d4" aria-label="Control electoral">
           <div class="pub-hab-icon rojo"><i class="fas fa-vote-yea"></i></div>
           <h3>Control Electoral</h3>
           <p>Centros CNE y centros comunales de votación. Padrón electoral actualizado.</p>
-          <span class="pub-hab-link">Verificar registro <i class="fas fa-arrow-right"></i></span>
         </div>
       </div>
     </div>
   </section>
+  <!-- ══════════════════════════════════════════════════════
+       PROYECTOS AGROECOLOGICOS
+       ══════════════════════════════════════════════════════ -->
+  <section class="pub-section" id="proyectos" aria-labelledby="projTitle">
+    <div class="pub-container">
+      <div class="pub-section-label fade-up"><i class="fas fa-seedling"></i> Obras e Iniciativas</div>
+      <h2 class="pub-section-title fade-up" id="projTitle">Proyectos <span>Agroecológicos</span></h2>
+      <p class="pub-section-sub fade-up">Conoce los proyectos en ejecución, propuestos y finalizados por los 9 consejos
+        comunales.</p>
+
+      <div class="pub-grid" id="indexProyectosGrid"
+        style="display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:1.5rem;" class="fade-up">
+        <!-- Proyectos inyectados via JS -->
+        <p style="color:var(--muted)">Cargando proyectos...</p>
+      </div>
+    </div>
+  </section>
+
   <!-- ══════════════════════════════════════════════════════
        CARTELERA DIGITAL
        ══════════════════════════════════════════════════════ -->
@@ -446,7 +478,7 @@
       </div>
     </div>
     <div class="pub-footer-bottom">
-      <span>© 2026 Comuna Socialista Agrícola Simón Rodríguez · SICAG v2.0</span>
+      <span>© 2026 Comuna Socialista Agroecológica Simón Rodríguez · SICAG v2.0</span>
       <span>Desarrollado con <i class="fas fa-heart" style="color:#EF5350"></i> para el Poder Popular · Yaracuy</span>
     </div>
     <div class="pub-footer-tricolor" role="presentation" aria-hidden="true"></div>

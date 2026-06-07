@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    SICAG — Portal Público JavaScript
    ============================================================ */
 (function () {
@@ -151,6 +151,178 @@
         btn.disabled = false;
       }, 3000);
     }, 1500);
+  });
+
+  /* ── CARGAR DATOS PUBLICOS ── */
+  async function cargarDatosPublicos() {
+    try {
+      let proyectos = [];
+      let noticias = [];
+      let stats = null;
+
+      // Soporte para API inyectada (Electron) o fetch REST backend
+      if (window.api && window.api.getProyectos) {
+        proyectos = await window.api.getProyectos();
+        if (window.api.getNoticias) noticias = await window.api.getNoticias();
+        if (window.api.getDashboardStats) stats = await window.api.getDashboardStats();
+      } else {
+        const resP = await fetch('http://localhost:3000/api/proyectos').catch(()=>null);
+        if (resP && resP.ok) proyectos = await resP.json();
+        
+        const resN = await fetch('http://localhost:3000/api/noticias').catch(()=>null);
+        if (resN && resN.ok) noticias = await resN.json();
+        
+        const resS = await fetch('http://localhost:3000/api/dashboard/stats').catch(()=>null);
+        if (resS && resS.ok) stats = await resS.json();
+      }
+      
+      renderProyectos(proyectos);
+      renderNoticias(noticias);
+      if (stats) renderStats(stats, proyectos.length);
+    } catch(err) {
+      console.error('Error cargando datos publicos', err);
+      renderProyectos([]);
+      renderNoticias([]);
+    }
+  }
+
+  function renderStats(stats, totalProyectos) {
+    // Actualizar elementos con los datos reales
+    // Agregamos data-count para que anime.js los anime cuando entre al viewport
+    const map = {
+      'idxHab': stats.habitantes || 0,
+      'idxCC': 9,
+      'idxHectareas': 156,
+      't1Ha': 156,
+      't1Proj': totalProyectos || stats.proyectos || 0,
+      't1Prod': 8500,
+      't2Elec': 92,
+      't2Agua': 85,
+      't2Gas': 78,
+      't4Ninos': stats.ninos || 0,
+      't4AdultosM': 850,
+      't4Disc': 120,
+      'dashHab': stats.habitantes || 0,
+      'dashElec': stats.electores || 0,
+      'dashCC': 9
+    };
+
+    for (const [id, value] of Object.entries(map)) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.dataset.count = value;
+        el.textContent = value.toLocaleString('es-VE') + (el.dataset.suffix || '');
+      }
+    }
+  }
+
+  function renderProyectos(proyectos) {
+    const grid = document.getElementById('indexProyectosGrid');
+    if (!grid) return;
+    
+    if (proyectos.length === 0) {
+       grid.innerHTML = '<p style="color:var(--muted);text-align:center;">No hay proyectos disponibles en este momento.</p>';
+       return;
+    }
+    
+    const ultimos = proyectos.slice(-6).reverse(); // Mostrar 6 max en landing
+    
+    grid.innerHTML = ultimos.map(p => {
+       const estado = (p.estado || 'propuesto').toLowerCase();
+       const avance = p.avance || 0;
+       return `
+         <div class="pub-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);">
+            <div style="font-size:0.75rem;font-weight:700;color:var(--vp);text-transform:uppercase;margin-bottom:0.5rem;display:flex;justify-content:space-between;">
+               <span><i class="fas fa-hammer"></i> ${estado}</span>
+               <span>${avance}%</span>
+            </div>
+            <h4 style="font-size:1rem;font-weight:700;margin-bottom:0.5rem;color:var(--txt)">${p.nombre_proyecto || ''}</h4>
+            <p style="font-size:0.8rem;color:var(--muted);flex:1;margin-bottom:1rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${p.descripcion || ''}</p>
+            <div style="font-size:0.75rem;color:var(--muted);border-top:1px solid var(--border);padding-top:0.75rem;">
+               <i class="fas fa-map-marker-alt"></i> ${p.consejo_comunal || 'Sector General'}
+            </div>
+         </div>
+       `;
+    }).join('');
+  }
+
+  function renderNoticias(noticias) {
+    const track = document.getElementById('carouselTrack');
+    if (!track) return;
+    
+    if (noticias.length === 0) {
+      track.innerHTML = '<p style="color:var(--muted);text-align:center;width:100%;">No hay noticias disponibles en este momento.</p>';
+      return;
+    }
+
+    const activas = noticias.slice(-9).reverse();
+    track.style.justifyContent = 'flex-start'; // Reset justify si habian
+    track.style.gap = '24px';
+    
+    track.innerHTML = activas.map(n => {
+       const tipo = (n.tipo_publicacion || 'noticia').toLowerCase();
+       let icono = 'fa-newspaper';
+       if (tipo === 'convocatoria') icono = 'fa-bullhorn';
+       if (tipo === 'encuesta') icono = 'fa-poll';
+       if (tipo === 'aviso') icono = 'fa-triangle-exclamation';
+       const fecha = n.fecha_publicacion ? new Date(n.fecha_publicacion).toLocaleDateString() : '';
+       return `
+         <div class="pub-news-card" style="min-width:300px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);flex:1;">
+            <div style="font-size:0.75rem;font-weight:700;color:var(--au);text-transform:uppercase;margin-bottom:0.5rem;">
+               <i class="fas ${icono}"></i> ${tipo}
+            </div>
+            <h4 style="font-size:1rem;font-weight:700;margin-bottom:0.5rem;color:var(--txt)">${n.titulo || ''}</h4>
+            <p style="font-size:0.8rem;color:var(--muted);flex:1;margin-bottom:1rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${n.contenido || ''}</p>
+            <div style="font-size:0.75rem;color:var(--muted);border-top:1px solid var(--border);padding-top:0.75rem;">
+               <i class="fas fa-calendar"></i> ${fecha}
+            </div>
+         </div>
+       `;
+    }).join('');
+  }
+
+  // Ejecutar carga
+  document.addEventListener('DOMContentLoaded', () => {
+     cargarDatosPublicos();
+     
+     // Habilitar Buscador de Habitante en Landing Page
+     const searchBtn = document.getElementById('habSearchBtn');
+     if (searchBtn) {
+       searchBtn.addEventListener('click', async () => {
+         const btnOriginHTML = searchBtn.innerHTML;
+         searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+         searchBtn.disabled = true;
+         
+         const input = document.getElementById('habSearch');
+         const q = (input ? input.value : '').toLowerCase().trim();
+         
+         try {
+            let habs = [];
+            if (window.api && window.api.getHabitantes) {
+              habs = await window.api.getHabitantes();
+            } else {
+              const res = await fetch('http://localhost:3000/api/habitantes').catch(()=>null);
+              if (res && res.ok) habs = await res.json();
+            }
+            
+            const match = habs.find(h => 
+               (h.cedula && h.cedula.toString() === q) || 
+               (h.nombres && h.nombres.toLowerCase().includes(q))
+            );
+            
+            if (match) {
+               alert(`✅ HABITANTE ENCONTRADO:\n\nNombre: ${match.nombres} ${match.apellidos || ''}\nC.I.: V-${match.cedula}\nConsejo Comunal: ${match.consejo ? match.consejo.nombre_comunidad : 'Registrado'}\nEstatus: Censado(a) correctamente en la plataforma SICAG.`);
+            } else {
+               alert(`❌ NO ENCONTRADO:\nNo se hallaron coincidencias para "${q}". Verifica el número de cédula o el nombre.`);
+            }
+         } catch(e) {
+            alert('Error de conexión al consultar habitante.');
+         }
+         
+         searchBtn.innerHTML = btnOriginHTML;
+         searchBtn.disabled = false;
+       });
+     }
   });
 
 })();

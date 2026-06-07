@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Módulo de Cartelera Digital (Noticias) - SICAG v5.0
  * Archivo: js/modules/noticias.js
  */
@@ -50,29 +50,119 @@ class NoticiasController {
   }
 
   async cargarDatos() {
-    // Usamos datos dummy si la API no devuelve nada
-    const dataDummy = [
-      { id: 1, tipo: 'noticia', titulo: 'Jornada de Vacunación', autor: 'Comité Salud', fecha: '2026-05-15', desc: 'Se realizará vacunación en la casa comunal.' },
-      { id: 2, tipo: 'convocatoria', titulo: 'Asamblea de Ciudadanos', autor: 'Sala Autogobierno', fecha: '2026-05-20', desc: 'Discusión de nuevos proyectos.', extra: 'Plaza Bolívar - 10:00 am' }
-    ];
+    try {
+      this.noticias = await window.api.getNoticias();
+      this.renderNoticias();
+      this.actualizarKPICards();
+    } catch (e) {
+      console.error(e);
+      // Fallback si la base de datos está vacía o hay error (para que la pantalla no quede en blanco visualmente si es la primera vez)
+      if (this.noticias.length === 0) {
+        this.noticias = [
+          { id: 1, tipo_publicacion: 'noticia', titulo: 'Jornada de Vacunación', contenido: 'Se realizará vacunación en la casa comunal.', fecha_publicacion: '2026-05-15T00:00:00.000Z' },
+          { id: 2, tipo_publicacion: 'convocatoria', titulo: 'Asamblea de Ciudadanos', contenido: 'Discusión de nuevos proyectos.', fecha_publicacion: '2026-05-20T00:00:00.000Z' }
+        ];
+        this.renderNoticias();
+      }
+    }
     
-    // Por simplicidad en este modulo v5.0 simularemos que ya cargaron visualmente (manteniendo el diseño premium actual),
-    // pero configuramos la infraestructura CRUD.
-    
-    // Actualizar el contador inicial
     this.actualizarContador();
+  }
+
+  actualizarKPICards() {
+    const total = this.noticias.length;
+    const nNoticias = this.noticias.filter(n => n.tipo_publicacion === 'noticia').length;
+    const nConv = this.noticias.filter(n => n.tipo_publicacion === 'convocatoria').length;
+    const nAvisos = this.noticias.filter(n => ['aviso', 'encuesta'].includes(n.tipo_publicacion)).length;
+
+    const elTotal = document.getElementById('kpiNoticiasTotal');
+    const elNot = document.getElementById('kpiNoticiasActivas');
+    const elConv = document.getElementById('kpiNoticiasConv');
+    const elAvi = document.getElementById('kpiNoticiasAvisos');
+
+    if (elTotal) elTotal.textContent = total;
+    if (elNot) elNot.textContent = nNoticias;
+    if (elConv) elConv.textContent = nConv;
+    if (elAvi) elAvi.textContent = nAvisos;
+  }
+
+  renderNoticias() {
+    const grid = document.getElementById('pubGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const iconMap = {
+      'noticia': 'fa-newspaper',
+      'convocatoria': 'fa-bullhorn',
+      'encuesta': 'fa-poll',
+      'aviso': 'fa-triangle-exclamation'
+    };
+
+    this.noticias.forEach(n => {
+      const tipo = (n.tipo_publicacion || 'noticia').toLowerCase();
+      const cssClass = tipo === 'aviso' ? 'aviso-cd' : tipo;
+      const icono = iconMap[tipo] || 'fa-file-alt';
+      const fecha = n.fecha_publicacion ? new Date(n.fecha_publicacion).toLocaleDateString() : 'Sin fecha';
+
+      const card = document.createElement('div');
+      card.className = 'pub-card';
+      card.dataset.id = n.id || n.id_publicacion;
+      card.dataset.type = tipo;
+
+      card.innerHTML = `
+        <div class="pub-card-bar bar-${tipo === 'aviso' ? 'aviso' : tipo}"></div>
+        <div class="pub-card-body">
+          <div class="pub-card-top">
+            <span class="pub-badge badge-${cssClass}"><i class="fas ${icono}"></i> ${tipo.toUpperCase()}</span>
+            <div class="pub-top-right">
+              <span class="pub-status-dot"><i class="fas fa-check-circle"></i> Activa</span>
+            </div>
+          </div>
+          <h4 class="pub-card-title">${n.titulo || ''}</h4>
+          <p class="pub-card-desc">${n.contenido || ''}</p>
+          <div class="pub-card-footer">
+            <div class="pub-meta-info">
+              <span class="pub-meta-row"><i class="fas fa-calendar"></i> ${fecha}</span>
+            </div>
+            <div class="pub-card-btns">
+              <button class="btn-sicag btn-sm" style="padding:4px 8px;font-size:0.75rem;background:transparent;color:var(--au)" onclick="abrirModalNoticia(${card.dataset.id}, '${tipo}')" title="Editar"><i class="fas fa-edit"></i></button>
+              <button class="btn-sicag btn-sm" style="padding:4px 8px;font-size:0.75rem;background:transparent;color:var(--ru)" onclick="confirmarEliminarNot(${card.dataset.id})" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
+            </div>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
   }
 
   abrirModalNoticia(id, tipo = 'noticia') {
     const modal = document.getElementById('modalNoticia');
     const title = document.getElementById('modalNotTitle');
     const form = document.getElementById('formNoticia');
+    const idInput = document.getElementById('notId');
     
     if (id) {
       title.innerHTML = '<i class="fas fa-pencil-alt" style="color:var(--au)"></i> Editar Publicación #' + id;
+      if (idInput) idInput.value = id;
+      const n = this.noticias.find(x => x.id == id || x.id_publicacion == id);
+      if (n) {
+        const titulo = document.getElementById('notTitulo');
+        const tipoInput = document.getElementById('notTipo');
+        const desc = document.getElementById('notDescripcion');
+        const fecha = document.getElementById('notFecha');
+        const autor = document.getElementById('notAutor');
+        
+        if (titulo) titulo.value = n.titulo || '';
+        if (tipoInput) tipoInput.value = (n.tipo_publicacion || 'noticia').toLowerCase();
+        if (desc) desc.value = n.contenido || '';
+        if (fecha && n.fecha_publicacion) fecha.value = n.fecha_publicacion.split('T')[0];
+        if (autor) autor.value = n.autor || 'Sala de Autogobierno';
+        this.handleTipoNoticia();
+      }
     } else {
       title.innerHTML = '<i class="fas fa-plus-circle" style="color:var(--vv)"></i> Nueva Publicación';
       if (form) form.reset();
+      if (idInput) idInput.value = '';
       const autorInput = document.getElementById('notAutor');
       if (autorInput) autorInput.value = window.auth ? window.auth.getUser()?.nombre : 'Sala de Autogobierno';
       
@@ -90,11 +180,12 @@ class NoticiasController {
     document.body.style.overflow = '';
   }
 
-  guardarNoticia() {
+  async guardarNoticia() {
     const titulo = document.getElementById('notTitulo')?.value.trim();
     const tipo = document.getElementById('notTipo')?.value;
     const desc = document.getElementById('notDescripcion')?.value.trim();
     const extra = document.getElementById('notExtra')?.value.trim();
+    const idInput = document.getElementById('notId')?.value;
 
     if (!titulo || !tipo || !desc) {
       if (window.Components) Components.showToast('Complete los campos obligatorios (*)', 'warning');
@@ -111,15 +202,33 @@ class NoticiasController {
       btn.disabled = true;
     }
 
-    setTimeout(() => {
-      if (window.Components) Components.showToast('Publicación exitosa', 'success');
+    const data = {
+      titulo: titulo,
+      tipo_publicacion: tipo,
+      contenido: desc,
+      autor: document.getElementById('notAutor')?.value.trim() || 'Sala de Autogobierno',
+      fecha_publicacion: document.getElementById('notFecha')?.value || new Date().toISOString()
+    };
+
+    try {
+      if (idInput) {
+        await window.api.actualizarNoticia(idInput, data);
+        if (window.Components) Components.showToast('Publicación actualizada', 'success');
+      } else {
+        await window.api.crearNoticia(data);
+        if (window.Components) Components.showToast('Publicación exitosa', 'success');
+      }
       this.cerrarModalNoticia();
+      await this.cargarDatos();
+    } catch (e) {
+      console.error(e);
+      if (window.Components) Components.showToast('Error al guardar publicación', 'error');
+    } finally {
       if (btn) {
         btn.innerHTML = '<i class="fas fa-paper-plane"></i> Publicar';
         btn.disabled = false;
       }
-      // Aqui idealmente recargamos los datos y la grilla
-    }, 1200);
+    }
   }
 
   handleTipoNoticia() {
@@ -156,17 +265,14 @@ class NoticiasController {
     }
   }
 
-  eliminarNoticiaVisual(id) {
-    const card = document.querySelector('#pubGrid .pub-card[data-id="' + id + '"]');
-    if (card) {
-      card.style.transition = 'all 0.35s ease';
-      card.style.opacity = '0';
-      card.style.transform = 'scale(0.88)';
-      setTimeout(() => {
-        card.remove();
-        this.actualizarContador();
-        if (window.Components) Components.showToast('Publicación eliminada', 'success');
-      }, 350);
+  async eliminarNoticiaVisual(id) {
+    try {
+      await window.api.eliminarNoticia(id);
+      if (window.Components) Components.showToast('Publicación eliminada', 'success');
+      await this.cargarDatos();
+    } catch (e) {
+      console.error(e);
+      if (window.Components) Components.showToast('Error al eliminar publicación', 'error');
     }
   }
 
