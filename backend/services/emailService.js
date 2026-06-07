@@ -9,20 +9,36 @@ class EmailService {
 
   async initTransporter() {
     try {
-      // Como estamos en entorno de desarrollo/prueba sin SMTP oficial todavía,
-      // creamos una cuenta temporal de Ethereal para simular envíos de correo.
-      const testAccount = await nodemailer.createTestAccount();
+      const env = require('../config/environment');
 
-      this.transporter = nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false,
-        auth: {
-          user: testAccount.user,
-          pass: testAccount.pass,
-        },
-      });
-      logger.info('Servicio de correos (Ethereal) inicializado con éxito.');
+      if (env.node_env === 'production' && env.smtp.user && env.smtp.pass) {
+        // En producción usamos las credenciales SMTP reales del .env
+        this.transporter = nodemailer.createTransport({
+          host: env.smtp.host,
+          port: env.smtp.port,
+          secure: env.smtp.port == 465, // true para 465, false para 587 o 25
+          auth: {
+            user: env.smtp.user,
+            pass: env.smtp.pass,
+          },
+        });
+        logger.info('Servicio de correos inicializado con credenciales SMTP reales (Producción).');
+      } else {
+        // Como estamos en entorno de desarrollo/prueba sin SMTP oficial todavía,
+        // creamos una cuenta temporal de Ethereal para simular envíos de correo.
+        const testAccount = await nodemailer.createTestAccount();
+
+        this.transporter = nodemailer.createTransport({
+          host: "smtp.ethereal.email",
+          port: 587,
+          secure: false,
+          auth: {
+            user: testAccount.user,
+            pass: testAccount.pass,
+          },
+        });
+        logger.info('Servicio de correos (Ethereal) inicializado con éxito para pruebas.');
+      }
     } catch (error) {
       logger.error('Error inicializando el servicio de correos:', error);
     }

@@ -23,6 +23,13 @@ module.exports = {
     refresh_expire: process.env.JWT_REFRESH_EXPIRE || '7d'
   },
 
+  smtp: {
+    host: process.env.SMTP_HOST || 'smtp.ethereal.email',
+    port: process.env.SMTP_PORT || 587,
+    user: process.env.SMTP_USER || null,
+    pass: process.env.SMTP_PASS || null
+  },
+
   cors: {
     origin: function (origin, callback) {
       // Permitir cualquier origen en desarrollo local
