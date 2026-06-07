@@ -61,12 +61,63 @@ class ReportesController {
       btnCloseFilters.addEventListener('click', () => modalFiltros.style.display = 'none');
     }
 
+    // Pre-cargar fecha mínima del sistema para "Fecha Desde"
+    const filtroDesde = document.getElementById('filtroDesde');
+    const filtroHasta = document.getElementById('filtroHasta');
+    if (filtroDesde && filtroHasta) {
+      const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
+      fetch(`${baseUrl}/censo-reportes/fecha-minima`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.fecha_minima) filtroDesde.value = data.fecha_minima;
+        })
+        .catch(err => console.error('Error cargando fecha minima:', err));
+      
+      const hoy = new Date().toISOString().split('T')[0];
+      filtroHasta.value = hoy;
+    }
+
+    // Lógica del Toggle de Fecha Nacimiento vs Edad
+    const chkNac = document.getElementById('chkNacimiento');
+    const fnacMin = document.getElementById('filtroNacMin');
+    const fnacMax = document.getElementById('filtroNacMax');
+    const edMin = document.getElementById('filtroEdadMin');
+    const edMax = document.getElementById('filtroEdadMax');
+    const lblNacMin = document.getElementById('lblNacMin');
+    const lblNacMax = document.getElementById('lblNacMax');
+
+    if (chkNac) {
+      chkNac.addEventListener('change', (e) => {
+        const isNac = e.target.checked;
+        if (isNac) {
+          // Activa Nacimiento, Desactiva Edades
+          fnacMin.disabled = false; fnacMin.style.background = '#fff'; fnacMin.style.cursor = 'text';
+          fnacMax.disabled = false; fnacMax.style.background = '#fff'; fnacMax.style.cursor = 'text';
+          lblNacMin.style.color = '#111'; lblNacMax.style.color = '#111';
+          
+          edMin.disabled = true; edMin.style.background = '#f3f4f6'; edMin.style.cursor = 'not-allowed'; edMin.value = '';
+          edMax.disabled = true; edMax.style.background = '#f3f4f6'; edMax.style.cursor = 'not-allowed'; edMax.value = '';
+        } else {
+          // Activa Edades, Desactiva Nacimiento
+          fnacMin.disabled = true; fnacMin.style.background = '#f3f4f6'; fnacMin.style.cursor = 'not-allowed'; fnacMin.value = '';
+          fnacMax.disabled = true; fnacMax.style.background = '#f3f4f6'; fnacMax.style.cursor = 'not-allowed'; fnacMax.value = '';
+          lblNacMin.style.color = '#888'; lblNacMax.style.color = '#888';
+          
+          edMin.disabled = false; edMin.style.background = '#fff'; edMin.style.cursor = 'text';
+          edMax.disabled = false; edMax.style.background = '#fff'; edMax.style.cursor = 'text';
+        }
+      });
+    }
+
+    // Limpiar Filtros
     if (btnLimpiarFiltros) {
       btnLimpiarFiltros.addEventListener('click', () => {
-        ['filtroDesde', 'filtroHasta', 'filtroConsejo', 'filtroEdadMin', 'filtroEdadMax', 'filtroGenero', 'filtroSalud', 'filtroCne', 'filtroTrabajo'].forEach(id => {
+        ['filtroEdadMin', 'filtroEdadMax', 'filtroNacMin', 'filtroNacMax', 'filtroConsejo', 'filtroGenero', 'filtroSalud', 'filtroCne', 'filtroTrabajo'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.value = '';
         });
+        document.querySelectorAll('.chk-extra').forEach(el => el.checked = false);
+        if (chkNac) { chkNac.checked = false; chkNac.dispatchEvent(new Event('change')); }
       });
     }
 
@@ -98,24 +149,37 @@ class ReportesController {
     const consejo_id = document.getElementById('filtroConsejo')?.value;
     const edad_min = document.getElementById('filtroEdadMin')?.value;
     const edad_max = document.getElementById('filtroEdadMax')?.value;
+    const nac_min = document.getElementById('filtroNacMin')?.value;
+    const nac_max = document.getElementById('filtroNacMax')?.value;
     const genero = document.getElementById('filtroGenero')?.value;
     const salud = document.getElementById('filtroSalud')?.value;
     const cne = document.getElementById('filtroCne')?.value;
     const trabajo = document.getElementById('filtroTrabajo')?.value;
+    
+    // Obtener extras
+    const extras = Array.from(document.querySelectorAll('.chk-extra:checked')).map(el => el.value).join(',');
 
     let params = new URLSearchParams();
     if (desde) params.append('desde', desde);
     if (hasta) params.append('hasta', hasta);
     if (consejo_id) params.append('consejo_id', consejo_id);
-    if (edad_min) params.append('edad_min', edad_min);
-    if (edad_max) params.append('edad_max', edad_max);
+    
+    const chkNac = document.getElementById('chkNacimiento');
+    if (chkNac && chkNac.checked) {
+      if (nac_min) params.append('nac_min', nac_min);
+      if (nac_max) params.append('nac_max', nac_max);
+    } else {
+      if (edad_min) params.append('edad_min', edad_min);
+      if (edad_max) params.append('edad_max', edad_max);
+    }
+
     if (genero) params.append('genero', genero);
     if (salud) params.append('salud', salud);
     if (cne) params.append('cne', cne);
     if (trabajo) params.append('trabajo', trabajo);
+    if (extras) params.append('extras', extras);
 
-    const qs = params.toString();
-    return qs; // Devuelve algo como "desde=2026&hasta=2026" sin el "?"
+    return params.toString();
   }
 
   async cargarKPIs() {

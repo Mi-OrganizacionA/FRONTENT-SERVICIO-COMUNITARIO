@@ -319,6 +319,18 @@
               <option value="9">Vencedores del Corozo</option>
             </select>
           </div>
+          <div class="form-group-sicag" style="grid-column:1/-1; background:#f0fdf4; border:1px solid #bbf7d0; padding:1rem; border-radius:8px; display:flex; align-items:center; gap:0.5rem; margin-top:0.5rem;">
+            <input type="checkbox" id="chkNacimiento" style="width:1.2rem; height:1.2rem; cursor:pointer;">
+            <label for="chkNacimiento" style="font-weight:700; color:#166534; cursor:pointer; margin:0;">Usar Rango de Fechas de Nacimiento (desactiva Edad)</label>
+          </div>
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;" id="lblNacMin">F. Nacimiento Desde</label>
+            <input type="date" id="filtroNacMin" class="input-sicag" disabled style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#f3f4f6; cursor:not-allowed;">
+          </div>
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;" id="lblNacMax">F. Nacimiento Hasta</label>
+            <input type="date" id="filtroNacMax" class="input-sicag" disabled style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#f3f4f6; cursor:not-allowed;">
+          </div>
           
           <div class="form-group-sicag">
             <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Mínima</label>
@@ -365,6 +377,27 @@
           </div>
         </div>
         
+        <!-- COLUMNAS ADICIONALES -->
+        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed #e5e7eb;">
+          <label style="font-weight:700; color:#111; font-size:1rem; margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem;">
+            <i class="fas fa-columns" style="color:var(--vp);"></i> ¿Deseas incluir columnas adicionales en el reporte?
+          </label>
+          <div style="display:flex; flex-wrap:wrap; gap:1.5rem; background:#f8fafc; padding:1rem; border-radius:8px; border:1px solid #e2e8f0;">
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
+              <input type="checkbox" class="chk-extra" value="telefono"> Teléfono
+            </label>
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
+              <input type="checkbox" class="chk-extra" value="nivel_academico"> Nivel Académico
+            </label>
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
+              <input type="checkbox" class="chk-extra" value="trabajo"> Situación Laboral
+            </label>
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
+              <input type="checkbox" class="chk-extra" value="salud"> Condición de Salud
+            </label>
+          </div>
+        </div>
+
         <!-- SELECCIÓN DEL REPORTE -->
         <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed #e5e7eb;">
           <label style="font-weight:700; color:#111; font-size:1rem; margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem;">

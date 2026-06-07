@@ -132,23 +132,23 @@
         <div class="kpi-icon verde"><i class="fas fa-users"></i></div>
         <div class="kpi-info">
           <h3>Habitantes Censados</h3>
-          <div class="kpi-value">347</div>
-          <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> Registros activos</span>
+          <div class="kpi-value" id="kpiHabitantes">0</div>
+          <span class="kpi-trend"><i class="fas fa-minus"></i> --</span>
         </div>
       </div>
       <div class="kpi-card border-azul">
         <div class="kpi-icon azul"><i class="fa-regular fa-square-check"></i></div>
         <div class="kpi-info">
           <h3>Electores Activos</h3>
-          <div class="kpi-value">231</div>
-          <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> 66.6% del total</span>
+          <div class="kpi-value" id="kpiElectores">0</div>
+          <span class="kpi-trend"><i class="fas fa-minus"></i> --</span>
         </div>
       </div>
       <div class="kpi-card border-amarillo">
         <div class="kpi-icon amarillo"><i class="fa-solid fa-map-location-dot"></i></div>
         <div class="kpi-info">
           <h3>Consejos Comunales</h3>
-          <div class="kpi-value">9</div>
+          <div class="kpi-value" id="kpiCC">0</div>
           <span class="kpi-trend up">Comuna Simon Rodriguez</span>
         </div>
       </div>
@@ -214,7 +214,7 @@
   </div>
 
   <div class="result-info-row fade-in-up">
-    <span id="resultCount">Mostrando <strong>7</strong> de <strong>347</strong> habitantes</span>
+    <span id="resultCount">Cargando habitantes...</span>
     <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
       <button class="btn-sicag btn-sm btn-outline-verde" onclick="exportarExcelCenso()">
         <i class="fas fa-file-excel"></i> Excel
@@ -239,101 +239,13 @@
           </tr>
         </thead>
         <tbody id="censoBody">
-          <tr>
-            <td>1</td><td>V-18.456.789</td>
-            <td><strong>Maria del Carmen Perez</strong><br><small class="text-gris">Sector La Esperanza, Casa #12</small></td>
-            <td>34</td><td><i class="fas fa-venus me-1" style="color:#E91E63;"></i>F</td>
-            <td>C.C. Jobito I</td><td><span class="badge-sicag badge-desarrollo">Embarazada</span></td>
-            <td><i class="fas fa-check-circle" style="color:var(--vp);"></i> Si</td>
-            <td>
-              <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver"><i class="fas fa-eye"></i></button>
-              <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalCenso(1)"><i class="fas fa-pencil-alt"></i></button>
-              <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="confirmarEliminarHab(1)"><i class="fas fa-trash-alt"></i></button>
-            </td>
-          </tr>
-          <tr>
-            <td>2</td><td>V-25.123.456</td>
-            <td><strong>Jose Luis Rodriguez</strong><br><small class="text-gris">Sector El Progreso, Casa #5</small></td>
-            <td>28</td><td><i class="fas fa-mars me-1" style="color:#2196F3;"></i>M</td>
-            <td>C.C. Jobito II</td><td><span class="badge-sicag badge-activo">Ninguna</span></td>
-            <td><i class="fas fa-check-circle" style="color:var(--vp);"></i> Si</td>
-            <td>
-              <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver"><i class="fas fa-eye"></i></button>
-              <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalCenso(2)"><i class="fas fa-pencil-alt"></i></button>
-              <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="confirmarEliminarHab(2)"><i class="fas fa-trash-alt"></i></button>
-            </td>
-          </tr>
-          <tr>
-            <td>3</td><td>V-8.765.432</td>
-            <td><strong>Carmen Teresa Mendez</strong><br><small class="text-gris">Sector Zamora, Casa #8</small></td>
-            <td>72</td><td><i class="fas fa-venus me-1" style="color:#E91E63;"></i>F</td>
-            <td>C.C. Brisas del Yurubi</td><td><span class="badge-sicag badge-finalizado">Adulto Mayor</span></td>
-            <td><i class="fas fa-check-circle" style="color:var(--vp);"></i> Si</td>
-            <td>
-              <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver"><i class="fas fa-eye"></i></button>
-              <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalCenso(3)"><i class="fas fa-pencil-alt"></i></button>
-              <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="confirmarEliminarHab(3)"><i class="fas fa-trash-alt"></i></button>
-            </td>
-          </tr>
-          <tr>
-            <td>4</td><td>V-30.987.654</td>
-            <td><strong>Andres Felipe Gomez</strong><br><small class="text-gris">Sector Pueblo Nuevo, Casa #3</small></td>
-            <td>8</td><td><i class="fas fa-mars me-1" style="color:#2196F3;"></i>M</td>
-            <td>C.C. Andres Eloy Blanco</td><td><span class="badge-sicag badge-pendiente">Nino (0-11)</span></td>
-            <td><i class="fas fa-minus-circle" style="color:var(--muted);"></i> No</td>
-            <td>
-              <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver"><i class="fas fa-eye"></i></button>
-              <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalCenso(4)"><i class="fas fa-pencil-alt"></i></button>
-              <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="confirmarEliminarHab(4)"><i class="fas fa-trash-alt"></i></button>
-            </td>
-          </tr>
-          <tr>
-            <td>5</td><td>V-20.456.123</td>
-            <td><strong>Ana Gabriela Flores</strong><br><small class="text-gris">Sector Sierra, Casa #15</small></td>
-            <td>26</td><td><i class="fas fa-venus me-1" style="color:#E91E63;"></i>F</td>
-            <td>C.C. Mercedes I</td><td><span class="badge-sicag badge-desarrollo">Lactante</span></td>
-            <td><i class="fas fa-check-circle" style="color:var(--vp);"></i> Si</td>
-            <td>
-              <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver"><i class="fas fa-eye"></i></button>
-              <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalCenso(5)"><i class="fas fa-pencil-alt"></i></button>
-              <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="confirmarEliminarHab(5)"><i class="fas fa-trash-alt"></i></button>
-            </td>
-          </tr>
-          <tr>
-            <td>6</td><td>V-15.321.654</td>
-            <td><strong>Luis Alberto Martinez</strong><br><small class="text-gris">Sector Bicentenario, Casa #7</small></td>
-            <td>67</td><td><i class="fas fa-mars me-1" style="color:#2196F3;"></i>M</td>
-            <td>C.C. Mercedes II</td><td><span class="badge-sicag badge-finalizado">Encamado</span></td>
-            <td><i class="fas fa-check-circle" style="color:var(--vp);"></i> Si</td>
-            <td>
-              <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver"><i class="fas fa-eye"></i></button>
-              <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalCenso(6)"><i class="fas fa-pencil-alt"></i></button>
-              <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="confirmarEliminarHab(6)"><i class="fas fa-trash-alt"></i></button>
-            </td>
-          </tr>
-          <tr>
-            <td>7</td><td>V-28.654.321</td>
-            <td><strong>Daniela Rojas Suarez</strong><br><small class="text-gris">Sector Los Proceres, Casa #2</small></td>
-            <td>15</td><td><i class="fas fa-venus me-1" style="color:#E91E63;"></i>F</td>
-            <td>Pueblo Nuevo</td>
-            <td><span class="badge-sicag" style="background:rgba(255,140,0,0.12);color:#FF8C00;">Adolescente</span></td>
-            <td><i class="fas fa-check-circle" style="color:var(--vp);"></i> Si</td>
-            <td>
-              <button class="btn-sicag btn-sm btn-primary btn-icon" title="Ver"><i class="fas fa-eye"></i></button>
-              <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalCenso(7)"><i class="fas fa-pencil-alt"></i></button>
-              <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="confirmarEliminarHab(7)"><i class="fas fa-trash-alt"></i></button>
-            </td>
-          </tr>
+          <tr><td colspan="9" style="text-align:center;color:#666;">Sin registros por mostrar.</td></tr>
         </tbody>
       </table>
     </div>
-    <div class="pagination-sicag">
+    <div class="pagination-sicag" id="censoPagination">
       <button class="page-btn" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
       <button class="page-btn active">1</button>
-      <button class="page-btn">2</button>
-      <button class="page-btn">3</button>
-      <button class="page-btn">...</button>
-      <button class="page-btn">35</button>
       <button class="page-btn" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
     </div>
   </div>

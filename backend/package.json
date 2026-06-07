@@ -26,6 +26,7 @@
     "pdfkit": "^0.18.0",
     "pdfkit-table": "^0.2.11",
     "pg": "^8.9.0",
+    "puppeteer": "^25.1.0",
     "sequelize": "^6.31.0",
     "sqlite3": "^6.0.1",
     "umzug": "^3.8.3",

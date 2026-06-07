@@ -9,6 +9,24 @@ class CensoReportesController {
     this.dbModels = models;
   }
   
+  static injectModels(models) {
+    CensoReportesController.dbModels = models;
+  }
+
+  /**
+   * Obtiene la fecha mínima de registro (para prellenar calendarios front)
+   */
+  static async getFechaMinima(req, res) {
+    try {
+      if (!CensoReportesController.dbModels) throw new Error('DB Models no inyectados');
+      const minDate = await CensoReportesService.getFechaMinima(CensoReportesController.dbModels);
+      res.json({ fecha_minima: minDate });
+    } catch (error) {
+      console.error('Error getFechaMinima:', error);
+      res.status(500).json({ error: 'Error obteniendo fecha mínima' });
+    }
+  }
+
   /**
    * Obtiene los KPIs estadísticos del censo para la vista principal de reportes
    */
@@ -58,13 +76,13 @@ class CensoReportesController {
    */
   static async exportarReporte(req, res) {
     try {
-      const { tipo, format, desde, hasta, consejo_id, edad_min, edad_max, genero, salud, cne, trabajo } = req.query;
+      const { tipo, format, desde, hasta, consejo_id, edad_min, edad_max, genero, salud, cne, trabajo, nac_min, nac_max, extras } = req.query;
 
       if (!tipo || !format) {
         return res.status(400).json({ error: 'Parámetros "tipo" y "format" son requeridos.' });
       }
 
-      const filtros = { desde, hasta, consejo_id, edad_min, edad_max, genero, salud, cne, trabajo };
+      const filtros = { desde, hasta, consejo_id, edad_min, edad_max, genero, salud, cne, trabajo, nac_min, nac_max, extras };
       
       if (!CensoReportesController.dbModels) throw new Error('Modelos de base de datos no inyectados en CensoReportesController');
 
@@ -78,6 +96,7 @@ class CensoReportesController {
         if (consejo) filtrosArr.push(`Consejo Comunal: ${consejo.nombre_comunidad}`);
       }
       if (edad_min || edad_max) filtrosArr.push(`Edad: ${edad_min||'0'} a ${edad_max||'∞'} años`);
+      if (nac_min || nac_max) filtrosArr.push(`F. Nacimiento: ${nac_min||'Cualquiera'} a ${nac_max||'Cualquiera'}`);
       if (genero) filtrosArr.push(`Género: ${genero}`);
       if (salud) filtrosArr.push(`Salud: ${salud}`);
       if (cne) filtrosArr.push(`CNE: ${cne === '1' ? 'Inscrito' : 'No Inscrito'}`);

@@ -221,7 +221,7 @@
           <div class="kpi-info">
             <h3>Total Proyectos</h3>
             <div class="kpi-value" id="kpiTotal">0</div>
-            <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> Registrados</span>
+            <span class="kpi-trend"><i class="fas fa-minus"></i> Registrados</span>
           </div>
         </div>
         <div class="kpi-card border-azul">
@@ -229,7 +229,7 @@
           <div class="kpi-info">
             <h3>Propuestos</h3>
             <div class="kpi-value" id="kpiPropuestos">0</div>
-            <span class="kpi-trend up">En evaluación</span>
+            <span class="kpi-trend">En evaluación</span>
           </div>
         </div>
         <div class="kpi-card border-terracota">
@@ -237,7 +237,7 @@
           <div class="kpi-info">
             <h3>En Ejecución</h3>
             <div class="kpi-value" id="kpiEjecucion">0</div>
-            <span class="kpi-trend up">Activos ahora</span>
+            <span class="kpi-trend">Activos ahora</span>
           </div>
         </div>
         <div class="kpi-card border-verde">
@@ -245,33 +245,14 @@
           <div class="kpi-info">
             <h3>Finalizados</h3>
             <div class="kpi-value" id="kpiFinalizados">0</div>
-            <span class="kpi-trend up">Completados</span>
+            <span class="kpi-trend">Completados</span>
           </div>
         </div>
       </div>
     </div>
 
     <!-- ══ PROYECTO DESTACADO ══ -->
-    <div class="proj-featured fade-in-up" id="projFeatured">
-      <div class="pf-icon"><i class="fas fa-seedling"></i></div>
-      <div class="pf-body">
-        <div class="pf-badge"><i class="fas fa-star"></i> Proyecto Principal</div>
-        <div class="pf-title" id="featTitle">Plan de Siembra Intensiva — Sectores Norte</div>
-        <div class="pf-meta">
-          <span><i class="fas fa-hammer"></i> En Ejecución</span>
-          <span><i class="fas fa-map-marker-alt"></i> Consejo Comunal El Progreso</span>
-          <span><i class="fas fa-dollar-sign"></i> Bs. 2.500.000</span>
-          <span><i class="fas fa-calendar"></i> Jun 2026</span>
-        </div>
-      </div>
-      <div class="pf-actions">
-        <button class="pf-btn primary" onclick="abrirModalProyecto(1)">
-          <i class="fas fa-pencil-alt"></i> Editar
-        </button>
-        <button class="pf-btn outline">
-          <i class="fas fa-eye"></i> Ver Detalle
-        </button>
-      </div>
+    <div class="proj-featured fade-in-up" id="projFeatured" style="display:none;">
     </div>
 
     <!-- ══ TOOLBAR ══ -->
@@ -501,14 +482,7 @@
   ══════════════════════════════════════════ */
 
   // Datos de ejemplo hasta conectar API real
-  let proyectos = [
-    { id: 1, titulo: 'Plan de Siembra Intensiva — Sector Norte', descripcion: 'Implementación de 5 hectáreas de cultivo de maíz y caraotas con semillas certificadas provistas por el FONDAS para el primer semestre 2026.', estado: 'en_ejecucion', consejo: 'El Progreso', presupuesto: 2500000, avance: 60, tipo: 'agricola', responsable: 'José Ramírez', fechaInicio: '2026-03-01', fechaFin: '2026-07-30', observaciones: 'Coordinar entrega de fertilizantes con AGROPATRIA.' },
-    { id: 2, titulo: 'Construcción de Tanque Comunitario de Agua', descripcion: 'Instalación de tanque metálico de 10.000 litros para almacenamiento de agua en el sector Bicentenario ante la intermitencia del servicio.', estado: 'aprobado', consejo: 'Bicentenario', presupuesto: 980000, avance: 0, tipo: 'infraestructura', responsable: 'María González', fechaInicio: '2026-06-15', fechaFin: '2026-08-15', observaciones: '' },
-    { id: 3, titulo: 'Jornada de Reforestación — Quebrada Los Naranjos', descripcion: 'Siembra de 300 árboles frutales y maderables a lo largo de la quebrada para recuperar el ecosistema natural del sector Sierra Verde.', estado: 'finalizado', consejo: 'Sierra Verde', presupuesto: 350000, avance: 100, tipo: 'ambiente', responsable: 'Ana Herrera', fechaInicio: '2026-01-10', fechaFin: '2026-04-20', observaciones: 'Proyecto completado exitosamente. 310 árboles sembrados.' },
-    { id: 4, titulo: 'Módulo de Computación para Escuela Comunal', descripcion: 'Dotación de 15 computadoras para la sede educativa del Consejo Comunal Vencedores, incluyendo instalación eléctrica y conectividad básica.', estado: 'propuesto', consejo: 'Vencedores', presupuesto: 1800000, avance: 0, tipo: 'educacion', responsable: 'Pedro Martínez', fechaInicio: '', fechaFin: '', observaciones: 'Pendiente aprobación de la Sala de Autogobierno.' },
-    { id: 5, titulo: 'Huerto Comunitario Agroecológico', descripcion: 'Habilitación de 1.200 m² para cultivo orgánico de hortalizas y aromáticas con técnicas agroecológicas sin agroquímicos, para surtir el comedor comunitario.', estado: 'en_ejecucion', consejo: 'La Esperanza', presupuesto: 620000, avance: 35, tipo: 'agricola', responsable: 'Luisa Peña', fechaInicio: '2026-04-01', fechaFin: '2026-09-01', observaciones: 'Primer corte de cilantro y ajíes realizado.' },
-    { id: 6, titulo: 'Reparación del Ambulatorio Rural Pueblo Nuevo', descripcion: 'Trabajos de pintura, reparación de techo, instalación eléctrica y dotación de mobiliario para el ambulatorio tipo I del sector.', estado: 'rechazado', consejo: 'Pueblo Nuevo', presupuesto: 2100000, avance: 0, tipo: 'salud', responsable: 'Carlos Blanco', fechaInicio: '', fechaFin: '', observaciones: 'Rechazado por falta de avalúo técnico certificado.' }
-  ];
+  let proyectos = [];
 
   let filtroActivo = 'todos';
   let projEliminarId = null;

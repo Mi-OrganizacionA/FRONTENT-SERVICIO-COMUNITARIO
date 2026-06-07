@@ -1,12 +1,12 @@
-﻿/* Sidebar compartido para todas las páginas administrativas de SICAG */
+/* Sidebar compartido para todas las páginas administrativas de SICAG */
 (function() {
   const menuSections = [
     {
       title: 'Gestión Principal',
       items: [
         { href: 'dashboard.html', icon: 'tachometer-alt', label: 'Dashboard' },
-        { href: 'censo.html', icon: 'users', label: 'Censo Comunitario', badge: '347' },
-        { href: 'noticias.html', icon: 'newspaper', label: 'Cartelera Digital', badge: '12' }
+        { href: 'censo.html', icon: 'users', label: 'Censo Comunitario' },
+        { href: 'noticias.html', icon: 'newspaper', label: 'Cartelera Digital' }
       ]
     },
     {

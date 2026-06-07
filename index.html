@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -128,20 +128,20 @@
        STATS BANNER
        ══════════════════════════════════════════════════════ -->
   <section class="pub-stats" aria-label="Estadísticas de la comuna">
-    <div class="pub-stats-grid">
+    <div class="pub-stats-grid" id="indexStatsRow">
       <div class="pub-stat-item fade-up">
         <div class="pub-stat-icon"><i class="fas fa-users"></i></div>
-        <div class="pub-stat-num" data-count="6000" data-suffix="+">6.000+</div>
+        <div class="pub-stat-num" id="idxHab">0</div>
         <div class="pub-stat-label">Habitantes Registrados</div>
       </div>
       <div class="pub-stat-item fade-up fade-up-d1">
         <div class="pub-stat-icon"><i class="fas fa-map-marked-alt"></i></div>
-        <div class="pub-stat-num" data-count="9">9</div>
+        <div class="pub-stat-num" id="idxCC">0</div>
         <div class="pub-stat-label">Consejos Comunales</div>
       </div>
       <div class="pub-stat-item fade-up fade-up-d2">
         <div class="pub-stat-icon"><i class="fas fa-tractor"></i></div>
-        <div class="pub-stat-num" data-count="156">156</div>
+        <div class="pub-stat-num" id="idxHectareas">0</div>
         <div class="pub-stat-label">Hectáreas Cultivadas</div>
       </div>
     </div>
@@ -222,94 +222,9 @@
         comunales de la Comuna Simón Rodríguez.</p>
 
       <div class="pub-carousel-wrap fade-up">
-        <div class="pub-carousel-track" id="carouselTrack">
-          <div class="pub-news-card">
-            <div class="pub-news-img"
-              style="background:linear-gradient(135deg,#1B5E20,#43A047);display:flex;align-items:center;justify-content:center">
-              <i class="fas fa-calendar-alt" style="font-size:3rem;color:rgba(255,255,255,.3)"></i>
-            </div>
-            <div class="pub-news-body">
-              <span class="pub-news-tag tag-convocatoria">Convocatoria</span>
-              <h4>Asamblea de Ciudadanos — Junio 2026</h4>
-              <p>Reunión ordinaria de los 9 consejos comunales para aprobación del presupuesto participativo 2026.</p>
-              <a href="#" class="pub-news-link">Leer más <i class="fas fa-arrow-right"></i></a>
-            </div>
-          </div>
-          <div class="pub-news-card">
-            <div class="pub-news-img"
-              style="background:linear-gradient(135deg,#1565C0,#42A5F5);display:flex;align-items:center;justify-content:center">
-              <i class="fas fa-seedling" style="font-size:3rem;color:rgba(255,255,255,.3)"></i>
-            </div>
-            <div class="pub-news-body">
-              <span class="pub-news-tag tag-noticia">Noticia</span>
-              <h4>Cosecha récord de cacao en el Corozo</h4>
-              <p>Los productores del C.C. Vencedores del Corozo superaron las 8 toneladas de cacao orgánico esta
-                temporada.</p>
-              <a href="#" class="pub-news-link">Leer más <i class="fas fa-arrow-right"></i></a>
-            </div>
-          </div>
-          <div class="pub-news-card">
-            <div class="pub-news-img"
-              style="background:linear-gradient(135deg,#E65100,#FFA726);display:flex;align-items:center;justify-content:center">
-              <i class="fas fa-poll" style="font-size:3rem;color:rgba(255,255,255,.3)"></i>
-            </div>
-            <div class="pub-news-body">
-              <span class="pub-news-tag tag-encuesta">Encuesta</span>
-              <h4>¿Qué proyecto priorizar en 2026?</h4>
-              <p>Participa en la encuesta popular para decidir el próximo proyecto socioproductivo de la comunidad.</p>
-              <a href="#" class="pub-news-link">Participar <i class="fas fa-arrow-right"></i></a>
-            </div>
-          </div>
-          <div class="pub-news-card">
-            <div class="pub-news-img"
-              style="background:linear-gradient(135deg,#4A148C,#7B1FA2);display:flex;align-items:center;justify-content:center">
-              <i class="fas fa-hand-holding-water" style="font-size:3rem;color:rgba(255,255,255,.3)"></i>
-            </div>
-            <div class="pub-news-body">
-              <span class="pub-news-tag tag-noticia">Noticia</span>
-              <h4>Nuevo sistema de riego para Brisas del Yurubí</h4>
-              <p>Inaugurado el sistema de riego por goteo en las 10 hectáreas del proyecto frutales tropicales.</p>
-              <a href="#" class="pub-news-link">Leer más <i class="fas fa-arrow-right"></i></a>
-            </div>
-          </div>
-          <div class="pub-news-card">
-            <div class="pub-news-img"
-              style="background:linear-gradient(135deg,#B71C1C,#EF5350);display:flex;align-items:center;justify-content:center">
-              <i class="fas fa-graduation-cap" style="font-size:3rem;color:rgba(255,255,255,.3)"></i>
-            </div>
-            <div class="pub-news-body">
-              <span class="pub-news-tag tag-convocatoria">Convocatoria</span>
-              <h4>Talleres UNEFA de Agroecología — Julio</h4>
-              <p>La UNEFA ofrece talleres gratuitos de agroecología para productores comunales de Las Mercedes.</p>
-              <a href="#" class="pub-news-link">Inscribirse <i class="fas fa-arrow-right"></i></a>
-            </div>
-          </div>
-          <div class="pub-news-card">
-            <div class="pub-news-img"
-              style="background:linear-gradient(135deg,#00695C,#26A69A);display:flex;align-items:center;justify-content:center">
-              <i class="fas fa-truck" style="font-size:3rem;color:rgba(255,255,255,.3)"></i>
-            </div>
-            <div class="pub-news-body">
-              <span class="pub-news-tag tag-noticia">Noticia</span>
-              <h4>Entrega de insumos agrícolas — Jobito I y II</h4>
-              <p>Semillas certificadas, fertilizantes orgánicos y herramientas entregados a 120 productores de la zona.
-              </p>
-              <a href="#" class="pub-news-link">Leer más <i class="fas fa-arrow-right"></i></a>
-            </div>
-          </div>
+        <div class="pub-carousel-track" id="carouselTrack" style="display:flex;justify-content:center;padding:2rem;">
+          <p style="color:var(--muted)">Sin noticias recientes.</p>
         </div>
-      </div>
-      <div class="pub-carousel-controls">
-        <button class="pub-carousel-btn" id="carouselPrev" aria-label="Anterior"><i
-            class="fas fa-chevron-left"></i></button>
-        <div class="pub-carousel-dots">
-          <button class="pub-dot active" aria-label="Slide 1"></button>
-          <button class="pub-dot" aria-label="Slide 2"></button>
-          <button class="pub-dot" aria-label="Slide 3"></button>
-          <button class="pub-dot" aria-label="Slide 4"></button>
-        </div>
-        <button class="pub-carousel-btn" id="carouselNext" aria-label="Siguiente"><i
-            class="fas fa-chevron-right"></i></button>
       </div>
     </div>
   </section>
@@ -330,9 +245,9 @@
           <p>Productores de café y cacao, proyectos agroecológicos activos y estadísticas de producción en las 156
             hectáreas cultivadas de la comuna.</p>
           <div class="pub-7t-stats">
-            <div class="pub-7t-stat"><span>156</span><small>Ha cultivadas</small></div>
-            <div class="pub-7t-stat"><span>24</span><small>Proyectos</small></div>
-            <div class="pub-7t-stat"><span>12.450</span><small>Kg producidos</small></div>
+            <div class="pub-7t-stat"><span id="t1Ha">0</span><small>Ha cultivadas</small></div>
+            <div class="pub-7t-stat"><span id="t1Proj">0</span><small>Proyectos</small></div>
+            <div class="pub-7t-stat"><span id="t1Prod">0</span><small>Kg producidos</small></div>
           </div>
         </div>
         <div class="pub-7t-card fade-up fade-up-d2">
@@ -342,20 +257,20 @@
           <p>Estado de los servicios de gas doméstico, agua potable y electrificación en los 9 consejos comunales del
             sector Las Mercedes.</p>
           <div class="pub-7t-stats">
-            <div class="pub-7t-stat"><span>87%</span><small>Electrificación</small></div>
-            <div class="pub-7t-stat"><span>73%</span><small>Agua potable</small></div>
-            <div class="pub-7t-stat"><span>91%</span><small>Gas doméstico</small></div>
+            <div class="pub-7t-stat"><span id="t2Elec">0%</span><small>Electrificación</small></div>
+            <div class="pub-7t-stat"><span id="t2Agua">0%</span><small>Agua potable</small></div>
+            <div class="pub-7t-stat"><span id="t2Gas">0%</span><small>Gas doméstico</small></div>
           </div>
         </div>
         <div class="pub-7t-card fade-up fade-up-d3">
           <div class="pub-7t-icon" style="background:rgba(249,168,37,.15);color:#FFD54F"><i class="fas fa-heart"></i>
           </div>
           <h4>T4 — Transformación Social</h4>
-          <p>Censos de niños 0–10 años, adultos mayores y personas con discapacidad. Registro actualizado 2026.</p>
+          <p>Censos de niños 0–10 años, adultos mayores y personas con discapacidad. Registro actualizado.</p>
           <div class="pub-7t-stats">
-            <div class="pub-7t-stat"><span>1.240</span><small>Niños 0-10</small></div>
-            <div class="pub-7t-stat"><span>680</span><small>Adultos mayores</small></div>
-            <div class="pub-7t-stat"><span>145</span><small>Discapacidad</small></div>
+            <div class="pub-7t-stat"><span id="t4Ninos">0</span><small>Niños 0-11</small></div>
+            <div class="pub-7t-stat"><span id="t4AdultosM">0</span><small>Adultos mayores</small></div>
+            <div class="pub-7t-stat"><span id="t4Disc">0</span><small>Discapacidad</small></div>
           </div>
         </div>
         <div class="pub-7t-card fade-up fade-up-d4">
@@ -364,9 +279,9 @@
           <h4>Dashboard Estadístico</h4>
           <p>Totales de habitantes por consejo comunal, padrón electoral y proyecciones demográficas del sector.</p>
           <div class="pub-7t-stats">
-            <div class="pub-7t-stat"><span>6.000+</span><small>Habitantes</small></div>
-            <div class="pub-7t-stat"><span>3.850</span><small>Electores</small></div>
-            <div class="pub-7t-stat"><span>9</span><small>CC activos</small></div>
+            <div class="pub-7t-stat"><span id="dashHab">0</span><small>Habitantes</small></div>
+            <div class="pub-7t-stat"><span id="dashElec">0</span><small>Electores</small></div>
+            <div class="pub-7t-stat"><span id="dashCC">0</span><small>CC activos</small></div>
           </div>
         </div>
       </div>

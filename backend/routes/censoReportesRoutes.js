@@ -6,6 +6,9 @@ const CensoReportesController = require('../controllers/censoReportesController'
 // pero por ahora para poder descargar mediante window.open() es preferible usar tokens en la URL 
 // o mantener la ruta pública de lectura (solo datos anónimos estadísticos).
 
+// Obtener la fecha del primer registro del sistema
+router.get('/fecha-minima', CensoReportesController.getFechaMinima);
+
 // Obtener KPIs generales del dashboard de reportes
 router.get('/kpis', CensoReportesController.getKpis);
 

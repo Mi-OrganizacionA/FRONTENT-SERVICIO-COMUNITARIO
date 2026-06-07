@@ -1165,7 +1165,6 @@
           <div class="cv-kpi-note">Infraestructura crítica</div>
         </div>
       </div>
-
       <div class="cv-kpi yellow">
         <div class="cv-kpi-icon"><i class="fas fa-fire-burner"></i></div>
         <div>
@@ -1188,63 +1187,33 @@
     <!-- ══ CONTENT ══ -->
     <div class="cv-content">
 
-      <!-- Toolbar -->
-      <div class="cv-toolbar">
-        <div class="cv-search-wrap">
-          <i class="fas fa-search"></i>
-          <input type="text" class="cv-search-input" id="cvSearch"
-            placeholder="Buscar por cédula, sector, condición...">
-        </div>
-
-        <div class="cv-filter-group">
-          <select class="cv-filter-select" id="filterCC" aria-label="Filtrar por Consejo Comunal">
-            <option value="">Todos los Consejos</option>
-            <option value="Jobito I">Jobito I</option>
-            <option value="Jobito II">Jobito II</option>
-            <option value="Brisas del Yurubí">Brisas del Yurubí</option>
-            <option value="Cacique Tamanaco">Cacique Tamanaco</option>
-            <option value="La Esperanza">La Esperanza</option>
-            <option value="Tierra Viva">Tierra Viva</option>
-            <option value="Nueva Raíz">Nueva Raíz</option>
-            <option value="Arcoíris">Arcoíris</option>
-            <option value="Unidos en Madera">Unidos en Madera</option>
-          </select>
-
-          <select class="cv-filter-select" id="filterCondicion" aria-label="Filtrar por condición">
-            <option value="">Todas las condiciones</option>
-            <option value="Buena">Buena</option>
-            <option value="Regular">Regular</option>
-            <option value="Mala">Mala</option>
-            <option value="Alto Riesgo">Alto Riesgo</option>
-          </select>
-
-          <select class="cv-filter-select" id="filterGas" aria-label="Filtrar por gas">
-            <option value="">Gas: Todos</option>
-            <option value="Si">Con Gas</option>
-            <option value="No posee">Sin Gas</option>
-          </select>
-        </div>
-
-        <div class="cv-toolbar-actions">
-          <button class="cv-icon-btn" title="Exportar Excel" id="btnExport" aria-label="Exportar">
-            <i class="fas fa-file-excel"></i>
-          </button>
-          <button class="cv-icon-btn" title="Imprimir" onclick="window.print()" aria-label="Imprimir">
-            <i class="fas fa-print"></i>
-          </button>
-          <button class="cv-icon-btn" title="Recargar datos" id="btnRefresh" aria-label="Recargar">
-            <i class="fas fa-rotate-right"></i>
-          </button>
-        </div>
-      </div>
-
       <!-- Table card -->
       <div class="cv-table-card">
-        <div class="cv-table-head">
-          <h2><i class="fas fa-table-list"></i> Listado de Viviendas</h2>
-          <div style="display:flex;align-items:center;gap:.75rem">
-            <span class="cv-count-badge" id="cvCountBadge">0 registros</span>
-            <small style="color:var(--gray4);font-size:.75rem">Una cédula · una vivienda</small>
+        <div class="cv-table-head" style="flex-wrap: wrap; gap: 1rem;">
+          <div style="display:flex; flex-direction:column; gap:.25rem">
+            <h2><i class="fas fa-table-list"></i> Listado de Viviendas</h2>
+            <div style="display:flex;align-items:center;gap:.75rem">
+              <span class="cv-count-badge" id="cvCountBadge">0 registros</span>
+              <small style="color:var(--gray4);font-size:.75rem">Una cédula · una vivienda</small>
+            </div>
+          </div>
+          
+          <div style="display:flex; align-items:center; gap:.75rem; flex:1; justify-content: flex-end; flex-wrap:wrap;">
+            <div class="cv-search-wrap" style="max-width: 300px; position:relative;">
+              <i class="fas fa-magnifying-glass" style="position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:var(--gray4)"></i>
+              <input type="text" class="cv-search-input" id="cvSearch" placeholder="Buscar por cédula o dirección..." aria-label="Buscar viviendas" style="width:100%; padding:.55rem 1rem .55rem 2.6rem; border-radius:50px; border:1.5px solid var(--gray3);">
+            </div>
+            
+            <button type="button" class="cv-btn cv-btn-ghost" data-bs-toggle="modal" data-bs-target="#modalFiltrosAvanzados" style="padding: .55rem 1rem; border-radius: 50px; border: 1.5px solid var(--gray3); background:#fff; color:var(--gray5);">
+              <i class="fas fa-filter" style="color: var(--vv);"></i> Filtros
+            </button>
+            
+            <button type="button" class="cv-icon-btn" title="Imprimir Lista" onclick="window.print()" aria-label="Imprimir">
+              <i class="fas fa-print"></i>
+            </button>
+            <button type="button" class="cv-icon-btn" title="Recargar datos" id="btnRefresh" aria-label="Recargar">
+              <i class="fas fa-rotate-right"></i>
+            </button>
           </div>
         </div>
 
@@ -1283,6 +1252,151 @@
     </div><!-- /cv-content -->
   </main>
 
+
+  <!-- ══════════════════════════════════════════
+       MODAL — FILTROS AVANZADOS
+  ══════════════════════════════════════════ -->
+  <div class="modal fade cv-modal" id="modalFiltrosAvanzados" tabindex="-1" aria-labelledby="modalFiltrosAvanzadosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="cv-modal-header">
+          <div class="cv-modal-header-left">
+            <div class="cv-modal-header-icon"><i class="fas fa-filter"></i></div>
+            <div>
+              <h5 class="cv-modal-title" id="modalFiltrosAvanzadosLabel">Filtros Avanzados</h5>
+              <p class="cv-modal-sub">Refina la lista de viviendas según características específicas.</p>
+            </div>
+          </div>
+          <button type="button" class="cv-modal-close" data-bs-dismiss="modal" aria-label="Cerrar">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+        <div class="cv-modal-body">
+          <div class="cv-form-row cv-grid-3">
+            <div class="cv-form-group">
+              <label>Consejo Comunal</label>
+              <select class="cv-form-control" id="advFilterCC">
+                <option value="">Todos</option>
+                <option value="El Cercado">El Cercado</option>
+                <option value="La Paz">La Paz</option>
+                <option value="Lomas de Leon">Lomas de Leon</option>
+                <option value="Brisas del Norte">Brisas del Norte</option>
+              </select>
+            </div>
+            <div class="cv-form-group">
+              <label>Condición Física</label>
+              <select class="cv-form-control" id="advFilterCond">
+                <option value="">Todas</option>
+                <option value="Buena">Buena</option>
+                <option value="Regular">Regular</option>
+                <option value="Mala">Mala</option>
+                <option value="Alto Riesgo">Alto Riesgo</option>
+              </select>
+            </div>
+            <div class="cv-form-group">
+              <label>Tipo de Vivienda</label>
+              <select class="cv-form-control" id="advFilterTipo">
+                <option value="">Todos</option>
+                <option value="Casa">Casa</option>
+                <option value="Apartamento">Apartamento</option>
+                <option value="Quinta">Quinta</option>
+                <option value="Rancho">Rancho</option>
+                <option value="Anexo">Anexo</option>
+                <option value="Habitación">Habitación</option>
+              </select>
+            </div>
+            <div class="cv-form-group">
+              <label>Tenencia</label>
+              <select class="cv-form-control" id="advFilterTenencia">
+                <option value="">Todas</option>
+                <option value="Propia">Propia</option>
+                <option value="Alquilada">Alquilada</option>
+                <option value="Prestada">Prestada</option>
+                <option value="Invadida">Invadida</option>
+                <option value="Asignada">Asignada (GMNVV)</option>
+              </select>
+            </div>
+            <div class="cv-form-group">
+              <label>Material de Paredes</label>
+              <select class="cv-form-control" id="advFilterParedes">
+                <option value="">Todos</option>
+                <option value="Bloque obra limpia">Bloque obra limpia</option>
+                <option value="Bloque frisado">Bloque frisado</option>
+                <option value="Adobe">Adobe</option>
+                <option value="Madera">Madera</option>
+                <option value="Zinc">Zinc</option>
+                <option value="Bahareque">Bahareque</option>
+              </select>
+            </div>
+            <div class="cv-form-group">
+              <label>Material de Techo</label>
+              <select class="cv-form-control" id="advFilterTecho">
+                <option value="">Todos</option>
+                <option value="Platabanda">Platabanda</option>
+                <option value="Zinc">Zinc / Acerolit</option>
+                <option value="Asbesto">Asbesto</option>
+                <option value="Machihembrado">Machihembrado</option>
+                <option value="Teja">Teja</option>
+              </select>
+            </div>
+            <div class="cv-form-group">
+              <label>Agua Potable</label>
+              <select class="cv-form-control" id="advFilterAgua">
+                <option value="">Todos</option>
+                <option value="Acueducto">Acueducto (Tubería)</option>
+                <option value="Cisterna">Camión Cisterna</option>
+                <option value="Pozo">Pozo profundo</option>
+                <option value="Pila pública">Pila pública</option>
+                <option value="No tiene">No tiene acceso</option>
+              </select>
+            </div>
+            <div class="cv-form-group">
+              <label>Gas Doméstico</label>
+              <select class="cv-form-control" id="advFilterGas">
+                <option value="">Todos</option>
+                <option value="Bombona">Bombona</option>
+                <option value="Tubería">Tubería (Directo)</option>
+                <option value="No posee">No posee (Leña/Eléctrica)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="cv-modal-footer" style="justify-content: flex-end; padding: 1.25rem 2rem; background: var(--gray1); border-top: 1px solid var(--gray3);">
+          <button type="button" class="cv-btn cv-btn-ghost" id="btnLimpiarFiltros" style="color:var(--gray5)"><i class="fas fa-eraser"></i> Limpiar</button>
+          <button type="button" class="cv-btn cv-btn-primary" id="btnAplicarFiltros" style="margin-left: 1rem;"><i class="fas fa-check"></i> Aplicar Filtros</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL — VERIFICACIÓN DE SEGURIDAD (CONTRASEÑA)
+  ══════════════════════════════════════════ -->
+  <div class="modal fade cv-modal" id="modalVerifyPassword" tabindex="-1" aria-labelledby="modalVerifyPasswordLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content" style="max-width: 400px; margin: auto;">
+        <div class="cv-modal-header" style="border-bottom: none; padding-bottom: 0;">
+          <button type="button" class="cv-modal-close" data-bs-dismiss="modal" aria-label="Cerrar" style="margin-left: auto;">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+        <div class="cv-modal-body" style="text-align: center; padding-top: 0;">
+          <div style="font-size: 3rem; color: var(--vp); margin-bottom: 1rem;"><i class="fas fa-shield-halved"></i></div>
+          <h5 style="font-weight: 800; color: var(--dark); margin-bottom: .5rem;">Autorización Requerida</h5>
+          <p style="font-size: .85rem; color: var(--gray5); margin-bottom: 1.5rem;">Para realizar esta acción sensible, por favor ingrese su clave de usuario.</p>
+          
+          <div class="cv-form-group" style="text-align: left;">
+            <label>Contraseña</label>
+            <input type="password" class="cv-form-control" id="verifyPasswordInput" placeholder="********">
+            <div id="verifyPasswordError" style="color: #E53935; font-size: .75rem; margin-top: .4rem; display: none; font-weight: 600;"><i class="fas fa-triangle-exclamation"></i> Contraseña incorrecta</div>
+          </div>
+        </div>
+        <div class="cv-modal-footer" style="padding: 1.5rem; justify-content: center; border-top: none;">
+          <button type="button" class="cv-btn cv-btn-primary" id="btnConfirmarPassword" style="width: 100%; justify-content: center; padding: .8rem;"><i class="fas fa-lock-open"></i> Confirmar y Continuar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ══════════════════════════════════════════
        MODAL — WIZARD REGISTRO VIVIENDA
@@ -2208,6 +2322,152 @@
     </div>
   </div>
 
+  <!-- ══════════════════════════════════════════
+       MODAL DE FILTROS AVANZADOS
+  ══════════════════════════════════════════ -->
+  <div class="modal fade cv-modal" id="modalFiltrosAvanzados" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="cv-modal-header">
+          <div class="cv-modal-header-left">
+            <div class="cv-modal-header-icon"><i class="fas fa-filter"></i></div>
+            <div>
+              <h5 class="cv-modal-title">Filtros Avanzados</h5>
+              <p class="cv-modal-sub">Refine la búsqueda de viviendas</p>
+            </div>
+          </div>
+          <button type="button" class="cv-modal-close" data-bs-dismiss="modal"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div class="cv-modal-body" style="padding: 1.5rem; max-height: 70vh; overflow-y: auto;">
+          <div class="cv-form-row cv-grid-2" style="margin-bottom: 1rem;">
+            <div class="cv-form-group">
+              <label>Consejo Comunal</label>
+              <select class="cv-form-control" id="advFilterCC">
+                <option value="">Todos</option>
+                <!-- JS Llenará esto -->
+              </select>
+            </div>
+            <div class="cv-form-group">
+              <label>Condición General</label>
+              <select class="cv-form-control" id="advFilterCond">
+                <option value="">Todas</option>
+                <option value="Buena">Buena</option>
+                <option value="Regular">Regular</option>
+                <option value="Mala">Mala</option>
+                <option value="Alto Riesgo">Alto Riesgo</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="cv-form-row cv-grid-2" style="margin-bottom: 1rem;">
+            <div class="cv-form-group">
+              <label>Servicio de Gas</label>
+              <select class="cv-form-control" id="advFilterGas">
+                <option value="">Todos</option>
+                <option value="Si">Con Gas (Bombona/Tubería)</option>
+                <option value="No posee">Sin Gas</option>
+              </select>
+            </div>
+            <div class="cv-form-group">
+              <label>Servicio de Agua</label>
+              <select class="cv-form-control" id="advFilterAgua">
+                <option value="">Todos</option>
+                <option value="Acueducto">Acueducto</option>
+                <option value="Cisterna">Cisterna</option>
+                <option value="Pila pública">Pila pública</option>
+                <option value="No tiene">No tiene</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="cv-form-row cv-grid-2" style="margin-bottom: 1rem;">
+            <div class="cv-form-group">
+              <label>Tipo de Vivienda</label>
+              <select class="cv-form-control" id="advFilterTipo">
+                <option value="">Todos</option>
+                <option value="Casa">Casa</option>
+                <option value="Quinta">Quinta</option>
+                <option value="Apartamento">Apartamento</option>
+                <option value="Rancho">Rancho</option>
+                <option value="Habitación">Habitación</option>
+                <option value="Anexo">Anexo</option>
+              </select>
+            </div>
+            <div class="cv-form-group">
+              <label>Tenencia</label>
+              <select class="cv-form-control" id="advFilterTenencia">
+                <option value="">Todas</option>
+                <option value="Propia Pagada">Propia Pagada</option>
+                <option value="Propia Pagando">Propia Pagando</option>
+                <option value="Alquilada">Alquilada</option>
+                <option value="Prestada">Prestada</option>
+                <option value="Invadida">Invadida</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="cv-form-row cv-grid-2">
+            <div class="cv-form-group">
+              <label>Material de Paredes</label>
+              <select class="cv-form-control" id="advFilterParedes">
+                <option value="">Todos</option>
+                <option value="Bloque/Ladrillo">Bloque/Ladrillo</option>
+                <option value="Madera">Madera</option>
+                <option value="Bahareque">Bahareque</option>
+                <option value="Zinc">Zinc</option>
+                <option value="Cartón/Plástico">Cartón/Plástico</option>
+              </select>
+            </div>
+            <div class="cv-form-group">
+              <label>Material del Techo</label>
+              <select class="cv-form-control" id="advFilterTecho">
+                <option value="">Todos</option>
+                <option value="Platabanda">Platabanda</option>
+                <option value="Zinc">Zinc</option>
+                <option value="Asbesto">Asbesto</option>
+                <option value="Machihembrado">Machihembrado</option>
+                <option value="Palma/Paja">Palma/Paja</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="cv-modal-footer" style="display:flex; justify-content:space-between;">
+          <button type="button" class="cv-btn cv-btn-ghost" id="btnLimpiarFiltros" style="color: #C62828;"><i class="fas fa-trash-can"></i> Limpiar</button>
+          <div>
+            <button type="button" class="cv-btn cv-btn-ghost" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="cv-btn cv-btn-primary" id="btnAplicarFiltros">Aplicar Filtros</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL DE VERIFICACIÓN DE SEGURIDAD (PASSWORD)
+  ══════════════════════════════════════════ -->
+  <div class="modal fade" id="modalVerifyPassword" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(4px);">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+      <div class="modal-content" style="border-radius: var(--r-lg); border:none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+        <div class="modal-body text-center" style="padding: 2rem 1.5rem;">
+          <div style="width: 50px; height: 50px; background: #FFEBEE; color: #C62828; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 1rem;">
+            <i class="fas fa-lock"></i>
+          </div>
+          <h5 style="font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: .5rem;">Autorización Requerida</h5>
+          <p style="font-size: .8rem; color: var(--gray5); margin-bottom: 1.5rem;">Por seguridad, ingrese su contraseña para continuar con esta acción crítica.</p>
+          
+          <div class="cv-form-group" style="text-align: left;">
+            <input type="password" class="cv-form-control" id="verifyPasswordInput" placeholder="Su contraseña" style="text-align: center; letter-spacing: 2px;">
+            <div id="verifyPasswordError" style="color: #C62828; font-size: .7rem; text-align: center; margin-top: .4rem; display: none;">Contraseña incorrecta</div>
+          </div>
+        </div>
+        <div style="display:flex; border-top: 1px solid var(--gray3);">
+          <button type="button" class="cv-btn" data-bs-dismiss="modal" style="flex:1; border-radius: 0 0 0 var(--r-lg); background: #fff; color: var(--gray5); border: none; padding: .8rem;">Cancelar</button>
+          <button type="button" class="cv-btn" id="btnConfirmarPassword" style="flex:1; border-radius: 0 0 var(--r-lg) 0; background: var(--vp); color: #fff; border: none; padding: .8rem; font-weight: 600;">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast container -->
   <div class="cv-toast-wrap" id="cvToastWrap"></div>
 
@@ -2671,16 +2931,26 @@
 
     function renderTable() {
       const q   = (document.getElementById('cvSearch').value || '').toLowerCase();
-      const cc  = document.getElementById('filterCC').value;
-      const cond= document.getElementById('filterCondicion').value;
-      const gas = document.getElementById('filterGas').value;
+      const cc  = document.getElementById('advFilterCC').value;
+      const cond= document.getElementById('advFilterCond').value;
+      const gas = document.getElementById('advFilterGas').value;
+      const agua = document.getElementById('advFilterAgua').value;
+      const tipo = document.getElementById('advFilterTipo').value;
+      const tenencia = document.getElementById('advFilterTenencia').value;
+      const paredes = document.getElementById('advFilterParedes').value;
+      const techo = document.getElementById('advFilterTecho').value;
 
       let data = viviendas.filter(v => {
-        const matchQ  = !q || (v.cedula||'').toLowerCase().includes(q) || (v.sector||'').toLowerCase().includes(q);
+        const matchQ  = !q || (v.cedula||'').toLowerCase().includes(q) || (v.sector||'').toLowerCase().includes(q) || (v.direccion||'').toLowerCase().includes(q);
         const matchCC = !cc   || v.sector === cc;
         const matchC  = !cond || v.condicion === cond;
         const matchG  = !gas  || v.gas === gas || (gas === 'Si' && v.gas !== 'No posee');
-        return matchQ && matchCC && matchC && matchG;
+        const matchAgua = !agua || v.agua === agua;
+        const matchTipo = !tipo || v.tipo === tipo;
+        const matchTenencia = !tenencia || v.tenencia === tenencia;
+        const matchParedes = !paredes || v.paredes === paredes;
+        const matchTecho = !techo || v.techo === techo;
+        return matchQ && matchCC && matchC && matchG && matchAgua && matchTipo && matchTenencia && matchParedes && matchTecho;
       });
 
       const body  = document.getElementById('cvTableBody');
@@ -2709,13 +2979,13 @@
           </span></td>
           <td>
             <div style="display:flex;gap:.3rem">
-              <button class="cv-act-btn view" title="Ver detalle" onclick="verVivienda(${i})" aria-label="Ver">
-                <i class="fas fa-eye"></i>
+              <button type="button" class="cv-act-btn view" title="Imprimir PDF" onclick="imprimirPdfVivienda('${v.id || v._id}')" aria-label="Imprimir PDF">
+                <i class="fas fa-file-pdf" style="color: #C62828;"></i>
               </button>
-              <button class="cv-act-btn edit" title="Editar" onclick="editarVivienda(${i})" aria-label="Editar">
+              <button type="button" class="cv-act-btn edit" title="Editar" onclick="intentarEditar('${v.id || v._id}', ${i})" aria-label="Editar">
                 <i class="fas fa-pencil"></i>
               </button>
-              <button class="cv-act-btn del" title="Eliminar" onclick="eliminarVivienda(${i})" aria-label="Eliminar">
+              <button type="button" class="cv-act-btn del" title="Eliminar" onclick="intentarEliminar('${v.id || v._id}', ${i})" aria-label="Eliminar">
                 <i class="fas fa-trash"></i>
               </button>
             </div>
@@ -2733,14 +3003,92 @@
       document.getElementById('kpi-sin-agua').textContent = viviendas.filter(v => v.agua === 'No tiene' || !v.agua).length;
     }
 
-    function verVivienda(i) { showToast(`Detalle vivienda: ${viviendas[i]?.cedula || i}`); }
-    function editarVivienda(i) { showToast('Función de edición próximamente.', 'error'); }
-    function eliminarVivienda(i) {
-      if (!confirm('¿Eliminar esta vivienda del registro?')) return;
-      viviendas.splice(i, 1);
-      localStorage.setItem('cv_viviendas', JSON.stringify(viviendas));
-      renderTable();
-      showToast('Vivienda eliminada del registro.');
+    let pendingAction = null;
+    let pendingId = null;
+
+    function imprimirPdfVivienda(id) {
+      if (!id || id === 'undefined') {
+        showToast('Esta vivienda no tiene ID (modo offline).', 'error');
+        return;
+      }
+      window.open(`/api/viviendas/${id}/exportar-pdf`, '_blank');
+    }
+
+    function intentarEditar(id, index) {
+      if (!id || id === 'undefined') { showToast('ID de vivienda no válido.', 'error'); return; }
+      pendingAction = 'edit';
+      pendingId = { id, index };
+      document.getElementById('verifyPasswordInput').value = '';
+      document.getElementById('verifyPasswordError').style.display = 'none';
+      const modal = new bootstrap.Modal(document.getElementById('modalVerifyPassword'));
+      modal.show();
+    }
+
+    function intentarEliminar(id, index) {
+      if (!id || id === 'undefined') { showToast('ID de vivienda no válido.', 'error'); return; }
+      pendingAction = 'delete';
+      pendingId = { id, index };
+      document.getElementById('verifyPasswordInput').value = '';
+      document.getElementById('verifyPasswordError').style.display = 'none';
+      const modal = new bootstrap.Modal(document.getElementById('modalVerifyPassword'));
+      modal.show();
+    }
+
+    document.getElementById('btnConfirmarPassword').addEventListener('click', async () => {
+      const password = document.getElementById('verifyPasswordInput').value;
+      const errorEl = document.getElementById('verifyPasswordError');
+      if (!password) {
+        errorEl.textContent = 'Ingrese la contraseña';
+        errorEl.style.display = 'block';
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/auth/verify-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ password })
+        });
+        const result = await response.json();
+        
+        if (response.ok && result.valid) {
+          bootstrap.Modal.getInstance(document.getElementById('modalVerifyPassword')).hide();
+          if (pendingAction === 'edit') {
+             // Iniciar edicion
+             showToast('Modo edición activado. (Lógica backend pdte)', 'success');
+             // editarViviendaReal(pendingId.id, pendingId.index);
+          } else if (pendingAction === 'delete') {
+             // Eliminar
+             eliminarViviendaReal(pendingId.id, pendingId.index);
+          }
+        } else {
+          errorEl.textContent = 'Contraseña incorrecta';
+          errorEl.style.display = 'block';
+        }
+      } catch (err) {
+        errorEl.textContent = 'Error de conexión';
+        errorEl.style.display = 'block';
+      }
+    });
+
+    async function eliminarViviendaReal(id, index) {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/viviendas/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+          viviendas.splice(index, 1);
+          renderTable();
+          showToast('Vivienda eliminada correctamente.');
+        } else {
+          showToast('No se pudo eliminar la vivienda.', 'error');
+        }
+      } catch (e) {
+        showToast('Error de conexión al eliminar.', 'error');
+      }
     }
 
     /* ── Controles Automáticos ── */
@@ -2864,9 +3212,20 @@
     });
 
     /* ── Search & filters ── */
-    ['cvSearch','filterCC','filterCondicion','filterGas'].forEach(id => {
-      document.getElementById(id).addEventListener('input', renderTable);
-      document.getElementById(id).addEventListener('change', renderTable);
+    document.getElementById('cvSearch').addEventListener('input', renderTable);
+    
+    document.getElementById('btnAplicarFiltros').addEventListener('click', () => {
+      const modalInstance = bootstrap.Modal.getInstance(document.getElementById('modalFiltrosAvanzados'));
+      if (modalInstance) modalInstance.hide();
+      renderTable();
+    });
+
+    document.getElementById('btnLimpiarFiltros').addEventListener('click', () => {
+      ['advFilterCC', 'advFilterCond', 'advFilterGas', 'advFilterAgua', 'advFilterTipo', 'advFilterTenencia', 'advFilterParedes', 'advFilterTecho'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      renderTable();
     });
 
     document.getElementById('btnRefresh').addEventListener('click', () => {

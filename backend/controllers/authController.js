@@ -1,4 +1,4 @@
-﻿const AuthService = require('../services/authService');
+const AuthService = require('../services/authService');
 let UsuarioModel = null;
 const logger = require('../utils/logger');
 
@@ -43,6 +43,25 @@ class AuthController {
       res.json(user);
     } catch (error) {
       res.status(500).json({ error: error.message });
+    }
+  }
+
+  static async verifyPassword(req, res) {
+    try {
+      const { contraseña } = req.body;
+      if (!contraseña) return res.status(400).json({ error: 'Contraseña requerida' });
+      
+      const userId = req.user.id;
+      const user = await UsuarioModel.findByPk(userId);
+      if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+      const isValid = AuthService.validatePassword(contraseña, user.contraseña);
+      if (!isValid) return res.status(401).json({ error: 'Contraseña incorrecta' });
+
+      res.json({ success: true, message: 'Contraseña verificada' });
+    } catch (error) {
+      logger.error('Error verificando contraseña:', error);
+      res.status(500).json({ error: 'Error del servidor al verificar contraseña' });
     }
   }
 

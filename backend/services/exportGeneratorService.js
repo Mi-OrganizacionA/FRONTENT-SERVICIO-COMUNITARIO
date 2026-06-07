@@ -62,9 +62,20 @@ class ExportGeneratorService {
         doc.on('data', chunk => chunks.push(chunk));
         doc.on('end', () => resolve(Buffer.concat(chunks)));
 
+        // Agregar el Logo
+        const fs = require('fs');
+        const path = require('path');
+        const logoPath = path.join(__dirname, '../../assets/img/logo_comuna.png');
+        
+        if (fs.existsSync(logoPath)) {
+          // Posicionar arriba a la izquierda
+          doc.image(logoPath, 40, 25, { width: 50 });
+        }
+
         // Encabezado
-        doc.fontSize(20).fillColor('#2E7D32').text('SICAG', { align: 'center' });
         doc.moveDown(0.5);
+        doc.fontSize(20).fillColor('#2E7D32').text('SICAG', { align: 'center' });
+        doc.moveDown(0.3);
         doc.fontSize(14).fillColor('#333333').text(title, { align: 'center' });
         
         if (filtrosText) {
