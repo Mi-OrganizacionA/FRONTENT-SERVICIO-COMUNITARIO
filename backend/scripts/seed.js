@@ -1,10 +1,10 @@
-const { initSQLite } = require('../config/database');
+const { initDatabase } = require('../config/database');
 const { initModels } = require('../models');
 const bcrypt = require('bcryptjs');
 
 async function seed() {
   console.log('Iniciando semilla de base de datos...');
-  const sequelize = await initSQLite();
+  const sequelize = await initDatabase();
   const models = await initModels(sequelize);
   const { Usuario, Habitante, ConsejoComunal, Configuracion } = models;
 
