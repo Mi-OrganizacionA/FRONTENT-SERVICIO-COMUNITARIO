@@ -33,6 +33,7 @@
     {
       title: 'Acceso Rápido',
       items: [
+        { href: 'ayuda.html', icon: 'circle-question', label: 'Centro de Ayuda' },
         { href: 'index.html', icon: 'globe', label: 'Portal Público', target: '_blank' },
         { href: 'login.html', icon: 'right-from-bracket', label: 'Cerrar Sesión', style: 'color:rgba(255,100,100,.85);' }
       ]
@@ -52,6 +53,7 @@
       title: 'Recursos',
       items: [
         { href: 'cartografia.html', icon: 'map-location-dot', label: 'Mapa Comunal' },
+        { href: 'ayuda.html',       icon: 'circle-question',  label: 'Centro de Ayuda' },
         { href: 'index.html',       icon: 'globe',             label: 'Portal Público', target: '_blank' }
       ]
     },
@@ -172,21 +174,36 @@
       </div>
       <div class="header-actions">
         ${roleBadge}
-        <button class="header-action-btn" type="button" aria-label="Notificaciones">
-          <i class="fas fa-bell"></i><span class="badge-notif">5</span>
-        </button>
-        <button class="header-action-btn" type="button" aria-label="Ayuda">
+        
+        <div class="header-notif-wrapper" id="headerNotifWrapper">
+          <button class="header-action-btn" type="button" aria-label="Notificaciones" id="headerNotifBtn">
+            <i class="fas fa-bell"></i><span class="badge-notif" id="headerNotifBadge" style="display:none;">0</span>
+          </button>
+          
+          <div class="header-notif-dropdown" id="headerNotifDropdown">
+            <div class="notif-dropdown-header">
+              <span>Notificaciones</span>
+              <a href="notificaciones.html">Ver todas</a>
+            </div>
+            <div class="notif-dropdown-body" id="headerNotifList">
+              <div class="notif-dropdown-empty">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Cargando...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a href="ayuda.html" class="header-action-btn" aria-label="Centro de Ayuda">
           <i class="fas fa-circle-question"></i>
-        </button>
-        <button class="header-user" type="button" aria-label="Menú de usuario" title="${nombre}">
+        </a>
+        <a href="perfil.html" class="header-user" aria-label="Mi Perfil" title="${nombre}" style="text-decoration:none;">
           <div class="header-user-avatar ${isVocero ? 'avatar-vocero' : ''}">${initials}</div>
           <span>${nombre}</span>
-          <i class="fas fa-chevron-down"></i>
-        </button>
+          <i class="fas fa-chevron-right" style="font-size:0.8rem; opacity:0.7;"></i>
+        </a>
       </div>`;
   };
-
-
 
   const renderHeader = () => {
     let header = document.querySelector('header.app-header');
@@ -254,10 +271,114 @@
     });
   };
 
+  /* ── DROPDOWN NOTIFICACIONES LOGIC ── */
+  const initNotificationsDropdown = () => {
+    const btn = document.getElementById('headerNotifBtn');
+    const dropdown = document.getElementById('headerNotifDropdown');
+    const list = document.getElementById('headerNotifList');
+    const badge = document.getElementById('headerNotifBadge');
+    
+    if (!btn || !dropdown) return;
+
+    let loaded = false;
+
+    // Toggle dropdown
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const isOpen = dropdown.classList.contains('show');
+      
+      // Cerrar otros dropdowns si existen
+      document.querySelectorAll('.show').forEach(el => {
+        if (el !== dropdown && el.classList.contains('header-notif-dropdown')) {
+          el.classList.remove('show');
+        }
+      });
+
+      dropdown.classList.toggle('show');
+
+      if (!isOpen && !loaded) {
+        // Fetch real data
+        try {
+          if (!window.api) throw new Error("API no disponible");
+          const notifs = await window.api.getNotificaciones();
+          const pendientes = notifs.filter(n => n.status === 'pendiente');
+          
+          if (badge) {
+            badge.textContent = pendientes.length;
+            badge.style.display = pendientes.length > 0 ? 'block' : 'none';
+          }
+
+          if (pendientes.length === 0) {
+            list.innerHTML = `
+              <div class="notif-dropdown-empty">
+                <i class="fas fa-check-circle" style="color:var(--vp)"></i>
+                <p>Estás al día</p>
+                <span style="font-size:0.7rem">No tienes solicitudes pendientes</span>
+              </div>
+            `;
+          } else {
+            // Sort by new
+            pendientes.sort((a, b) => new Date(b.createdAt || b.fechaSolicitud) - new Date(a.createdAt || a.fechaSolicitud));
+            
+            list.innerHTML = pendientes.slice(0, 5).map(n => {
+              const dateObj = new Date(n.createdAt || n.fechaSolicitud);
+              const timeStr = isNaN(dateObj.getTime()) ? 'Reciente' : dateObj.toLocaleDateString();
+              
+              return `
+                <a href="notificaciones.html" class="notif-item">
+                  <div class="notif-item-icon">
+                    <i class="fas fa-user-plus"></i>
+                  </div>
+                  <div class="notif-item-content">
+                    <h4>${n.titulo || 'Solicitud de registro'}</h4>
+                    <p>${n.mensaje || 'Un vocero solicita validación.'}</p>
+                    <span class="notif-item-time">${timeStr}</span>
+                  </div>
+                </a>
+              `;
+            }).join('');
+            
+            if (pendientes.length > 5) {
+              list.innerHTML += `
+                <a href="notificaciones.html" style="display:block; text-align:center; padding:.8rem; font-size:.8rem; font-weight:600; color:var(--vp); text-decoration:none;">
+                  Ver ${pendientes.length - 5} más...
+                </a>
+              `;
+            }
+          }
+          loaded = true;
+        } catch (err) {
+          list.innerHTML = `
+            <div class="notif-dropdown-empty">
+              <i class="fas fa-exclamation-triangle" style="color:var(--ru)"></i>
+              <p>Error al cargar</p>
+            </div>
+          `;
+        }
+      }
+    });
+
+    // Close on click outside
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+    
+    // Initial fetch to set the badge count
+    if (window.api && badge) {
+      window.api.getNotificaciones().then(notifs => {
+        const p = notifs.filter(n => n.status === 'pendiente').length;
+        badge.textContent = p;
+        badge.style.display = p > 0 ? 'block' : 'none';
+      }).catch(() => {});
+    }
+  };
+
   window.addEventListener('DOMContentLoaded', () => {
     renderHeader();
     renderSidebar();
     initSidebarToggle();
+    initNotificationsDropdown();
   });
 })();
-

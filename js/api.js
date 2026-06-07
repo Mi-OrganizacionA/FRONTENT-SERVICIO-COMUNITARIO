@@ -41,6 +41,62 @@ class APIManager {
   }
 
   // ─────────────────────────────────────────
+  // AUTHENTICATION & SECURITY
+  // ─────────────────────────────────────────
+  async cambiarPassword(passwordActual, nuevaPassword) {
+    if (this.isDevelopment) {
+      return new Promise(r => setTimeout(() => r({ success: true, message: 'Simulado' }), 500));
+    }
+    const response = await fetch(`${this.baseURL}/auth/password`, {
+      method: 'PUT',
+      ...this._getHeaders(),
+      body: JSON.stringify({ passwordActual, nuevaPassword })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Error al cambiar la contraseña');
+    return data;
+  }
+
+  // ─────────────────────────────────────────
+  // CONFIGURACIÓN GLOBALES
+  // ─────────────────────────────────────────
+  async saveConfig(nombre, estado) {
+    if (this.isDevelopment) {
+      return new Promise(r => setTimeout(() => r({ success: true }), 500));
+    }
+    const response = await fetch(`${this.baseURL}/system/config`, {
+      method: 'POST',
+      ...this._getHeaders(),
+      body: JSON.stringify({ nombre, estado })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+    return data;
+  }
+
+  async downloadBackup() {
+    if (this.isDevelopment) {
+      return new Promise(r => setTimeout(() => r(true), 1500));
+    }
+    // En producción redirigimos para que se inicie la descarga directa del archivo
+    window.location.href = `${this.baseURL}/system/backup?token=${this._getToken()}`;
+  }
+
+  async cleanLogs(monthsOld) {
+    if (this.isDevelopment) {
+      return new Promise(r => setTimeout(() => r({ mensaje: 'Registros purgados simuladamente' }), 1200));
+    }
+    const response = await fetch(`${this.baseURL}/auditoria/clean`, {
+      method: 'DELETE',
+      ...this._getHeaders(),
+      body: JSON.stringify({ monthsOld })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Error purgando logs');
+    return data;
+  }
+
+  // ─────────────────────────────────────────
   // HABITANTES
   // ─────────────────────────────────────────
   async getHabitantes(filtros = {}) {
@@ -497,8 +553,10 @@ class APIManager {
   _getHeaders() {
     const token = localStorage.getItem('token');
     return {
-      'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` })
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      }
     };
   }
 

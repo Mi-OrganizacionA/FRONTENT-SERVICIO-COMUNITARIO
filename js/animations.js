@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    SICAG — Animaciones con Anime.js v3
    Módulo central de animaciones para index.html y login.html
    ============================================================ */
@@ -127,6 +127,7 @@
     if (heroScroll) {
       heroTimeline.add({
         targets: heroScroll,
+        translateX: ['-50%', '-50%'],
         translateY: [10, 0],
         opacity: [0, 1],
         duration: 400,
@@ -137,6 +138,7 @@
     if (heroScroll) {
       anime({
         targets: heroScroll,
+        translateX: ['-50%', '-50%'],
         translateY: [0, 6],
         duration: 1000,
         direction: 'alternate',

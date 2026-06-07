@@ -65,6 +65,28 @@ class AuthController {
     }
   }
 
+  static async changePassword(req, res) {
+    try {
+      const { passwordActual, nuevaPassword } = req.body;
+      if (!passwordActual || !nuevaPassword) return res.status(400).json({ error: 'Faltan campos de contraseña' });
+
+      const userId = req.user.id;
+      const user = await UsuarioModel.findByPk(userId);
+      if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+      const isValid = AuthService.validatePassword(passwordActual, user.contraseña);
+      if (!isValid) return res.status(401).json({ error: 'La contraseña actual es incorrecta' });
+
+      user.contraseña = AuthService.hashPassword(nuevaPassword);
+      await user.save();
+
+      res.json({ success: true, message: 'Contraseña actualizada exitosamente' });
+    } catch (error) {
+      logger.error('Error cambiando contraseña:', error);
+      res.status(500).json({ error: 'Error del servidor al cambiar contraseña' });
+    }
+  }
+
   static setUsuarioModel(model) {
     UsuarioModel = model;
   }

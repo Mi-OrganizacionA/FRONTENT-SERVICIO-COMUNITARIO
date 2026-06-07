@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -42,8 +42,9 @@
 
     html,
     body {
-      height: 100%;
+      min-height: 100vh;
       font-family: 'Poppins', sans-serif;
+      background: var(--bg);
     }
 
     /* ══════════════════════════════════════════════════════
@@ -82,6 +83,25 @@
       min-height: 100vh;
       display: grid;
       grid-template-columns: 1fr 1fr;
+      position: relative;
+      background: var(--vx);
+      overflow: hidden;
+    }
+
+    /* Fondo unificado de imagen con overlay */
+    .login-hero-bg {
+      position: absolute;
+      inset: 0;
+      background: url('../assets/img/hero_community.png') center/cover no-repeat;
+      opacity: .12;
+      z-index: 0;
+    }
+
+    .login-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(13, 31, 13, .95) 0%, rgba(27, 94, 32, .85) 100%);
+      z-index: 1;
     }
 
     /* ══════════════════════════════════════════════════════
@@ -89,34 +109,20 @@
        ══════════════════════════════════════════════════════ */
     .login-hero {
       position: relative;
-      background: var(--vx);
-      overflow: hidden;
+      z-index: 3;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      padding: 5rem 3.5rem 3rem;
+      justify-content: center;
+      padding: 5rem 3.5rem;
     }
 
-    /* Fondo de imagen con overlay */
-    .login-hero-bg {
-      position: absolute;
-      inset: 0;
-      background: url('../assets/img/hero_community.png') center/cover no-repeat;
-      opacity: .18;
-    }
-
-    .login-hero-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(160deg, rgba(13, 31, 13, .95) 0%, rgba(27, 94, 32, .75) 60%, rgba(13, 31, 13, .9) 100%);
-    }
-
-    /* Partículas CSS puras */
+    /* Partículas flotantes */
     .particles {
       position: absolute;
       inset: 0;
       overflow: hidden;
       pointer-events: none;
+      z-index: 2;
     }
 
     .particle {
@@ -126,97 +132,23 @@
       animation: float linear infinite;
     }
 
-    .particle:nth-child(1) {
-      width: 6px;
-      height: 6px;
-      left: 10%;
-      bottom: -20px;
-      animation-duration: 12s;
-      animation-delay: 0s;
-    }
-
-    .particle:nth-child(2) {
-      width: 10px;
-      height: 10px;
-      left: 20%;
-      bottom: -20px;
-      animation-duration: 18s;
-      animation-delay: 2s;
-    }
-
-    .particle:nth-child(3) {
-      width: 4px;
-      height: 4px;
-      left: 35%;
-      bottom: -20px;
-      animation-duration: 14s;
-      animation-delay: 4s;
-    }
-
-    .particle:nth-child(4) {
-      width: 8px;
-      height: 8px;
-      left: 50%;
-      bottom: -20px;
-      animation-duration: 20s;
-      animation-delay: 1s;
-    }
-
-    .particle:nth-child(5) {
-      width: 5px;
-      height: 5px;
-      left: 65%;
-      bottom: -20px;
-      animation-duration: 16s;
-      animation-delay: 3s;
-    }
-
-    .particle:nth-child(6) {
-      width: 12px;
-      height: 12px;
-      left: 80%;
-      bottom: -20px;
-      animation-duration: 22s;
-      animation-delay: 5s;
-    }
-
-    .particle:nth-child(7) {
-      width: 7px;
-      height: 7px;
-      left: 90%;
-      bottom: -20px;
-      animation-duration: 15s;
-      animation-delay: 0.5s;
-    }
-
-    .particle:nth-child(8) {
-      width: 3px;
-      height: 3px;
-      left: 45%;
-      bottom: -20px;
-      animation-duration: 11s;
-      animation-delay: 6s;
-    }
+    .particle:nth-child(1) { width: 6px; height: 6px; left: 10%; bottom: -20px; animation-duration: 12s; animation-delay: 0s; }
+    .particle:nth-child(2) { width: 10px; height: 10px; left: 20%; bottom: -20px; animation-duration: 18s; animation-delay: 2s; }
+    .particle:nth-child(3) { width: 4px; height: 4px; left: 35%; bottom: -20px; animation-duration: 14s; animation-delay: 4s; }
+    .particle:nth-child(4) { width: 8px; height: 8px; left: 50%; bottom: -20px; animation-duration: 20s; animation-delay: 1s; }
+    .particle:nth-child(5) { width: 5px; height: 5px; left: 65%; bottom: -20px; animation-duration: 16s; animation-delay: 3s; }
+    .particle:nth-child(6) { width: 12px; height: 12px; left: 80%; bottom: -20px; animation-duration: 22s; animation-delay: 5s; }
+    .particle:nth-child(7) { width: 7px; height: 7px; left: 90%; bottom: -20px; animation-duration: 15s; animation-delay: 0.5s; }
+    .particle:nth-child(8) { width: 3px; height: 3px; left: 45%; bottom: -20px; animation-duration: 11s; animation-delay: 6s; }
 
     @keyframes float {
-      0% {
-        transform: translateY(0) rotate(0deg);
-        opacity: 0;
-      }
-
-      10% {
-        opacity: 1;
-      }
-
-      90% {
-        opacity: .6;
-      }
-
-      100% {
-        transform: translateY(-110vh) rotate(720deg);
-        opacity: 0;
-      }
+      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: .6; }
+      100% { transform: translateY(-110vh) rotate(720deg); opacity: 0; }
     }
+
+    /* Animaciones */
 
     /* Contenido hero */
     .hero-content {
@@ -242,6 +174,9 @@
       font-size: 1.5rem;
       color: #fff;
       box-shadow: 0 8px 24px rgba(67, 160, 71, .4);
+      animation: none !important;
+      transform: none !important;
+      transition: none !important;
     }
 
     .hero-logo-text {
@@ -361,38 +296,13 @@
        PANEL DERECHO — FORMULARIO
        ══════════════════════════════════════════════════════ */
     .login-form-panel {
-      background: var(--bg);
+      position: relative;
+      z-index: 3;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 5rem 3rem;
-      position: relative;
-    }
-
-    /* Decoración geométrica fondo */
-    .login-form-panel::before {
-      content: '';
-      position: absolute;
-      top: -80px;
-      right: -80px;
-      width: 280px;
-      height: 280px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(46, 125, 50, .08) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .login-form-panel::after {
-      content: '';
-      position: absolute;
-      bottom: -60px;
-      left: -60px;
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(249, 168, 37, .07) 0%, transparent 70%);
-      pointer-events: none;
     }
 
     /* Tarjeta del formulario */
@@ -439,6 +349,9 @@
       font-size: 1.8rem;
       color: #fff;
       box-shadow: 0 12px 32px rgba(46, 125, 50, .35);
+      animation: none !important;
+      transform: none !important;
+      transition: none !important;
     }
 
     .card-header-login h2 {
@@ -775,16 +688,17 @@
        ══════════════════════════════════════════════════════ */
     @media (max-width: 900px) {
       .login-page {
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column-reverse;
       }
 
       .login-hero {
-        display: none;
+        padding: 4rem 2rem;
       }
 
       .login-form-panel {
         padding: 4rem 1.5rem;
-        min-height: 100vh;
+        min-height: auto;
       }
     }
 
@@ -805,23 +719,25 @@
   </div>
 
   <div class="login-page">
+    <!-- Fondos compartidos (Unificados) -->
+    <div class="login-hero-bg"></div>
+    <div class="login-hero-overlay"></div>
+    <!-- Contenedor para las partículas flotantes pequeñas -->
+    <div class="particles" aria-hidden="true">
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+    </div>
 
     <!-- ══════════════════════════════════════════════════════
          PANEL IZQUIERDO — HERO BRANDING
          ══════════════════════════════════════════════════════ -->
     <aside class="login-hero" aria-label="Identidad del sistema">
-      <div class="login-hero-bg"></div>
-      <div class="login-hero-overlay"></div>
-      <div class="particles" aria-hidden="true">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-      </div>
 
       <!-- Logo -->
       <div class="hero-content">
@@ -863,14 +779,6 @@
         </div>
       </div>
 
-      <div class="hero-footer">
-        <p>
-          <i class="fas fa-map-marker-alt"></i>
-          Las Mercedes, San Felipe<br>
-          Estado Yaracuy · Venezuela · 2026
-        </p>
-        <span class="hero-version">VERSIÓN 3.0</span>
-      </div>
     </aside>
 
     <!-- ══════════════════════════════════════════════════════
@@ -947,15 +855,6 @@
           <button class="demo-btn" id="demoVoceroBtn" onclick="fillDemo('vocero','vocero123')">
             <i class="fas fa-user"></i> Vocero
           </button>
-        </div>
-
-        <!-- Footer tarjeta -->
-        <div class="card-foot">
-          <div class="secure-badge"><i class="fas fa-shield-alt"></i> Conexión segura · SICAG v3.0</div>
-          <p>
-            <a href="index.html"><i class="fas fa-arrow-left"></i> Volver al Portal Público</a>
-            <br>© 2026 — Todos los derechos reservados
-          </p>
         </div>
 
       </div>

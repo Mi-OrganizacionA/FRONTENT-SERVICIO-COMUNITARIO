@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Mi Perfil — SICAG.">
+  <title>Mi Perfil — SICAG</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="css/admin.css" rel="stylesheet">
+
+  <style>
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .profile-avatar-lg {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--vp), var(--vv));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(46, 125, 50, 0.3);
+      flex-shrink: 0;
+    }
+    .profile-avatar-lg.vocero {
+      background: linear-gradient(135deg, #1565C0, #42A5F5);
+      box-shadow: 0 10px 25px rgba(21, 101, 192, 0.3);
+    }
+    .profile-info h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.8rem;
+      color: var(--txt);
+      font-weight: 800;
+    }
+    .profile-info p {
+      margin: 0;
+      color: var(--sub);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+
+<body data-search-placeholder="Buscar configuraciones...">
+  <div class="barra-tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div id="header-placeholder"></div>
+  <nav id="sidebar-placeholder"></nav>
+
+  <main class="app-main" role="main">
+    
+    <!-- ══ PREMIUM HEADER ══ -->
+    <div class="ph-wrap fade-in">
+      <div class="ph-deco-dots" aria-hidden="true"></div>
+      <nav class="ph-breadcrumb" aria-label="Ruta de navegación">
+        <a href="dashboard.html"><i class="fas fa-home"></i></a>
+        <i class="fas fa-chevron-right ph-sep"></i>
+        <span class="ph-cur">Mi Perfil</span>
+      </nav>
+      <div class="ph-body">
+        <div class="ph-left">
+          <div class="ph-icon"><i class="fas fa-user-circle"></i></div>
+          <div>
+            <div class="ph-module"><i class="fas fa-id-card"></i> Cuenta de Usuario</div>
+            <h1 class="ph-title">Mi Perfil</h1>
+            <p class="ph-sub">Visualiza tus datos personales y gestiona la seguridad de tu cuenta de acceso.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CONTENIDO DE PERFIL ══ -->
+    <div style="display:grid; grid-template-columns: 1fr; gap: 2rem; max-width: 900px; margin: 0 auto;" class="fade-in-up">
+      
+      <!-- Datos de la Cuenta -->
+      <section class="card-sicag">
+        <div class="card-header-sicag">
+          <span><i class="fas fa-address-card"></i> Datos de la Cuenta</span>
+        </div>
+        <div class="card-body-sicag">
+          
+          <div class="profile-header">
+            <div class="profile-avatar-lg" id="profileAvatar"></div>
+            <div class="profile-info">
+              <h2 id="profileName">Cargando...</h2>
+              <p><i class="fas fa-id-badge" style="color:var(--vp);"></i> <span id="profileRole">Cargando rol...</span></p>
+              <p id="profileCcContainer" style="display:none; margin-top:0.3rem;">
+                <i class="fas fa-map-pin" style="color:#E65100;"></i> <span id="profileCc"></span>
+              </p>
+            </div>
+          </div>
+
+          <div class="form-section-header form-section-verde" style="margin-bottom:1.1rem;">
+            <i class="fas fa-lock"></i> Seguridad y Acceso
+          </div>
+          
+          <form id="formPassword">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag">Contraseña Actual <span style="color:var(--ru);">*</span></label>
+              <input type="password" id="passActual" class="form-control-sicag" placeholder="Ingresa tu contraseña actual" required>
+            </div>
+            
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
+              <div class="form-group-sicag" style="margin-bottom:0;">
+                <label class="form-label-sicag">Nueva Contraseña <span style="color:var(--ru);">*</span></label>
+                <input type="password" id="passNueva" class="form-control-sicag" placeholder="Mínimo 8 caracteres" required minlength="8">
+              </div>
+              <div class="form-group-sicag" style="margin-bottom:0;">
+                <label class="form-label-sicag">Confirmar Nueva Contraseña <span style="color:var(--ru);">*</span></label>
+                <input type="password" id="passConfirm" class="form-control-sicag" placeholder="Repite la nueva contraseña" required minlength="8">
+              </div>
+            </div>
+
+            <div style="text-align:right; border-top:1px solid var(--border); padding-top:1.5rem;">
+              <button class="btn-sicag btn-primary" type="submit">
+                <i class="fas fa-key"></i> Actualizar Contraseña
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- SICAG Scripts -->
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/layout-menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Cargar datos del usuario
+      const user = window.auth ? window.auth.getUser() : null;
+      if (user) {
+        document.getElementById('profileName').textContent = user.nombre || 'Usuario';
+        
+        const isVocero = user.rol === 'vocero';
+        const avatar = document.getElementById('profileAvatar');
+        
+        // Iniciales
+        avatar.textContent = (user.nombre || 'SA').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+        
+        if (isVocero) {
+          avatar.classList.add('vocero');
+          document.getElementById('profileRole').textContent = 'Vocero Comunal';
+          if (user.consejoComunal) {
+            document.getElementById('profileCcContainer').style.display = 'flex';
+            document.getElementById('profileCc').textContent = user.consejoComunal;
+          }
+        } else {
+          document.getElementById('profileRole').textContent = 'Administrador General';
+        }
+      }
+
+      // Validar formulario de contraseña
+      const form = document.getElementById('formPassword');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const actual = document.getElementById('passActual').value;
+        const nueva = document.getElementById('passNueva').value;
+        const confirm = document.getElementById('passConfirm').value;
+
+        if (nueva !== confirm) {
+          Components.showToast('Las contraseñas nuevas no coinciden.', 'error');
+          return;
+        }
+
+        if (actual === nueva) {
+          Components.showToast('La nueva contraseña debe ser diferente a la actual.', 'error');
+          return;
+        }
+
+        const btn = form.querySelector('button');
+        const oldHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Actualizando...';
+        btn.disabled = true;
+
+        try {
+          if (!window.api) throw new Error("La API no está conectada");
+          await window.api.cambiarPassword(actual, nueva);
+          
+          form.reset();
+          Components.showToast('Tu contraseña ha sido actualizada con éxito.', 'success');
+        } catch (error) {
+          Components.showToast(error.message || 'Ocurrió un error al cambiar la contraseña.', 'error');
+        } finally {
+          btn.innerHTML = oldHtml;
+          btn.disabled = false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

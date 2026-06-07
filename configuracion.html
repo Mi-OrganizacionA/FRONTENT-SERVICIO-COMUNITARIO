@@ -1,29 +1,187 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Configuración del Sistema — SICAG.">
-  <title>Configuración — SICAG</title>
+  <meta name="description" content="Configuración Global — SICAG.">
+  <title>Configuración Global — SICAG</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
-  <link rel="preload" href="css/admin.css" as="style">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="css/admin.css" rel="stylesheet">
+
+  <style>
+    .config-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    @media(max-width: 992px) {
+      .config-wrapper {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Switch CSS Premium */
+    .switch-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1.2rem;
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: var(--r-md);
+      border: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+
+    .switch-info h4 {
+      margin: 0 0 0.3rem 0;
+      font-size: 1rem;
+      color: var(--txt);
+      font-weight: 700;
+    }
+
+    .switch-info p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--sub);
+      line-height: 1.4;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 54px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    input:checked+.slider {
+      background-color: var(--vp);
+    }
+
+    input.danger:checked+.slider {
+      background-color: var(--ru);
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(26px);
+    }
+
+    /* Card Actions */
+    .action-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+    }
+
+    .action-row:hover {
+      border-color: var(--vp);
+      background: rgba(67, 160, 71, 0.02);
+    }
+
+    .action-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .action-content {
+      flex: 1;
+      padding: 0 1.5rem;
+    }
+
+    .action-content h4 {
+      margin: 0 0 0.3rem 0;
+      font-size: 1.05rem;
+      color: var(--txt);
+    }
+
+    .action-content p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--sub);
+    }
+
+    /* Mobile Responsiveness */
+    @media(max-width: 768px) {
+      .action-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+      }
+      .action-content {
+        padding: 0;
+        width: 100%;
+      }
+      .action-row button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
 </head>
+
 <body data-search-placeholder="Buscar configuraciones...">
   <div class="barra-tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <div id="header-placeholder"></div>
   <nav id="sidebar-placeholder"></nav>
-  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral"><i class="fas fa-bars"></i></button>
 
   <main class="app-main" role="main">
-    
+
     <!-- ══ PREMIUM HEADER ══ -->
     <div class="ph-wrap fade-in">
       <div class="ph-deco-dots" aria-hidden="true"></div>
@@ -34,102 +192,205 @@
       </nav>
       <div class="ph-body">
         <div class="ph-left">
-          <div class="ph-icon"><i class="fas fa-cog"></i></div>
+          <div class="ph-icon"><i class="fas fa-sliders"></i></div>
           <div>
-            <div class="ph-module"><i class="fas fa-shield-halved"></i> Administración del Sistema</div>
-            <h1 class="ph-title">Configuración</h1>
-            <p class="ph-sub">Administra los ajustes del sistema, la gestión de la comunidad y la información pública desde un solo lugar.</p>
+            <div class="ph-module"><i class="fas fa-shield-halved"></i> Administración Global</div>
+            <h1 class="ph-title">Configuración del Sistema</h1>
+            <p class="ph-sub">Gestiona las políticas de acceso, reglas de validación y mantenimiento de la base de datos
+              del SICAG.</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ══ QUICK ACTION CARDS ══ -->
-    <div class="config-grid fade-in-up" style="margin-bottom:2rem; display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1.25rem;">
-      <article class="config-card" style="background:var(--card); border:1px solid var(--border); border-radius:var(--r-lg); padding:1.5rem; transition:transform var(--tr);">
-        <div style="font-size:2rem; color:var(--vp); margin-bottom:1rem;"><i class="fas fa-users-gear"></i></div>
-        <h3 style="font-size:1.1rem; font-weight:700; color:var(--txt); margin-bottom:.5rem;">Voceros</h3>
-        <p style="color:var(--muted); font-size:.85rem; margin-bottom:1rem; line-height:1.5;">Administra voceros comunitarios, asigna comunidades y controla los permisos de acceso al censo.</p>
-        <a href="voceros.html" class="btn-sicag btn-outline-verde" style="width:100%; justify-content:center;">Administrar Voceros</a>
-      </article>
-      <article class="config-card" style="background:var(--card); border:1px solid var(--border); border-radius:var(--r-lg); padding:1.5rem; transition:transform var(--tr);">
-        <div style="font-size:2rem; color:#1565C0; margin-bottom:1rem;"><i class="fas fa-bullhorn"></i></div>
-        <h3 style="font-size:1.1rem; font-weight:700; color:var(--txt); margin-bottom:.5rem;">Cartelera Digital</h3>
-        <p style="color:var(--muted); font-size:.85rem; margin-bottom:1rem; line-height:1.5;">Publica encuestas, avisos y noticias de los consejos comunales para que sean vistas en el portal público.</p>
-        <a href="noticias.html" class="btn-sicag btn-outline-verde" style="width:100%; justify-content:center; color:#1565C0; border-color:rgba(21,101,192,.3);">Gestionar Publicaciones</a>
-      </article>
-      <article class="config-card" style="background:var(--card); border:1px solid var(--border); border-radius:var(--r-lg); padding:1.5rem; transition:transform var(--tr);">
-        <div style="font-size:2rem; color:#E65100; margin-bottom:1rem;"><i class="fas fa-globe"></i></div>
-        <h3 style="font-size:1.1rem; font-weight:700; color:var(--txt); margin-bottom:.5rem;">Portal Público</h3>
-        <p style="color:var(--muted); font-size:.85rem; margin-bottom:1rem; line-height:1.5;">Configura el contenido general visible en el portal público y los datos de contacto principales.</p>
-        <button class="btn-sicag btn-outline-verde" onclick="Components.showToast('Configuración de portal próximamente.', 'info')" style="width:100%; justify-content:center; color:#E65100; border-color:rgba(230,81,0,.3);">Ajustes del Portal</button>
-      </article>
+    <div class="config-wrapper fade-in-up">
+
+      <!-- COLUMNA IZQUIERDA -->
+      <div class="config-col">
+
+        <!-- Políticas del Sistema -->
+        <section class="card-sicag">
+          <div class="card-header-sicag">
+            <span><i class="fas fa-gavel"></i> Políticas y Reglas del Sistema</span>
+          </div>
+          <div class="card-body-sicag">
+
+            <div class="switch-container">
+              <div class="switch-info">
+                <h4>Apertura del Censo Comunitario</h4>
+                <p>Permitir a los Voceros registrar nuevos habitantes y viviendas. Si se apaga, el censo se bloquea
+                  (Solo lectura).</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggleCenso" checked onchange="toggleSetting('Censo', this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="switch-container" style="border-left: 4px solid var(--ru);">
+              <div class="switch-info">
+                <h4>Aprobación Automática (Modo Peligroso)</h4>
+                <p>Si se activa, los registros de los voceros NO pasarán por la bandeja de validaciones y se guardarán
+                  de inmediato.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" class="danger" id="toggleAutoAprob"
+                  onchange="toggleSetting('Aprobación Automática', this.checked, true)">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Datos de Identidad -->
+        <section class="card-sicag" style="margin-top: 2rem;">
+          <div class="card-header-sicag">
+            <span><i class="fas fa-map-location-dot"></i> Identidad de la Comuna</span>
+          </div>
+          <div class="card-body-sicag">
+            <form id="formIdentidad">
+              <div class="form-group-sicag">
+                <label class="form-label-sicag">Nombre de la Comuna</label>
+                <input type="text" class="form-control-sicag" value="Comuna Socialista Agroecológica Simón Rodríguez"
+                  readonly style="background:#f5f5f5; cursor:not-allowed;">
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div class="form-group-sicag" style="margin-bottom:0;">
+                  <label class="form-label-sicag">Estado</label>
+                  <input type="text" class="form-control-sicag" value="Yaracuy" readonly
+                    style="background:#f5f5f5; cursor:not-allowed;">
+                </div>
+                <div class="form-group-sicag" style="margin-bottom:0;">
+                  <label class="form-label-sicag">Municipio</label>
+                  <input type="text" class="form-control-sicag" value="San Felipe" readonly
+                    style="background:#f5f5f5; cursor:not-allowed;">
+                </div>
+              </div>
+            </form>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- COLUMNA DERECHA -->
+      <div class="config-col">
+
+        <!-- Mantenimiento de BD -->
+        <section class="card-sicag">
+          <div class="card-header-sicag">
+            <span><i class="fas fa-server"></i> Mantenimiento de Base de Datos</span>
+          </div>
+          <div class="card-body-sicag">
+
+            <div class="action-row">
+              <div class="action-icon" style="background:rgba(21, 101, 192, 0.1); color:#1565C0;">
+                <i class="fas fa-database"></i>
+              </div>
+              <div class="action-content">
+                <h4>Respaldo del Sistema (Backup)</h4>
+                <p>Descarga una copia completa de la base de datos actual (Formato SQLite) para seguridad y
+                  restauración.</p>
+              </div>
+              <button class="btn-sicag btn-outline-verde" onclick="descargarBackup(this)"
+                style="border-color:#1565C0; color:#1565C0;">
+                <i class="fas fa-download"></i> Descargar
+              </button>
+            </div>
+
+            <div class="action-row">
+              <div class="action-icon" style="background:rgba(230, 81, 0, 0.1); color:#E65100;">
+                <i class="fas fa-broom"></i>
+              </div>
+              <div class="action-content">
+                <h4>Purgar Registros de Auditoría</h4>
+                <p>Elimina el historial de trazabilidad (Logs) más antiguo de 6 meses para liberar espacio en el
+                  servidor.</p>
+              </div>
+              <button class="btn-sicag btn-outline-verde" onclick="purgarLogs(this)"
+                style="border-color:#E65100; color:#E65100;">
+                <i class="fas fa-trash"></i> Purgar Logs
+              </button>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+
     </div>
-
-    <!-- ══ SETTINGS FORM ══ -->
-    <section class="card-sicag fade-in-up">
-      <div class="card-header-sicag">
-        <span><i class="fas fa-sliders-h"></i> Ajustes Generales del Sistema</span>
-      </div>
-      <div class="card-body-sicag">
-        <form id="formAjustes" onsubmit="event.preventDefault(); Components.showToast('Ajustes guardados correctamente.', 'success');">
-          <div class="form-section-header form-section-verde" style="margin-bottom:1.1rem;">
-            <i class="fas fa-info-circle"></i> Datos de la Comuna
-          </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
-            <div class="form-group-sicag" style="margin-bottom:0;">
-              <label class="form-label-sicag">Nombre de la Comuna</label>
-              <input type="text" class="form-control-sicag" value="Comuna Socialista Simón Rodríguez" required>
-            </div>
-            <div class="form-group-sicag" style="margin-bottom:0;">
-              <label class="form-label-sicag">Ubicación</label>
-              <input type="text" class="form-control-sicag" value="Estado Yaracuy, Municipio San Felipe" required>
-            </div>
-          </div>
-          
-          <div class="form-section-header form-section-verde" style="margin-bottom:1.1rem; margin-top:1.5rem;">
-            <i class="fas fa-shield-halved"></i> Seguridad
-          </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
-            <div class="form-group-sicag" style="margin-bottom:0;">
-              <label class="form-label-sicag">Actualizar Contraseña de Administrador</label>
-              <input type="password" class="form-control-sicag" placeholder="Nueva contraseña">
-            </div>
-            <div class="form-group-sicag" style="margin-bottom:0;">
-              <label class="form-label-sicag">Confirmar Contraseña</label>
-              <input type="password" class="form-control-sicag" placeholder="Repetir contraseña">
-            </div>
-          </div>
-
-          <div style="margin-top:2rem; text-align:right;">
-            <button class="btn-sicag btn-primary" type="submit">
-              <i class="fas fa-save"></i> Guardar Ajustes
-            </button>
-          </div>
-        </form>
-      </div>
-    </section>
 
   </main>
 
-  <!-- SICAG Scripts -->
   <script src="js/auth.js"></script>
-  <script src="js/api.js"></script>
+  <script src="js/api.js?v=2"></script>
   <script src="js/components.js"></script>
   <script src="js/layout-menu.js"></script>
-  <script src="js/roles.js"></script>
+
   <script>
-    // Configuración hover effects for cards
-    document.querySelectorAll('.config-card').forEach(card => {
-      card.addEventListener('mouseenter', () => {
-        card.style.transform = 'translateY(-4px)';
-        card.style.boxShadow = 'var(--shadow-md)';
-      });
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = 'translateY(0)';
-        card.style.boxShadow = 'none';
-      });
+    // Validar acceso solo para administradores (protección frontal)
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = window.auth ? window.auth.getUser() : null;
+      if (user && user.rol !== 'admin') {
+        document.body.innerHTML = '<h2 style="text-align:center; margin-top:50px; color:var(--ru);">Acceso Denegado. Se requiere nivel de Administrador Global.</h2>';
+      }
     });
+
+    // Lógica para los switches conectada al API
+    async function toggleSetting(nombre, estado, esPeligroso = false) {
+      if (esPeligroso && estado === true) {
+        const confirmar = confirm('¡ADVERTENCIA! Activar la Aprobación Automática permite que los voceros guarden datos directamente sin revisión. ¿Estás seguro de asumir este riesgo de seguridad?');
+        if (!confirmar) {
+          event.target.checked = false;
+          return;
+        }
+      }
+      try {
+        if (!window.api) throw new Error("API no disponible");
+        await window.api.saveConfig(nombre, estado);
+        const accion = estado ? 'Activado' : 'Desactivado';
+        Components.showToast(`Ajuste guardado en BD: ${nombre} -> ${accion}`, estado ? 'success' : 'info');
+      } catch (err) {
+        console.error(err);
+        Components.showToast(`Error al guardar la configuración: ${err.message}`, 'error');
+        event.target.checked = !estado; // revert
+      }
+    }
+
+    async function descargarBackup(btn) {
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando...';
+      btn.disabled = true;
+      try {
+        if (!window.api) throw new Error();
+        await window.api.downloadBackup();
+        Components.showToast('Descarga iniciada exitosamente.', 'success');
+      } catch (err) {
+        Components.showToast('Error al descargar el respaldo.', 'error');
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    async function purgarLogs(btn) {
+      if (confirm('¿Seguro que deseas purgar los historiales antiguos? Esta acción no se puede deshacer.')) {
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Limpiando...';
+        btn.disabled = true;
+        try {
+          if (!window.api) throw new Error();
+          const res = await window.api.cleanLogs(6); // 6 meses
+          Components.showToast(res.mensaje || 'Registros purgados exitosamente.', 'success');
+        } catch (err) {
+          Components.showToast('Error al purgar los logs.', 'error');
+        } finally {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      }
+    }
   </script>
 </body>
+
 </html>

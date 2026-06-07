@@ -1,4 +1,4 @@
-﻿require('dotenv').config();
+require('dotenv').config();
 
 module.exports = {
   node_env: process.env.NODE_ENV || 'development',
@@ -24,7 +24,10 @@ module.exports = {
   },
 
   cors: {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:8080',
+    origin: function (origin, callback) {
+      // Permitir cualquier origen en desarrollo local
+      callback(null, true);
+    },
     credentials: true
   },
 
