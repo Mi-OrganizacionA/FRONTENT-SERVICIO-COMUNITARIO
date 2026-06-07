@@ -1,4 +1,4 @@
-﻿const logger = require('../utils/logger');
+const logger = require('../utils/logger');
 const AuditService = require('../services/auditService');
 const HabitantesService = require('../services/habitantesService');
 let HabitanteModel = null;
@@ -19,17 +19,17 @@ class HabitantesController {
       
       // Restricción de acceso para voceros
       if (req.user?.rol === 'vocero') {
-        where.id_comunidad = req.user.id_comunidad_asignada;
+        where.consejo_comunal_id = req.user.id_comunidad_asignada;
       } else if (consejo_id) {
-        where.id_comunidad = consejo_id;
+        where.consejo_comunal_id = consejo_id;
       }
       
       if (condicion_salud) where.condicion_salud = condicion_salud;
       if (nombre) {
         const { Op } = require('sequelize');
         where[Op.or] = [
-          { nombre: { [Op.iLike]: `%${nombre}%` } },
-          { apellido: { [Op.iLike]: `%${nombre}%` } },
+          { nombres: { [Op.iLike]: `%${nombre}%` } },
+          { apellidos: { [Op.iLike]: `%${nombre}%` } },
           { cedula: nombre }
         ];
       }
@@ -39,7 +39,7 @@ class HabitantesController {
         where,
         limit: parseInt(limit),
         offset,
-        order: [['nombre', 'ASC']]
+        order: [['nombres', 'ASC']]
       });
 
       // Enriquecer con campos calculados
@@ -152,7 +152,7 @@ class HabitantesController {
    */
   static async create(req, res) {
     try {
-      const { cedula, nombre, apellido, id_comunidad, ...data } = req.body;
+      const { cedula, nombres, apellidos, consejo_comunal_id, ...data } = req.body;
       
       // Verificar que cédula sea única
       const existe = await HabitanteModel.findOne({ where: { cedula } });
@@ -160,9 +160,9 @@ class HabitantesController {
 
       const habitante = await HabitantesService.crear(HabitanteModel, {
         cedula,
-        nombre,
-        apellido,
-        id_comunidad,
+        nombres,
+        apellidos,
+        consejo_comunal_id,
         ...data,
         activo: true,
         fecha_creacion: new Date()
@@ -231,22 +231,23 @@ class HabitantesController {
       if (isNaN(consejo_id)) return res.status(400).json({ error: 'consejo_id inválido' });
       const { cedula, nombre } = req.query;
       
-      let where = { activo: true, id_comunidad: consejo_id };
+      let where = { activo: true, consejo_comunal_id: consejo_id };
       if (cedula) where.cedula = cedula;
       if (nombre) {
         const { Op } = require('sequelize');
         where[Op.or] = [
-          { nombre: { [Op.iLike]: `%${nombre}%` } }
+          { nombres: { [Op.iLike]: `%${nombre}%` } },
+          { apellidos: { [Op.iLike]: `%${nombre}%` } }
         ];
       }
 
       const habitantes = await HabitanteModel.findAll({
         where,
         attributes: {
-          exclude: ['direccion', 'email', 'telefono', 'foto_cedula_url', 'numero_hijos', 'estado_civil']
+          exclude: ['direccion', 'email', 'telefono', 'fotografia_cedula_url']
         },
         limit: 20,
-        order: [['nombre', 'ASC']]
+        order: [['nombres', 'ASC']]
       });
 
       // Enriquecer con edad y estado electoral

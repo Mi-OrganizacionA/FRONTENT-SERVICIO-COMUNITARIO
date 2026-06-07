@@ -78,8 +78,13 @@ class APIManager {
     if (this.isDevelopment) {
       return new Promise(r => setTimeout(() => r(true), 1500));
     }
-    // En producción redirigimos para que se inicie la descarga directa del archivo
-    window.location.href = `${this.baseURL}/system/backup?token=${this._getToken()}`;
+    const token = localStorage.getItem('token');
+    const a = document.createElement('a');
+    a.href = `${this.baseURL}/system/backup?token=${token}`;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   async cleanLogs(monthsOld) {
@@ -566,6 +571,20 @@ class APIManager {
       resultado = resultado.filter(h => h.consejoComunal === filtros.consejoComunal);
     }
     return resultado;
+  }
+
+  async guardarPasoCenso(paso, idEstudio, datos) {
+    if (this.isDevelopment) {
+      return new Promise(r => setTimeout(() => r({ success: true, id_estudio: idEstudio || Math.floor(Math.random() * 90000000) }), 500));
+    }
+    const response = await fetch(`${this.baseURL}/estudios-demograficos/paso`, {
+      method: 'POST',
+      ...this._getHeaders(),
+      body: JSON.stringify({ paso, id_estudio: idEstudio, datos })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || `Error en paso ${paso}`);
+    return data;
   }
 
   _filterProyectos(proyectos, filtros) {

@@ -19,14 +19,24 @@ async function initModels(sequelize) {
   const CarteleraDigital = require('./CarteleraDigital')(sequelize);
   const LogAuditoria = require('./LogAuditoria')(sequelize);
 
+  // Modelos del Censo Desglosados
+  const CensoCaracteristicaFamiliar = require('./CensoCaracteristicaFamiliar')(sequelize);
+  const CensoSituacionEconomica = require('./CensoSituacionEconomica')(sequelize);
+  const CensoSituacionVivienda = require('./CensoSituacionVivienda')(sequelize);
+  const CensoSalud = require('./CensoSalud')(sequelize);
+  const CensoServicios = require('./CensoServicios')(sequelize);
+  const CensoParticipacionComunitaria = require('./CensoParticipacionComunitaria')(sequelize);
+  const CensoSituacionComunidad = require('./CensoSituacionComunidad')(sequelize);
+  const CensoOpcionMultiple = require('./CensoOpcionMultiple')(sequelize);
+
   // Definir relaciones para que los modelos con consejo_comunal_id queden enlazados
-  Usuario.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
+  Usuario.belongsTo(ConsejoComunal, { foreignKey: 'id_comunidad_asignada', as: 'consejo' });
   Habitante.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
-  Proyecto.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
-  Votacion.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
+  Proyecto.belongsTo(ConsejoComunal, { foreignKey: 'id_comunidad', as: 'consejo' });
+  Votacion.belongsTo(ConsejoComunal, { foreignKey: 'id_comunidad', as: 'consejo' });
   Vivienda.belongsTo(ConsejoComunal, { foreignKey: 'id_comunidad', as: 'consejo' });
-  Reporte7T.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
-  EstudioDemografico.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
+  Reporte7T.belongsTo(ConsejoComunal, { foreignKey: 'id_comunidad', as: 'consejo' });
+  EstudioDemografico.belongsTo(ConsejoComunal, { foreignKey: 'id_comunidad', as: 'consejo' });
   ProduccionAgricola.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
 
   // Relaciones específicas
@@ -38,13 +48,13 @@ async function initModels(sequelize) {
   PersonaGrupoSocial.belongsTo(OrganizacionSocial, { foreignKey: 'id_organizacion', as: 'organizacion' });
   PersonaGrupoSocial.belongsTo(Habitante, { foreignKey: 'id_habitante', as: 'habitante' });
 
-  ConsejoComunal.hasMany(Usuario, { foreignKey: 'consejo_comunal_id', as: 'usuarios' });
+  ConsejoComunal.hasMany(Usuario, { foreignKey: 'id_comunidad_asignada', as: 'usuarios' });
   ConsejoComunal.hasMany(Habitante, { foreignKey: 'consejo_comunal_id', as: 'habitantes' });
-  ConsejoComunal.hasMany(Proyecto, { foreignKey: 'consejo_comunal_id', as: 'proyectos' });
-  ConsejoComunal.hasMany(Votacion, { foreignKey: 'consejo_comunal_id', as: 'votaciones' });
+  ConsejoComunal.hasMany(Proyecto, { foreignKey: 'id_comunidad', as: 'proyectos' });
+  ConsejoComunal.hasMany(Votacion, { foreignKey: 'id_comunidad', as: 'votaciones' });
   ConsejoComunal.hasMany(Vivienda, { foreignKey: 'id_comunidad', as: 'viviendas' });
-  ConsejoComunal.hasMany(Reporte7T, { foreignKey: 'consejo_comunal_id', as: 'reportes' });
-  ConsejoComunal.hasMany(EstudioDemografico, { foreignKey: 'consejo_comunal_id', as: 'estudios' });
+  ConsejoComunal.hasMany(Reporte7T, { foreignKey: 'id_comunidad', as: 'reportes' });
+  ConsejoComunal.hasMany(EstudioDemografico, { foreignKey: 'id_comunidad', as: 'estudios' });
   ConsejoComunal.hasMany(ProduccionAgricola, { foreignKey: 'consejo_comunal_id', as: 'producciones' });
 
   // Vinculaciones con usuarios y validaciones
@@ -52,10 +62,38 @@ async function initModels(sequelize) {
   BandejaValidaciones.belongsTo(Usuario, { foreignKey: 'id_validador', as: 'validador' });
   CarteleraDigital.belongsTo(Usuario, { foreignKey: 'id_autor', as: 'autor' });
 
+  // Relaciones del Censo de Viviendas
+  EstudioDemografico.hasMany(CensoCaracteristicaFamiliar, { foreignKey: 'id_estudio', as: 'familiares' });
+  CensoCaracteristicaFamiliar.belongsTo(EstudioDemografico, { foreignKey: 'id_estudio' });
+
+  EstudioDemografico.hasOne(CensoSituacionEconomica, { foreignKey: 'id_estudio', as: 'situacion_economica' });
+  CensoSituacionEconomica.belongsTo(EstudioDemografico, { foreignKey: 'id_estudio' });
+
+  EstudioDemografico.hasOne(CensoSituacionVivienda, { foreignKey: 'id_estudio', as: 'situacion_vivienda' });
+  CensoSituacionVivienda.belongsTo(EstudioDemografico, { foreignKey: 'id_estudio' });
+
+  EstudioDemografico.hasOne(CensoSalud, { foreignKey: 'id_estudio', as: 'salud' });
+  CensoSalud.belongsTo(EstudioDemografico, { foreignKey: 'id_estudio' });
+
+  EstudioDemografico.hasOne(CensoServicios, { foreignKey: 'id_estudio', as: 'servicios' });
+  CensoServicios.belongsTo(EstudioDemografico, { foreignKey: 'id_estudio' });
+
+  EstudioDemografico.hasOne(CensoParticipacionComunitaria, { foreignKey: 'id_estudio', as: 'participacion_comunitaria' });
+  CensoParticipacionComunitaria.belongsTo(EstudioDemografico, { foreignKey: 'id_estudio' });
+
+  EstudioDemografico.hasOne(CensoSituacionComunidad, { foreignKey: 'id_estudio', as: 'situacion_comunidad' });
+  CensoSituacionComunidad.belongsTo(EstudioDemografico, { foreignKey: 'id_estudio' });
+
+  EstudioDemografico.hasMany(CensoOpcionMultiple, { foreignKey: 'id_estudio', as: 'opciones_multiples' });
+  CensoOpcionMultiple.belongsTo(EstudioDemografico, { foreignKey: 'id_estudio' });
+
   return {
     Usuario, Habitante, Proyecto, Votacion, Noticia, Vivienda, Reporte7T, ConsejoComunal,
     EstudioDemografico, ProduccionAgricola, OrganizacionSocial, PersonaGrupoSocial,
-    BandejaValidaciones, CarteleraDigital, LogAuditoria
+    BandejaValidaciones, CarteleraDigital, LogAuditoria,
+    CensoCaracteristicaFamiliar, CensoSituacionEconomica, CensoSituacionVivienda,
+    CensoSalud, CensoServicios, CensoParticipacionComunitaria, CensoSituacionComunidad,
+    CensoOpcionMultiple
   };
 }
 

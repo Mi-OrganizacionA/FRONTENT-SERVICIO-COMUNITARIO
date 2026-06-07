@@ -2482,11 +2482,12 @@
     ══════════════════════════════════════════ */
     let currentStep = 1;
     const totalSteps = 10;
+    window.currentCensoId = null;
 
     /* ── Auto-save y Recuperación ── */
     function saveDraft() {
       const form = document.getElementById('formVivienda');
-      const data = { _currentStep: currentStep };
+      const data = { _currentStep: currentStep, _currentCensoId: window.currentCensoId };
       const elements = form.querySelectorAll('input, select, textarea');
       elements.forEach(el => {
         if (!el.id) return;
@@ -2504,8 +2505,11 @@
       if (!draftStr) return;
       try {
         const data = JSON.parse(draftStr);
+        if (data._currentCensoId) {
+           window.currentCensoId = data._currentCensoId;
+        }
         Object.keys(data).forEach(key => {
-          if (key === '_currentStep') return;
+          if (key === '_currentStep' || key === '_currentCensoId') return;
           const el = document.getElementById(key);
           if (el) {
             if (el.type === 'checkbox' || el.type === 'radio') {
@@ -2532,6 +2536,7 @@
 
     function clearDraft() {
       localStorage.removeItem('borradorCensoVivienda');
+      window.currentCensoId = null;
     }
 
     /* ── Validación dinámica por panel ── */
@@ -2579,7 +2584,7 @@
       { badge: 'Sec. X',    name: 'Diagnóstico y Situación de la Comunidad'},
     ];
 
-    function navigateToStep(n) {
+    async function navigateToStep(n) {
       if (n === currentStep) return;
       if (n < currentStep) {
         currentStep = n;
@@ -2589,14 +2594,137 @@
         if (validateCurrentPanel()) {
           const targetStepEl = document.getElementById('step-' + n);
           if (targetStepEl && (targetStepEl.classList.contains('done') || n === currentStep + 1)) {
-             currentStep = n;
-             goToStep(currentStep);
-             saveDraft();
+            
+            // GUARDADO PROGRESIVO
+            const btnSiguiente = document.getElementById('btnNext');
+            const originalText = btnSiguiente ? btnSiguiente.innerHTML : '';
+            if (btnSiguiente) btnSiguiente.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            
+            try {
+              const datosDelPaso = recolectarDatosDelPaso(currentStep);
+              if (window.api && window.api.guardarPasoCenso) {
+                // Generar ID aleatorio en el paso 1 si no existe
+                if (currentStep === 1 && !window.currentCensoId) {
+                  window.currentCensoId = Math.floor(Math.random() * 90000000) + 10000000;
+                }
+                
+                const res = await window.api.guardarPasoCenso(currentStep, window.currentCensoId, datosDelPaso);
+                if (res && res.id_estudio) {
+                  window.currentCensoId = res.id_estudio;
+                }
+              }
+              
+              if (btnSiguiente) btnSiguiente.innerHTML = originalText;
+              currentStep = n;
+              goToStep(currentStep);
+              saveDraft();
+            } catch (err) {
+              if (btnSiguiente) btnSiguiente.innerHTML = originalText;
+              showToast('Error guardando el paso: ' + err.message, 'error');
+            }
           } else {
-             showToast('Debe completar los pasos anteriores antes de avanzar a este paso.', 'error');
+            showToast('Debe completar los pasos anteriores antes de avanzar a este paso.', 'error');
           }
         }
       }
+    }
+
+    function recolectarDatosDelPaso(paso) {
+      const panel = document.getElementById('panel' + paso);
+      if (!panel) return {};
+      
+      const datos = {};
+      
+      // Recolectar inputs regulares, excluyendo familiares
+      panel.querySelectorAll('input:not([type="radio"]):not([type="checkbox"]):not(.fam-input), select:not(.fam-input), textarea').forEach(el => {
+         if (el.id) {
+           const val = el.value;
+           // Convert camelCase to snake_case for DB compatibility
+           const snakeKey = el.id.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+           datos[snakeKey] = val;
+         }
+      });
+
+      // Recolectar radios
+      panel.querySelectorAll('input[type="radio"]:checked').forEach(el => {
+         if (el.name) {
+           const snakeKey = el.name.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+           datos[snakeKey] = el.value;
+         }
+      });
+
+      // Recolectar checkboxes
+      panel.querySelectorAll('input[type="checkbox"]').forEach(el => {
+         if (el.checked) {
+            if (el.name) {
+               if (!datos.opciones) datos.opciones = [];
+               datos.opciones.push({ categoria: el.name, valor: el.value, cantidad: 1 });
+            } else if (el.id) {
+               const snakeKey = el.id.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+               datos[snakeKey] = true;
+            }
+         } else {
+            if (el.id && !el.name) {
+               const snakeKey = el.id.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+               datos[snakeKey] = false;
+            }
+         }
+      });
+
+      // Recolectar Familiares (Sección 3 y 4)
+      if (paso === 3 || paso === 4) {
+         const familiares = [];
+         
+         // Jefe (paso 3)
+         if (paso === 3) {
+            const cedula = document.getElementById('cedulaJefe')?.value;
+            const nombres = document.getElementById('jefNombres')?.value;
+            const apellidos = document.getElementById('jefApellidos')?.value;
+            if (cedula || nombres) {
+               familiares.push({
+                 cedula_identidad: cedula,
+                 nombres_apellidos: (nombres + ' ' + (apellidos||'')).trim(),
+                 parentesco: 'Jefe(a) de Familia',
+                 fecha_nacimiento: document.getElementById('jefFechaNac')?.value,
+                 genero: document.getElementById('jefSexo')?.value,
+                 es_jefe_familia: true,
+                 nivel_educativo: document.getElementById('jefNivelInstruccion')?.value,
+                 ocupacion: document.getElementById('jefProfesion')?.value
+               });
+            }
+         }
+
+         // Otros familiares
+         panel.querySelectorAll('.familiar-row').forEach(row => {
+            const cedula = row.querySelector('.fam-cedula')?.value;
+            const nombres = row.querySelector('.fam-nombres')?.value;
+            const parentesco = row.querySelector('.fam-parentesco')?.value;
+            const fechaNac = row.querySelector('.fam-fechanac')?.value;
+            const sexo = row.querySelector('.fam-sexo')?.value;
+            if (cedula || nombres) {
+               familiares.push({
+                 cedula_identidad: cedula,
+                 nombres_apellidos: nombres,
+                 parentesco: parentesco,
+                 fecha_nacimiento: fechaNac,
+                 genero: sexo,
+                 es_jefe_familia: false
+               });
+            }
+         });
+         
+         if (familiares.length > 0) {
+           if (!datos.familiares) datos.familiares = [];
+           datos.familiares.push(...familiares);
+         }
+      }
+
+      // Si es paso 1, enviamos id_comunidad (asumiendo que la cabecera lo necesita)
+      if (paso === 1) {
+         datos.id_comunidad = 1; // Consejo por defecto
+      }
+
+      return datos;
     }
 
     function goToStep(n) {
