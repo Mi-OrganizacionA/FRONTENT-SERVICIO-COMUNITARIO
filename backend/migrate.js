@@ -7,7 +7,7 @@ const logger = require('./utils/logger');
 async function createUmzug(sequelize) {
   return new Umzug({
     migrations: {
-      glob: path.join(__dirname, 'migrations', '*.js'),
+      glob: 'migrations/*.js',
       resolve: ({ name, path: migrationPath, context }) => {
         const migration = require(migrationPath);
         return {

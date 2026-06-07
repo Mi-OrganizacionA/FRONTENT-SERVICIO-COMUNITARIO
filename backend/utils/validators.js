@@ -86,6 +86,64 @@ const reporteSchema = Joi.object({
   fecha: Joi.date().optional()
 });
 
+// Esquemas para nuevas entidades
+const bandejaValidacionesSchema = Joi.object({
+  tabla_afectada: Joi.string().min(1).max(100).required(),
+  registro_id: Joi.number().integer().allow(null),
+  tipo_accion: Joi.string().valid('CREATE', 'UPDATE', 'DELETE').required(),
+  datos_temporales: Joi.object().required()
+});
+
+const carteleraDigitalSchema = Joi.object({
+  tipo_publicacion: Joi.string().valid('noticia', 'anuncio', 'encuesta').required(),
+  titulo: Joi.string().min(3).max(300).required(),
+  contenido: Joi.string().min(1).max(5000).required()
+});
+
+const personaGrupoSocialSchema = Joi.object({
+  id_habitante: Joi.number().integer().positive().required(),
+  id_organizacion: Joi.number().integer().positive().required(),
+  rol_en_grupo: Joi.string().min(1).max(50).required()
+});
+
+const personaGrupoActualizarRolSchema = Joi.object({
+  rol_en_grupo: Joi.string().min(1).max(50).required()
+});
+
+const personaGrupoSalidaSchema = Joi.object({
+  motivo: Joi.string().max(200).allow('', null)
+});
+
+const produccionAgricolaSchema = Joi.object({
+  id_habitante: Joi.number().integer().positive().required(),
+  rubro: Joi.string().min(1).max(100).required(),
+  hectareas_cultivadas: Joi.number().min(0.01).required(),
+  tipo_cultivo: Joi.string().valid('orgánico', 'convencional', 'agroforestal', 'otro').required(),
+  productos_secundarios: Joi.array().items(Joi.string()),
+  latitud: Joi.number().allow(null),
+  longitud: Joi.number().allow(null)
+});
+
+const viviendasSchema = Joi.object({
+  id_comunidad: Joi.number().integer().positive().required(),
+  id_jefe_familia: Joi.number().integer().positive().required(),
+  tipo_vivienda: Joi.string().min(1).max(100).required(),
+  cantidad_habitaciones: Joi.number().integer().min(1),
+  tipo_paredes: Joi.string().allow('', null),
+  tipo_techo: Joi.string().allow('', null),
+  condiciones_salubridad: Joi.string().allow('', null),
+  requiere_ayuda_mejora: Joi.boolean()
+});
+
+const organizacionSocialSchema = Joi.object({
+  id_comunidad: Joi.number().integer().positive().required(),
+  nombre_organizacion: Joi.string().min(3).max(200).required(),
+  tipo_organizacion: Joi.string().min(1).max(100).required(),
+  descripcion: Joi.string().allow('', null),
+  mision: Joi.string().allow('', null),
+  id_habitante_responsable: Joi.number().integer().positive().allow(null)
+});
+
 module.exports = {
   authLoginSchema,
   habitanteCreateSchema,
@@ -94,6 +152,14 @@ module.exports = {
   proyectoSchema,
   noticiaSchema,
   reporteSchema,
+  bandejaValidacionesSchema,
+  carteleraDigitalSchema,
+  personaGrupoSocialSchema,
+  personaGrupoActualizarRolSchema,
+  personaGrupoSalidaSchema,
+  produccionAgricolaSchema,
+  viviendasSchema,
+  organizacionSocialSchema,
   idParamSchema,
   consejoParamSchema,
   votacionParamSchema,

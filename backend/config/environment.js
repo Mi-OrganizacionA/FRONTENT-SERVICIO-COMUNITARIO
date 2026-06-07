@@ -7,6 +7,7 @@ module.exports = {
 
   db_type: process.env.DB_TYPE || 'postgres',
   db: {
+    sqlite_storage: process.env.SQLITE_STORAGE || process.env.DB_PATH || 'database.sqlite',
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 5432,
     name: process.env.DB_NAME || 'sicag_db',

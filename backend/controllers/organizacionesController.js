@@ -1,9 +1,15 @@
+const logger = require("../utils/logger");
+const AuditService = require("../services/auditService");
+const PersonaGrupoSocialController = require("./personaGrupoSocialController");
+
 let OrganizacionSocial;
 
-module.exports = {
-  setModel: (model) => { OrganizacionSocial = model; },
+class OrganizacionesController {
+  static setModel(model) {
+    OrganizacionSocial = model;
+  }
 
-  getAll: async (req, res, next) => {
+  static async getAll(req, res, next) {
     try {
       const { tipo_organizacion } = req.query;
       const where = {};
@@ -11,30 +17,165 @@ module.exports = {
       const data = await OrganizacionSocial.findAll({ where });
       res.json(data);
     } catch (error) { next(error); }
-  },
+  }
 
-  create: async (req, res, next) => {
-    try {
-      const data = await OrganizacionSocial.create(req.body);
-      res.status(201).json(data);
-    } catch (error) { next(error); }
-  },
-
-  update: async (req, res, next) => {
+  static async getById(req, res, next) {
     try {
       const data = await OrganizacionSocial.findByPk(req.params.id);
-      if (!data) return res.status(404).json({ error: 'Organización no encontrada' });
-      await data.update(req.body);
+      if (!data) return res.status(404).json({ error: "Organizaci�n no encontrada" });
       res.json(data);
     } catch (error) { next(error); }
-  },
+  }
 
-  remove: async (req, res, next) => {
+  static async create(req, res, next) {
     try {
-      const data = await OrganizacionSocial.findByPk(req.params.id);
-      if (!data) return res.status(404).json({ error: 'Organización no encontrada' });
-      await data.destroy();
-      res.json({ success: true });
+      const data = await OrganizacionSocial.create(req.body);
+      if (req.user) {
+        await AuditService.log(req.user.id, "CREATE", "organizaciones_sociales", data.id, null, data.toJSON());
+      }
+      res.status(201).json(data);
     } catch (error) { next(error); }
   }
-};
+
+  static async update(req, res, next) {
+    try {
+      const data = await OrganizacionSocial.findByPk(req.params.id);
+      if (!data) return res.status(404).json({ error: "Organizaci�n no encontrada" });
+      const datosAntiguos = data.toJSON();
+      await data.update(req.body);
+      if (req.user) {
+        await AuditService.log(req.user.id, "UPDATE", "organizaciones_sociales", data.id, datosAntiguos, data.toJSON());
+      }
+      res.json(data);
+    } catch (error) { next(error); }
+  }
+
+  static async remove(req, res, next) {
+    try {
+      const data = await OrganizacionSocial.findByPk(req.params.id);
+      if (!data) return res.status(404).json({ error: "Organizaci�n no encontrada" });
+      const datosAntiguos = data.toJSON();
+      await data.update({ activo: false }); 
+      if (req.user) {
+        await AuditService.log(req.user.id, "DELETE", "organizaciones_sociales", data.id, datosAntiguos, data.toJSON());
+      }
+      res.json({ success: true, message: "Organizaci�n eliminada (soft delete)" });
+    } catch (error) { next(error); }
+  }
+
+  static async getPorConsejo(req, res, next) {
+    try {
+      const { consejoId } = req.params;
+      const organizaciones = await OrganizacionSocial.findAll({
+        where: { id_comunidad: consejoId, activo: true },
+        include: [{
+          model: require("../models").PersonaGrupoSocial,
+          as: "miembros",
+          where: { fecha_salida: null, activo: true },
+          required: false
+        }]
+      });
+
+      const resultado = organizaciones.map(org => {
+        const orgJSON = org.toJSON();
+        orgJSON.totalMiembros = orgJSON.miembros ? orgJSON.miembros.length : 0;
+        delete orgJSON.miembros;
+        return orgJSON;
+      });
+
+      res.json(resultado);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getMiembros(req, res, next) {
+    try {
+      const { id } = req.params;
+      const org = await OrganizacionSocial.findByPk(id);
+      if (!org) return res.status(404).json({ error: "Organizaci�n no encontrada" });
+
+      const miembros = await require("../models").PersonaGrupoSocial.findAll({
+        where: { id_organizacion: id, activo: true, fecha_salida: null },
+        include: [{
+          model: require("../models").Habitante,
+          as: "habitante",
+          attributes: ["id", "nombres", "apellidos", "cedula", "genero", "fecha_nacimiento"]
+        }]
+      });
+
+      res.json(miembros);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getEstadisticas(req, res, next) {
+    try {
+      const { id } = req.params;
+      const org = await OrganizacionSocial.findByPk(id);
+      if (!org) return res.status(404).json({ error: "Organizaci�n no encontrada" });
+
+      const miembros = await require("../models").PersonaGrupoSocial.findAll({
+        where: { id_organizacion: id, activo: true, fecha_salida: null },
+        include: [{
+          model: require("../models").Habitante,
+          as: "habitante"
+        }]
+      });
+
+      const totalMiembros = miembros.length;
+      const miembrosPorRol = {};
+      const generoMiembros = { M: 0, F: 0, Otro: 0 };
+      const condicionSalud = {};
+
+      miembros.forEach(m => {
+        miembrosPorRol[m.rol_en_grupo] = (miembrosPorRol[m.rol_en_grupo] || 0) + 1;
+        
+        if (m.habitante && m.habitante.genero) {
+          const gen = m.habitante.genero.toUpperCase();
+          if (["M", "F"].includes(gen)) {
+            generoMiembros[gen]++;
+          } else {
+            generoMiembros["Otro"]++;
+          }
+        } else {
+          generoMiembros["Otro"]++;
+        }
+
+        if (m.habitante && m.habitante.condicion_salud) {
+          condicionSalud[m.habitante.condicion_salud] = (condicionSalud[m.habitante.condicion_salud] || 0) + 1;
+        }
+      });
+
+      res.json({
+        totalMiembros,
+        miembrosPorRol,
+        generoMiembros,
+        condicionSalud
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async agregarMiembro(req, res, next) {
+    try {
+      req.body.id_organizacion = req.params.id;
+      await PersonaGrupoSocialController.agregarMiembro(req, res);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async removerMiembro(req, res, next) {
+    try {
+      req.params.id = req.params.membresia_id;
+      await PersonaGrupoSocialController.removerMiembro(req, res);
+    } catch (error) {
+      next(error);
+    }
+  }
+}
+
+module.exports = OrganizacionesController;

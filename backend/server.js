@@ -18,7 +18,13 @@ const organizacionesRoutes = require('./routes/organizaciones');
 const viviendasRoutes = require('./routes/viviendas');
 const notificacionesRoutes = require('./routes/notificaciones');
 const vocerosRoutes = require('./routes/voceros');
+const bandejaValidacionesRoutes = require('./routes/bandeja_validaciones');
+const carteleraDigitalRoutes = require('./routes/cartelera_digital');
+const auditoriaRoutes = require('./routes/auditoria');
+const personaGrupoSocialRoutes = require('./routes/persona_grupo_social');
+const estudiosDemograficosRoutes = require('./routes/estudios_demograficos');
 const errorHandler = require('./middleware/errorHandler');
+const { captureClientInfo } = require('./middleware/auditMiddleware');
 
 const app = express();
 app.use(helmet());
@@ -26,6 +32,7 @@ app.use(cors(env.cors));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
+app.use(captureClientInfo);
 
 app.use((req, res, next) => { logger.info(`${req.method} ${req.path}`); next(); });
 
@@ -41,6 +48,11 @@ app.use('/api/organizaciones', organizacionesRoutes);
 app.use('/api/viviendas', viviendasRoutes);
 app.use('/api/notificaciones', notificacionesRoutes);
 app.use('/api/voceros', vocerosRoutes);
+app.use('/api/validaciones', bandejaValidacionesRoutes);
+app.use('/api/cartelera', carteleraDigitalRoutes);
+app.use('/api/auditoria', auditoriaRoutes);
+app.use('/api/membresias', personaGrupoSocialRoutes);
+app.use('/api/estudios-demograficos', estudiosDemograficosRoutes);
 app.use((req, res) => res.status(404).json({ error: 'Ruta no encontrada', path: req.path }));
 app.use(errorHandler);
 
@@ -70,6 +82,12 @@ async function start() {
       const ViviendasController = require('./controllers/viviendasController');
       const ValidacionesController = require('./controllers/validacionesController');
       const VocerosController = require('./controllers/vocerosController');
+      const BandejaValidacionesController = require('./controllers/bandejaValidacionesController');
+      const CarteleraDigitalController = require('./controllers/carteleraDigitalController');
+      const AuditController = require('./controllers/auditController');
+      const PersonaGrupoSocialController = require('./controllers/personaGrupoSocialController');
+      const EstudioDemograficoController = require('./controllers/estudioDemograficoController');
+      const AuditService = require('./services/auditService');
 
       AuthController.setUsuarioModel(models.Usuario);
       HabitantesController.setModel(models.Habitante);
@@ -82,6 +100,11 @@ async function start() {
       ViviendasController.setModel(models.Vivienda);
       ValidacionesController.setModel(models.BandejaValidaciones);
       VocerosController.setModel(models.Usuario);
+      BandejaValidacionesController.setModel(models.BandejaValidaciones);
+      CarteleraDigitalController.setModel(models.CarteleraDigital);
+      PersonaGrupoSocialController.setModel(models.PersonaGrupoSocial);
+      EstudioDemograficoController.setModel(models.EstudioDemografico);
+      AuditService.setModel(models.LogAuditoria);
 
       await runMigrations(sequelize);
     }

@@ -3,13 +3,16 @@
 module.exports = (sequelize) => {
   const ConsejoComunal = sequelize.define('ConsejoComunal', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    nombre: { type: DataTypes.STRING(150), allowNull: false },
+    nombre_comunidad: { type: DataTypes.STRING(150), allowNull: false, unique: true },
     descripcion: DataTypes.TEXT,
-    direccion: DataTypes.TEXT,
-    telefono: DataTypes.STRING(20),
-    email: DataTypes.STRING(100),
-    activo: { type: DataTypes.BOOLEAN, defaultValue: true },
-    fecha_creacion: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
+    ubicacion: DataTypes.TEXT,
+    responsable: DataTypes.STRING(150),
+    habitantes_count: { 
+      type: DataTypes.INTEGER, 
+      defaultValue: 0 
+    }, // Actualizado automáticamente por triggers
+    fecha_creacion: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+    activo: { type: DataTypes.BOOLEAN, defaultValue: true }
   }, {
     tableName: 'consejos_comunales',
     timestamps: false
