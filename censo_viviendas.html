@@ -573,13 +573,18 @@
       max-height: 90vh;
       display: flex;
       flex-direction: column;
+      border-radius: var(--r-lg);
+      min-height: 0;
     }
+
     #formVivienda {
       display: flex;
       flex-direction: column;
       flex: 1;
+      min-height: 0;
       overflow: hidden;
     }
+
     #modalVivienda .cv-modal-body {
       overflow-y: auto;
       flex: 1;
@@ -1064,8 +1069,21 @@
         height: 100%;
       }
       #modalVivienda .modal-content {
-        max-height: 100dvh;
+        height: 100%;
+        max-height: none;
         border-radius: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      #formVivienda {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+      .cv-modal-body {
+        flex: 1;
+        overflow-y: auto;
       }
 
       /* Header más compacto */
@@ -1321,21 +1339,21 @@
 
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="planillaNro" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>N° de Planilla <span class="req">*</span></span>
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.4rem;">
+                    <label for="planillaNro" style="margin:0;">N° de Planilla <span class="req">*</span></label>
                     <label style="font-size:0.7rem; color:var(--gray5); font-weight:normal; cursor:pointer; display:flex; align-items:center; gap:4px; margin:0;">
                       <input type="checkbox" id="chkPlanillaAuto" checked> Auto
                     </label>
-                  </label>
+                  </div>
                   <input type="text" class="cv-form-control" id="planillaNro" placeholder="N° de Planilla" required readonly style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
                 </div>
                 <div class="cv-form-group">
-                  <label for="fechaCenso" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>Fecha del Censo <span class="req">*</span></span>
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.4rem;">
+                    <label for="fechaCenso" style="margin:0;">Fecha del Censo <span class="req">*</span></label>
                     <label style="font-size:0.7rem; color:var(--gray5); font-weight:normal; cursor:pointer; display:flex; align-items:center; gap:4px; margin:0;">
                       <input type="checkbox" id="chkFechaAuto" checked> Auto
                     </label>
-                  </label>
+                  </div>
                   <input type="date" class="cv-form-control" id="fechaCenso" required readonly style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
                 </div>
                 <div class="cv-form-group">
@@ -1429,7 +1447,15 @@
                 Sección III — Datos del Jefe del Grupo Familiar
               </div>
 
-              <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
+              <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
+                <div class="cv-form-group">
+                  <label for="cedulaJefe">Cédula <span class="req">*</span></label>
+                  <div class="cv-input-group">
+                    <input type="text" class="cv-form-control" id="cedulaJefe" placeholder="V-12.345.678" required>
+                    <button type="button" class="cv-btn-validate" id="btnValidarCedula"><i class="fas fa-magnifying-glass"></i></button>
+                  </div>
+                  <span class="cv-form-hint">Una cédula = una vivienda</span>
+                </div>
                 <div class="cv-form-group">
                   <label for="jefNombres">Nombres <span class="req">*</span></label>
                   <input type="text" class="cv-form-control" id="jefNombres" placeholder="Nombres completos" required>
@@ -1442,14 +1468,6 @@
 
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="cedulaJefe">Cédula <span class="req">*</span></label>
-                  <div class="cv-input-group">
-                    <input type="text" class="cv-form-control" id="cedulaJefe" placeholder="V-12.345.678" required>
-                    <button type="button" class="cv-btn-validate" id="btnValidarCedula"><i class="fas fa-magnifying-glass"></i></button>
-                  </div>
-                  <span class="cv-form-hint">Una cédula = una vivienda</span>
-                </div>
-                <div class="cv-form-group">
                   <label for="jefNacionalidad">Nacionalidad</label>
                   <select class="cv-form-control" id="jefNacionalidad">
                     <option value="V">Venezolano (V)</option>
@@ -1460,9 +1478,6 @@
                   <label for="jefFechaNac">Fecha de Nacimiento <span class="req">*</span></label>
                   <input type="date" class="cv-form-control" id="jefFechaNac" required>
                 </div>
-              </div>
-
-              <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="jefSexo">Sexo <span class="req">*</span></label>
                   <select class="cv-form-control" id="jefSexo" required>
@@ -1471,6 +1486,9 @@
                     <option value="Femenino">Femenino</option>
                   </select>
                 </div>
+              </div>
+
+              <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="jefEstadoCivil">Estado Civil <span class="req">*</span></label>
                   <select class="cv-form-control" id="jefEstadoCivil" required>
@@ -1577,12 +1595,15 @@
                   <div style="font-size:.75rem;font-weight:700;color:var(--vp);margin-bottom:.6rem">👤 Integrante #1</div>
                   <div class="cv-form-row cv-grid-3">
                     <div class="cv-form-group">
-                      <label>Nombres y Apellidos</label>
-                      <input type="text" class="cv-form-control fam-nombres" placeholder="Nombres y apellidos">
+                      <label>Cédula / Fecha Nacimiento</label>
+                      <div class="cv-input-group">
+                        <input type="text" class="cv-form-control fam-cedula" placeholder="V-XX.XXX.XXX">
+                        <button type="button" class="cv-btn-validate btn-validar-fam"><i class="fas fa-magnifying-glass"></i></button>
+                      </div>
                     </div>
                     <div class="cv-form-group">
-                      <label>Cédula / Fecha Nacimiento</label>
-                      <input type="text" class="cv-form-control fam-cedula" placeholder="V-XX.XXX.XXX">
+                      <label>Nombres y Apellidos</label>
+                      <input type="text" class="cv-form-control fam-nombres" placeholder="Nombres y apellidos">
                     </div>
                     <div class="cv-form-group">
                       <label>Parentesco</label>
@@ -2531,12 +2552,15 @@
         </button>
         <div class="cv-form-row cv-grid-3">
           <div class="cv-form-group">
-            <label>Nombres y Apellidos</label>
-            <input type="text" class="cv-form-control fam-nombres" placeholder="Nombres y apellidos">
+            <label>Cédula / Fecha Nacimiento</label>
+            <div class="cv-input-group">
+              <input type="text" class="cv-form-control fam-cedula" placeholder="V-XX.XXX.XXX">
+              <button type="button" class="cv-btn-validate btn-validar-fam"><i class="fas fa-magnifying-glass"></i></button>
+            </div>
           </div>
           <div class="cv-form-group">
-            <label>Cédula / Fecha Nacimiento</label>
-            <input type="text" class="cv-form-control fam-cedula" placeholder="V-XX.XXX.XXX">
+            <label>Nombres y Apellidos</label>
+            <input type="text" class="cv-form-control fam-nombres" placeholder="Nombres y apellidos">
           </div>
           <div class="cv-form-group">
             <label>Parentesco</label>
@@ -2582,6 +2606,28 @@
         </div>
       `;
       list.appendChild(row);
+
+      // Conectar autocompletado para el nuevo familiar
+      if (window.HabitanteAutocomplete) {
+        const newCedulaInput = row.querySelector('.fam-cedula');
+        HabitanteAutocomplete.attachTo(newCedulaInput, (datos) => {
+          row.querySelector('.fam-nombres').value = (datos.nombres + ' ' + (datos.apellidos||'')).trim();
+          
+          if (datos.genero) {
+            const selectSexo = row.querySelector('.fam-sexo');
+            if (selectSexo) {
+               selectSexo.value = datos.genero === 'Masculino' ? 'M' : (datos.genero === 'Femenino' ? 'F' : '');
+            }
+          }
+        }, { debounce: 600 });
+
+        const btnLupa = row.querySelector('.btn-validar-fam');
+        if (btnLupa) {
+          btnLupa.addEventListener('click', () => {
+            if (newCedulaInput.forceSearch) newCedulaInput.forceSearch();
+          });
+        }
+      }
     });
 
     /* ══════════════════════════════════════════
@@ -2833,6 +2879,68 @@
     renderTable();
   </script>
 
+  <script src="js/habitante-autocomplete.js" defer></script>
   <script src="js/censo-viviendas.js" defer></script>
+  <script>
+    // Configurar Autocompletado una vez cargado el DOM
+    document.addEventListener('DOMContentLoaded', () => {
+      // Configurar para Jefe de Familia
+      if (window.HabitanteAutocomplete) {
+        HabitanteAutocomplete.attachTo('cedulaJefe', (datos) => {
+          document.getElementById('jefNombres').value = datos.nombres || '';
+          document.getElementById('jefApellidos').value = datos.apellidos || '';
+          
+          if (datos.fecha_nacimiento) {
+             const d = new Date(datos.fecha_nacimiento);
+             document.getElementById('jefFechaNac').value = d.toISOString().split('T')[0];
+          }
+          
+          if (datos.genero) {
+            const sexoMap = { 'Masculino': 'Masculino', 'Femenino': 'Femenino' };
+            const s = sexoMap[datos.genero];
+            if (s) document.getElementById('jefSexo').value = s;
+          }
+          
+          if (datos.nivel_educativo) {
+            document.getElementById('jefNivelInstruccion').value = datos.nivel_educativo;
+          }
+          
+          if (datos.ocupacion) {
+            document.getElementById('jefProfesion').value = datos.ocupacion;
+          }
+        });
+        
+        // Vincular el botón de lupa manualmente
+        document.getElementById('btnValidarCedula').addEventListener('click', () => {
+           const input = document.getElementById('cedulaJefe');
+           if (input.forceSearch) input.forceSearch();
+        });
+
+        // Configurar Autocompletado para el Integrante #1
+        const fam1Input = document.querySelector('#familiarList .fam-cedula');
+        if (fam1Input) {
+          HabitanteAutocomplete.attachTo(fam1Input, (datos) => {
+            const row = fam1Input.closest('.familiar-row');
+            if (row) {
+              row.querySelector('.fam-nombres').value = (datos.nombres + ' ' + (datos.apellidos||'')).trim();
+              if (datos.genero) {
+                const selectSexo = row.querySelector('.fam-sexo');
+                if (selectSexo) {
+                   selectSexo.value = datos.genero === 'Masculino' ? 'M' : (datos.genero === 'Femenino' ? 'F' : '');
+                }
+              }
+            }
+          }, { debounce: 600 });
+          
+          const btnLupa1 = document.querySelector('#familiarList .btn-validar-fam');
+          if (btnLupa1) {
+            btnLupa1.addEventListener('click', () => {
+              if (fam1Input.forceSearch) fam1Input.forceSearch();
+            });
+          }
+        }
+      }
+    });
+  </script>
 </body>
 </html>

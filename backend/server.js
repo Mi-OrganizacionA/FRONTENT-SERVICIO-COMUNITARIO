@@ -43,6 +43,7 @@ app.use('/api/votaciones', votacionesRoutes);
 app.use('/api/proyectos', proyectosRoutes);
 app.use('/api/noticias', noticiasRoutes);
 app.use('/api/reportes', reportesRoutes);
+app.use('/api/censo-reportes', require('./routes/censoReportesRoutes'));
 app.use('/api/produccion_agricola', produccionRoutes);
 app.use('/api/organizaciones', organizacionesRoutes);
 app.use('/api/viviendas', viviendasRoutes);
@@ -84,6 +85,7 @@ async function start() {
       const VocerosController = require('./controllers/vocerosController');
       const BandejaValidacionesController = require('./controllers/bandejaValidacionesController');
       const CarteleraDigitalController = require('./controllers/carteleraDigitalController');
+      const CensoReportesController = require('./controllers/censoReportesController');
       const AuditController = require('./controllers/auditController');
       const PersonaGrupoSocialController = require('./controllers/personaGrupoSocialController');
       const EstudioDemograficoController = require('./controllers/estudioDemograficoController');
@@ -104,6 +106,7 @@ async function start() {
       CarteleraDigitalController.setModel(models.CarteleraDigital);
       PersonaGrupoSocialController.setModel(models.PersonaGrupoSocial);
       EstudioDemograficoController.setModel(models.EstudioDemografico);
+      CensoReportesController.setModels(models);
       AuditService.setModel(models.LogAuditoria);
 
       await runMigrations(sequelize);

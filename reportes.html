@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -59,37 +59,8 @@
       </div>
     </div>
 
-    <!-- FILTROS -->
-    <div class="filter-bar fade-in-up">
-      <div class="filter-group">
-        <label class="filter-label" for="filtroDesde">Desde</label>
-        <input type="date" class="filter-input" id="filtroDesde" value="2026-01-01">
-      </div>
-      <div class="filter-group">
-        <label class="filter-label" for="filtroHasta">Hasta</label>
-        <input type="date" class="filter-input" id="filtroHasta" value="2026-12-31">
-      </div>
-      <div class="filter-group">
-        <label class="filter-label" for="filtroConsejo">Consejo Comunal</label>
-        <select class="filter-select" id="filtroConsejo">
-          <option value="">Todos los consejos</option>
-          <option>C.C. Jobito I</option>
-          <option>C.C. Jobito II</option>
-          <option>C.C. Brisas del Yurubí</option>
-          <option>C.C. Andrés Eloy Blanco</option>
-          <option>C.C. Mercedes I</option>
-          <option>C.C. Mercedes II</option>
-          <option>C.C. Santa Cruz de las Mercedes</option>
-          <option>C.C. Fortaleza del Corozo</option>
-          <option>C.C. Vencedores del Corozo</option>
-        </select>
-      </div>
-      <div class="filter-group" style="align-self:flex-end;">
-        <button class="btn-sicag btn-primary btn-sm" id="btnFiltrar">
-          <i class="fas fa-filter"></i> Aplicar Filtro
-        </button>
-      </div>
     </div>
+
 
     <!-- KPI STATS RÁPIDOS -->
     <div class="ph-kpi-float">
@@ -98,32 +69,32 @@
           <div class="kpi-icon verde"><i class="fas fa-users"></i></div>
           <div class="kpi-info">
             <h3>Total Personas</h3>
-            <div class="kpi-value">347</div>
-            <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> +15 este mes</span>
+            <div class="kpi-value" id="kpi-total-personas">--</div>
+            <span class="kpi-trend" id="kpi-trend-personas">--</span>
           </div>
         </div>
         <div class="kpi-card border-azul">
           <div class="kpi-icon azul"><i class="fas fa-wheelchair"></i></div>
           <div class="kpi-info">
             <h3>Con Discapacidad</h3>
-            <div class="kpi-value">12</div>
-            <span class="kpi-trend up"><i class="fas fa-circle" style="font-size:.5rem;"></i> 3.5% del censo</span>
+            <div class="kpi-value" id="kpi-discapacidad">--</div>
+            <span class="kpi-trend" id="kpi-trend-discapacidad">--</span>
           </div>
         </div>
         <div class="kpi-card border-amarillo">
           <div class="kpi-icon amarillo"><i class="fas fa-home"></i></div>
           <div class="kpi-info">
             <h3>Viviendas Censadas</h3>
-            <div class="kpi-value">198</div>
-            <span class="kpi-trend up"><i class="fas fa-arrow-up"></i> 9 consejos</span>
+            <div class="kpi-value" id="kpi-viviendas">--</div>
+            <span class="kpi-trend" id="kpi-trend-viviendas">--</span>
           </div>
         </div>
         <div class="kpi-card border-rojo">
           <div class="kpi-icon rojo"><i class="fas fa-user-clock"></i></div>
           <div class="kpi-info">
             <h3>Adultos Mayores</h3>
-            <div class="kpi-value">39</div>
-            <span class="kpi-trend up"><i class="fas fa-circle" style="font-size:.5rem;"></i> 11.2% del censo</span>
+            <div class="kpi-value" id="kpi-adultos-mayores">--</div>
+            <span class="kpi-trend" id="kpi-trend-adultos">--</span>
           </div>
         </div>
       </div>
@@ -246,38 +217,6 @@
             </div>
           </div>
 
-          <!-- 6. Otros / Personalizado -->
-          <div class="report-dl-card">
-            <div class="report-dl-header">
-              <div class="report-dl-icon" style="background:rgba(46,125,50,.08);color:var(--vp);">
-                <i class="fas fa-sliders-h"></i>
-              </div>
-              <div>
-                <div class="report-dl-title">Reporte Personalizado</div>
-                <div class="report-dl-desc">Selecciona los campos y filtros que necesitas para generar un reporte a medida del censo comunal.</div>
-              </div>
-            </div>
-            <div style="margin-bottom:.5rem;">
-              <select class="filter-select" id="customReportType" style="width:100%;font-size:.78rem;">
-                <option value="">Selecciona tipo de reporte...</option>
-                <option value="electores">Registro Electoral</option>
-                <option value="embarazadas">Mujeres Embarazadas</option>
-                <option value="lactantes">Madres Lactantes</option>
-                <option value="encamados">Personas Encamadas</option>
-                <option value="por-cc">Por Consejo Comunal</option>
-                <option value="genero">Por Género</option>
-              </select>
-            </div>
-            <div class="report-dl-actions">
-              <button class="btn-sicag btn-primary btn-sm" id="btnCustomExcel">
-                <i class="fas fa-file-excel"></i> Generar Excel
-              </button>
-              <button class="btn-sicag btn-outline-verde btn-sm" id="btnCustomPDF">
-                <i class="fas fa-file-pdf"></i> Generar PDF
-              </button>
-            </div>
-          </div>
-
         </div>
       </div>
     </div>
@@ -319,18 +258,11 @@
               <th>Viviendas</th>
             </tr>
           </thead>
-          <tbody>
-            <tr><td><strong>Jobito I</strong></td><td>52</td><td>38</td><td>9</td><td>5</td><td>2</td><td>24</td></tr>
-            <tr><td><strong>Jobito II</strong></td><td>45</td><td>31</td><td>8</td><td>4</td><td>1</td><td>20</td></tr>
-            <tr><td><strong>Brisas del Yurubí</strong></td><td>41</td><td>28</td><td>7</td><td>4</td><td>1</td><td>19</td></tr>
-            <tr><td><strong>Andrés Eloy Blanco</strong></td><td>38</td><td>26</td><td>6</td><td>4</td><td>2</td><td>18</td></tr>
-            <tr><td><strong>Mercedes I</strong></td><td>36</td><td>22</td><td>7</td><td>4</td><td>1</td><td>17</td></tr>
-            <tr><td><strong>Mercedes II</strong></td><td>35</td><td>24</td><td>6</td><td>4</td><td>1</td><td>16</td></tr>
-            <tr><td><strong>Santa Cruz de las Mercedes</strong></td><td>38</td><td>25</td><td>8</td><td>5</td><td>2</td><td>18</td></tr>
-            <tr><td><strong>Fortaleza del Corozo</strong></td><td>32</td><td>20</td><td>5</td><td>4</td><td>1</td><td>14</td></tr>
-            <tr><td><strong>Vencedores del Corozo</strong></td><td>30</td><td>17</td><td>6</td><td>5</td><td>1</td><td>12</td></tr>
-            <tr style="background:rgba(46,125,50,.08);font-weight:700;">
-              <td>TOTAL</td><td>347</td><td>231</td><td>62</td><td>39</td><td>12</td><td>158</td>
+          <tbody id="resumen-tbody">
+            <tr>
+              <td colspan="7" style="text-align:center;padding:2rem;color:var(--text-light);">
+                <i class="fas fa-spinner fa-spin"></i> Cargando resumen estadístico...
+              </td>
             </tr>
           </tbody>
         </table>
@@ -338,6 +270,133 @@
     </div>
 
   </main>
+
+  <!-- BOTÓN FLOTANTE (FAB) PARA FILTROS -->
+  <button class="fab-btn" id="btnOpenFilters" aria-label="Abrir Filtros" style="position:fixed;bottom:2rem;right:2rem;width:60px;height:60px;border-radius:50%;background:var(--vp);color:white;border:none;box-shadow:0 6px 16px rgba(46,125,50,0.3);font-size:1.5rem;cursor:pointer;z-index:99;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;">
+    <i class="fas fa-filter"></i>
+  </button>
+
+  <!-- MODAL DE FILTROS AVANZADOS -->
+  <div class="modal-overlay" id="modalFiltrosAvanzados" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); z-index:9999; display:none; align-items:center; justify-content:center; backdrop-filter:blur(8px);">
+    <div class="modal-content" style="background:#ffffff; border-radius:16px; padding:0; max-width:800px; width:95%; box-shadow:0 25px 50px rgba(0,0,0,0.3); overflow:hidden; display:flex; flex-direction:column; animation: fadeUp 0.3s ease-out;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%); padding:1.5rem 2.5rem; display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center;">
+          <div style="background:rgba(255,255,255,0.2); width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-right:1rem; backdrop-filter:blur(4px);">
+            <i class="fas fa-filter" style="color:#ffffff; font-size:1.4rem;"></i>
+          </div>
+          <div>
+            <h2 style="font-size:1.4rem; color:#ffffff; margin:0; font-weight:800; letter-spacing:-0.5px;">Filtros de Exportación</h2>
+            <p style="color:rgba(255,255,255,0.8); margin:0; font-size:0.85rem; margin-top:0.2rem;">Configura los datos exactos que deseas generar en PDF o Excel.</p>
+          </div>
+        </div>
+        <button class="modal-close" id="btnCloseFilters" style="background:rgba(255,255,255,0.15); border:none; width:36px; height:36px; border-radius:50%; color:#ffffff; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; transition:background 0.2s;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="padding:2.5rem; max-height:65vh; overflow-y:auto;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;">
+          
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Fecha Desde</label>
+            <input type="date" id="filtroDesde" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; transition:border 0.2s;">
+          </div>
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Fecha Hasta</label>
+            <input type="date" id="filtroHasta" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; transition:border 0.2s;">
+          </div>
+          <div class="form-group-sicag" style="grid-column:1/-1;">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Consejo Comunal</label>
+            <select id="filtroConsejo" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; transition:border 0.2s; background:#fff;">
+              <option value="">Todos los Consejos Comunales</option>
+              <option value="1">Jobito I</option>
+              <option value="2">Jobito II</option>
+              <option value="3">Brisas del Yurubí</option>
+              <option value="4">Andrés Eloy Blanco</option>
+              <option value="5">Mercedes I</option>
+              <option value="6">Mercedes II</option>
+              <option value="7">Santa Cruz de las Mercedes</option>
+              <option value="8">Fortaleza del Corozo</option>
+              <option value="9">Vencedores del Corozo</option>
+            </select>
+          </div>
+          
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Mínima</label>
+            <input type="number" id="filtroEdadMin" class="input-sicag" placeholder="Ej: 18" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none;">
+          </div>
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Máxima</label>
+            <input type="number" id="filtroEdadMax" class="input-sicag" placeholder="Ej: 60" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none;">
+          </div>
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Género</label>
+            <select id="filtroGenero" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
+              <option value="">Cualquiera</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+            </select>
+          </div>
+
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Condición de Salud</label>
+            <select id="filtroSalud" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
+              <option value="">Todas</option>
+              <option value="saludable">Saludable</option>
+              <option value="enfermedad_cronica">Enfermedad Crónica</option>
+              <option value="discapacidad">Con Discapacidad</option>
+              <option value="encamado">Encamado</option>
+            </select>
+          </div>
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Elector / Inscrito CNE</label>
+            <select id="filtroCne" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
+              <option value="">Ambos</option>
+              <option value="1">Sí (Inscritos)</option>
+              <option value="0">No Inscritos</option>
+            </select>
+          </div>
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Situación Laboral</label>
+            <select id="filtroTrabajo" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
+              <option value="">Cualquiera</option>
+              <option value="1">Trabaja Actualmente</option>
+              <option value="0">No Trabaja / Desempleado</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- SELECCIÓN DEL REPORTE -->
+        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed #e5e7eb;">
+          <label style="font-weight:700; color:#111; font-size:1rem; margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem;">
+            <i class="fas fa-file-export" style="color:var(--vp);"></i> ¿Qué reporte deseas generar con estos filtros?
+          </label>
+          <select id="customReportType" class="input-sicag" style="width:100%; padding:0.85rem 1rem; border:2px solid #e5e7eb; border-radius:10px; font-size:1rem; color:#222; outline:none; background:#fff; font-weight:500; cursor:pointer;">
+            <option value="total-personas">Padrón Completo de Personas</option>
+            <option value="electores">Registro Electoral (Mayores de 18)</option>
+            <option value="ninos">Padrón de Niños y Adolescentes</option>
+            <option value="adultos-mayores">Padrón de Adultos Mayores (60+)</option>
+            <option value="discapacidad">Personas con Discapacidad</option>
+            <option value="encamados">Personas Encamadas</option>
+            <option value="embarazadas">Mujeres (Censo Demográfico Femenino)</option>
+            <option value="viviendas">Censo de Viviendas</option>
+          </select>
+        </div>
+
+      </div>
+      <div class="modal-footer" style="padding:1.5rem 2.5rem; background:#f9fafb; border-top:1px solid #e5e7eb; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <button class="btn-sicag" id="btnLimpiarFiltros" style="background:#ffffff; border:1px solid #d1d5db; color:#4b5563; padding:0.7rem 1.5rem; border-radius:8px; font-weight:600; cursor:pointer; transition:0.2s; box-shadow:0 1px 2px rgba(0,0,0,0.05);">Limpiar Filtros</button>
+        
+        <div style="display:flex; gap:0.75rem;">
+          <button class="btn-sicag" id="btnCustomExcel" style="background:#107c41; color:white; border:none; padding:0.7rem 1.5rem; border-radius:8px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(16,124,65,0.3); display:flex; align-items:center; gap:0.5rem; transition:0.2s;">
+            <i class="fas fa-file-excel"></i> Exportar Excel
+          </button>
+          <button class="btn-sicag" id="btnCustomPDF" style="background:linear-gradient(135deg, #e53935 0%, #c62828 100%); color:white; border:none; padding:0.7rem 1.5rem; border-radius:8px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(229,57,53,0.3); display:flex; align-items:center; gap:0.5rem; transition:0.2s;">
+            <i class="fas fa-file-pdf"></i> Exportar PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- SICAG v5.0 Core Scripts -->
   <script src="js/auth.js"></script>

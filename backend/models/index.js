@@ -1,4 +1,4 @@
-﻿const logger = require('../utils/logger');
+const logger = require('../utils/logger');
 
 async function initModels(sequelize) {
   const Usuario = require('./Usuario')(sequelize);
@@ -24,7 +24,7 @@ async function initModels(sequelize) {
   Habitante.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
   Proyecto.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
   Votacion.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
-  Vivienda.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
+  Vivienda.belongsTo(ConsejoComunal, { foreignKey: 'id_comunidad', as: 'consejo' });
   Reporte7T.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
   EstudioDemografico.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
   ProduccionAgricola.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
@@ -42,7 +42,7 @@ async function initModels(sequelize) {
   ConsejoComunal.hasMany(Habitante, { foreignKey: 'consejo_comunal_id', as: 'habitantes' });
   ConsejoComunal.hasMany(Proyecto, { foreignKey: 'consejo_comunal_id', as: 'proyectos' });
   ConsejoComunal.hasMany(Votacion, { foreignKey: 'consejo_comunal_id', as: 'votaciones' });
-  ConsejoComunal.hasMany(Vivienda, { foreignKey: 'consejo_comunal_id', as: 'viviendas' });
+  ConsejoComunal.hasMany(Vivienda, { foreignKey: 'id_comunidad', as: 'viviendas' });
   ConsejoComunal.hasMany(Reporte7T, { foreignKey: 'consejo_comunal_id', as: 'reportes' });
   ConsejoComunal.hasMany(EstudioDemografico, { foreignKey: 'consejo_comunal_id', as: 'estudios' });
   ConsejoComunal.hasMany(ProduccionAgricola, { foreignKey: 'consejo_comunal_id', as: 'producciones' });

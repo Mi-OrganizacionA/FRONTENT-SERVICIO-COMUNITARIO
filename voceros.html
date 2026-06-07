@@ -91,6 +91,17 @@
         <form id="formAgregar" novalidate>
           
           <div class="form-group-sicag">
+            <label class="form-label-sicag" for="inputCedula">Buscar Habitante (Cédula) *</label>
+            <div style="display:flex;">
+              <input type="text" class="form-control-sicag" id="inputCedula" placeholder="Ej: 12345678" required style="border-top-right-radius:0; border-bottom-right-radius:0;">
+              <button type="button" id="btnValidarVocero" style="background:var(--vp); color:white; border:none; padding:0 1rem; border-top-right-radius:var(--r-sm); border-bottom-right-radius:var(--r-sm); cursor:pointer;"><i class="fas fa-magnifying-glass"></i></button>
+            </div>
+            <div id="buscarResult" style="margin:.5rem 0;color:var(--vp);font-size:.85rem;font-weight:600;"></div>
+            <small style="color:var(--muted);font-size:.75rem;">El habitante debe estar censado previamente en el sistema.</small>
+            <input type="hidden" id="inputNombre">
+          </div>
+
+          <div class="form-group-sicag">
             <label class="form-label-sicag" for="selComunidad">Comunidad Asignada *</label>
             <select class="form-control-sicag" id="selComunidad" required>
               <option value="">Seleccionar comunidad...</option>
@@ -104,13 +115,6 @@
               <option value="C.C. Fortaleza del Corozo">C.C. Fortaleza del Corozo</option>
               <option value="C.C. Vencedores del Corozo">C.C. Vencedores del Corozo</option>
             </select>
-          </div>
-
-          <div class="form-group-sicag">
-            <label class="form-label-sicag" for="inputCedula">Buscar Habitante (Cédula) *</label>
-            <input type="text" class="form-control-sicag" id="inputCedula" placeholder="Ej: 12345678" required>
-            <div id="buscarResult" style="margin:.5rem 0;color:var(--vp);font-size:.85rem;font-weight:600;"></div>
-            <small style="color:var(--muted);font-size:.75rem;">El habitante debe estar censado previamente en el sistema.</small>
           </div>
 
           <div class="form-group-sicag">
@@ -136,5 +140,27 @@
   <script src="js/layout-menu.js"></script>
   <script src="js/roles.js"></script>
   <script src="js/voceros.js"></script>
+  <script src="js/habitante-autocomplete.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.HabitanteAutocomplete) {
+        HabitanteAutocomplete.attachTo('inputCedula', (datos) => {
+          const inputNombre = document.getElementById('inputNombre');
+          const buscarResult = document.getElementById('buscarResult');
+          const fullName = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
+          if (inputNombre) inputNombre.value = fullName;
+          if (buscarResult) buscarResult.textContent = `✅ Habitante encontrado: ${fullName}`;
+        });
+
+        const btnLupa = document.getElementById('btnValidarVocero');
+        if (btnLupa) {
+          btnLupa.addEventListener('click', () => {
+            const input = document.getElementById('inputCedula');
+            if (input.forceSearch) input.forceSearch();
+          });
+        }
+      }
+    });
+  </script>
 </body>
 </html>

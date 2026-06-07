@@ -1,0 +1,117 @@
+const logger = require('../utils/logger');
+const models = require('../models');
+const CensoReportesService = require('../services/censoReportesService');
+const ExportGeneratorService = require('../services/exportGeneratorService');
+
+class CensoReportesController {
+  
+  static setModels(models) {
+    this.dbModels = models;
+  }
+  
+  /**
+   * Obtiene los KPIs estadísticos del censo para la vista principal de reportes
+   */
+  static async getKpis(req, res) {
+    try {
+      const filtros = {
+        consejo_id: req.query.consejo_id,
+        fecha_desde: req.query.desde,
+        fecha_hasta: req.query.hasta,
+        edad_min: req.query.edad_min,
+        edad_max: req.query.edad_max,
+        genero: req.query.genero,
+        salud: req.query.salud,
+        cne: req.query.cne,
+        trabajo: req.query.trabajo
+      };
+
+      if (!CensoReportesController.dbModels) throw new Error('Modelos de base de datos no inyectados en CensoReportesController');
+      const kpis = await CensoReportesService.getKpis(CensoReportesController.dbModels, filtros);
+      
+      res.json(kpis);
+    } catch (error) {
+      logger.error('Error obteniendo KPIs de reportes:', error);
+      res.status(500).json({ error: 'Error obteniendo KPIs estadísticos' });
+    }
+  }
+
+  /**
+   * Obtiene el resumen detallado agrupado por Consejo Comunal
+   */
+  static async getResumen(req, res) {
+    try {
+      if (!CensoReportesController.dbModels) throw new Error('Modelos no inyectados');
+      const { desde, hasta, consejo_id, edad_min, edad_max, genero, salud, cne, trabajo } = req.query;
+      const resumen = await CensoReportesService.getResumenPorConsejo(CensoReportesController.dbModels, {
+        desde, hasta, consejo_id, edad_min, edad_max, genero, salud, cne, trabajo
+      });
+      res.json(resumen);
+    } catch (error) {
+      logger.error('Error obteniendo resumen por consejo:', error);
+      res.status(500).json({ error: 'Error obteniendo resumen estadístico' });
+    }
+  }
+
+  /**
+   * Exporta un reporte en formato PDF o Excel
+   */
+  static async exportarReporte(req, res) {
+    try {
+      const { tipo, format, desde, hasta, consejo_id, edad_min, edad_max, genero, salud, cne, trabajo } = req.query;
+
+      if (!tipo || !format) {
+        return res.status(400).json({ error: 'Parámetros "tipo" y "format" son requeridos.' });
+      }
+
+      const filtros = { desde, hasta, consejo_id, edad_min, edad_max, genero, salud, cne, trabajo };
+      
+      if (!CensoReportesController.dbModels) throw new Error('Modelos de base de datos no inyectados en CensoReportesController');
+
+      // Construir texto de filtros para el documento
+      let filtrosText = '';
+      const filtrosArr = [];
+      if (desde) filtrosArr.push(`Desde: ${desde}`);
+      if (hasta) filtrosArr.push(`Hasta: ${hasta}`);
+      if (consejo_id) {
+        const consejo = await CensoReportesController.dbModels.ConsejoComunal.findByPk(consejo_id);
+        if (consejo) filtrosArr.push(`Consejo Comunal: ${consejo.nombre_comunidad}`);
+      }
+      if (edad_min || edad_max) filtrosArr.push(`Edad: ${edad_min||'0'} a ${edad_max||'∞'} años`);
+      if (genero) filtrosArr.push(`Género: ${genero}`);
+      if (salud) filtrosArr.push(`Salud: ${salud}`);
+      if (cne) filtrosArr.push(`CNE: ${cne === '1' ? 'Inscrito' : 'No Inscrito'}`);
+      if (trabajo) filtrosArr.push(`Trabaja: ${trabajo === '1' ? 'Sí' : 'No'}`);
+      
+      if (filtrosArr.length > 0) filtrosText = 'Filtros aplicados - ' + filtrosArr.join(' | ');
+
+      // Obtener datos estructurados del servicio
+      const { title, headers, rows } = await CensoReportesService.getReporteData(CensoReportesController.dbModels, tipo, filtros);
+
+      // Generar archivo según formato
+      if (format.toLowerCase() === 'pdf') {
+        const pdfBuffer = await ExportGeneratorService.generatePDF(title, headers, rows, filtrosText);
+        
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=reporte_${tipo}_${Date.now()}.pdf`);
+        return res.send(pdfBuffer);
+      } 
+      else if (format.toLowerCase() === 'excel') {
+        const excelBuffer = await ExportGeneratorService.generateExcel(headers, rows, title, filtrosText);
+        
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename=reporte_${tipo}_${Date.now()}.xlsx`);
+        return res.send(excelBuffer);
+      } 
+      else {
+        return res.status(400).json({ error: 'Formato no soportado. Use "pdf" o "excel".' });
+      }
+
+    } catch (error) {
+      logger.error('Error exportando reporte:', error);
+      res.status(500).json({ error: 'Error generando el archivo de exportación: ' + error.message });
+    }
+  }
+}
+
+module.exports = CensoReportesController;

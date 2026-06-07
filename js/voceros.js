@@ -119,10 +119,13 @@
       return alert('Contraseña de administrador incorrecta.');
     }
 
+    const inputNombre = document.getElementById('inputNombre');
+    const nombreEncontrado = (inputNombre && inputNombre.value) ? inputNombre.value : ('Vocero ' + cedula);
+
     try {
       await window.api.crearVocero({
         cedula,
-        nombre: 'Vocero ' + cedula, // En un caso real buscaríamos en Habitantes o Viviendas para cruzar la data
+        nombre: nombreEncontrado, // Toma el nombre real del habitante
         comunidad
       });
       createVoceroAccount(cedula);
