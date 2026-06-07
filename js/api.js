@@ -4,7 +4,7 @@
  */
 class APIManager {
   constructor() {
-    this.baseURL = 'http://localhost:3000/api'; // URL del backend real en Node.js
+    this.baseURL = 'https://sicag-api.onrender.com/api'; // URL del backend real en Render (Producción)
     this.mockData = null;
     this.isDevelopment = false; // Desactivado para conectar a producción
     this.initMockData();
