@@ -3475,7 +3475,34 @@
             });
           }
         }
+        }
       }
+
+      // Redirección Automática y Resaltado desde Búsqueda Global
+      const urlParams = new URLSearchParams(window.location.search);
+      const viewViviendaId = urlParams.get('viewVivienda');
+      const highlightFamiliar = urlParams.get('highlightFamiliar');
+      
+      if (viewViviendaId) {
+        setTimeout(() => {
+          if (typeof window.editarVivienda === 'function') {
+             window.editarVivienda(Number(viewViviendaId));
+             if (highlightFamiliar && typeof goToStep === 'function') {
+                setTimeout(() => {
+                  goToStep(4);
+                  // Resaltado visual sutil del panel
+                  const panel = document.getElementById('panel4');
+                  if(panel) {
+                    panel.style.transition = 'box-shadow 0.3s ease';
+                    panel.style.boxShadow = '0 0 15px rgba(255, 193, 7, 0.6)';
+                    setTimeout(() => panel.style.boxShadow = '', 3000);
+                  }
+                }, 500);
+             }
+          }
+        }, 800); // Dar tiempo a que carguen las viviendas
+      }
+
     });
   </script>
 </body>

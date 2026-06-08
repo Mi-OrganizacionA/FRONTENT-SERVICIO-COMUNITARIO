@@ -636,6 +636,25 @@
       if (elEl) elEl.value = age >= 18 ? 'Habilitado para votar' : 'No habilitado (menor de edad)';
     }
   });
+
+  // ─────────────────────────────────────────
+  // Redirección Automática desde Spotlight
+  // ─────────────────────────────────────────
+  const urlParams = new URLSearchParams(window.location.search);
+  const viewHabitanteId = urlParams.get('viewHabitante');
+  if (viewHabitanteId) {
+    setTimeout(() => {
+      // Necesitamos cargar el habitante y abrir el modal.
+      // Actualmente censoCtrl hace la carga, y si abrirModalCenso recibe id, dice "Editar Habitante #id"
+      if (typeof window.abrirModalCenso === 'function') {
+        window.abrirModalCenso(viewHabitanteId);
+        // Si usamos censoCtrl para auto-llenar los datos:
+        if (window.censoCtrl && typeof window.censoCtrl.editarHabitante === 'function') {
+           window.censoCtrl.editarHabitante(viewHabitanteId);
+        }
+      }
+    }, 600);
+  }
 })();
 </script>
 </body>

@@ -75,6 +75,27 @@ class DashboardController {
       if (elNinos) elNinos.textContent = 0;
     }
 
+    // Actualizar tabla resumen consejos
+    const tbConsejos = document.getElementById('tbConsejos');
+    if (tbConsejos && this.resumen) {
+      tbConsejos.innerHTML = '';
+      const dataResumen = this.resumen.filter(r => r.consejo !== 'TOTAL' && r.total_hab > 0);
+      if (dataResumen.length === 0) {
+        tbConsejos.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#666;">Sin datos en la base de datos.</td></tr>';
+      } else {
+        dataResumen.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${r.consejo}</td>
+            <td>${r.total_hab}</td>
+            <td>${r.electores}</td>
+            <td>${r.ninos}</td>
+          `;
+          tbConsejos.appendChild(tr);
+        });
+      }
+    }
+
     // Actualizar tabla recientes
     const tbody = document.querySelector('#recentTable tbody');
     if (tbody && this.habitantes) {

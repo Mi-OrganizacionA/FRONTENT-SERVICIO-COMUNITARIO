@@ -599,6 +599,23 @@ class APIManager {
     }
   }
 
+  }
+
+  // ─────────────────────────────────────────
+  // BÚSQUEDA GLOBAL
+  // ─────────────────────────────────────────
+  async globalSearch(query) {
+    if (!query || query.length < 2) return [];
+    try {
+      const response = await fetch(`${this.baseURL}/search?q=${encodeURIComponent(query)}`, this._getHeaders());
+      if (!response.ok) return [];
+      return await response.json();
+    } catch (e) {
+      console.error("Error en búsqueda global", e);
+      return [];
+    }
+  }
+
   // ─────────────────────────────────────────
   // MÉTODOS AUXILIARES
   // ─────────────────────────────────────────

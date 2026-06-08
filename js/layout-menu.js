@@ -170,7 +170,10 @@
       <div class="header-search">
         <i class="fas fa-magnifying-glass"></i>
         <label for="globalSearch" class="sr-only">Buscar</label>
-        <input type="search" id="globalSearch" placeholder="${placeholder}">
+        <input type="search" id="globalSearch" placeholder="${placeholder}" autocomplete="off">
+        <div id="globalSearchDropdown" class="global-search-dropdown">
+          <div class="search-empty">Escribe para buscar...</div>
+        </div>
       </div>
       <div class="header-actions">
         ${roleBadge}
@@ -377,10 +380,81 @@
     }
   };
 
+  const initGlobalSearch = () => {
+    const input = document.getElementById('globalSearch');
+    const dropdown = document.getElementById('globalSearchDropdown');
+    if (!input || !dropdown) return;
+
+    let timeoutId;
+
+    const renderResults = (results) => {
+      dropdown.innerHTML = '';
+      if (results.length === 0) {
+        dropdown.innerHTML = '<div class="search-empty">No se encontraron resultados</div>';
+        return;
+      }
+
+      results.forEach(item => {
+        let icon = 'search';
+        if (item.tipo === 'habitante') icon = 'user';
+        if (item.tipo === 'vocero') icon = 'user-tie';
+        if (item.tipo === 'configuracion') icon = 'gear';
+        if (item.tipo === 'familiar_vivienda') icon = 'people-roof';
+
+        const a = document.createElement('a');
+        a.className = 'search-result-item';
+        a.href = item.url;
+        a.innerHTML = `
+          <div class="search-result-icon"><i class="fas fa-${icon}"></i></div>
+          <div class="search-result-text">
+            <div class="search-result-title">${item.titulo}</div>
+            <div class="search-result-sub">${item.subtitulo}</div>
+          </div>
+        `;
+        dropdown.appendChild(a);
+      });
+    };
+
+    input.addEventListener('input', (e) => {
+      const q = e.target.value.trim();
+      if (q.length < 2) {
+        dropdown.classList.remove('show');
+        return;
+      }
+
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(async () => {
+        dropdown.innerHTML = '<div class="search-empty"><i class="fas fa-spinner fa-spin"></i> Buscando...</div>';
+        dropdown.classList.add('show');
+        try {
+          const results = await window.api.globalSearch(q);
+          renderResults(results);
+        } catch (error) {
+          dropdown.innerHTML = '<div class="search-empty text-danger">Error en la búsqueda</div>';
+        }
+      }, 400); // 400ms debounce
+    });
+
+    // Cerrar al hacer clic fuera
+    document.addEventListener('click', (e) => {
+      if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Abrir al enfocar si tiene texto
+    input.addEventListener('focus', () => {
+      if (input.value.trim().length >= 2) {
+        dropdown.classList.add('show');
+      }
+    });
+  };
+
   window.addEventListener('DOMContentLoaded', () => {
     renderHeader();
     renderSidebar();
     initSidebarToggle();
     initNotificationsDropdown();
+    initGlobalSearch();
   });
 })();

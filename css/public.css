@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    SICAG — Portal Público — Estilo Drivelodge
    ============================================================ */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
@@ -1338,6 +1338,11 @@ ul {
   font-size: .95rem
 }
 
+.pub-ci-text {
+  flex: 1;
+  min-width: 0;
+}
+
 .pub-ci-text strong {
   font-size: .8rem;
   text-transform: uppercase;
@@ -1349,7 +1354,9 @@ ul {
 
 .pub-ci-text span {
   font-size: .88rem;
-  font-weight: 500
+  font-weight: 500;
+  display: block;
+  word-break: break-word;
 }
 
 .pub-social-links {

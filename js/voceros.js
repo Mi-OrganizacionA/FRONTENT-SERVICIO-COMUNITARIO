@@ -40,6 +40,7 @@
 
     voceros.forEach((vocero) => {
       const row = document.createElement('tr');
+      row.dataset.id = vocero.id;
       row.innerHTML = `
         <td>${vocero.cedula || vocero.nombre_usuario}</td>
         <td>${vocero.nombre}</td>
@@ -154,5 +155,22 @@
     elements.form.addEventListener('submit', handleFormSubmit);
   }
 
-  renderVocerosTable();
+  // Resaltado de fila desde búsqueda global
+  const applyUrlHighlight = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewVoceroId = urlParams.get('viewVocero');
+    if (viewVoceroId) {
+      setTimeout(() => {
+        const row = document.querySelector(`tr[data-id="${viewVoceroId}"]`);
+        if (row) {
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          row.style.transition = 'background-color 0.5s ease';
+          row.style.backgroundColor = 'rgba(255, 193, 7, 0.4)';
+          setTimeout(() => row.style.backgroundColor = '', 3000);
+        }
+      }, 500);
+    }
+  };
+
+  renderVocerosTable().then(applyUrlHighlight);
 })();

@@ -24,6 +24,7 @@ const auditoriaRoutes = require('./routes/auditoria');
 const personaGrupoSocialRoutes = require('./routes/persona_grupo_social');
 const estudiosDemograficosRoutes = require('./routes/estudios_demograficos');
 const systemRoutes = require('./routes/system');
+const searchRoutes = require('./routes/searchRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const { captureClientInfo } = require('./middleware/auditMiddleware');
 
@@ -56,6 +57,7 @@ app.use('/api/auditoria', auditoriaRoutes);
 app.use('/api/membresias', personaGrupoSocialRoutes);
 app.use('/api/estudios-demograficos', estudiosDemograficosRoutes);
 app.use('/api/system', systemRoutes);
+app.use('/api/search', searchRoutes);
 app.use((req, res) => res.status(404).json({ error: 'Ruta no encontrada', path: req.path }));
 app.use(errorHandler);
 
@@ -93,6 +95,7 @@ async function start() {
       const EstudioDemograficoController = require('./controllers/estudioDemograficoController');
       const AuditService = require('./services/auditService');
       const SystemController = require('./controllers/systemController');
+      const SearchController = require('./controllers/searchController');
 
       AuthController.setUsuarioModel(models.Usuario);
       HabitantesController.setModel(models.Habitante);
@@ -112,6 +115,7 @@ async function start() {
       CensoReportesController.setModels(models);
       AuditService.setModel(models.LogAuditoria);
       SystemController.setConfiguracionModel(models.Configuracion);
+      SearchController.setModels(models);
 
       await runMigrations(sequelize);
     }

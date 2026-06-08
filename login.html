@@ -497,6 +497,15 @@
       margin-bottom: 1.6rem;
     }
 
+    .form-extras {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
     .remember-label {
       display: flex;
       align-items: center;
@@ -921,12 +930,11 @@
             </div>
           </div>
 
-          <!-- Recordarme / Olvidé clave -->
           <div class="form-extras">
             <label class="remember-label">
               <input type="checkbox" id="rememberMe"> Recordarme
             </label>
-            <a href="#" id="forgotPasswordBtn" style="color: var(--primary); text-decoration: none; font-size: 0.9rem;">¿Olvidaste tu contraseña?</a>
+            <a href="#" id="forgotPasswordBtn" class="forgot-link">¿Olvidaste tu contraseña?</a>
           </div>
 
           <!-- Botón ingresar -->
