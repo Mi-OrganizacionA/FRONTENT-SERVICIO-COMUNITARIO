@@ -231,15 +231,15 @@
        const estado = (p.estado || 'propuesto').toLowerCase();
        const avance = p.avance || 0;
        return `
-         <div class="pub-card" style="background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);">
+         <div class="pub-card" style="background:var(--white);border:1px solid var(--gray3);border-radius:var(--r-lg);padding:1.5rem;display:flex;flex-direction:column;box-shadow:var(--sh-sm);transition:var(--tr);">
             <div style="font-size:0.75rem;font-weight:700;color:var(--vp);text-transform:uppercase;margin-bottom:0.5rem;display:flex;justify-content:space-between;">
                <span><i class="fas fa-hammer"></i> ${estado}</span>
                <span>${avance}%</span>
             </div>
-            <h4 style="font-size:1rem;font-weight:700;margin-bottom:0.5rem;color:var(--txt)">${p.nombre_proyecto || ''}</h4>
-            <p style="font-size:0.8rem;color:var(--muted);flex:1;margin-bottom:1rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${p.descripcion || ''}</p>
-            <div style="font-size:0.75rem;color:var(--muted);border-top:1px solid var(--border);padding-top:0.75rem;">
-               <i class="fas fa-map-marker-alt"></i> ${p.consejo_comunal || 'Sector General'}
+            <h4 style="font-size:1rem;font-weight:700;margin-bottom:0.5rem;color:var(--dark)">${p.nombre_proyecto || ''}</h4>
+            <p style="font-size:0.8rem;color:var(--gray4);flex:1;margin-bottom:1rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${p.descripcion || ''}</p>
+            <div style="font-size:0.75rem;color:var(--gray4);border-top:1px solid var(--gray3);padding-top:0.75rem;">
+               <i class="fas fa-map-marker-alt" style="color:var(--vv)"></i> ${p.consejo_comunal || 'Sector General'}
             </div>
          </div>
        `;
@@ -262,19 +262,35 @@
     track.innerHTML = activas.map(n => {
        const tipo = (n.tipo_publicacion || 'noticia').toLowerCase();
        let icono = 'fa-newspaper';
-       if (tipo === 'convocatoria') icono = 'fa-bullhorn';
-       if (tipo === 'encuesta') icono = 'fa-poll';
-       if (tipo === 'aviso') icono = 'fa-triangle-exclamation';
+       let colorTag = 'var(--az)';
+       let bgTag = '#E3F2FD';
+       
+       if (tipo === 'convocatoria') {
+         icono = 'fa-bullhorn';
+         colorTag = '#E65100';
+         bgTag = '#FFF8E1';
+       } else if (tipo === 'encuesta') {
+         icono = 'fa-poll';
+         colorTag = 'var(--vp)';
+         bgTag = 'var(--vbg)';
+       } else if (tipo === 'aviso') {
+         icono = 'fa-triangle-exclamation';
+         colorTag = 'var(--ru)';
+         bgTag = '#FFEBEE';
+       }
+       
        const fecha = n.fecha_publicacion ? new Date(n.fecha_publicacion).toLocaleDateString() : '';
        return `
-         <div class="pub-news-card" style="min-width:300px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);flex:1;">
-            <div style="font-size:0.75rem;font-weight:700;color:var(--au);text-transform:uppercase;margin-bottom:0.5rem;">
-               <i class="fas ${icono}"></i> ${tipo}
-            </div>
-            <h4 style="font-size:1rem;font-weight:700;margin-bottom:0.5rem;color:var(--txt)">${n.titulo || ''}</h4>
-            <p style="font-size:0.8rem;color:var(--muted);flex:1;margin-bottom:1rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${n.contenido || ''}</p>
-            <div style="font-size:0.75rem;color:var(--muted);border-top:1px solid var(--border);padding-top:0.75rem;">
-               <i class="fas fa-calendar"></i> ${fecha}
+         <div class="pub-news-card">
+            <div class="pub-news-body">
+               <div class="pub-news-tag" style="background:${bgTag};color:${colorTag};">
+                  <i class="fas ${icono}"></i> ${tipo}
+               </div>
+               <h4>${n.titulo || ''}</h4>
+               <p>${n.contenido || ''}</p>
+               <div class="pub-news-link" style="color:var(--gray4);border-top:1px solid var(--gray3);padding-top:1rem;width:100%;">
+                  <i class="fas fa-calendar" style="color:var(--vv);"></i> ${fecha}
+               </div>
             </div>
          </div>
        `;
