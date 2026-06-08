@@ -30,13 +30,18 @@ class DashboardController {
 
   async cargarDatos() {
     try {
-      // Cargamos stats y habitantes desde la API real
-      this.stats = await window.api.getDashboardStats();
-      this.habitantes = await window.api.getHabitantes();
-      this.noticias = await window.api.getNoticias();
-      this.resumen = await window.api.getDashboardResumen();
+      const pStats = window.api.getDashboardStats().catch(() => ({ habitantes: 0, proyectos: 0, consejos: 0, viviendas: 0 }));
+      const pHabitantes = window.api.getHabitantes().catch(() => []);
+      const pNoticias = window.api.getNoticias().catch(() => []);
+      const pResumen = window.api.getDashboardResumen().catch(() => []);
+      
+      this.stats = await pStats;
+      this.habitantes = await pHabitantes;
+      this.noticias = await pNoticias;
+      this.resumen = await pResumen;
       this.habitantesTotales = await window.api.getHabitantes({ limit: 5000 }).catch(() => this.habitantes);
     } catch (err) {
+      console.error(err);
       throw err;
     }
   }
