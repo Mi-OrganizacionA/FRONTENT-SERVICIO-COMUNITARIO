@@ -1,8 +1,8 @@
-﻿const Joi = require('joi');
+const Joi = require('joi');
 
 const authLoginSchema = Joi.object({
-  usuario: Joi.string().min(3).max(50).required(),
-  contraseña: Joi.string().min(6).max(128).required()
+  email: Joi.string().min(3).max(100).required(),
+  password: Joi.string().min(6).max(128).required()
 });
 
 const habitanteCreateSchema = Joi.object({
