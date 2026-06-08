@@ -181,7 +181,8 @@ class APIManager {
     const params = new URLSearchParams(filtros);
     const response = await fetch(`${this.baseURL}/habitantes?${params}`, this._getHeaders());
     if (!response.ok) throw new Error('Error fetching habitantes');
-    return response.json();
+    const data = await response.json();
+    return data.habitantes || data;
   }
 
   async crearHabitante(datos) {
@@ -247,7 +248,7 @@ class APIManager {
 
   async getNotificaciones() {
     if (!this.isDevelopment) {
-      const response = await fetch(`${this.baseURL}/bandeja_validaciones/pendientes`, this._getHeaders());
+      const response = await fetch(`${this.baseURL}/validaciones/pendientes`, this._getHeaders());
       if (!response.ok) throw new Error('Error al obtener notificaciones');
       return response.json();
     }
@@ -256,7 +257,7 @@ class APIManager {
 
   async aprobarNotificacion(id, comentarios) {
     if (!this.isDevelopment) {
-      const response = await fetch(`${this.baseURL}/bandeja_validaciones/${id}/aprobar`, {
+      const response = await fetch(`${this.baseURL}/validaciones/${id}/aprobar`, {
         method: 'PUT',
         ...this._getHeaders(),
         body: JSON.stringify({ comentarios })
@@ -269,7 +270,7 @@ class APIManager {
 
   async rechazarNotificacion(id, motivo) {
     if (!this.isDevelopment) {
-      const response = await fetch(`${this.baseURL}/bandeja_validaciones/${id}/rechazar`, {
+      const response = await fetch(`${this.baseURL}/validaciones/${id}/rechazar`, {
         method: 'PUT',
         ...this._getHeaders(),
         body: JSON.stringify({ motivo })
@@ -490,7 +491,7 @@ class APIManager {
     await this.waitForMockData();
     if (this.isDevelopment) return this.mockData?.noticias || [];
     const params = new URLSearchParams(filtros);
-    const response = await fetch(`${this.baseURL}/noticias?${params}`, this._getHeaders());
+    const response = await fetch(`${this.baseURL}/cartelera/publico/activas`, this._getHeaders());
     if (!response.ok) throw new Error('Error fetching noticias');
     return response.json();
   }
@@ -505,7 +506,7 @@ class APIManager {
       this.saveMockData();
       return registro;
     }
-    const response = await fetch(`${this.baseURL}/noticias`, {
+    const response = await fetch(`${this.baseURL}/cartelera`, {
       method: 'POST',
       ...this._getHeaders(),
       body: JSON.stringify(datos)
@@ -525,7 +526,7 @@ class APIManager {
       }
       throw new Error('Noticia no encontrada');
     }
-    const response = await fetch(`${this.baseURL}/noticias/${id}`, {
+    const response = await fetch(`${this.baseURL}/cartelera/${id}`, {
       method: 'PUT',
       ...this._getHeaders(),
       body: JSON.stringify(cambios)
@@ -541,7 +542,7 @@ class APIManager {
       this.saveMockData();
       return { success: true };
     }
-    const response = await fetch(`${this.baseURL}/noticias/${id}`, {
+    const response = await fetch(`${this.baseURL}/cartelera/${id}`, {
       method: 'DELETE',
       ...this._getHeaders()
     });
@@ -576,10 +577,10 @@ class APIManager {
       const proyectos = proyRes.ok ? await proyRes.json() : [];
       
       return {
-        habitantes: habitantes.length || 0,
-        viviendas: viviendas.length || 0,
-        proyectos: proyectos.length || 0,
-        consejos: 8 // Valor base
+        habitantes: habitantes.total !== undefined ? habitantes.total : habitantes.length || 0,
+        viviendas: viviendas.total !== undefined ? viviendas.total : viviendas.length || 0,
+        proyectos: proyectos.total !== undefined ? proyectos.total : proyectos.length || 0,
+        consejos: 8
       };
     } catch (e) {
       console.error("Error obteniendo stats del dashboard", e);

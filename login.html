@@ -708,6 +708,99 @@
         border-radius: 20px;
       }
     }
+
+    /* ══════════════════════════════════════════════════════
+       MODAL DE RECUPERAR CONTRASEÑA
+       ══════════════════════════════════════════════════════ */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+    }
+    .modal.show {
+      display: flex;
+    }
+    .modal-content {
+      background-color: var(--wh);
+      padding: 2.5rem;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .modal-content h2 {
+      margin-bottom: 0.5rem;
+      font-size: 1.4rem;
+      color: var(--txt);
+      font-weight: 700;
+    }
+    .modal-content p {
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--sub);
+      line-height: 1.5;
+    }
+    .modal-content .form-group {
+      margin-bottom: 1.2rem;
+    }
+    .modal-content label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--sub);
+    }
+    .modal-content input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border: 1.5px solid #E0E7E0;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-family: 'Poppins', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .modal-content input:focus {
+      border-color: var(--vv);
+    }
+    .modal-content .close {
+      position: absolute;
+      top: 1rem;
+      right: 1.2rem;
+      font-size: 1.8rem;
+      color: #999;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-content .close:hover {
+      color: var(--ru);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--vv) 0%, var(--vd) 100%);
+      color: white;
+      border: none;
+      padding: 0.95rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(46, 125, 50, .2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(46, 125, 50, .3);
+    }
   </style>
 </head>
 
@@ -846,16 +939,7 @@
 
         </form>
 
-        <!-- Demo roles -->
-        <div class="or-sep"><span>Acceso rápido de demostración</span></div>
-        <div class="demo-roles">
-          <button class="demo-btn" id="demoAdminBtn" onclick="fillDemo('admin','admin123')">
-            <i class="fas fa-user-shield"></i> Administrador
-          </button>
-          <button class="demo-btn" id="demoVoceroBtn" onclick="fillDemo('vocero','vocero123')">
-            <i class="fas fa-user"></i> Vocero
-          </button>
-        </div>
+        <!-- Demo roles removidos -->
 
       </div>
     </main>

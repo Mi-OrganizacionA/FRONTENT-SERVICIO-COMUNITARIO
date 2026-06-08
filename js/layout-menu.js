@@ -26,7 +26,7 @@
       title: 'Administración',
       items: [
         { href: 'voceros.html',      icon: 'users-gear',   label: 'Gestión de Voceros' },
-        { title: 'Validaciones', icon: 'fas fa-bell', link: 'notificaciones.html', roles: ['admin'] },
+        { href: 'notificaciones.html', icon: 'bell',       label: 'Validaciones' },
         { href: 'configuracion.html',icon: 'gear',         label: 'Configuración' }
       ]
     },
