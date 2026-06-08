@@ -137,17 +137,17 @@ class LoginController {
 
     btnOpen.addEventListener('click', (e) => {
       e.preventDefault();
-      modal.style.display = 'block';
+      modal.classList.add('show');
     });
 
     btnClose.addEventListener('click', () => {
-      modal.style.display = 'none';
+      modal.classList.remove('show');
       this._resetRecoveryModal();
     });
 
     window.addEventListener('click', (e) => {
       if (e.target === modal) {
-        modal.style.display = 'none';
+        modal.classList.remove('show');
         this._resetRecoveryModal();
       }
     });
@@ -189,7 +189,7 @@ class LoginController {
         try {
           await window.api.resetPassword(email, code, newPassword);
           alert('¡Contraseña cambiada exitosamente! Ya puedes iniciar sesión.');
-          modal.style.display = 'none';
+          modal.classList.remove('show');
           this._resetRecoveryModal();
         } catch (error) {
           alert('Error: ' + error.message);

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Módulo de Autenticación Centralizado (SICAG v5.0)
  * Gestiona tokens JWT (simulados), roles y permisos.
  */
@@ -14,31 +14,29 @@ class AuthManager {
   // ─────────────────────────────────────────
   async login(usuario, contraseña) {
     try {
-      // Simulación de validación (en producción haría fetch a /api/auth/login)
-      const DEMO_USERS = {
-        'admin': { nombre: 'Administrador General', rol: 'admin', consejoComunal: 'Todos' },
-        'vocero': { nombre: 'Vocero Jobito I', rol: 'vocero', consejoComunal: 'Jobito I' }
-      };
-
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          if (DEMO_USERS[usuario] && contraseña.length > 3) {
-            const userData = DEMO_USERS[usuario];
-            const fakeToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.simulado.' + Date.now();
-            
-            this.token = fakeToken;
-            this.user = userData;
-            
-            localStorage.setItem('token', fakeToken);
-            localStorage.setItem('user', JSON.stringify(userData));
-            
-            this._notifyObservers({ tipo: 'login', usuario: userData });
-            resolve(userData);
-          } else {
-            reject(new Error('Credenciales inválidas. Usuario no encontrado.'));
-          }
-        }, 1200); // delay simulado
+      // Producción: Petición real al backend
+      const baseURL = window.api ? window.api.baseURL : 'https://sicag-api.onrender.com/api';
+      const response = await fetch(`${baseURL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: usuario, password: contraseña })
       });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Credenciales inválidas. Usuario no encontrado.');
+      }
+
+      const data = await response.json();
+      
+      this.token = data.token;
+      this.user = data.usuario;
+      
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.usuario));
+      
+      this._notifyObservers({ tipo: 'login', usuario: data.usuario });
+      return data.usuario;
     } catch (error) {
       console.error('Error en login:', error);
       throw error;
