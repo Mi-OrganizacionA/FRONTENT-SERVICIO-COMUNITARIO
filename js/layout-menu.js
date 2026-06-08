@@ -401,6 +401,8 @@
         if (item.tipo === 'configuracion') icon = 'gear';
         if (item.tipo === 'familiar_vivienda') icon = 'people-roof';
 
+        if (item.tipo === 'seccion') icon = 'folder-open';
+
         const a = document.createElement('a');
         a.className = 'search-result-item';
         a.href = item.url;
@@ -415,6 +417,429 @@
       });
     };
 
+    const STATIC_SECTIONS = [
+  {
+    "tipo": "seccion",
+    "titulo": "Why am I seeing this?",
+    "subtitulo": "Sección en 404.html",
+    "url": "404.html?highlightSection=why%20am%20i%20seeing%20this%3F",
+    "keywords": "why am i seeing this? seccion 404"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "1. Solicitud de Registro",
+    "subtitulo": "Sección en ayuda.html",
+    "url": "ayuda.html?highlightSection=1.%20solicitud%20de%20registro",
+    "keywords": "1. solicitud de registro seccion ayuda"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "2. Estado Pendiente",
+    "subtitulo": "Sección en ayuda.html",
+    "url": "ayuda.html?highlightSection=2.%20estado%20pendiente",
+    "keywords": "2. estado pendiente seccion ayuda"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "3. Revisión Administrativa",
+    "subtitulo": "Sección en ayuda.html",
+    "url": "ayuda.html?highlightSection=3.%20revisi%C3%B3n%20administrativa",
+    "keywords": "3. revisión administrativa seccion ayuda"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "4. Aprobación Final",
+    "subtitulo": "Sección en ayuda.html",
+    "url": "ayuda.html?highlightSection=4.%20aprobaci%C3%B3n%20final",
+    "keywords": "4. aprobación final seccion ayuda"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Área Total",
+    "subtitulo": "Sección en cartografia.html",
+    "url": "cartografia.html?highlightSection=%C3%A1rea%20total",
+    "keywords": "área total seccion cartografia"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Consejos Comunales",
+    "subtitulo": "Sección en cartografia.html",
+    "url": "cartografia.html?highlightSection=consejos%20comunales",
+    "keywords": "consejos comunales seccion cartografia"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Ha Cultivadas",
+    "subtitulo": "Sección en cartografia.html",
+    "url": "cartografia.html?highlightSection=ha%20cultivadas",
+    "keywords": "ha cultivadas seccion cartografia"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Familias",
+    "subtitulo": "Sección en cartografia.html",
+    "url": "cartografia.html?highlightSection=familias",
+    "keywords": "familias seccion cartografia"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Habitantes Censados",
+    "subtitulo": "Sección en censo.html",
+    "url": "censo.html?highlightSection=habitantes%20censados",
+    "keywords": "habitantes censados seccion censo"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Electores Activos",
+    "subtitulo": "Sección en censo.html",
+    "url": "censo.html?highlightSection=electores%20activos",
+    "keywords": "electores activos seccion censo"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Consejos Comunales",
+    "subtitulo": "Sección en censo.html",
+    "url": "censo.html?highlightSection=consejos%20comunales",
+    "keywords": "consejos comunales seccion censo"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Apertura del Censo Comunitario",
+    "subtitulo": "Sección en configuracion.html",
+    "url": "configuracion.html?highlightSection=apertura%20del%20censo%20comunitario",
+    "keywords": "apertura del censo comunitario seccion configuracion"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Aprobación Automática (Global)",
+    "subtitulo": "Sección en configuracion.html",
+    "url": "configuracion.html?highlightSection=aprobaci%C3%B3n%20autom%C3%A1tica%20(global)",
+    "keywords": "aprobación automática (global) seccion configuracion"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Aprobación Habitantes",
+    "subtitulo": "Sección en configuracion.html",
+    "url": "configuracion.html?highlightSection=aprobaci%C3%B3n%20habitantes",
+    "keywords": "aprobación habitantes seccion configuracion"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Aprobación Noticias",
+    "subtitulo": "Sección en configuracion.html",
+    "url": "configuracion.html?highlightSection=aprobaci%C3%B3n%20noticias",
+    "keywords": "aprobación noticias seccion configuracion"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Aprobación Proyectos",
+    "subtitulo": "Sección en configuracion.html",
+    "url": "configuracion.html?highlightSection=aprobaci%C3%B3n%20proyectos",
+    "keywords": "aprobación proyectos seccion configuracion"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Aprobación Organizaciones",
+    "subtitulo": "Sección en configuracion.html",
+    "url": "configuracion.html?highlightSection=aprobaci%C3%B3n%20organizaciones",
+    "keywords": "aprobación organizaciones seccion configuracion"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Aprobación Reportes Inter-comunales",
+    "subtitulo": "Sección en configuracion.html",
+    "url": "configuracion.html?highlightSection=aprobaci%C3%B3n%20reportes%20inter-comunales",
+    "keywords": "aprobación reportes inter-comunales seccion configuracion"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Respaldo del Sistema (Backup)",
+    "subtitulo": "Sección en configuracion.html",
+    "url": "configuracion.html?highlightSection=respaldo%20del%20sistema%20(backup)",
+    "keywords": "respaldo del sistema (backup) seccion configuracion"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Purgar Registros de Auditoría",
+    "subtitulo": "Sección en configuracion.html",
+    "url": "configuracion.html?highlightSection=purgar%20registros%20de%20auditor%C3%ADa",
+    "keywords": "purgar registros de auditoría seccion configuracion"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Habitantes Censados",
+    "subtitulo": "Sección en dashboard.html",
+    "url": "dashboard.html?highlightSection=habitantes%20censados",
+    "keywords": "habitantes censados seccion dashboard"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Electores Activos",
+    "subtitulo": "Sección en dashboard.html",
+    "url": "dashboard.html?highlightSection=electores%20activos",
+    "keywords": "electores activos seccion dashboard"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Niños (0–11 años)",
+    "subtitulo": "Sección en dashboard.html",
+    "url": "dashboard.html?highlightSection=ni%C3%B1os%20(0%E2%80%9311%20a%C3%B1os)",
+    "keywords": "niños (0–11 años) seccion dashboard"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Noticias Publicadas",
+    "subtitulo": "Sección en dashboard.html",
+    "url": "dashboard.html?highlightSection=noticias%20publicadas",
+    "keywords": "noticias publicadas seccion dashboard"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Total Publicaciones",
+    "subtitulo": "Sección en noticias.html",
+    "url": "noticias.html?highlightSection=total%20publicaciones",
+    "keywords": "total publicaciones seccion noticias"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Noticias",
+    "subtitulo": "Sección en noticias.html",
+    "url": "noticias.html?highlightSection=noticias",
+    "keywords": "noticias seccion noticias"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Convocatorias",
+    "subtitulo": "Sección en noticias.html",
+    "url": "noticias.html?highlightSection=convocatorias",
+    "keywords": "convocatorias seccion noticias"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Avisos / Encuestas",
+    "subtitulo": "Sección en noticias.html",
+    "url": "noticias.html?highlightSection=avisos%20%2F%20encuestas",
+    "keywords": "avisos / encuestas seccion noticias"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Organizaciones",
+    "subtitulo": "Sección en organizaciones.html",
+    "url": "organizaciones.html?highlightSection=organizaciones",
+    "keywords": "organizaciones seccion organizaciones"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Movimientos Sociales",
+    "subtitulo": "Sección en organizaciones.html",
+    "url": "organizaciones.html?highlightSection=movimientos%20sociales",
+    "keywords": "movimientos sociales seccion organizaciones"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Con Contacto",
+    "subtitulo": "Sección en organizaciones.html",
+    "url": "organizaciones.html?highlightSection=con%20contacto",
+    "keywords": "con contacto seccion organizaciones"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Comités",
+    "subtitulo": "Sección en organizaciones.html",
+    "url": "organizaciones.html?highlightSection=comit%C3%A9s",
+    "keywords": "comités seccion organizaciones"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Parcelas Activas",
+    "subtitulo": "Sección en produccion_agricola.html",
+    "url": "produccion_agricola.html?highlightSection=parcelas%20activas",
+    "keywords": "parcelas activas seccion produccion_agricola"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Hectáreas Cultivadas",
+    "subtitulo": "Sección en produccion_agricola.html",
+    "url": "produccion_agricola.html?highlightSection=hect%C3%A1reas%20cultivadas",
+    "keywords": "hectáreas cultivadas seccion produccion_agricola"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Rubro Principal",
+    "subtitulo": "Sección en produccion_agricola.html",
+    "url": "produccion_agricola.html?highlightSection=rubro%20principal",
+    "keywords": "rubro principal seccion produccion_agricola"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Rendimiento (Ton)",
+    "subtitulo": "Sección en produccion_agricola.html",
+    "url": "produccion_agricola.html?highlightSection=rendimiento%20(ton)",
+    "keywords": "rendimiento (ton) seccion produccion_agricola"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Total Proyectos",
+    "subtitulo": "Sección en proyectos.html",
+    "url": "proyectos.html?highlightSection=total%20proyectos",
+    "keywords": "total proyectos seccion proyectos"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Propuestos",
+    "subtitulo": "Sección en proyectos.html",
+    "url": "proyectos.html?highlightSection=propuestos",
+    "keywords": "propuestos seccion proyectos"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "En Ejecución",
+    "subtitulo": "Sección en proyectos.html",
+    "url": "proyectos.html?highlightSection=en%20ejecuci%C3%B3n",
+    "keywords": "en ejecución seccion proyectos"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Finalizados",
+    "subtitulo": "Sección en proyectos.html",
+    "url": "proyectos.html?highlightSection=finalizados",
+    "keywords": "finalizados seccion proyectos"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Total Personas",
+    "subtitulo": "Sección en reportes.html",
+    "url": "reportes.html?highlightSection=total%20personas",
+    "keywords": "total personas seccion reportes"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Con Discapacidad",
+    "subtitulo": "Sección en reportes.html",
+    "url": "reportes.html?highlightSection=con%20discapacidad",
+    "keywords": "con discapacidad seccion reportes"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Viviendas Censadas",
+    "subtitulo": "Sección en reportes.html",
+    "url": "reportes.html?highlightSection=viviendas%20censadas",
+    "keywords": "viviendas censadas seccion reportes"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Adultos Mayores",
+    "subtitulo": "Sección en reportes.html",
+    "url": "reportes.html?highlightSection=adultos%20mayores",
+    "keywords": "adultos mayores seccion reportes"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: 404",
+    "subtitulo": "Página Principal",
+    "url": "404.html",
+    "keywords": "modulo pagina 404"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: AYUDA",
+    "subtitulo": "Página Principal",
+    "url": "ayuda.html",
+    "keywords": "modulo pagina ayuda"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: CARTOGRAFIA",
+    "subtitulo": "Página Principal",
+    "url": "cartografia.html",
+    "keywords": "modulo pagina cartografia"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: CENSO",
+    "subtitulo": "Página Principal",
+    "url": "censo.html",
+    "keywords": "modulo pagina censo"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: CENSO VIVIENDAS",
+    "subtitulo": "Página Principal",
+    "url": "censo_viviendas.html",
+    "keywords": "modulo pagina censo_viviendas"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: CONFIGURACION",
+    "subtitulo": "Página Principal",
+    "url": "configuracion.html",
+    "keywords": "modulo pagina configuracion"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: DASHBOARD",
+    "subtitulo": "Página Principal",
+    "url": "dashboard.html",
+    "keywords": "modulo pagina dashboard"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: NOTICIAS",
+    "subtitulo": "Página Principal",
+    "url": "noticias.html",
+    "keywords": "modulo pagina noticias"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: NOTIFICACIONES",
+    "subtitulo": "Página Principal",
+    "url": "notificaciones.html",
+    "keywords": "modulo pagina notificaciones"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: ORGANIZACIONES",
+    "subtitulo": "Página Principal",
+    "url": "organizaciones.html",
+    "keywords": "modulo pagina organizaciones"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: PERFIL",
+    "subtitulo": "Página Principal",
+    "url": "perfil.html",
+    "keywords": "modulo pagina perfil"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: PRODUCCION AGRICOLA",
+    "subtitulo": "Página Principal",
+    "url": "produccion_agricola.html",
+    "keywords": "modulo pagina produccion_agricola"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: PROYECTOS",
+    "subtitulo": "Página Principal",
+    "url": "proyectos.html",
+    "keywords": "modulo pagina proyectos"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: REPORTES",
+    "subtitulo": "Página Principal",
+    "url": "reportes.html",
+    "keywords": "modulo pagina reportes"
+  },
+  {
+    "tipo": "seccion",
+    "titulo": "Módulo: VOCEROS",
+    "subtitulo": "Página Principal",
+    "url": "voceros.html",
+    "keywords": "modulo pagina voceros"
+  }
+];
+
     input.addEventListener('input', (e) => {
       const q = e.target.value.trim();
       if (q.length < 2) {
@@ -426,9 +851,21 @@
       timeoutId = setTimeout(async () => {
         dropdown.innerHTML = '<div class="search-empty"><i class="fas fa-spinner fa-spin"></i> Buscando...</div>';
         dropdown.classList.add('show');
+        
         try {
-          const results = await window.api.globalSearch(q);
-          renderResults(results);
+          const lowerQ = q.toLowerCase();
+          const localMatches = STATIC_SECTIONS.filter(s => 
+            s.titulo.toLowerCase().includes(lowerQ) || 
+            s.keywords.includes(lowerQ)
+          );
+
+          let dbResults = [];
+          if (window.api && typeof window.api.globalSearch === 'function') {
+            dbResults = await window.api.globalSearch(q).catch(() => []);
+          }
+
+          const combined = [...localMatches, ...dbResults];
+          renderResults(combined);
         } catch (error) {
           dropdown.innerHTML = '<div class="search-empty text-danger">Error en la búsqueda</div>';
         }
@@ -456,5 +893,43 @@
     initSidebarToggle();
     initNotificationsDropdown();
     initGlobalSearch();
+  });
+
+  // ─────────────────────────────────────────
+  // Resaltado de Sección Dinámico Global
+  // ─────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sectionParam = urlParams.get('highlightSection');
+    
+    if (sectionParam) {
+      const textLower = decodeURIComponent(sectionParam).toLowerCase();
+      
+      setTimeout(() => {
+        const elements = document.querySelectorAll('h1, h2, h3, h4, h5, .card-header, .card-title');
+        let target = null;
+        for (let el of elements) {
+          if (el.textContent.toLowerCase().includes(textLower)) {
+            target = el;
+            break;
+          }
+        }
+        
+        if (target) {
+          const container = target.closest('.card, .card-sicag, section, .modal-content') || target.parentElement;
+          if (container) {
+            container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            container.style.transition = 'box-shadow 0.5s ease, background-color 0.5s ease';
+            container.style.boxShadow = '0 0 15px rgba(255,193,7,0.8)';
+            container.style.backgroundColor = 'rgba(255, 193, 7, 0.1)';
+            
+            setTimeout(() => {
+              container.style.boxShadow = '';
+              container.style.backgroundColor = '';
+            }, 3000);
+          }
+        }
+      }, 600); // Dar tiempo a que otras cosas rendericen
+    }
   });
 })();
