@@ -7,34 +7,34 @@ const authLoginSchema = Joi.object({
 
 const habitanteCreateSchema = Joi.object({
   cedula: Joi.string().min(6).max(12).required(),
-  nombre: Joi.string().min(2).max(100).required(),
-  apellido: Joi.string().min(2).max(100).required(),
+  nombres: Joi.string().min(2).max(100).required(),
+  apellidos: Joi.string().min(2).max(100).required(),
   genero: Joi.string().valid('M', 'F', 'Otro').required(),
   consejo_comunal_id: Joi.number().integer().required(),
-  edad: Joi.number().integer().min(0),
-  email: Joi.string().email(),
-  telefono: Joi.string().max(20),
-  direccion: Joi.string().max(300),
-  clasificacion: Joi.string().valid('adulto', 'niño', 'adulto_mayor', 'discapacitado', 'encamado'),
+  fecha_nacimiento: Joi.date().iso().required(),
+  email: Joi.string().email().allow('', null),
+  telefono: Joi.string().max(20).allow('', null),
+  direccion: Joi.string().max(300).allow('', null),
+  clasificacion: Joi.string().valid('adulto', 'niño', 'adulto_mayor', 'discapacitado', 'encamado').allow('', null),
   elector: Joi.boolean(),
-  foto_cedula_url: Joi.string().uri(),
-  centro_electoral: Joi.string().max(100)
+  foto_cedula_url: Joi.string().uri().allow('', null),
+  centro_electoral: Joi.string().max(100).allow('', null)
 });
 
 const habitanteUpdateSchema = Joi.object({
   cedula: Joi.string().min(6).max(12),
-  nombre: Joi.string().min(2).max(100),
-  apellido: Joi.string().min(2).max(100),
+  nombres: Joi.string().min(2).max(100),
+  apellidos: Joi.string().min(2).max(100),
   genero: Joi.string().valid('M', 'F', 'Otro'),
   consejo_comunal_id: Joi.number().integer(),
-  edad: Joi.number().integer().min(0),
-  email: Joi.string().email(),
-  telefono: Joi.string().max(20),
-  direccion: Joi.string().max(300),
-  clasificacion: Joi.string().valid('adulto', 'niño', 'adulto_mayor', 'discapacitado', 'encamado'),
+  fecha_nacimiento: Joi.date().iso(),
+  email: Joi.string().email().allow('', null),
+  telefono: Joi.string().max(20).allow('', null),
+  direccion: Joi.string().max(300).allow('', null),
+  clasificacion: Joi.string().valid('adulto', 'niño', 'adulto_mayor', 'discapacitado', 'encamado').allow('', null),
   elector: Joi.boolean(),
-  foto_cedula_url: Joi.string().uri(),
-  centro_electoral: Joi.string().max(100)
+  foto_cedula_url: Joi.string().uri().allow('', null),
+  centro_electoral: Joi.string().max(100).allow('', null)
 });
 
 const votacionSchema = Joi.object({

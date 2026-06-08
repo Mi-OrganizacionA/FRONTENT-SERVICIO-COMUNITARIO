@@ -155,16 +155,29 @@
 
   /* ── CARGAR DATOS PUBLICOS ── */
   async function cargarDatosPublicos() {
-    try {
-      let proyectos = [];
-      let noticias = [];
-      let stats = null;
+    let proyectos = [];
+    let noticias = [];
+    let stats = null;
 
+    try {
       // Soporte para API inyectada (Electron) o fetch REST backend
-      if (window.api && window.api.getProyectos) {
-        proyectos = await window.api.getProyectos();
-        if (window.api.getNoticias) noticias = await window.api.getNoticias();
-        if (window.api.getDashboardStats) stats = await window.api.getDashboardStats();
+      if (window.api && window.api.getProyectosPublicos) {
+        proyectos = await window.api.getProyectosPublicos().catch(e => {
+            console.warn('Proyectos requiere auth o falló:', e.message);
+            return [];
+        });
+        if (window.api.getNoticias) {
+            noticias = await window.api.getNoticias().catch(e => {
+                console.error('Error fetching noticias:', e.message);
+                return [];
+            });
+        }
+        if (window.api.getDashboardStats) {
+            stats = await window.api.getDashboardStats().catch(e => {
+                console.warn('Stats requiere auth o falló:', e.message);
+                return null;
+            });
+        }
       } else {
         const resP = await fetch('http://localhost:3000/api/proyectos').catch(()=>null);
         if (resP && resP.ok) proyectos = await resP.json();
@@ -180,7 +193,7 @@
       renderNoticias(noticias);
       if (stats) renderStats(stats, proyectos.length);
     } catch(err) {
-      console.error('Error cargando datos publicos', err);
+      console.error('Error general cargando datos publicos', err);
       renderProyectos([]);
       renderNoticias([]);
     }

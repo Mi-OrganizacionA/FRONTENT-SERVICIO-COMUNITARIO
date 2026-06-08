@@ -79,8 +79,17 @@ module.exports = {
       
       const usersTraits = await queryInterface.describeTable('usuarios');
       
-      if (usersTraits.usuario && !usersTraits.email) {
-        await queryInterface.renameColumn('usuarios', 'usuario', 'email');
+      if (usersTraits.usuario) {
+        if (!usersTraits.email) {
+          await queryInterface.renameColumn('usuarios', 'usuario', 'email');
+        } else {
+          // Si ambos existen, asumimos que el nuevo sistema usa email y descartamos usuario
+          if (queryInterface.sequelize.getDialect() === 'sqlite') {
+            await queryInterface.sequelize.query('ALTER TABLE usuarios DROP COLUMN usuario');
+          } else {
+            await queryInterface.removeColumn('usuarios', 'usuario');
+          }
+        }
       }
       
       if (usersTraits.contraseña && !usersTraits.credenciales) {

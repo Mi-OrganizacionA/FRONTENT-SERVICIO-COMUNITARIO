@@ -2803,8 +2803,7 @@
 
     document.getElementById('btnNext').addEventListener('click', () => {
       if (!validateCurrentPanel()) return;
-      saveDraft(); // Guardar avance al hacer siguiente
-      if (currentStep < totalSteps) goToStep(currentStep + 1);
+      if (currentStep < totalSteps) navigateToStep(currentStep + 1);
     });
 
     document.getElementById('btnPrev').addEventListener('click', () => {

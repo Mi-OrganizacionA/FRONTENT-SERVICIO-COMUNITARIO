@@ -1,8 +1,6 @@
 const bandejaValidacionesController = require('../controllers/bandejaValidacionesController');
-const ValidacionFirma = require('../models/ValidacionFirma');
 const AuditService = require('../services/auditService');
 
-jest.mock('../models/ValidacionFirma');
 jest.mock('../services/auditService');
 
 describe('BandejaValidacionesController', () => {

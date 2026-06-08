@@ -4,6 +4,16 @@ const ProyectosService = require('../services/proyectosService');
 let ProyectoModel = null;
 
 class ProyectosController {
+  static async getPublicos(req, res) {
+    try {
+      const proyectos = await ProyectosService.list(ProyectoModel, {});
+      res.json(proyectos);
+    } catch (error) {
+      logger.error('Error obteniendo proyectos publicos:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   static async getAll(req, res) {
     try {
       const filtros = {};

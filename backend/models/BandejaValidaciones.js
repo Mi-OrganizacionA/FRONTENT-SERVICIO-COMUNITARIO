@@ -1,4 +1,4 @@
-﻿const { DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
   const BandejaValidaciones = sequelize.define('BandejaValidaciones', {
@@ -14,7 +14,7 @@ module.exports = (sequelize) => {
       allowNull: true // NULL mientras esté pendiente
     },
     tabla_afectada: { type: DataTypes.STRING(100), allowNull: false },
-    registro_id: { type: DataTypes.INTEGER, allowNull: false },
+    registro_id: { type: DataTypes.INTEGER, allowNull: true }, // NULL para operaciones CREATE
     tipo_accion: { 
       type: DataTypes.ENUM('CREATE', 'UPDATE', 'DELETE'), 
       allowNull: false 

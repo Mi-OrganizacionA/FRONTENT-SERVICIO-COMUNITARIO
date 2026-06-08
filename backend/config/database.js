@@ -5,7 +5,7 @@ const logger = require('../utils/logger');
 async function initSQLite() {
   const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: env.db.sqlite_storage || 'database.sqlite',
+    storage: process.env.SQLITE_STORAGE || env.db.sqlite_storage || 'database.sqlite',
     logging: env.node_env === 'development' ? console.log : false
   });
 

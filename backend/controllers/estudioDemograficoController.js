@@ -167,30 +167,36 @@ class EstudioDemograficoController {
               await db.CensoCaracteristicaFamiliar.bulkCreate(fams, { transaction: t });
             }
             break;
-          case 4: // Economía
+          case 4: { // Economía
             const [eco, ecoCreated] = await db.CensoSituacionEconomica.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
             if (!ecoCreated) await eco.update(datos, { transaction: t });
             break;
-          case 5: // Vivienda
+          }
+          case 5: { // Vivienda
             const [viv, vivCreated] = await db.CensoSituacionVivienda.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
             if (!vivCreated) await viv.update(datos, { transaction: t });
             break;
-          case 6: // Salud
+          }
+          case 6: { // Salud
             const [sal, salCreated] = await db.CensoSalud.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
             if (!salCreated) await sal.update(datos, { transaction: t });
             break;
-          case 7: // Servicios
+          }
+          case 7: { // Servicios
             const [ser, serCreated] = await db.CensoServicios.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
             if (!serCreated) await ser.update(datos, { transaction: t });
             break;
-          case 8: // Participación
+          }
+          case 8: { // Participación
             const [par, parCreated] = await db.CensoParticipacionComunitaria.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
             if (!parCreated) await par.update(datos, { transaction: t });
             break;
-          case 9: // Comunidad
+          }
+          case 9: { // Comunidad
             const [com, comCreated] = await db.CensoSituacionComunidad.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
             if (!comCreated) await com.update(datos, { transaction: t });
             break;
+          }
           case 10: // Opciones Múltiples (Guardado Final o intermedio si aplica)
             if (datos.opciones && datos.opciones.length > 0) {
               await db.CensoOpcionMultiple.destroy({ where: { id_estudio }, transaction: t });
