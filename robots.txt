@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sicag-oficial.web.app/sitemap.xml
