@@ -367,7 +367,7 @@
 
     let item = null;
     if (tipo === 'proyecto') {
-      item = todosLosProyectos.find(p => p.id === id);
+      item = todosLosProyectos.find(p => String(p.id) === String(id));
       if (!item) return;
       titleEl.textContent = item.nombre_proyecto;
       infoEl.innerHTML = `
@@ -378,7 +378,7 @@
       `;
       descEl.textContent = item.descripcion || 'Sin descripción detallada.';
     } else if (tipo === 'noticia') {
-      item = todasLasNoticias.find(n => n.id === id);
+      item = todasLasNoticias.find(n => String(n.id) === String(id));
       if (!item) return;
       titleEl.textContent = item.titulo;
       const fecha = item.fecha_publicacion ? new Date(item.fecha_publicacion).toLocaleDateString() : 'Desconocida';
