@@ -588,6 +588,17 @@ class APIManager {
     }
   }
 
+  async getDashboardResumen() {
+    try {
+      const response = await fetch(`${this.baseURL}/censo-reportes/resumen`, this._getHeaders());
+      if (!response.ok) return [];
+      return await response.json();
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  }
+
   // ─────────────────────────────────────────
   // MÉTODOS AUXILIARES
   // ─────────────────────────────────────────

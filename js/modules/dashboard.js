@@ -34,6 +34,8 @@ class DashboardController {
       this.stats = await window.api.getDashboardStats();
       this.habitantes = await window.api.getHabitantes();
       this.noticias = await window.api.getNoticias();
+      this.resumen = await window.api.getDashboardResumen();
+      this.habitantesTotales = await window.api.getHabitantes({ limit: 5000 }).catch(() => this.habitantes);
     } catch (err) {
       throw err;
     }
@@ -125,16 +127,57 @@ class DashboardController {
 
     var palVerde = ['#2E7D32','#388E3C','#43A047','#4CAF50','#66BB6A','#81C784','#A5D6A7','#C8E6C9','#E8F5E9'];
 
+    // Procesar datos para Donut Consejos
+    let labelsConsejos = [];
+    let dataConsejos = [];
+    if (this.resumen && this.resumen.length > 0) {
+      const filtered = this.resumen.filter(r => r.consejo !== 'TOTAL' && r.total_hab > 0);
+      labelsConsejos = filtered.map(r => r.consejo);
+      dataConsejos = filtered.map(r => r.total_hab);
+    }
+    if (dataConsejos.length === 0) { labelsConsejos = ['Sin Datos']; dataConsejos = [1]; }
+
+    // Procesar datos para Bar Clasificaciones
+    let ninos = 0, adol = 0, mayores = 0, embaraz = 0, lactantes = 0, discap = 0, electores = 0;
+    if (this.habitantesTotales && this.habitantesTotales.length > 0) {
+      const today = new Date();
+      this.habitantesTotales.forEach(h => {
+        if (h.fecha_nacimiento) {
+          const fnac = new Date(h.fecha_nacimiento);
+          let age = today.getFullYear() - fnac.getFullYear();
+          if (today.getMonth() < fnac.getMonth() || (today.getMonth() === fnac.getMonth() && today.getDate() < fnac.getDate())) age--;
+          if (age <= 11) ninos++;
+          else if (age >= 12 && age <= 17) adol++;
+          if (age >= 60) mayores++;
+          if (age >= 18) electores++;
+        }
+        if (h.condicion_salud === 'discapacidad') discap++;
+        if (h.condicion_salud === 'embarazada' || h.condicion_salud === 'embarazo') embaraz++;
+        if (h.condicion_salud === 'lactante') lactantes++;
+      });
+    }
+    const dataClasificaciones = [ninos, adol, mayores, embaraz, lactantes, discap, electores];
+
+    // Procesar datos para Line Registros (Por Mes del Año Actual)
+    const registrosPorMes = new Array(12).fill(0);
+    const currentYear = new Date().getFullYear();
+    if (this.habitantesTotales && this.habitantesTotales.length > 0) {
+      this.habitantesTotales.forEach(h => {
+        const d = h.fecha_registro ? new Date(h.fecha_registro) : new Date();
+        if (d.getFullYear() === currentYear) {
+          registrosPorMes[d.getMonth()]++;
+        }
+      });
+    }
+
     // --- Donut Consejos ---
     const ctxConsejos = document.getElementById('chartConsejos');
     if (ctxConsejos) {
-      // Extraemos etiquetas de los datos si quisiéramos, pero para el demo usamos la data dura
-      // que coincide con el diseño visual del usuario
       new Chart(ctxConsejos.getContext('2d'), {
         type: 'doughnut',
         data: {
-          labels: ['Jobito I','Jobito II','Brisas del Yurubí','A. E. Blanco','Mercedes I','Mercedes II','Santa Cruz','Fortaleza Corozo','Vencedores Corozo'],
-          datasets: [{ data: [52,45,41,38,36,35,38,32,30], backgroundColor: palVerde, borderWidth: 3, borderColor: '#fff', hoverOffset: 8 }]
+          labels: labelsConsejos,
+          datasets: [{ data: dataConsejos, backgroundColor: palVerde, borderWidth: 3, borderColor: '#fff', hoverOffset: 8 }]
         },
         options: {
           responsive: true, maintainAspectRatio: false, cutout: '52%',
@@ -154,7 +197,7 @@ class DashboardController {
         type: 'bar',
         data: {
           labels: ['Niños\n(0-11)','Adolesc.','Adultos\nMayores','Embaraz.','Lactantes','Discap.','Electores'],
-          datasets: [{ label: 'Personas', data: [62,48,39,14,8,12,231],
+          datasets: [{ label: 'Personas', data: dataClasificaciones,
             backgroundColor: ['rgba(249,168,37,.85)','rgba(255,140,0,.85)','rgba(198,40,40,.85)','rgba(233,30,99,.85)','rgba(156,39,176,.85)','rgba(21,101,192,.85)','rgba(46,125,50,.85)'],
             borderRadius: 6, borderSkipped: false
           }]
@@ -177,7 +220,7 @@ class DashboardController {
         type: 'line',
         data: {
           labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
-          datasets: [{ label: 'Nuevos registros', data: [45,38,52,41,36,28,22,18,25,20,12,10],
+          datasets: [{ label: 'Nuevos registros', data: registrosPorMes,
             borderColor: '#43A047', backgroundColor: gR, borderWidth: 3, fill: true, tension: 0.4,
             pointBackgroundColor: '#43A047', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 7
           }]
