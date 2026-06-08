@@ -220,8 +220,8 @@
             translateY: options.translateY ?? [45, 0],
             translateX: options.translateX ?? [0, 0],
             opacity: [0, 1],
-            duration: options.duration ?? 700,
-            delay: anime.stagger(options.stagger ?? 100),
+            duration: options.duration ?? 400,
+            delay: anime.stagger(options.stagger ?? 50),
             easing: options.easing ?? 'easeOutExpo',
           });
         }
@@ -238,49 +238,53 @@
 
     // Tarjetas Habitante
     createScrollAnimator('.pub-hab-card', {
-      translateY: [50, 0],
-      stagger: 120,
+      translateY: [30, 0],
+      stagger: 60,
+      duration: 400,
       easing: 'easeOutBack',
     });
 
     // Tarjetas 7 Transformaciones
     createScrollAnimator('.pub-7t-card', {
-      translateX: [-40, 0],
-      translateY: [20, 0],
-      stagger: 140,
-      duration: 750,
+      translateX: [-20, 0],
+      translateY: [10, 0],
+      stagger: 70,
+      duration: 400,
       easing: 'easeOutExpo',
     });
 
     // Section labels y títulos
     createScrollAnimator('.pub-section-label', {
-      translateY: [20, 0],
+      translateY: [15, 0],
       stagger: 0,
-      duration: 500,
+      duration: 350,
     });
 
     // Items de lista CC
     createScrollAnimator('.pub-cc-item', {
-      translateX: [-20, 0],
+      translateX: [-15, 0],
       translateY: [0, 0],
-      stagger: 60,
-      duration: 400,
+      stagger: 30,
+      duration: 300,
       easing: 'easeOutSine',
     });
 
     // Cards de noticias (carousel)
-    createScrollAnimator('.pub-news-card', {
-      translateY: [30, 0],
-      stagger: 90,
-      duration: 500,
-    });
+    window.reinitCardsAnim = function() {
+      createScrollAnimator('.pub-news-card, .pub-card', {
+        translateY: [20, 0],
+        stagger: 50,
+        duration: 400,
+      });
+    };
+    window.reinitCardsAnim();
 
     // Contacto grid items
     createScrollAnimator('.pub-contact-item', {
-      translateX: [-25, 0],
+      translateX: [-15, 0],
       translateY: [0, 0],
-      stagger: 80,
-      duration: 500,
+      stagger: 40,
+      duration: 350,
     });
 
     /* ── 6. HOVER MICRO-ANIMATIONS en tarjetas ── */

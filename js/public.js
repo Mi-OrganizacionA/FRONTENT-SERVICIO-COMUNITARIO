@@ -153,6 +153,14 @@
     }, 1500);
   });
 
+  /* ── GLOBAL STATE PARA EXPLORADOR ── */
+  let todasLasNoticias = [];
+  let todosLosProyectos = [];
+  let explorerType = '';
+  let explorerPage = 1;
+  const EXPLORER_PER_PAGE = 8;
+  let explorerFiltered = [];
+
   /* ── CARGAR DATOS PUBLICOS ── */
   async function cargarDatosPublicos() {
     let proyectos = [];
@@ -189,6 +197,9 @@
         if (resS && resS.ok) stats = await resS.json();
       }
       
+      todasLasNoticias = noticias;
+      todosLosProyectos = proyectos;
+
       renderProyectos(proyectos);
       renderNoticias(noticias);
       if (stats) renderStats(stats, proyectos.length);
@@ -229,50 +240,46 @@
     }
   }
 
+  function generarHtmlProyecto(p) {
+     const estado = (p.estado || 'propuesto').toLowerCase();
+     const avance = p.avance || 0;
+     // Usamos JSON.stringify y escape para pasar el objeto al onclick, pero es mejor pasar el ID y buscarlo.
+     return `
+       <div class="pub-card" style="background:#fff;border:1px solid var(--gray3);border-radius:var(--r-lg);padding:1.5rem;display:flex;flex-direction:column;box-shadow:var(--sh-sm);transition:var(--tr);cursor:pointer;" onclick="abrirModalDetalle(${p.id}, 'proyecto')">
+          <div style="font-size:0.75rem;font-weight:700;color:var(--vp);text-transform:uppercase;margin-bottom:0.5rem;display:flex;justify-content:space-between;">
+             <span><i class="fas fa-hammer"></i> ${estado}</span>
+             <span>${avance}%</span>
+          </div>
+          <h4 style="font-size:1rem;font-weight:700;margin-bottom:0.5rem;color:var(--dark)">${p.nombre_proyecto || ''}</h4>
+          <p style="font-size:0.8rem;color:var(--gray4);flex:1;margin-bottom:1rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${p.descripcion || ''}</p>
+          <div style="font-size:0.75rem;color:var(--gray4);border-top:1px solid var(--gray3);padding-top:0.75rem;">
+             <i class="fas fa-map-marker-alt" style="color:var(--vv)"></i> ${p.consejo_comunal || 'Sector General'}
+          </div>
+       </div>
+     `;
+  }
+
   function renderProyectos(proyectos) {
     const grid = document.getElementById('indexProyectosGrid');
     if (!grid) return;
     
-    if (proyectos.length === 0) {
-       grid.innerHTML = '<p style="color:var(--muted);text-align:center;">No hay proyectos disponibles en este momento.</p>';
-       return;
-    }
+    let html = '';
+    const ultimos = proyectos.slice(-5).reverse(); // Mostrar 5 max en landing
+    html += ultimos.map(p => generarHtmlProyecto(p)).join('');
     
-    const ultimos = proyectos.slice(-6).reverse(); // Mostrar 6 max en landing
+    // Siempre agregar tarjeta ver mas
+    html += `
+      <div class="pub-card card-ver-mas" onclick="abrirExplorador('proyectos')" style="border-radius:var(--r-lg);padding:1.5rem;min-height:220px;">
+         <i class="fas fa-arrow-right"></i>
+         <h3>Ver más proyectos</h3>
+      </div>
+    `;
+    grid.innerHTML = html;
     
-    grid.innerHTML = ultimos.map(p => {
-       const estado = (p.estado || 'propuesto').toLowerCase();
-       const avance = p.avance || 0;
-       return `
-         <div class="pub-card" style="background:var(--white);border:1px solid var(--gray3);border-radius:var(--r-lg);padding:1.5rem;display:flex;flex-direction:column;box-shadow:var(--sh-sm);transition:var(--tr);">
-            <div style="font-size:0.75rem;font-weight:700;color:var(--vp);text-transform:uppercase;margin-bottom:0.5rem;display:flex;justify-content:space-between;">
-               <span><i class="fas fa-hammer"></i> ${estado}</span>
-               <span>${avance}%</span>
-            </div>
-            <h4 style="font-size:1rem;font-weight:700;margin-bottom:0.5rem;color:var(--dark)">${p.nombre_proyecto || ''}</h4>
-            <p style="font-size:0.8rem;color:var(--gray4);flex:1;margin-bottom:1rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${p.descripcion || ''}</p>
-            <div style="font-size:0.75rem;color:var(--gray4);border-top:1px solid var(--gray3);padding-top:0.75rem;">
-               <i class="fas fa-map-marker-alt" style="color:var(--vv)"></i> ${p.consejo_comunal || 'Sector General'}
-            </div>
-         </div>
-       `;
-    }).join('');
+    if(window.reinitCardsAnim) setTimeout(window.reinitCardsAnim, 50);
   }
 
-  function renderNoticias(noticias) {
-    const track = document.getElementById('carouselTrack');
-    if (!track) return;
-    
-    if (noticias.length === 0) {
-      track.innerHTML = '<p style="color:var(--muted);text-align:center;width:100%;">No hay noticias disponibles en este momento.</p>';
-      return;
-    }
-
-    const activas = noticias.slice(-9).reverse();
-    track.style.justifyContent = 'flex-start'; // Reset justify si habian
-    track.style.gap = '24px';
-    
-    track.innerHTML = activas.map(n => {
+  function generarHtmlNoticia(n) {
        const tipo = (n.tipo_publicacion || 'noticia').toLowerCase();
        let icono = 'fa-newspaper';
        let colorTag = 'var(--az)';
@@ -294,21 +301,223 @@
        
        const fecha = n.fecha_publicacion ? new Date(n.fecha_publicacion).toLocaleDateString() : '';
        return `
-         <div class="pub-news-card">
-            <div class="pub-news-body">
-               <div class="pub-news-tag" style="background:${bgTag};color:${colorTag};">
+         <div class="pub-news-card" style="cursor:pointer;" onclick="abrirModalDetalle(${n.id}, 'noticia')">
+            <div class="pub-news-body" style="display:flex;flex-direction:column;height:100%;">
+               <div class="pub-news-tag" style="background:${bgTag};color:${colorTag};align-self:flex-start;">
                   <i class="fas ${icono}"></i> ${tipo}
                </div>
                <h4>${n.titulo || ''}</h4>
-               <p>${n.contenido || ''}</p>
-               <div class="pub-news-link" style="color:var(--gray4);border-top:1px solid var(--gray3);padding-top:1rem;width:100%;">
+               <p style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;flex:1;">${n.contenido || ''}</p>
+               <div class="pub-news-link" style="color:var(--gray4);border-top:1px solid var(--gray3);padding-top:1rem;width:100%;margin-top:1rem;">
                   <i class="fas fa-calendar" style="color:var(--vv);"></i> ${fecha}
                </div>
             </div>
          </div>
        `;
-    }).join('');
   }
+
+  function renderNoticias(noticias) {
+    const track = document.getElementById('carouselTrack');
+    if (!track) return;
+
+    const activas = noticias.slice(-5).reverse();
+    track.style.justifyContent = 'flex-start'; // Reset justify si habian
+    track.style.gap = '24px';
+    
+    let html = activas.map(n => generarHtmlNoticia(n)).join('');
+    
+    html += `
+      <div class="pub-news-card card-ver-mas" onclick="abrirExplorador('noticias')" style="min-height:220px; flex: 0 0 calc(33.333% - 1rem);">
+         <i class="fas fa-arrow-right"></i>
+         <h3>Ver más noticias</h3>
+      </div>
+    `;
+    track.innerHTML = html;
+    
+    if(window.reinitCardsAnim) setTimeout(window.reinitCardsAnim, 50);
+  }
+
+  /* ── LÓGICA DE MODALES Y EXPLORADOR ── */
+  const modalDetalleOverlay = document.getElementById('modalDetalleOverlay');
+  const modalExploradorOverlay = document.getElementById('modalExploradorOverlay');
+
+  window.cerrarModales = function() {
+    if(modalDetalleOverlay) modalDetalleOverlay.classList.remove('open');
+    if(modalExploradorOverlay) modalExploradorOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  document.getElementById('modalDetalleClose')?.addEventListener('click', () => {
+    modalDetalleOverlay.classList.remove('open');
+    if(!modalExploradorOverlay.classList.contains('open')) document.body.style.overflow = '';
+  });
+  document.getElementById('modalExploradorClose')?.addEventListener('click', window.cerrarModales);
+
+  window.abrirModalDetalle = function(id, tipo) {
+    const titleEl = document.getElementById('modalDetalleTitle');
+    const infoEl = document.getElementById('modalDetalleInfo');
+    const descEl = document.getElementById('modalDetalleDesc');
+
+    let item = null;
+    if (tipo === 'proyecto') {
+      item = todosLosProyectos.find(p => p.id === id);
+      if (!item) return;
+      titleEl.textContent = item.nombre_proyecto;
+      infoEl.innerHTML = `
+        <div class="pub-modal-info-item"><label>Estado</label><span>${item.estado || 'Propuesto'}</span></div>
+        <div class="pub-modal-info-item"><label>Avance</label><span>${item.avance || 0}%</span></div>
+        <div class="pub-modal-info-item"><label>Consejo Comunal</label><span>${item.consejo_comunal || 'N/A'}</span></div>
+        <div class="pub-modal-info-item"><label>Presupuesto Estimado</label><span>${item.presupuesto_estimado ? Number(item.presupuesto_estimado).toLocaleString('es-VE',{style:'currency',currency:'VES'}) : 'No definido'}</span></div>
+      `;
+      descEl.textContent = item.descripcion || 'Sin descripción detallada.';
+    } else if (tipo === 'noticia') {
+      item = todasLasNoticias.find(n => n.id === id);
+      if (!item) return;
+      titleEl.textContent = item.titulo;
+      const fecha = item.fecha_publicacion ? new Date(item.fecha_publicacion).toLocaleDateString() : 'Desconocida';
+      infoEl.innerHTML = `
+        <div class="pub-modal-info-item"><label>Tipo</label><span><i class="fas fa-bullhorn"></i> ${item.tipo_publicacion || 'Noticia'}</span></div>
+        <div class="pub-modal-info-item"><label>Fecha</label><span><i class="fas fa-calendar"></i> ${fecha}</span></div>
+        <div class="pub-modal-info-item" style="grid-column: 1 / -1;"><label>Autor</label><span>${item.autor || 'Sistema SICAG'}</span></div>
+      `;
+      descEl.innerHTML = (item.contenido || '').replace(/\n/g, '<br>');
+    }
+
+    modalDetalleOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.abrirExplorador = function(tipo) {
+    explorerType = tipo;
+    explorerPage = 1;
+    const searchInput = document.getElementById('fsSearch');
+    const filterStatus = document.getElementById('fsFilterStatus');
+    
+    if(searchInput) searchInput.value = '';
+    if(document.getElementById('fsFilterCC')) document.getElementById('fsFilterCC').value = '';
+    
+    if (tipo === 'proyectos') {
+      document.getElementById('fsTitle').textContent = 'Explorador de Proyectos';
+      document.getElementById('fsSub').textContent = 'Proyectos agroecológicos y de infraestructura de los consejos comunales.';
+      document.getElementById('fsIcon').innerHTML = '<i class="fas fa-seedling"></i>';
+      if(filterStatus) {
+        filterStatus.style.display = 'block';
+        filterStatus.innerHTML = `
+          <option value="">Todos los Estados</option>
+          <option value="activo">Activo</option>
+          <option value="desarrollo">En Desarrollo</option>
+          <option value="propuesto">Propuesto</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="completado">Completado</option>
+        `;
+      }
+    } else {
+      document.getElementById('fsTitle').textContent = 'Explorador de Noticias';
+      document.getElementById('fsSub').textContent = 'Avisos, convocatorias y actualizaciones de la comuna.';
+      document.getElementById('fsIcon').innerHTML = '<i class="fas fa-newspaper"></i>';
+      if(filterStatus) {
+        filterStatus.style.display = 'block';
+        filterStatus.innerHTML = `
+          <option value="">Todos los Tipos</option>
+          <option value="noticia">Noticia</option>
+          <option value="convocatoria">Convocatoria</option>
+          <option value="encuesta">Encuesta</option>
+          <option value="aviso">Aviso</option>
+        `;
+      }
+    }
+    
+    filtrarExplorador();
+    modalExploradorOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  function filtrarExplorador() {
+    const q = document.getElementById('fsSearch').value.toLowerCase().trim();
+    const cc = document.getElementById('fsFilterCC').value;
+    const status = document.getElementById('fsFilterStatus').value.toLowerCase();
+    
+    let base = explorerType === 'proyectos' ? todosLosProyectos : todasLasNoticias;
+    
+    explorerFiltered = base.filter(item => {
+      // Búsqueda por texto
+      const textMatch = explorerType === 'proyectos' ? 
+        ((item.nombre_proyecto||'').toLowerCase().includes(q) || (item.descripcion||'').toLowerCase().includes(q)) :
+        ((item.titulo||'').toLowerCase().includes(q) || (item.contenido||'').toLowerCase().includes(q));
+        
+      if (!textMatch) return false;
+      
+      // Búsqueda por CC
+      if (cc) {
+        if (explorerType === 'proyectos') {
+           const cName = (item.consejo_comunal || '').toLowerCase();
+           const keywordMap = {
+              'jobito1': 'jobito i', 'jobito2': 'jobito ii', 'brisas': 'brisas',
+              'aeb': 'andrés eloy', 'mercedes1': 'mercedes', 'santacruz': 'santa cruz', 'corozo': 'corozo'
+           };
+           const kw = keywordMap[cc] || cc;
+           if (!cName.includes(kw)) return false;
+        }
+      }
+      
+      // Búsqueda por estado/tipo
+      if (status) {
+        if (explorerType === 'proyectos') {
+          if ((item.estado||'').toLowerCase() !== status) return false;
+        } else {
+          if ((item.tipo_publicacion||'').toLowerCase() !== status) return false;
+        }
+      }
+      
+      return true;
+    });
+    
+    explorerFiltered.reverse(); // más recientes primero
+    explorerPage = 1;
+    renderExploradorGrid();
+  }
+
+  document.getElementById('fsSearch')?.addEventListener('input', filtrarExplorador);
+  document.getElementById('fsFilterCC')?.addEventListener('change', filtrarExplorador);
+  document.getElementById('fsFilterStatus')?.addEventListener('change', filtrarExplorador);
+
+  function renderExploradorGrid() {
+    const grid = document.getElementById('fsGrid');
+    const pagination = document.getElementById('fsPagination');
+    if(!grid || !pagination) return;
+
+    const start = (explorerPage - 1) * EXPLORER_PER_PAGE;
+    const end = start + EXPLORER_PER_PAGE;
+    const paged = explorerFiltered.slice(start, end);
+    
+    if (paged.length === 0) {
+      grid.innerHTML = '<p style="text-align:center;width:100%;color:var(--gray4);grid-column:1/-1;">No se encontraron resultados.</p>';
+      pagination.innerHTML = '';
+      return;
+    }
+    
+    if (explorerType === 'proyectos') {
+      grid.innerHTML = paged.map(p => generarHtmlProyecto(p)).join('');
+    } else {
+      grid.innerHTML = paged.map(n => generarHtmlNoticia(n)).join('');
+    }
+    
+    // Generar paginación
+    const totalPages = Math.ceil(explorerFiltered.length / EXPLORER_PER_PAGE);
+    let pagHtml = '';
+    if (totalPages > 1) {
+      for(let i=1; i<=totalPages; i++) {
+        pagHtml += `<button class="pub-page-btn ${i===explorerPage?'active':''}" onclick="window.cambiarPaginaExplorador(${i})">${i}</button>`;
+      }
+    }
+    pagination.innerHTML = pagHtml;
+  }
+
+  window.cambiarPaginaExplorador = function(p) {
+    explorerPage = p;
+    renderExploradorGrid();
+    document.getElementById('modalExploradorOverlay').scrollTo({top:0, behavior:'smooth'});
+  };
 
   // Ejecutar carga
   document.addEventListener('DOMContentLoaded', () => {
