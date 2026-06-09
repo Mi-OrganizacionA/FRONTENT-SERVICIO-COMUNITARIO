@@ -537,30 +537,43 @@
       return;
     }
     
-    // Preparar payload manual
+    // Preparar payload adaptado para el backend
+    var habNombre = document.getElementById('habNombre').value.trim();
+    var partes = habNombre.split(' ');
+    var nombres = partes.length > 1 ? partes[0] : habNombre;
+    var apellidos = partes.length > 1 ? partes.slice(1).join(' ') : 'N/A';
+
+    var fechaNac = document.getElementById('habFechaNac').value;
+    var age = 0;
+    if (fechaNac) {
+      var hoy = new Date(), nac = new Date(fechaNac);
+      age = hoy.getFullYear() - nac.getFullYear();
+      var m = hoy.getMonth() - nac.getMonth();
+      if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) age--;
+    }
+
+    var condicionSalud = document.getElementById('condicionSalud').value;
+    var clasificacion = 'adulto';
+    if (condicionSalud === 'discapacidad') clasificacion = 'discapacitado';
+    else if (condicionSalud === 'encamado') clasificacion = 'encamado';
+    else if (age <= 11) clasificacion = 'niño';
+    else if (age >= 60) clasificacion = 'adulto_mayor';
+
     var data = {
       cedula: document.getElementById('habCedula').value.trim(),
-      nombres: document.getElementById('habNombre').value.trim(),
-      apellidos: '', // Formulario usa solo un campo para ambos de momento
-      fecha_nacimiento: document.getElementById('habFechaNac').value,
+      nombres: nombres,
+      apellidos: apellidos,
+      fecha_nacimiento: fechaNac,
       genero: document.getElementById('habGenero').value,
       telefono: document.getElementById('habTelefono').value.trim(),
       email: document.getElementById('habEmail').value.trim(),
-      ocupacion: document.getElementById('habOcupacion').value.trim(),
-      id_comunidad: parseInt(document.getElementById('habCC').value),
-      nivel_educativo: document.getElementById('habNivelEducativo').value,
+      consejo_comunal_id: parseInt(document.getElementById('habCC').value),
       direccion: document.getElementById('habDireccion').value.trim(),
-      condicion_salud: document.getElementById('condicionSalud').value,
-      fotografia_cedula_url: '', // Faltaría subir imagen a bucket/server
-      tiene_cedula_ampliada: document.getElementById('tieneCedulaAmpliada').checked
+      clasificacion: clasificacion,
+      elector: age >= 18,
+      foto_cedula_url: '',
+      centro_electoral: ''
     };
-
-    // Separar nombres y apellidos rudimentario si hay espacio
-    var partes = data.nombres.split(' ');
-    if (partes.length > 1) {
-      data.nombres = partes[0];
-      data.apellidos = partes.slice(1).join(' ');
-    }
 
     try {
       var title = document.getElementById('modalCensoTitle');
