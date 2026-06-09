@@ -315,10 +315,15 @@ class APIManager {
     if (this.isDevelopment) {
       return this._filterProyectos(this.mockData.proyectos, filtros);
     }
-    const params = new URLSearchParams(filtros);
-    const response = await fetch(`${this.baseURL}/proyectos/publico?${params}`, this._getHeaders());
-    if (!response.ok) throw new Error('Error fetching proyectos publicos');
-    return response.json();
+    try {
+      const params = new URLSearchParams(filtros);
+      const response = await fetch(`${this.baseURL}/proyectos/publico?${params}`, this._getHeaders());
+      if (!response.ok) throw new Error('Error fetching proyectos publicos');
+      return await response.json();
+    } catch (error) {
+      console.warn('API pública falló, usando datos locales como respaldo:', error.message);
+      return this._filterProyectos(this.mockData?.proyectos || [], filtros);
+    }
   }
 
   async crearProyecto(datos) {
