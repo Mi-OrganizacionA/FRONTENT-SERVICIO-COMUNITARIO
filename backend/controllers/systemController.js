@@ -3,6 +3,9 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const env = require('../config/environment');
 const logger = require('../utils/logger');
+const { Habitante } = require('../models/Habitante');
+const { Proyecto } = require('../models/Proyecto');
+const { Vivienda } = require('../models/Vivienda');
 let ConfiguracionModel = null;
 
 class SystemController {
@@ -20,6 +23,24 @@ class SystemController {
     } catch (error) {
       logger.error('Error fetching config:', error);
       res.status(500).json({ error: 'Error al obtener configuración' });
+    }
+  }
+
+  static async getPublicStats(req, res) {
+    try {
+      const countHab = await Habitante.count();
+      const countProy = await Proyecto.count();
+      const countViv = await Vivienda.count();
+      // Si el modelo ConsejoComunal existiera, podríamos contar, pero son 9 estáticos
+      res.json({
+        habitantes: countHab,
+        proyectos: countProy,
+        viviendas: countViv,
+        consejos: 9
+      });
+    } catch (error) {
+      logger.error('Error fetching public stats:', error);
+      res.status(500).json({ error: 'Error al obtener estadísticas públicas' });
     }
   }
 

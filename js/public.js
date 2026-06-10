@@ -186,6 +186,11 @@
                 return null;
             });
         }
+        if (!stats) {
+            const baseApi = window.api.baseURL || 'https://sicag-api.onrender.com/api';
+            const resS = await fetch(`${baseApi}/system/public-stats`).catch(()=>null);
+            if (resS && resS.ok) stats = await resS.json();
+        }
       } else {
         const baseApi = window.api ? window.api.baseURL : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api');
         const resP = await fetch(`${baseApi}/proyectos/publico`).catch(()=>null);
@@ -193,6 +198,9 @@
         
         const resN = await fetch(`${baseApi}/cartelera/publico/activas`).catch(()=>null);
         if (resN && resN.ok) noticias = await resN.json();
+
+        const resS = await fetch(`${baseApi}/system/public-stats`).catch(()=>null);
+        if (resS && resS.ok) stats = await resS.json();
       }
       
       todasLasNoticias = noticias;
@@ -205,6 +213,12 @@
       console.error('Error general cargando datos publicos', err);
       renderProyectos([]);
       renderNoticias([]);
+    } finally {
+      const backendLoader = document.getElementById('backendLoader');
+      if (backendLoader) {
+        backendLoader.style.opacity = '0';
+        setTimeout(() => backendLoader.remove(), 400);
+      }
     }
   }
 

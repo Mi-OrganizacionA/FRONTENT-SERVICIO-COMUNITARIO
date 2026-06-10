@@ -5,6 +5,7 @@ const { verifyToken, requireRole } = require('../middleware/auth');
 
 router.get('/config', verifyToken, systemController.getConfig);
 router.post('/config', verifyToken, requireRole(['admin']), systemController.saveConfig);
-router.get('/backup', systemController.downloadBackup); // Usualmente protegeríamos esto, pero como se descarga por URL directa pasaremos un token por query string si es necesario.
+router.get('/backup', systemController.downloadBackup); 
+router.get('/public-stats', systemController.getPublicStats);
 
 module.exports = router;
