@@ -334,7 +334,6 @@
     const track = document.getElementById('carouselTrack');
     if (!track) return;
 
-<<<<<<< HEAD
     // Ordenar: las publicaciones destacadas van primero
     const noticiasOrdenadas = [...noticias].sort((a, b) => {
       const aD = (a.destacada === true || a.destacada === 1) ? 1 : 0;
@@ -344,14 +343,6 @@
 
     const activas = noticiasOrdenadas.slice(-5).reverse();
     track.style.justifyContent = 'flex-start';
-=======
-    const hoy = new Date();
-    const activas = noticias
-      .filter(n => !n.fecha_cierre || new Date(n.fecha_cierre) >= hoy)
-      .sort((a, b) => (b.destacada ? 1 : 0) - (a.destacada ? 1 : 0))
-      .slice(0, 5);
-    track.style.justifyContent = 'flex-start'; // Reset justify si habian
->>>>>>> 3d21877adb989fa9194122013016d8119f9a9635
     track.style.gap = '24px';
     
     let html = activas.map(n => generarHtmlNoticia(n)).join('');
@@ -603,7 +594,6 @@
 
          // Intentar API pública del backend primero (no requiere token)
          try {
-<<<<<<< HEAD
            const baseUrl = (window.api && window.api.baseURL) || 'https://sicag-api.onrender.com/api';
            const res = await fetch(`${baseUrl}/habitantes/publico/buscar?cedula=${encodeURIComponent(soloNumeros)}`);
            if (res.ok) {
@@ -613,31 +603,6 @@
            }
          } catch (_) {
            // Si no hay endpoint público específico, fallback al endpoint general
-=======
-            let habs = [];
-            if (window.api && window.api.buscarHabitantesPublico) {
-              habs = await window.api.buscarHabitantesPublico(q);
-            } else {
-              const baseApi = window.api ? window.api.baseURL : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api');
-              const res = await fetch(`${baseApi}/habitantes/publico/buscar?q=${encodeURIComponent(q)}`).catch(()=>null);
-              if (res && res.ok) habs = await res.json();
-            }
-            
-            const qNorm = q.replace(/[.\s-]/g,'').replace(/^[ve]/i,'');
-            const match = habs.find(h => 
-               (h.cedula && h.cedula.toString().replace(/[.\s-]/g,'') === qNorm) || 
-               (h.nombres && h.nombres.toLowerCase().includes(q)) ||
-               (`${h.nombres} ${h.apellidos||''}`.toLowerCase().includes(q))
-            ) || habs[0];
-            
-            if (match) {
-               alert(`✅ HABITANTE ENCONTRADO:\n\nNombre: ${match.nombres} ${match.apellidos || ''}\nC.I.: V-${match.cedula}\nConsejo Comunal: ${match.consejo ? match.consejo.nombre_comunidad : 'Registrado'}\nEstatus: Censado(a) correctamente en la plataforma SICAG.`);
-            } else {
-               alert(`❌ NO ENCONTRADO:\nNo se hallaron coincidencias para "${q}". Verifica el número de cédula o el nombre.`);
-            }
-         } catch(e) {
-            alert('Error de conexión al consultar habitante.');
->>>>>>> 3d21877adb989fa9194122013016d8119f9a9635
          }
 
          // Fallback: usar window.api.getHabitantes si el anterior no dio resultado

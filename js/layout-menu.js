@@ -277,7 +277,6 @@
 
   /* ── LÓGICA DEL BOTÓN DE NOTIFICACIONES ── */
   const initNotificationsDropdown = () => {
-<<<<<<< HEAD
     const btn   = document.getElementById('headerNotifBtn');
     const badge = document.getElementById('headerNotifBadge');
 
@@ -312,43 +311,6 @@
           // Si falla el fetch, el badge permanece oculto
           badge.style.display = 'none';
         });
-=======
-    const btn = document.getElementById('headerNotifBtn');
-    const dropdown = document.getElementById('headerNotifDropdown');
-    const badge = document.getElementById('headerNotifBadge');
-    
-    if (!btn) return;
-
-    // Eliminar el dropdown de la interfaz, ya que solo redirigirá
-    if (dropdown) {
-      dropdown.style.display = 'none';
-    }
-
-    // Al hacer clic, redirigir directamente
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.location.href = 'notificaciones.html';
-    });
-    
-    // Initial fetch to set the badge count
-    if (window.api && badge) {
-      window.api.getNotificaciones().then(notifs => {
-        const count = notifs.length;
-        if (count > 0) {
-          badge.textContent = count;
-          badge.style.display = 'block';
-          
-          const mItem = document.querySelector('.mobile-menu-item[href="notificaciones.html"]');
-          if (mItem && !mItem.innerHTML.includes('mobile-badge')) {
-            mItem.innerHTML += `<span class="mobile-badge">${count > 99 ? '99+' : count}</span>`;
-          }
-        } else {
-          badge.style.display = 'none';
-        }
-      }).catch(err => {
-        console.error('Error al obtener notificaciones para el badge', err);
-      });
->>>>>>> 3d21877adb989fa9194122013016d8119f9a9635
     }
   };
 

@@ -152,11 +152,7 @@ class NoticiasController {
           <div class="pub-card-top">
             <span class="pub-badge badge-${cssClass}"><i class="fas ${icono}"></i> ${tipo.toUpperCase()}</span>
             <div class="pub-top-right">
-<<<<<<< HEAD
               ${esDestacada ? '<span style="font-size:.72rem;font-weight:700;color:var(--au);"><i class="fas fa-star"></i> Destacada</span>' : ''}
-=======
-              ${star}
->>>>>>> 3d21877adb989fa9194122013016d8119f9a9635
               <span class="pub-status-dot"><i class="fas fa-check-circle"></i> Activa</span>
             </div>
           </div>
@@ -217,7 +213,6 @@ class NoticiasController {
 
       // Autor automático: se autocompleta con el nombre del usuario autenticado (no editable)
       const autorInput = document.getElementById('notAutor');
-<<<<<<< HEAD
       if (autorInput) {
         const nombreUsuario = window.auth?.getUser()?.nombre || 'Sala de Autogobierno';
         autorInput.value = nombreUsuario;
@@ -226,16 +221,6 @@ class NoticiasController {
         autorInput.style.cursor = 'not-allowed';
       }
 
-=======
-      const user = window.auth?.getUser();
-      if (autorInput) {
-        autorInput.value = user?.nombre || 'Sala de Autogobierno';
-        autorInput.readOnly = true;
-      }
-      const destacada = document.getElementById('notDestacada');
-      if (destacada) destacada.checked = false;
-      
->>>>>>> 3d21877adb989fa9194122013016d8119f9a9635
       const tipoInput = document.getElementById('notTipo');
       if (tipoInput) tipoInput.value = tipo;
       this.handleTipoNoticia();
@@ -276,19 +261,12 @@ class NoticiasController {
       titulo: titulo,
       tipo_publicacion: tipo,
       contenido: desc,
-<<<<<<< HEAD
       autor: document.getElementById('notAutor')?.value.trim() || 'Sala de Autogobierno',
       fecha_publicacion: document.getElementById('notFecha')?.value || new Date().toISOString(),
       // Incluir enlace de encuesta si aplica (campo 'extra' del formulario)
       enlace_encuesta: tipo === 'encuesta' ? (extra || '') : undefined,
       // Incluir lugar/horario si es convocatoria
       lugar_horario: tipo === 'convocatoria' ? (extra || '') : undefined
-=======
-      enlace_extra: extra || null,
-      fecha_cierre: document.getElementById('notCierre')?.value || null,
-      destacada: document.getElementById('notDestacada')?.checked || false,
-      fecha_publicacion: document.getElementById('notFecha')?.value || new Date().toISOString()
->>>>>>> 3d21877adb989fa9194122013016d8119f9a9635
     };
 
     try {
