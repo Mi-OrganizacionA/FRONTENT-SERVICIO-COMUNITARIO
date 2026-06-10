@@ -5,7 +5,8 @@ const { verifyToken, requireRole } = require('../middleware/auth');
 const { validate } = require('../middleware/validation');
 const { habitanteCreateSchema, habitanteUpdateSchema, idParamSchema, paginationSchema } = require('../utils/validators');
 
-// Endpoint público para búsqueda básica
+// Endpoints públicos (portal web, sin autenticación)
+router.get('/publico/buscar', habitantesController.buscarPublico);
 router.get('/publico/:consejo_id', habitantesController.getPublico);
 
 // Obtener todos los habitantes (con paginación y filtros)

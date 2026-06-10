@@ -1,4 +1,4 @@
-DOCUMENTO TÉCNICO OFICIAL: SISTEMA WEB INFORMATIVO Y DE GESTIÓN COMUNAL (SICAG)
+DOCUMENTO TÉCNICO OFICIAL: SISTEMA DE INFORMACIÓN COMUNAL AGROECOLÓGICA (SICAG)
 Estado Actual, Análisis Detallado de Arquitectura y Plan de Finalización
 📋 RESUMEN EJECUTIVO
 ESTADO GENERAL: ✅ 95% COMPLETADO
@@ -100,5 +100,5 @@ Entregar claves de administrador general (Superusuario).
 Respaldar las variables de entorno de producción (.env).
 Simulacro de creación de una noticia y un proyecto en vivo.
 🏁 CONCLUSIONES FINALES Y RECOMENDACIONES
-El Sistema de Información Comunal de Autogestión (SICAG) es actualmente un producto digital de grado profesional, que cumple al 100% con los requerimientos operativos de una comuna moderna. Se ha logrado separar impecablemente la lógica de negocio del diseño visual, asegurando escalabilidad.
+El Sistema de Información Comunal Agroecológica (SICAG) es actualmente un producto digital de grado profesional, que cumple al 100% con los requerimientos operativos de una comuna moderna. Se ha logrado separar impecablemente la lógica de negocio del diseño visual, asegurando escalabilidad.
 Recomendación Inmediata: El sistema está catalogado como "LISTO PARA USAR" en un entorno real. Se recomienda iniciar el proceso de migración de datos (pasar los cuadernos y planillas físicas de la comuna al sistema digital) mientras el equipo de desarrollo finaliza en paralelo las tareas secundarias de testing automatizado y manuales técnicos.

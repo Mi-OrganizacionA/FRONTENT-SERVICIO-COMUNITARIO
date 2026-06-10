@@ -123,7 +123,7 @@
     /* Branding diferenciado por rol */
     const brandIcon  = isVocero ? 'house-user'  : 'seedling';
     const brandTitle = isVocero ? 'SICAG'        : 'SICAG';
-    const brandSub   = isVocero ? 'Módulo Vocero · Censo'  : 'Panel Administrativo v3.0';
+    const brandSub   = isVocero ? 'Módulo Vocero · Censo'  : 'Panel Administrativo v2.5';
 
     /* Etiqueta de rol para el sidebar */
     const roleBadgeHtml = isVocero
@@ -147,7 +147,7 @@
       ${ccInfoHtml}
       ${sections}
       <div class="sidebar-footer">
-        <small>SICAG v3.0 · Sala de Autogobierno · 2026</small>
+        <small>SICAG v2.5 · Sala de Autogobierno · 2026</small>
       </div>`;
   };
 
@@ -277,6 +277,7 @@
 
   /* ── LÓGICA DEL BOTÓN DE NOTIFICACIONES ── */
   const initNotificationsDropdown = () => {
+<<<<<<< HEAD
     const btn   = document.getElementById('headerNotifBtn');
     const badge = document.getElementById('headerNotifBadge');
 
@@ -311,6 +312,43 @@
           // Si falla el fetch, el badge permanece oculto
           badge.style.display = 'none';
         });
+=======
+    const btn = document.getElementById('headerNotifBtn');
+    const dropdown = document.getElementById('headerNotifDropdown');
+    const badge = document.getElementById('headerNotifBadge');
+    
+    if (!btn) return;
+
+    // Eliminar el dropdown de la interfaz, ya que solo redirigirá
+    if (dropdown) {
+      dropdown.style.display = 'none';
+    }
+
+    // Al hacer clic, redirigir directamente
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.href = 'notificaciones.html';
+    });
+    
+    // Initial fetch to set the badge count
+    if (window.api && badge) {
+      window.api.getNotificaciones().then(notifs => {
+        const count = notifs.length;
+        if (count > 0) {
+          badge.textContent = count;
+          badge.style.display = 'block';
+          
+          const mItem = document.querySelector('.mobile-menu-item[href="notificaciones.html"]');
+          if (mItem && !mItem.innerHTML.includes('mobile-badge')) {
+            mItem.innerHTML += `<span class="mobile-badge">${count > 99 ? '99+' : count}</span>`;
+          }
+        } else {
+          badge.style.display = 'none';
+        }
+      }).catch(err => {
+        console.error('Error al obtener notificaciones para el badge', err);
+      });
+>>>>>>> 3d21877adb989fa9194122013016d8119f9a9635
     }
   };
 
@@ -796,7 +834,18 @@
 
           let dbResults = [];
           if (window.api && typeof window.api.globalSearch === 'function') {
-            dbResults = await window.api.globalSearch(q).catch(() => []);
+            try {
+              dbResults = await window.api.globalSearch(q);
+            } catch (searchErr) {
+              if (searchErr.message === 'NO_TOKEN' || searchErr.message === 'TOKEN_EXPIRED') {
+                dropdown.innerHTML = '<div class="search-empty text-danger"><i class="fas fa-lock"></i> Sesión expirada. <a href="login.html">Iniciar sesión</a></div>';
+                return;
+              }
+              dbResults = [];
+            }
+          } else if (!localStorage.getItem('token')) {
+            dropdown.innerHTML = '<div class="search-empty text-warning"><i class="fas fa-lock"></i> Inicie sesión para buscar registros</div>';
+            return;
           }
 
           const combined = [...localMatches, ...dbResults];

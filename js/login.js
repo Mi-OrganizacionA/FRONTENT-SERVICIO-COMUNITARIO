@@ -1,5 +1,5 @@
 /* ============================================================
-   SICAG v5.0 — Login Refactorizado (Usa AuthManager)
+   SICAG v2.5 — Login Refactorizado (Usa AuthManager)
    Archivo: js/login.js
    ============================================================ */
 

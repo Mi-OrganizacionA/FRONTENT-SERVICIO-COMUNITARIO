@@ -132,15 +132,22 @@ class HabitantesService {
   static async buscar(habitanteModel, termino) {
     try {
       const { Op } = require('sequelize');
+      const cedulaNorm = termino.replace(/[.\s-]/g, '').replace(/^[VE]/i, '');
       const habitantes = await habitanteModel.findAll({
         where: {
+          activo: true,
           [Op.or]: [
+            { cedula: { [Op.like]: `%${cedulaNorm}%` } },
             { cedula: { [Op.like]: `%${termino}%` } },
-            { nombre: { [Op.like]: `%${termino}%` } },
-            { apellido: { [Op.like]: `%${termino}%` } }
-          ],
-          activo: true
+            { nombres: { [Op.like]: `%${termino}%` } },
+            { apellidos: { [Op.like]: `%${termino}%` } }
+          ]
         },
+        include: [{
+          model: habitanteModel.sequelize.models.ConsejoComunal,
+          as: 'consejo',
+          attributes: ['id', 'nombre_comunidad']
+        }],
         limit: 50
       });
       

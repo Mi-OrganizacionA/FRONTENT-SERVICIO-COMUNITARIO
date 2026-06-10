@@ -1,5 +1,5 @@
-﻿/**
- * Componentes reutilizables de SICAG v5.0 y utilidades de interfaz
+/**
+ * Componentes reutilizables de SICAG v2.5 y utilidades de interfaz
  * Archivo: js/components.js
  */
 
@@ -179,7 +179,7 @@ class Components {
 const SICAG = {
   loadComponent: async (targetId, filePath, callback) => {
     // Si quedan referencias viejas
-    console.warn('SICAG.loadComponent is deprecated in v5.0.');
+    console.warn('SICAG.loadComponent is deprecated in v2.5.');
   },
   getSession: () => {
     // Proxy al nuevo auth

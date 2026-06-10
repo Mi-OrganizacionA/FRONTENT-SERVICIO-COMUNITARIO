@@ -187,14 +187,12 @@
             });
         }
       } else {
-        const resP = await fetch('http://localhost:3000/api/proyectos').catch(()=>null);
+        const baseApi = window.api ? window.api.baseURL : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api');
+        const resP = await fetch(`${baseApi}/proyectos/publico`).catch(()=>null);
         if (resP && resP.ok) proyectos = await resP.json();
         
-        const resN = await fetch('http://localhost:3000/api/noticias').catch(()=>null);
+        const resN = await fetch(`${baseApi}/cartelera/publico/activas`).catch(()=>null);
         if (resN && resN.ok) noticias = await resN.json();
-        
-        const resS = await fetch('http://localhost:3000/api/dashboard/stats').catch(()=>null);
-        if (resS && resS.ok) stats = await resS.json();
       }
       
       todasLasNoticias = noticias;
@@ -311,14 +309,19 @@
        }
        
        const fecha = n.fecha_publicacion ? new Date(n.fecha_publicacion).toLocaleDateString() : '';
+       const star = n.destacada ? '<i class="fas fa-star" style="color:#F9A825;margin-right:4px;"></i>' : '';
+       const encuestaBtn = (tipo === 'encuesta' && n.enlace_extra)
+         ? `<a href="${n.enlace_extra}" target="_blank" rel="noopener" class="pub-news-link" style="color:var(--vp);font-weight:600;margin-top:.5rem;display:inline-block;" onclick="event.stopPropagation();"><i class="fas fa-external-link-alt"></i> Participar en la encuesta</a>`
+         : '';
        return `
-         <div class="pub-news-card" style="cursor:pointer;" onclick="abrirModalDetalle(${n.id}, 'noticia')">
+         <div class="pub-news-card" style="cursor:pointer;${n.destacada ? 'border:2px solid #F9A825;' : ''}" onclick="abrirModalDetalle(${n.id}, 'noticia')">
             <div class="pub-news-body" style="display:flex;flex-direction:column;height:100%;">
                <div class="pub-news-tag" style="background:${bgTag};color:${colorTag};align-self:flex-start;">
-                  <i class="fas ${icono}"></i> ${tipo}
+                  ${star}<i class="fas ${icono}"></i> ${tipo}
                </div>
                <h4>${n.titulo || ''}</h4>
                <p style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;flex:1;">${n.contenido || ''}</p>
+               ${encuestaBtn}
                <div class="pub-news-link" style="color:var(--gray4);border-top:1px solid var(--gray3);padding-top:1rem;width:100%;margin-top:1rem;">
                   <i class="fas fa-calendar" style="color:var(--vv);"></i> ${fecha}
                </div>
@@ -331,6 +334,7 @@
     const track = document.getElementById('carouselTrack');
     if (!track) return;
 
+<<<<<<< HEAD
     // Ordenar: las publicaciones destacadas van primero
     const noticiasOrdenadas = [...noticias].sort((a, b) => {
       const aD = (a.destacada === true || a.destacada === 1) ? 1 : 0;
@@ -340,6 +344,14 @@
 
     const activas = noticiasOrdenadas.slice(-5).reverse();
     track.style.justifyContent = 'flex-start';
+=======
+    const hoy = new Date();
+    const activas = noticias
+      .filter(n => !n.fecha_cierre || new Date(n.fecha_cierre) >= hoy)
+      .sort((a, b) => (b.destacada ? 1 : 0) - (a.destacada ? 1 : 0))
+      .slice(0, 5);
+    track.style.justifyContent = 'flex-start'; // Reset justify si habian
+>>>>>>> 3d21877adb989fa9194122013016d8119f9a9635
     track.style.gap = '24px';
     
     let html = activas.map(n => generarHtmlNoticia(n)).join('');
@@ -405,7 +417,15 @@
         <div class="pub-modal-info-item"><label>Fecha</label><span><i class="fas fa-calendar"></i> ${fecha}</span></div>
         <div class="pub-modal-info-item" style="grid-column: 1 / -1;"><label>Autor</label><span>${item.autor || 'Sistema SICAG'}</span></div>
       `;
-      descEl.innerHTML = (item.contenido || '').replace(/\n/g, '<br>');
+      let descHtml = (item.contenido || '').replace(/\n/g, '<br>');
+      if (item.tipo_publicacion === 'encuesta' && item.enlace_extra) {
+        descHtml += `<p style="margin-top:1rem;"><a href="${item.enlace_extra}" target="_blank" rel="noopener" style="color:var(--vp);font-weight:600;"><i class="fas fa-external-link-alt"></i> Participar en la encuesta</a></p>`;
+      }
+      if (item.fecha_cierre) {
+        const cierre = new Date(item.fecha_cierre).toLocaleDateString();
+        infoEl.innerHTML += `<div class="pub-modal-info-item"><label>Cierre</label><span><i class="fas fa-hourglass-end"></i> ${cierre}</span></div>`;
+      }
+      descEl.innerHTML = descHtml;
     }
 
     modalDetalleOverlay.setAttribute('aria-hidden', 'false');
@@ -583,6 +603,7 @@
 
          // Intentar API pública del backend primero (no requiere token)
          try {
+<<<<<<< HEAD
            const baseUrl = (window.api && window.api.baseURL) || 'https://sicag-api.onrender.com/api';
            const res = await fetch(`${baseUrl}/habitantes/publico/buscar?cedula=${encodeURIComponent(soloNumeros)}`);
            if (res.ok) {
@@ -592,6 +613,31 @@
            }
          } catch (_) {
            // Si no hay endpoint público específico, fallback al endpoint general
+=======
+            let habs = [];
+            if (window.api && window.api.buscarHabitantesPublico) {
+              habs = await window.api.buscarHabitantesPublico(q);
+            } else {
+              const baseApi = window.api ? window.api.baseURL : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api');
+              const res = await fetch(`${baseApi}/habitantes/publico/buscar?q=${encodeURIComponent(q)}`).catch(()=>null);
+              if (res && res.ok) habs = await res.json();
+            }
+            
+            const qNorm = q.replace(/[.\s-]/g,'').replace(/^[ve]/i,'');
+            const match = habs.find(h => 
+               (h.cedula && h.cedula.toString().replace(/[.\s-]/g,'') === qNorm) || 
+               (h.nombres && h.nombres.toLowerCase().includes(q)) ||
+               (`${h.nombres} ${h.apellidos||''}`.toLowerCase().includes(q))
+            ) || habs[0];
+            
+            if (match) {
+               alert(`✅ HABITANTE ENCONTRADO:\n\nNombre: ${match.nombres} ${match.apellidos || ''}\nC.I.: V-${match.cedula}\nConsejo Comunal: ${match.consejo ? match.consejo.nombre_comunidad : 'Registrado'}\nEstatus: Censado(a) correctamente en la plataforma SICAG.`);
+            } else {
+               alert(`❌ NO ENCONTRADO:\nNo se hallaron coincidencias para "${q}". Verifica el número de cédula o el nombre.`);
+            }
+         } catch(e) {
+            alert('Error de conexión al consultar habitante.');
+>>>>>>> 3d21877adb989fa9194122013016d8119f9a9635
          }
 
          // Fallback: usar window.api.getHabitantes si el anterior no dio resultado

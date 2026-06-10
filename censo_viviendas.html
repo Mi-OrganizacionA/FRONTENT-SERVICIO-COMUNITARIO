@@ -1498,6 +1498,12 @@
                 </div>
               </div>
 
+              <div class="cv-form-row" style="margin-bottom:.75rem;">
+                <label style="font-size:0.85rem;cursor:pointer;display:flex;align-items:center;gap:8px;">
+                  <input type="checkbox" id="chkEncuestadoEsJefe">
+                  ¿El encuestado es el jefe(a) de familia? (se completará automáticamente en el Paso 3)
+                </label>
+              </div>
               <div class="cv-form-row cv-grid-2">
                 <div class="cv-form-group">
                   <label for="encuestadoNombre">Nombre del Encuestado <span class="req">*</span></label>
@@ -2474,6 +2480,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/masks.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/layout-menu.js"></script>
   <script src="js/roles.js"></script>
 
@@ -2522,7 +2529,7 @@
         });
 
         // Disparar changes para lógica encadenada
-        const triggers = ['gasDomestico', 'jefIncapacitado'];
+        const triggers = ['chkPlanillaAuto', 'chkFechaAuto', 'chkEncuestadoEsJefe', 'gasDomestico', 'jefIncapacitado'];
         triggers.forEach(id => {
           const el = document.getElementById(id);
           if (el) el.dispatchEvent(new Event('change'));
@@ -2553,7 +2560,7 @@
           valid = false;
           el.style.borderColor = '#EF5350';
           el.style.boxShadow = '0 0 0 3px rgba(239,83,80,.15)';
-          errors.push(el.labels?.[0]?.textContent?.replace(' *','') || id);
+          errors.push(el.labels?.[0]?.textContent?.replace(' *','') || el.id);
           // Auto-reset border on change
           el.addEventListener('change', () => {
             el.style.borderColor = '';
@@ -2824,17 +2831,6 @@
     });
 
     // Guardado manual al avanzar de paso ya se maneja en btnNext.click
-
-    // Limpiar al guardar exitosamente
-    document.getElementById('formVivienda').addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (!validateCurrentPanel()) return;
-      // Simulamos que guardó
-      clearDraft();
-      showToast('Censo de Vivienda guardado exitosamente', 'success');
-      const mod = bootstrap.Modal.getInstance(document.getElementById('modalVivienda'));
-      if (mod) mod.hide();
-    });
 
     /* ── Gas cylinders toggle ── */
     document.getElementById('gasDomestico').addEventListener('change', function () {
@@ -3246,62 +3242,112 @@
     }
 
     /* ── Controles Automáticos ── */
-    document.getElementById('chkPlanillaAuto').addEventListener('change', function() {
-      const input = document.getElementById('planillaNro');
-      if (this.checked) {
-        input.readOnly = true;
+    function setAutoFieldState(input, isAuto, autoValue) {
+      if (!input) return;
+      if (isAuto) {
+        input.setAttribute('readonly', 'readonly');
         input.style.backgroundColor = 'var(--gray1)';
         input.style.fontWeight = '700';
         input.style.color = 'var(--vp)';
         input.style.borderStyle = 'dashed';
-        input.value = 'VIV-' + String(Math.floor(Math.random() * 100000)).padStart(5, '0');
+        input.style.pointerEvents = 'none';
+        if (autoValue !== undefined) input.value = autoValue;
       } else {
+        input.removeAttribute('readonly');
         input.readOnly = false;
         input.style.backgroundColor = '';
         input.style.fontWeight = '';
         input.style.color = '';
         input.style.borderStyle = '';
-        input.value = '';
+        input.style.pointerEvents = '';
+        if (input.type === 'date') input.removeAttribute('disabled');
         input.focus();
+      }
+    }
+
+    function initEncuestadorAuto() {
+      const user = window.auth?.getUser();
+      if (!user) return;
+      const nom = document.getElementById('encuestadorNombre');
+      const ced = document.getElementById('encuestadorCedula');
+      if (nom && !nom.value) {
+        nom.value = user.nombre || '';
+        nom.readOnly = true;
+      }
+      if (ced && !ced.value) {
+        ced.value = user.cedula || user.documento || '';
+        ced.readOnly = true;
+      }
+    }
+
+    function syncEncuestadoDesdeJefe() {
+      if (!document.getElementById('chkEncuestadoEsJefe')?.checked) return;
+      const nombres = document.getElementById('jefNombres')?.value || '';
+      const apellidos = document.getElementById('jefApellidos')?.value || '';
+      const cedula = document.getElementById('cedulaJefe')?.value || '';
+      const nomEnc = document.getElementById('encuestadoNombre');
+      const cedEnc = document.getElementById('encuestadoCedula');
+      if (nomEnc) nomEnc.value = `${nombres} ${apellidos}`.trim();
+      if (cedEnc) cedEnc.value = cedula;
+    }
+
+    document.getElementById('chkPlanillaAuto').addEventListener('change', function() {
+      const input = document.getElementById('planillaNro');
+      if (this.checked) {
+        setAutoFieldState(input, true, 'VIV-' + String(Math.floor(Math.random() * 100000)).padStart(5, '0'));
+      } else {
+        setAutoFieldState(input, false);
+        input.value = '';
       }
     });
 
     document.getElementById('chkFechaAuto').addEventListener('change', function() {
       const input = document.getElementById('fechaCenso');
       if (this.checked) {
-        input.readOnly = true;
-        input.style.backgroundColor = 'var(--gray1)';
-        input.style.fontWeight = '700';
-        input.style.color = 'var(--vp)';
-        input.style.borderStyle = 'dashed';
-        input.value = new Date().toISOString().split('T')[0];
+        setAutoFieldState(input, true, new Date().toISOString().split('T')[0]);
       } else {
-        input.readOnly = false;
-        input.style.backgroundColor = '';
-        input.style.fontWeight = '';
-        input.style.color = '';
-        input.style.borderStyle = '';
+        setAutoFieldState(input, false);
       }
+    });
+
+    document.getElementById('chkEncuestadoEsJefe')?.addEventListener('change', function() {
+      const nomEnc = document.getElementById('encuestadoNombre');
+      const cedEnc = document.getElementById('encuestadoCedula');
+      if (this.checked) {
+        syncEncuestadoDesdeJefe();
+        if (nomEnc) nomEnc.readOnly = true;
+        if (cedEnc) cedEnc.readOnly = true;
+      } else {
+        if (nomEnc) { nomEnc.readOnly = false; nomEnc.value = ''; }
+        if (cedEnc) { cedEnc.readOnly = false; cedEnc.value = ''; }
+      }
+    });
+
+    ['cedulaJefe', 'jefNombres', 'jefApellidos'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', syncEncuestadoDesdeJefe);
     });
 
     /* ── Nuevo Registro ── */
     document.getElementById('btnNuevaVivienda').addEventListener('click', () => {
       document.getElementById('formVivienda').reset();
+      window.currentCensoId = null;
       goToStep(1);
       
-      // Restablecer a modo automático
       document.getElementById('chkPlanillaAuto').checked = true;
       document.getElementById('chkPlanillaAuto').dispatchEvent(new Event('change'));
-      
       document.getElementById('chkFechaAuto').checked = true;
       document.getElementById('chkFechaAuto').dispatchEvent(new Event('change'));
+      initEncuestadorAuto();
       
-      // Limpiar errores visuales
       document.querySelectorAll('.cv-form-control').forEach(el => {
         el.style.borderColor = '';
         el.style.boxShadow = '';
       });
     });
+
+    // Inicializar campos automáticos al cargar la página
+    document.getElementById('chkPlanillaAuto').dispatchEvent(new Event('change'));
+    document.getElementById('chkFechaAuto').dispatchEvent(new Event('change'));
 
     /* ── Form submit (paso final) ── */
     document.getElementById('formVivienda').addEventListener('submit', function (e) {

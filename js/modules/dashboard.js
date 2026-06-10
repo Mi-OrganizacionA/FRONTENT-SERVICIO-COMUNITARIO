@@ -1,5 +1,5 @@
 /**
- * Módulo de Dashboard (SICAG v5.0)
+ * Módulo de Dashboard (SICAG v2.5)
  * Archivo: js/dashboard.js
  */
 

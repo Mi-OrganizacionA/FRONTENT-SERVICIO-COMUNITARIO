@@ -61,21 +61,20 @@ class HabitanteAutocomplete {
 
       setStatus('loading');
       try {
+        const baseURL = window.api?.baseURL || 'https://sicag-api.onrender.com/api';
         const token = localStorage.getItem('token') || '';
-        // La API puede ser /api/habitantes/buscar/:cedula o usar query ?cedula=
-        // Asumiendo la ruta estándar de REST: GET /api/habitantes?cedula=XXX
-        const res = await fetch(`http://localhost:3000/api/habitantes?cedula=${cedula}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+        const res = await fetch(`${baseURL}/habitantes/buscar/rapido?q=${encodeURIComponent(cedula)}`, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
         });
 
         if (!res.ok) throw new Error('Error al consultar');
 
         const json = await res.json();
-        // El controller devuelve array. Filtramos exactamente
         let habitante = null;
-        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-          // Algunos endpoints permiten array, otros retornan exacto. Tomamos el primero
-          habitante = json.data.find(h => h.cedula.includes(cedula));
+        const lista = Array.isArray(json) ? json : (json.habitantes || json.data || []);
+        if (lista.length > 0) {
+          const cedNorm = cedula.replace(/[.\s-]/g, '').replace(/^[VE]/i, '');
+          habitante = lista.find(h => String(h.cedula).replace(/[.\s-]/g,'') === cedNorm) || lista[0];
         }
 
         if (habitante) {

@@ -1,5 +1,5 @@
-﻿/**
- * Sistema centralizado de validación (SICAG v5.0)
+/**
+ * Sistema centralizado de validación (SICAG v2.5)
  * Archivo: js/validators.js
  */
 

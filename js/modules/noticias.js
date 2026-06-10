@@ -1,5 +1,5 @@
 /**
- * Módulo de Cartelera Digital (Noticias) - SICAG v5.0
+ * Módulo de Cartelera Digital (Noticias) - SICAG v2.5
  * Archivo: js/modules/noticias.js
  */
 
@@ -22,6 +22,13 @@ class NoticiasController {
   }
 
   _setupUI() {
+    const autorInput = document.getElementById('notAutor');
+    const user = window.auth?.getUser();
+    if (autorInput && user?.nombre) {
+      autorInput.value = user.nombre;
+      autorInput.readOnly = true;
+    }
+
     const tipoSelect = document.getElementById('notTipo');
     if (tipoSelect) {
       tipoSelect.addEventListener('change', () => this.handleTipoNoticia());
@@ -52,20 +59,14 @@ class NoticiasController {
   async cargarDatos() {
     try {
       this.noticias = await window.api.getNoticias();
-      this.renderNoticias();
-      this.actualizarKPICards();
+      if (!this.noticias || !Array.isArray(this.noticias)) this.noticias = [];
     } catch (e) {
-      console.error(e);
-      // Fallback si la base de datos está vacía o hay error (para que la pantalla no quede en blanco visualmente si es la primera vez)
-      if (this.noticias.length === 0) {
-        this.noticias = [
-          { id: 1, tipo_publicacion: 'noticia', titulo: 'Jornada de Vacunación', contenido: 'Se realizará vacunación en la casa comunal.', fecha_publicacion: '2026-05-15T00:00:00.000Z' },
-          { id: 2, tipo_publicacion: 'convocatoria', titulo: 'Asamblea de Ciudadanos', contenido: 'Discusión de nuevos proyectos.', fecha_publicacion: '2026-05-20T00:00:00.000Z' }
-        ];
-        this.renderNoticias();
-      }
+      console.error('Error cargando noticias:', e);
+      this.noticias = [];
     }
-    
+    this.renderNoticias();
+    this._renderDestacadas();
+    this.actualizarKPICards();
     this.actualizarContador();
   }
 
@@ -84,6 +85,24 @@ class NoticiasController {
     if (elNot) elNot.textContent = nNoticias;
     if (elConv) elConv.textContent = nConv;
     if (elAvi) elAvi.textContent = nAvisos;
+  }
+
+  _renderDestacadas() {
+    const container = document.getElementById('featuredPubContainer');
+    if (!container) return;
+    const destacadas = this.noticias.filter(n => n.destacada && n.activo !== false);
+    if (!destacadas.length) {
+      container.style.display = 'none';
+      container.innerHTML = '';
+      return;
+    }
+    container.style.display = 'block';
+    container.innerHTML = `
+      <div class="feat-pub-banner">
+        <i class="fas fa-star"></i>
+        <strong>Destacadas:</strong>
+        ${destacadas.map(n => `<span class="feat-pub">${n.titulo}</span>`).join('')}
+      </div>`;
   }
 
   renderNoticias() {
@@ -126,13 +145,18 @@ class NoticiasController {
       card.dataset.id = n.id || n.id_publicacion;
       card.dataset.type = tipo;
 
+      const star = n.destacada ? '<i class="fas fa-star pub-star" title="Destacada"></i>' : '';
       card.innerHTML = `
         <div class="pub-card-bar bar-${tipo === 'aviso' ? 'aviso' : tipo}"></div>
         <div class="pub-card-body">
           <div class="pub-card-top">
             <span class="pub-badge badge-${cssClass}"><i class="fas ${icono}"></i> ${tipo.toUpperCase()}</span>
             <div class="pub-top-right">
+<<<<<<< HEAD
               ${esDestacada ? '<span style="font-size:.72rem;font-weight:700;color:var(--au);"><i class="fas fa-star"></i> Destacada</span>' : ''}
+=======
+              ${star}
+>>>>>>> 3d21877adb989fa9194122013016d8119f9a9635
               <span class="pub-status-dot"><i class="fas fa-check-circle"></i> Activa</span>
             </div>
           </div>
@@ -177,7 +201,14 @@ class NoticiasController {
         if (desc) desc.value = n.contenido || '';
         if (fecha && n.fecha_publicacion) fecha.value = n.fecha_publicacion.split('T')[0];
         if (autor) autor.value = n.autor || 'Sala de Autogobierno';
+        const extra = document.getElementById('notExtra');
+        const cierre = document.getElementById('notCierre');
+        const destacada = document.getElementById('notDestacada');
+        if (extra) extra.value = n.enlace_extra || '';
+        if (cierre && n.fecha_cierre) cierre.value = n.fecha_cierre.split('T')[0];
+        if (destacada) destacada.checked = !!n.destacada;
         this.handleTipoNoticia();
+        this._renderDestacadas();
       }
     } else {
       title.innerHTML = '<i class="fas fa-plus-circle" style="color:var(--vv)"></i> Nueva Publicación';
@@ -186,6 +217,7 @@ class NoticiasController {
 
       // Autor automático: se autocompleta con el nombre del usuario autenticado (no editable)
       const autorInput = document.getElementById('notAutor');
+<<<<<<< HEAD
       if (autorInput) {
         const nombreUsuario = window.auth?.getUser()?.nombre || 'Sala de Autogobierno';
         autorInput.value = nombreUsuario;
@@ -194,6 +226,16 @@ class NoticiasController {
         autorInput.style.cursor = 'not-allowed';
       }
 
+=======
+      const user = window.auth?.getUser();
+      if (autorInput) {
+        autorInput.value = user?.nombre || 'Sala de Autogobierno';
+        autorInput.readOnly = true;
+      }
+      const destacada = document.getElementById('notDestacada');
+      if (destacada) destacada.checked = false;
+      
+>>>>>>> 3d21877adb989fa9194122013016d8119f9a9635
       const tipoInput = document.getElementById('notTipo');
       if (tipoInput) tipoInput.value = tipo;
       this.handleTipoNoticia();
@@ -234,12 +276,19 @@ class NoticiasController {
       titulo: titulo,
       tipo_publicacion: tipo,
       contenido: desc,
+<<<<<<< HEAD
       autor: document.getElementById('notAutor')?.value.trim() || 'Sala de Autogobierno',
       fecha_publicacion: document.getElementById('notFecha')?.value || new Date().toISOString(),
       // Incluir enlace de encuesta si aplica (campo 'extra' del formulario)
       enlace_encuesta: tipo === 'encuesta' ? (extra || '') : undefined,
       // Incluir lugar/horario si es convocatoria
       lugar_horario: tipo === 'convocatoria' ? (extra || '') : undefined
+=======
+      enlace_extra: extra || null,
+      fecha_cierre: document.getElementById('notCierre')?.value || null,
+      destacada: document.getElementById('notDestacada')?.checked || false,
+      fecha_publicacion: document.getElementById('notFecha')?.value || new Date().toISOString()
+>>>>>>> 3d21877adb989fa9194122013016d8119f9a9635
     };
 
     try {

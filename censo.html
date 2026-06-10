@@ -25,6 +25,10 @@
       --tr:.25s cubic-bezier(.4,0,.2,1); --r-sm:10px; --r-md:16px; --r-lg:22px;
       --sh-v:0 12px 40px rgba(46,125,50,.22);
     }
+    tr.row-highlight{background:#FFF9C4 !important;box-shadow:inset 0 0 0 2px var(--au);transition:background .3s;}
+    .table-actions .btn-action{width:34px;height:34px;border-radius:8px;border:1px solid var(--gray3);background:#fff;color:var(--vp);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--tr);}
+    .table-actions .btn-action:hover{background:var(--vbg);border-color:var(--vv);}
+    .table-actions .btn-action.delete{color:var(--ru);}
     .cv-modal .modal-content{border-radius:var(--r-lg);border:none;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.18);}
     #modalCenso .modal-content,#modalEliminarHab .modal-content{max-height:90vh;display:flex;flex-direction:column;}
     #formCenso{display:flex;flex-direction:column;flex:1;overflow:hidden;}
@@ -497,7 +501,31 @@
     current = step;
   }
 
-  window.habNext = function() { if (current < TOTAL) goTo(current + 1); };
+  function validateHabPanel(step) {
+    const panel = document.getElementById('hab-panel' + step);
+    if (!panel) return true;
+    let valid = true;
+    const errors = [];
+    panel.querySelectorAll('input[required], select[required], textarea[required]').forEach(function(field) {
+      const val = field.type === 'checkbox' ? field.checked : (field.value || '').trim();
+      if (!val) {
+        valid = false;
+        field.style.borderColor = '#C62828';
+        errors.push(field.labels?.[0]?.textContent?.replace(' *','') || field.id);
+      } else {
+        field.style.borderColor = '';
+      }
+    });
+    if (!valid && window.Components) {
+      Components.showToast('Complete los campos obligatorios: ' + errors.slice(0,3).join(', '), 'warning');
+    }
+    return valid;
+  }
+
+  window.habNext = function() {
+    if (!validateHabPanel(current)) return;
+    if (current < TOTAL) goTo(current + 1);
+  };
   window.habPrev = function() { if (current > 1) goTo(current - 1); };
   window.navigateToHabStep = function(step) { goTo(step); };
 
@@ -506,16 +534,17 @@
   });
 
   window.abrirModalCenso = function(id) {
+    if (id && window.censoCtrl && typeof window.censoCtrl.editarHabitante === 'function') {
+      window.censoCtrl.editarHabitante(id);
+      return;
+    }
     var modalEl = document.getElementById('modalCenso');
     if (!modalEl) return;
     var title = document.getElementById('modalCensoTitle');
-    if (id) {
-      if (title) title.textContent = 'Editar Habitante #' + id;
-    } else {
-      if (title) title.textContent = 'Registro de Habitante';
-      var form = document.getElementById('formCenso');
-      if (form) form.reset();
-    }
+    if (window.censoCtrl) window.censoCtrl.editingId = null;
+    if (title) title.textContent = 'Registro de Habitante';
+    var form = document.getElementById('formCenso');
+    if (form) form.reset();
     goTo(1);
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
   };
@@ -560,8 +589,9 @@
     else if (age <= 11) clasificacion = 'niño';
     else if (age >= 60) clasificacion = 'adulto_mayor';
 
+    var cedulaVal = document.getElementById('habCedula').value.trim().replace(/[.\s-]/g, '').replace(/^[VE]/i, '');
     var data = {
-      cedula: document.getElementById('habCedula').value.trim(),
+      cedula: cedulaVal,
       nombres: nombres,
       apellidos: apellidos,
       fecha_nacimiento: fechaNac,
@@ -570,19 +600,24 @@
       email: document.getElementById('habEmail').value.trim(),
       consejo_comunal_id: parseInt(document.getElementById('habCC').value),
       direccion: document.getElementById('habDireccion').value.trim(),
-      clasificacion: clasificacion,
-      elector: age >= 18,
-      foto_cedula_url: '',
-      centro_electoral: ''
+      condicion_salud: condicionSalud || 'saludable',
+      tiene_cedula_ampliada: document.getElementById('tieneCedulaAmpliada')?.checked || false
     };
 
     try {
-      var title = document.getElementById('modalCensoTitle');
-      var isEditing = title && title.textContent.includes('Editar');
-      var habIdMatch = isEditing ? title.textContent.match(/#(\d+)/) : null;
-      var habId = habIdMatch ? parseInt(habIdMatch[1]) : null;
+      var habId = window.censoCtrl?.editingId || null;
+      if (!habId) {
+        var duplicado = window.censoCtrl?.habitantes?.find(function(h) {
+          return String(h.cedula).replace(/[.\s-]/g,'') === cedulaVal;
+        });
+        if (duplicado) {
+          if (window.Components) Components.showToast('Esta cédula ya está registrada en el censo.', 'error');
+          else alert('Esta cédula ya está registrada.');
+          return;
+        }
+      }
 
-      if (isEditing && habId) {
+      if (habId) {
         await window.api.actualizarHabitante(habId, data);
         if (window.Components) Components.showToast('Habitante actualizado correctamente.', 'success');
       } else {
@@ -602,7 +637,9 @@
       }
     } catch(err) {
       console.error(err);
-      if (window.Components) Components.showToast('Error al guardar habitante.', 'error');
+      var msg = err.message && err.message.includes('Cédula') ? err.message : 'Error al guardar habitante.';
+      if (window.Components) Components.showToast(msg, 'error');
+      else alert(msg);
     }
   };
 
@@ -658,16 +695,13 @@
   const viewHabitanteId = urlParams.get('viewHabitante');
   if (viewHabitanteId) {
     setTimeout(() => {
-      // Necesitamos cargar el habitante y abrir el modal.
-      // Actualmente censoCtrl hace la carga, y si abrirModalCenso recibe id, dice "Editar Habitante #id"
-      if (typeof window.abrirModalCenso === 'function') {
-        window.abrirModalCenso(viewHabitanteId);
-        // Si usamos censoCtrl para auto-llenar los datos:
-        if (window.censoCtrl && typeof window.censoCtrl.editarHabitante === 'function') {
-           window.censoCtrl.editarHabitante(viewHabitanteId);
+      if (window.censoCtrl) {
+        window.censoCtrl.renderTabla(viewHabitanteId);
+        if (typeof window.censoCtrl.editarHabitante === 'function') {
+          window.censoCtrl.editarHabitante(viewHabitanteId);
         }
       }
-    }, 600);
+    }, 800);
   }
 })();
 </script>

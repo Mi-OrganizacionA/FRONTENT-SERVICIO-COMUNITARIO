@@ -1,5 +1,5 @@
 /**
- * Módulo de Autenticación Centralizado (SICAG v5.0)
+ * Módulo de Autenticación Centralizado (SICAG v2.5)
  * Gestiona tokens JWT (simulados), roles y permisos.
  */
 class AuthManager {
@@ -56,7 +56,16 @@ class AuthManager {
   // VERIFICACIÓN Y PERMISOS
   // ─────────────────────────────────────────
   isAuthenticated() {
-    return !!this.token && !!this.user;
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    if (token && user) {
+      this.token = token;
+      this.user = this._parseUser(user);
+      return true;
+    }
+    this.token = null;
+    this.user = null;
+    return false;
   }
 
   hasRole(role) {
