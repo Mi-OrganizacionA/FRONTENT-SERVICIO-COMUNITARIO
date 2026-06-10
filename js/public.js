@@ -4,6 +4,37 @@
 (function () {
   'use strict';
 
+  // ==========================================
+  // INTERACTIVIDAD CARTOGRAFÍA (IFRAME)
+  // ==========================================
+  document.addEventListener('DOMContentLoaded', () => {
+    const mapTriggers = document.querySelectorAll('[data-map-target]');
+    const iframe = document.getElementById('mapaIframe');
+
+    mapTriggers.forEach(trigger => {
+      trigger.addEventListener('click', (e) => {
+        // Si es un enlace del footer y hace salto a #mapa, dejamos que ocurra normalmente
+        // pero igual enviamos el postMessage
+        const targetName = trigger.getAttribute('data-map-target');
+        
+        // Enviamos el mensaje al iframe
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.postMessage({
+            action: 'highlightCommunity',
+            community: targetName
+          }, '*');
+        }
+
+        // Añadir una pequeña animación visual en index.html si no es footer
+        if (!trigger.classList.contains('footer-map-link')) {
+          mapTriggers.forEach(t => t.style.background = '');
+          trigger.style.background = 'rgba(46, 125, 50, 0.15)';
+          trigger.style.borderRadius = '8px';
+        }
+      });
+    });
+  });
+
   /* ── NAV SCROLL ── */
   const nav = document.getElementById('pubNav');
   window.addEventListener('scroll', () => {

@@ -286,7 +286,7 @@
             <div class="cc-dot" style="background:rgba(21,101,192,.1);color:var(--az);"><i class="fas fa-flag"></i>
             </div>
             <div>
-              <strong>C.C. Mercedes I</strong>
+              <strong>C.C. Las Mercedes I</strong>
               <span>Zona central-sur · 145 familias · Café</span>
             </div>
           </div>
@@ -294,7 +294,7 @@
             <div class="cc-dot" style="background:rgba(21,101,192,.1);color:var(--az);"><i class="fas fa-flag"></i>
             </div>
             <div>
-              <strong>C.C. Mercedes II</strong>
+              <strong>C.C. Las Mercedes II</strong>
               <span>Zona sur · 130 familias · Yuca y tubérculos</span>
             </div>
           </div>
@@ -355,8 +355,8 @@
       { lat: 10.360, lng: -68.722, nombre: 'C.C. Jobito II', hab: 170, color: '#388E3C', cultivo: 'Maíz' },
       { lat: 10.345, lng: -68.728, nombre: 'C.C. Brisas del Yurubí', hab: 210, color: '#F9A825', cultivo: 'Cacao y frutales' },
       { lat: 10.352, lng: -68.733, nombre: 'C.C. Andrés Eloy Blanco', hab: 160, color: '#FF8C00', cultivo: 'Hortalizas' },
-      { lat: 10.347, lng: -68.738, nombre: 'C.C. Mercedes I', hab: 145, color: '#1565C0', cultivo: 'Café' },
-      { lat: 10.350, lng: -68.742, nombre: 'C.C. Mercedes II', hab: 130, color: '#1976D2', cultivo: 'Yuca y tubérculos' },
+      { lat: 10.347, lng: -68.738, nombre: 'C.C. Las Mercedes I', hab: 145, color: '#1565C0', cultivo: 'Café' },
+      { lat: 10.350, lng: -68.742, nombre: 'C.C. Las Mercedes II', hab: 130, color: '#1976D2', cultivo: 'Yuca y tubérculos' },
       { lat: 10.340, lng: -68.745, nombre: 'C.C. Santa Cruz de las Mercedes', hab: 140, color: '#C62828', cultivo: 'Ganadería menor' },
       { lat: 10.362, lng: -68.726, nombre: 'C.C. Fortaleza del Corozo', hab: 110, color: '#43A047', cultivo: 'Maíz colectivo' },
       { lat: 10.335, lng: -68.750, nombre: 'C.C. Vencedores del Corozo', hab: 95, color: '#66BB6A', cultivo: 'Café de altura' },
@@ -396,6 +396,62 @@
         document.querySelectorAll('.map-filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
       });
+    });
+
+    // Guardar referencia a los markers para abrirlos externamente
+    const ccMarkers = {};
+    ccLayer.eachLayer(layer => {
+      // Intentamos extraer el nombre del popup
+      const popupContent = layer.getPopup().getContent();
+      consejos.forEach(cc => {
+        if (popupContent.includes(cc.nombre)) {
+          ccMarkers[cc.nombre] = layer;
+        }
+      });
+    });
+
+    let currentHighlight = null;
+
+    // Escuchar mensajes desde index.html
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.action === 'highlightCommunity') {
+        const targetName = event.data.community;
+        const targetMarker = ccMarkers[targetName];
+        
+        if (targetMarker) {
+          // Centrar el mapa en la comunidad
+          map.setView(targetMarker.getLatLng(), 15);
+          // Abrir popup
+          targetMarker.openPopup();
+
+          // Eliminar el resaltado anterior
+          if (currentHighlight) {
+            map.removeLayer(currentHighlight);
+          }
+
+          // Crear un polígono representativo (un círculo) mientras no haya coordenadas exactas
+          // El color lo tomamos de la info del consejo
+          const ccInfo = consejos.find(c => c.nombre === targetName);
+          if (ccInfo) {
+            currentHighlight = L.circle(targetMarker.getLatLng(), {
+              color: ccInfo.color,
+              fillColor: ccInfo.color,
+              fillOpacity: 0.3,
+              radius: 400 // Radio en metros para abarcar la zona aproximadamente
+            }).addTo(map);
+
+            // Hacer un pequeño efecto pulsante
+            currentHighlight.getElement()?.animate([
+              { fillOpacity: 0.2 },
+              { fillOpacity: 0.5 },
+              { fillOpacity: 0.2 }
+            ], {
+              duration: 1500,
+              iterations: 3
+            });
+          }
+        }
+      }
     });
 
     // Populate KPIs using API

@@ -216,7 +216,7 @@
         <div class="pub-hab-card fade-up fade-up-d2" aria-label="Mi consejo comunal">
           <div class="pub-hab-icon amarillo"><i class="fas fa-house-chimney"></i></div>
           <h3>Mi Consejo Comunal</h3>
-          <p>Jobito I/II · Brisas del Yurubí · Andrés Eloy Blanco · Mercedes I/II y más.</p>
+          <p>Jobito I/II · Brisas del Yurubí · Andrés Eloy Blanco · Las Mercedes I/II y más.</p>
         </div>
         <div class="pub-hab-card fade-up fade-up-d3" aria-label="Estadísticas demográficas">
           <div class="pub-hab-icon azul"><i class="fas fa-chart-pie"></i></div>
@@ -334,21 +334,18 @@
       <p class="pub-section-sub fade-up">Explora la ubicación de los 9 consejos comunales. Sector Las Mercedes, San
         Felipe, estado Yaracuy, Venezuela.</p>
       <div class="pub-map-wrap fade-up">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d60000!2d-68.7348!3d10.3472!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses!2sve!4v1"
-          allowfullscreen="" loading="lazy"
-          title="Mapa de la Comuna Simón Rodríguez — Las Mercedes, San Felipe, Yaracuy"></iframe>
+        <iframe id="mapaIframe" src="cartografia.html" class="pub-map-frame" title="Mapa de la Comuna Simón Rodríguez — Las Mercedes, San Felipe, Yaracuy"></iframe>
       </div>
       <div class="pub-cc-list fade-up">
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Jobito I</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Jobito II</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Brisas del Yurubí</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Andrés Eloy Blanco</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Mercedes I</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Mercedes II</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Santa Cruz de las Mercedes</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Fortaleza del Corozo</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Vencedores del Corozo</div>
+        <div class="pub-cc-item" data-map-target="C.C. Jobito I" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Jobito I</div>
+        <div class="pub-cc-item" data-map-target="C.C. Jobito II" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Jobito II</div>
+        <div class="pub-cc-item" data-map-target="C.C. Brisas del Yurubí" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Brisas del Yurubí</div>
+        <div class="pub-cc-item" data-map-target="C.C. Andrés Eloy Blanco" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Andrés Eloy Blanco</div>
+        <div class="pub-cc-item" data-map-target="C.C. Las Mercedes I" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Las Mercedes I</div>
+        <div class="pub-cc-item" data-map-target="C.C. Las Mercedes II" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Las Mercedes II</div>
+        <div class="pub-cc-item" data-map-target="C.C. Santa Cruz de las Mercedes" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Santa Cruz de las Mercedes</div>
+        <div class="pub-cc-item" data-map-target="C.C. Fortaleza del Corozo" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Fortaleza del Corozo</div>
+        <div class="pub-cc-item" data-map-target="C.C. Vencedores del Corozo" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Vencedores del Corozo</div>
       </div>
     </div>
   </section>
@@ -410,8 +407,8 @@
                 <option>C.C. Jobito II</option>
                 <option>C.C. Brisas del Yurubí</option>
                 <option>C.C. Andrés Eloy Blanco</option>
-                <option>C.C. Mercedes I</option>
-                <option>C.C. Mercedes II</option>
+                <option>C.C. Las Mercedes I</option>
+                <option>C.C. Las Mercedes II</option>
                 <option>C.C. Santa Cruz de las Mercedes</option>
                 <option>C.C. Fortaleza del Corozo</option>
                 <option>C.C. Vencedores del Corozo</option>
@@ -460,14 +457,14 @@
       <div>
         <h4>Consejos Comunales</h4>
         <ul>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Jobito I</a></li>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Jobito II</a></li>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Brisas del Yurubí</a></li>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Andrés Eloy Blanco</a></li>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Mercedes I y II</a></li>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Santa Cruz de las Mercedes</a></li>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Fortaleza del Corozo</a></li>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Vencedores del Corozo</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Jobito I"><i class="fas fa-chevron-right"></i> C.C. Jobito I</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Jobito II"><i class="fas fa-chevron-right"></i> C.C. Jobito II</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Brisas del Yurubí"><i class="fas fa-chevron-right"></i> C.C. Brisas del Yurubí</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Andrés Eloy Blanco"><i class="fas fa-chevron-right"></i> C.C. Andrés Eloy Blanco</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Las Mercedes I"><i class="fas fa-chevron-right"></i> C.C. Las Mercedes I y II</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Santa Cruz de las Mercedes"><i class="fas fa-chevron-right"></i> C.C. Santa Cruz de las Mercedes</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Fortaleza del Corozo"><i class="fas fa-chevron-right"></i> C.C. Fortaleza del Corozo</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Vencedores del Corozo"><i class="fas fa-chevron-right"></i> C.C. Vencedores del Corozo</a></li>
         </ul>
       </div>
       <div>
@@ -538,7 +535,7 @@
             <option value="jobito2">C.C. Jobito II</option>
             <option value="brisas">C.C. Brisas del Yurubí</option>
             <option value="aeb">C.C. Andrés Eloy Blanco</option>
-            <option value="mercedes1">C.C. Mercedes I / II</option>
+            <option value="mercedes1">C.C. Las Mercedes I / II</option>
             <option value="santacruz">C.C. Santa Cruz de las Mercedes</option>
             <option value="corozo">C.C. El Corozo</option>
           </select>
@@ -679,4 +676,5 @@
 </body>
 
 </html>
+
 
