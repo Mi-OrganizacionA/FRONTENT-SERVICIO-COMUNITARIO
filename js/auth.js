@@ -125,3 +125,36 @@ if (document.readyState === 'loading') {
 } else {
   checkAuthMiddleware();
 }
+
+// Escuchar cualquier clic en la página para proteger acciones si la sesión se cerró (ej. en otra pestaña)
+document.addEventListener('click', (e) => {
+  const path = window.location.pathname;
+  const isPublicPage = path.includes('login.html') || 
+                       path.includes('index.html') || 
+                       path.includes('consulta_habitantes.html') || 
+                       path.endsWith('/');
+  
+  if (!isPublicPage && !window.auth.isAuthenticated()) {
+    e.preventDefault();
+    e.stopPropagation();
+    alert('Tu sesión ha expirado o fue cerrada desde otra pestaña.');
+    window.location.href = 'login.html';
+  }
+}, true); // Fase de captura para interceptar antes que cualquier otro evento
+
+// Redirigir directamente al dashboard desde index.html si ya está logueado
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.auth.isAuthenticated()) {
+    const loginLinks = document.querySelectorAll('a[href="login.html"]');
+    loginLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'dashboard.html';
+      });
+      // Opcional: Cambiar texto del botón
+      if (link.innerHTML.includes('Acceso Voceros')) {
+        link.innerHTML = '<i class="fas fa-chart-line"></i> Ir al Dashboard';
+      }
+    });
+  }
+});
