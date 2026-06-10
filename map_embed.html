@@ -23,6 +23,25 @@
       maxZoom: 18
     }).addTo(map);
 
+    // Cargar capa GeoJSON de Venezuela
+    fetch('venezuela.geojson')
+      .then(response => response.json())
+      .then(data => {
+        L.geoJSON(data, {
+          style: function (feature) {
+            // Resaltar el estado Yaracuy si existe la propiedad
+            const isYaracuy = feature.properties && feature.properties.name && feature.properties.name.toLowerCase().includes('yaracuy');
+            return {
+              color: isYaracuy ? '#2E7D32' : '#888',
+              weight: isYaracuy ? 2 : 1,
+              fillColor: isYaracuy ? '#43A047' : '#cccccc',
+              fillOpacity: isYaracuy ? 0.1 : 0.05
+            };
+          }
+        }).addTo(map);
+      })
+      .catch(err => console.log('No se pudo cargar el GeoJSON de Venezuela:', err));
+
     function crearIcono(color, icon = 'fa-seedling') {
       return L.divIcon({
         className: '',
