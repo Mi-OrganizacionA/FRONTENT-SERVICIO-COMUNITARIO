@@ -59,21 +59,14 @@ class NoticiasController {
   async cargarDatos() {
     try {
       this.noticias = await window.api.getNoticias();
-      this.renderNoticias();
-      this._renderDestacadas();
-      this.actualizarKPICards();
+      if (!this.noticias || !Array.isArray(this.noticias)) this.noticias = [];
     } catch (e) {
-      console.error(e);
-      // Fallback si la base de datos está vacía o hay error (para que la pantalla no quede en blanco visualmente si es la primera vez)
-      if (this.noticias.length === 0) {
-        this.noticias = [
-          { id: 1, tipo_publicacion: 'noticia', titulo: 'Jornada de Vacunación', contenido: 'Se realizará vacunación en la casa comunal.', fecha_publicacion: '2026-05-15T00:00:00.000Z' },
-          { id: 2, tipo_publicacion: 'convocatoria', titulo: 'Asamblea de Ciudadanos', contenido: 'Discusión de nuevos proyectos.', fecha_publicacion: '2026-05-20T00:00:00.000Z' }
-        ];
-        this.renderNoticias();
-      }
+      console.error('Error cargando noticias:', e);
+      this.noticias = [];
     }
-    
+    this.renderNoticias();
+    this._renderDestacadas();
+    this.actualizarKPICards();
     this.actualizarContador();
   }
 

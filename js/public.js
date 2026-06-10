@@ -187,11 +187,11 @@
             });
         }
       } else {
-        const base = 'https://sicag-api.onrender.com/api';
-        const resP = await fetch(`${base}/proyectos/publico`).catch(()=>null);
+        const baseApi = window.api ? window.api.baseURL : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api');
+        const resP = await fetch(`${baseApi}/proyectos/publico`).catch(()=>null);
         if (resP && resP.ok) proyectos = await resP.json();
         
-        const resN = await fetch(`${base}/cartelera/publico/activas`).catch(()=>null);
+        const resN = await fetch(`${baseApi}/cartelera/publico/activas`).catch(()=>null);
         if (resN && resN.ok) noticias = await resN.json();
       }
       
@@ -563,8 +563,8 @@
             if (window.api && window.api.buscarHabitantesPublico) {
               habs = await window.api.buscarHabitantesPublico(q);
             } else {
-              const base = 'https://sicag-api.onrender.com/api';
-              const res = await fetch(`${base}/habitantes/publico/buscar?q=${encodeURIComponent(q)}`).catch(()=>null);
+              const baseApi = window.api ? window.api.baseURL : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api');
+              const res = await fetch(`${baseApi}/habitantes/publico/buscar?q=${encodeURIComponent(q)}`).catch(()=>null);
               if (res && res.ok) habs = await res.json();
             }
             

@@ -4,9 +4,11 @@
  */
 class APIManager {
   constructor() {
-    this.baseURL = 'https://sicag-api.onrender.com/api'; // URL del backend real en Render (Producción)
+    const host = window.location.hostname;
+    this.isLocal = host === 'localhost' || host === '127.0.0.1';
+    this.baseURL = this.isLocal ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api';
     this.mockData = null;
-    this.isDevelopment = false; // Desactivado para conectar a producción
+    this.isDevelopment = false;
     this.initMockData();
   }
 

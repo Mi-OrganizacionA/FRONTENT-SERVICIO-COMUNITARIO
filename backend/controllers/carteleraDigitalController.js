@@ -10,7 +10,12 @@ class CarteleraDigitalController {
     CarteleraModel = model;
   }
 
+  static getModel() {
+    return CarteleraModel;
+  }
+
   static _mapPublicacion(pub) {
+    if (!pub) return null;
     const data = pub.toJSON ? pub.toJSON() : pub;
     return {
       ...data,
@@ -32,14 +37,15 @@ class CarteleraDigitalController {
 
   static async getActivas(req, res) {
     try {
+      if (!CarteleraModel) return res.status(500).json({ error: 'Modelo no inicializado' });
       const Usuario = CarteleraModel.sequelize?.models?.Usuario;
       const publicaciones = await CarteleraModel.findAll({
-        where: this._whereActivas(),
+        where: CarteleraDigitalController._whereActivas(),
         include: Usuario ? [{ model: Usuario, as: 'autor', attributes: ['id', 'nombre'] }] : [],
         order: [['destacada', 'DESC'], ['fecha_publicacion', 'DESC']],
         limit: 50
       });
-      res.json(publicaciones.map(p => this._mapPublicacion(p)));
+      res.json(publicaciones.map(p => CarteleraDigitalController._mapPublicacion(p)));
     } catch (error) {
       logger.error('Error obteniendo publicaciones activas:', error);
       res.status(500).json({ error: error.message });
@@ -55,12 +61,12 @@ class CarteleraDigitalController {
 
       const Usuario = CarteleraModel.sequelize?.models?.Usuario;
       const publicaciones = await CarteleraModel.findAll({
-        where: { ...this._whereActivas(), tipo_publicacion: tipo },
+        where: { ...CarteleraDigitalController._whereActivas(), tipo_publicacion: tipo },
         include: Usuario ? [{ model: Usuario, as: 'autor', attributes: ['id', 'nombre'] }] : [],
         order: [['fecha_publicacion', 'DESC']],
         limit: 30
       });
-      res.json(publicaciones.map(p => this._mapPublicacion(p)));
+      res.json(publicaciones.map(p => CarteleraDigitalController._mapPublicacion(p)));
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -94,7 +100,7 @@ class CarteleraDigitalController {
 
       res.status(201).json({
         mensaje: 'Publicación creada exitosamente',
-        publicacion: this._mapPublicacion(publicacion)
+        publicacion: CarteleraDigitalController._mapPublicacion(publicacion)
       });
     } catch (error) {
       logger.error('Error creando publicación:', error);
@@ -125,7 +131,7 @@ class CarteleraDigitalController {
 
       res.json({
         mensaje: 'Publicación actualizada',
-        publicacion: this._mapPublicacion(publicacion)
+        publicacion: CarteleraDigitalController._mapPublicacion(publicacion)
       });
     } catch (error) {
       logger.error('Error actualizando publicación:', error);
@@ -157,7 +163,7 @@ class CarteleraDigitalController {
         include: Usuario ? [{ model: Usuario, as: 'autor', attributes: ['id', 'nombre'] }] : []
       });
       if (!publicacion) return res.status(404).json({ error: 'Publicación no encontrada' });
-      res.json(this._mapPublicacion(publicacion));
+      res.json(CarteleraDigitalController._mapPublicacion(publicacion));
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
