@@ -1,5 +1,5 @@
 /**
- * Módulo de Reportes - SICAG v5.0
+ * Módulo de Reportes - SICAG v2.5
  * Archivo: js/modules/reportes.js
  */
 

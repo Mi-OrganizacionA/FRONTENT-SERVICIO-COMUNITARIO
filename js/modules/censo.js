@@ -1,5 +1,5 @@
 /**
- * Modulo de Censo Comunitario (SICAG v5.0)
+ * Modulo de Censo Comunitario (SICAG v2.5)
  * Archivo: js/modules/censo.js
  */
 

@@ -1,6 +1,6 @@
-﻿# Instrucciones y Convenciones del Proyecto SICAG
+# Instrucciones y Convenciones del Proyecto SICAG
 
-Este archivo contiene la arquitectura compartida del equipo, las convenciones de código y los flujos de trabajo específicos para el repositorio **FRONTENT-SERVICIO-COMUNITARIO** (Sistema Comunal de Autogestión - SICAG).
+Este archivo contiene la arquitectura compartida del equipo, las convenciones de código y los flujos de trabajo específicos para el repositorio **FRONTENT-SERVICIO-COMUNITARIO** (Sistema de Información Comunal Agroecológica - SICAG).
 
 ## Excepción a la Regla Global de Idioma (IMPORTANTE)
 

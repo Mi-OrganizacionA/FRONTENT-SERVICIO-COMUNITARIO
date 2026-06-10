@@ -1,6 +1,6 @@
-# SICAG v5.0 - Frontend
+# SICAG v2.5 - Frontend
 
-Sistema Comunal de Autogestión (SICAG) - Módulo Frontend Refactorizado.
+Sistema de Información Comunal Agroecológica (SICAG) - Módulo Frontend Refactorizado.
 
 ## Instalación
 

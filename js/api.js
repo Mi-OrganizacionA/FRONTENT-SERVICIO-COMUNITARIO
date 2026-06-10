@@ -1,5 +1,5 @@
 /**
- * Módulo centralizado de API (SICAG v5.0)
+ * Módulo centralizado de API (SICAG v2.5)
  * Gestiona todas las llamadas a datos (simulado con seed.json local en desarrollo)
  */
 class APIManager {

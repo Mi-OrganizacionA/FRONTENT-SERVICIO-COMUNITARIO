@@ -1,5 +1,5 @@
 /**
- * Módulo de Cartelera Digital (Noticias) - SICAG v5.0
+ * Módulo de Cartelera Digital (Noticias) - SICAG v2.5
  * Archivo: js/modules/noticias.js
  */
 

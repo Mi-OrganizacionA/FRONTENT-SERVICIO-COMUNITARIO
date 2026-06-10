@@ -1,4 +1,4 @@
-﻿import { authService } from './services/auth-service.js';
+import { authService } from './services/auth-service.js';
 import { habitantesService } from './services/habitantes-service.js';
 import { produccionService } from './services/produccion-service.js';
 import { gruposService } from './services/grupos-service.js';
@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   console.log(
-    '%c🌿 SICAG v1.0 — Sistema de Información Comunal Agroecológica',
+    '%c🌿 SICAG v2.5 — Sistema de Información Comunal Agroecológica',
     'color: #4CAF50; font-size: 14px; font-weight: bold;'
   );
   console.log(

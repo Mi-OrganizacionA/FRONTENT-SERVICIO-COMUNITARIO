@@ -1,5 +1,5 @@
 /**
- * Módulo de Autenticación Centralizado (SICAG v5.0)
+ * Módulo de Autenticación Centralizado (SICAG v2.5)
  * Gestiona tokens JWT (simulados), roles y permisos.
  */
 class AuthManager {
