@@ -274,111 +274,46 @@
     });
   };
 
-  /* ── DROPDOWN NOTIFICACIONES LOGIC ── */
+
+  /* ── LÓGICA DEL BOTÓN DE NOTIFICACIONES ── */
   const initNotificationsDropdown = () => {
-    const btn = document.getElementById('headerNotifBtn');
-    const dropdown = document.getElementById('headerNotifDropdown');
-    const list = document.getElementById('headerNotifList');
+    const btn   = document.getElementById('headerNotifBtn');
     const badge = document.getElementById('headerNotifBadge');
-    
-    if (!btn || !dropdown) return;
 
-    let loaded = false;
+    if (!btn) return;
 
-    // Toggle dropdown
-    btn.addEventListener('click', async (e) => {
+    // Al hacer clic en la campana → redirigir directamente a notificaciones.html
+    btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const isOpen = dropdown.classList.contains('show');
-      
-      // Cerrar otros dropdowns si existen
-      document.querySelectorAll('.show').forEach(el => {
-        if (el !== dropdown && el.classList.contains('header-notif-dropdown')) {
-          el.classList.remove('show');
-        }
-      });
+      window.location.href = 'notificaciones.html';
+    });
 
-      dropdown.classList.toggle('show');
+    // Fetch inicial: obtener conteo real de pendientes y actualizar el badge del header
+    if (window.api && badge) {
+      window.api.getNotificaciones()
+        .then(notifs => {
+          // 'notifs' es el array correcto (antes se usaba 'pendientes' por error)
+          const count = Array.isArray(notifs) ? notifs.length : 0;
 
-      if (!isOpen && !loaded) {
-        // Fetch real data
-        try {
-          if (!window.api) throw new Error("API no disponible");
-          const notifs = await window.api.getNotificaciones();
-          const count = notifs.length;
-          
-          if (badge) {
-            badge.textContent = pendientes.length;
-            badge.style.display = pendientes.length > 0 ? 'block' : 'none';
-          }
+          // Actualizar badge visual en el header
+          badge.textContent = count > 99 ? '99+' : count;
+          badge.style.display = count > 0 ? 'flex' : 'none';
 
-          if (pendientes.length === 0) {
-            list.innerHTML = `
-              <div class="notif-dropdown-empty">
-                <i class="fas fa-check-circle" style="color:var(--vp)"></i>
-                <p>Estás al día</p>
-                <span style="font-size:0.7rem">No tienes solicitudes pendientes</span>
-              </div>
-            `;
-          } else {
-            // Sort by new
-            pendientes.sort((a, b) => new Date(b.createdAt || b.fechaSolicitud) - new Date(a.createdAt || a.fechaSolicitud));
-            
-            list.innerHTML = pendientes.slice(0, 5).map(n => {
-              const dateObj = new Date(n.createdAt || n.fechaSolicitud);
-              const timeStr = isNaN(dateObj.getTime()) ? 'Reciente' : dateObj.toLocaleDateString();
-              
-              return `
-                <a href="notificaciones.html" class="notif-item">
-                  <div class="notif-item-icon">
-                    <i class="fas fa-user-plus"></i>
-                  </div>
-                  <div class="notif-item-content">
-                    <h4>${n.titulo || 'Solicitud de registro'}</h4>
-                    <p>${n.mensaje || 'Un vocero solicita validación.'}</p>
-                    <span class="notif-item-time">${timeStr}</span>
-                  </div>
-                </a>
-              `;
-            }).join('');
-            
-            if (pendientes.length > 5) {
-              list.innerHTML += `
-                <a href="notificaciones.html" style="display:block; text-align:center; padding:.8rem; font-size:.8rem; font-weight:600; color:var(--vp); text-decoration:none;">
-                  Ver ${pendientes.length - 5} más...
-                </a>
-              `;
+          // Actualizar badge en el ítem móvil si existe
+          if (count > 0) {
+            const mItem = document.querySelector('.mobile-menu-item[href="notificaciones.html"]');
+            if (mItem && !mItem.querySelector('.mobile-badge')) {
+              mItem.innerHTML += `<span class="mobile-badge">${count > 99 ? '99+' : count}</span>`;
             }
           }
-          loaded = true;
-        } catch (err) {
-          list.innerHTML = `
-            <div class="notif-dropdown-empty">
-              <i class="fas fa-exclamation-triangle" style="color:var(--ru)"></i>
-              <p>Error al cargar</p>
-            </div>
-          `;
-        }
-      }
-    });
-
-    // Close on click outside
-    document.addEventListener('click', (e) => {
-      if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
-        dropdown.classList.remove('show');
-      }
-    });
-    
-    // Initial fetch to set the badge count
-    if (window.api && badge) {
-      window.api.getNotificaciones().then(notifs => {
-        const count = notifs.length;
-        if (count > 0) {
-          const mItem = document.querySelector('.mobile-menu-item[href="notificaciones.html"]');
-          if (mItem) mItem.innerHTML += `<span class="mobile-badge">${count > 99 ? '99+' : count}</span>`;
-        }
-      });
+        })
+        .catch(() => {
+          // Si falla el fetch, el badge permanece oculto
+          badge.style.display = 'none';
+        });
     }
   };
+
 
   const initGlobalSearch = () => {
     const input = document.getElementById('globalSearch');

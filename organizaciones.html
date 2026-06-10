@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -104,7 +104,7 @@
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div id="header-placeholder"></div>
   <nav id="sidebar-placeholder"></nav>
-  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral"><i class="fas fa-bars"></i></button>
+  <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral"><i class="fas fa-bars"></i></button>
 
   <main class="app-main" role="main">
 
@@ -126,10 +126,10 @@
           </div>
         </div>
         <div class="ph-actions" style="display:flex;gap:.6rem;flex-wrap:wrap;">
-          <button class="ph-btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)" onclick="exportarOrganizaciones()">
+          <button type="button" class="ph-btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)" onclick="exportarOrganizaciones()">
             <i class="fas fa-file-excel"></i> Exportar
           </button>
-          <button class="ph-btn" onclick="abrirModalOrganizacion()">
+          <button type="button" class="ph-btn" onclick="abrirModalOrganizacion()">
             <i class="fas fa-plus"></i> Nueva Organización
           </button>
         </div>
@@ -213,7 +213,7 @@
           <i class="fas fa-hands-holding-circle" style="color:rgba(165,214,167,.9)"></i>
           <span id="modalOrgTitleText">Nueva Organización</span>
         </h3>
-        <button class="modal-close" style="background:rgba(255,255,255,.15);color:#fff;" onclick="cerrarModalOrganizacion()" aria-label="Cerrar">&times;</button>
+        <button type="button" class="modal-close" style="background:rgba(255,255,255,.15);color:#fff;" onclick="cerrarModalOrganizacion()" aria-label="Cerrar">&times;</button>
       </div>
       <div class="modal-body-sicag">
         <form id="formOrganizacion" novalidate>
@@ -254,7 +254,7 @@
           <div class="mfg-2">
             <div class="form-group-sicag">
               <label class="form-label-sicag" for="orgTelefono">Teléfono Principal</label>
-              <input type="text" class="form-control-sicag" id="orgTelefono" placeholder="Ej: +58 412 1234567">
+              <input type="text" class="form-control-sicag" id="orgTelefono" data-mask="telefono" placeholder="Ej: +58 412 1234567">
             </div>
             <div class="form-group-sicag">
               <label class="form-label-sicag" for="orgEmail">Correo Electrónico</label>
@@ -265,16 +265,17 @@
         </form>
       </div>
       <div class="modal-footer-sicag">
-        <button class="btn-sicag btn-outline-verde" onclick="cerrarModalOrganizacion()">
+        <button type="button" class="btn-sicag btn-outline-verde" onclick="cerrarModalOrganizacion()">
           <i class="fas fa-times"></i> Cancelar
         </button>
-        <button class="btn-sicag btn-primary" onclick="guardarOrganizacion()">
+        <button type="button" class="btn-sicag btn-primary" onclick="guardarOrganizacion()">
           <i class="fas fa-save"></i> <span id="btnGuardarText">Guardar Registro</span>
         </button>
       </div>
     </div>
   </div>
 
+  <script src="js/masks.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/api.js"></script>
   <script src="js/components.js"></script>
@@ -298,16 +299,27 @@
 
   function renderKPIs() {
     document.getElementById('kpiOrganizaciones').textContent = organizaciones.length;
-    document.getElementById('kpiMovimientos').textContent = organizaciones.filter(o => o.tipo_organizacion === 'Movimiento Social' || o.tipo_organizacion === 'Frente de Masas').length;
-    document.getElementById('kpiContacto').textContent = organizaciones.filter(o => o.contacto_telefono || o.contacto_email).length;
-    document.getElementById('kpiComites').textContent = organizaciones.filter(o => o.tipo_organizacion === 'Comité de Trabajo').length;
+    // Soporte para nombres alternativos de campo (Movimiento Social o Frente de Masas)
+    document.getElementById('kpiMovimientos').textContent = organizaciones.filter(o =>
+      o.tipo_organizacion === 'Movimiento Social' || o.tipo_organizacion === 'Frente de Masas'
+    ).length;
+    // Soporte de campo con nombres: contacto_telefono | telefono, contacto_email | email
+    document.getElementById('kpiContacto').textContent = organizaciones.filter(o =>
+      o.contacto_telefono || o.telefono || o.contacto_email || o.email
+    ).length;
+    document.getElementById('kpiComites').textContent = organizaciones.filter(o =>
+      o.tipo_organizacion === 'Comité de Trabajo'
+    ).length;
   }
 
   function renderGrid() {
     const q = (document.getElementById('orgSearchInput')?.value || '').toLowerCase();
-    const list = organizaciones.filter(o => 
-      !q || o.nombre_organizacion.toLowerCase().includes(q) || o.tipo_organizacion.toLowerCase().includes(q)
-    );
+    const list = organizaciones.filter(o => {
+      // Guarda defensiva ante campos nulos
+      const nombre = (o.nombre_organizacion || '').toLowerCase();
+      const tipo   = (o.tipo_organizacion   || '').toLowerCase();
+      return !q || nombre.includes(q) || tipo.includes(q);
+    });
 
     const grid = document.getElementById('orgGrid');
     const empty = document.getElementById('orgEmpty');
@@ -337,8 +349,8 @@
               ${!o.contacto_telefono && !o.contacto_email ? `<div class="org-meta-row"><i class="fas fa-comment-slash"></i> Sin contacto registrado</div>` : ''}
             </div>
             <div class="org-card-btns">
-              <button class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalOrganizacion(${o.id})"><i class="fas fa-pencil-alt"></i></button>
-              <button class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="eliminarOrganizacion(${o.id})"><i class="fas fa-trash-alt"></i></button>
+              <button type="button" class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalOrganizacion(${o.id})"><i class="fas fa-pencil-alt"></i></button>
+              <button type="button" class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="eliminarOrganizacion(${o.id})"><i class="fas fa-trash-alt"></i></button>
             </div>
           </div>
         </div>
@@ -432,3 +444,6 @@
   </script>
 </body>
 </html>
+
+
+

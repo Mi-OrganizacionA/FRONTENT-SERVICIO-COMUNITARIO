@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -94,7 +94,7 @@
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 <div id="header-placeholder"></div>
 <nav id="sidebar-placeholder"></nav>
-<button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menu lateral">
+<button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menu lateral">
   <i class="fas fa-bars"></i>
 </button>
 
@@ -116,10 +116,10 @@
         </div>
       </div>
       <div class="ph-actions" style="display:flex;gap:.6rem;flex-wrap:wrap;">
-        <button class="ph-btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)" id="btnExportCenso" onclick="exportarExcelCenso()">
+        <button type="button" class="ph-btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)" id="btnExportCenso" onclick="exportarExcelCenso()">
           <i class="fas fa-file-pdf"></i> Exportar
         </button>
-        <button class="ph-btn" id="btnAbrirRegistro" onclick="abrirModalCenso()">
+        <button type="button" class="ph-btn" id="btnAbrirRegistro" onclick="abrirModalCenso()">
           <i class="fas fa-user-plus"></i> Registrar Habitante
         </button>
       </div>
@@ -207,7 +207,7 @@
       </div>
     </div>
     <div class="filter-group" style="align-self:flex-end;">
-      <button class="btn-sicag btn-primary btn-sm" onclick="filtrarCenso(event)">
+      <button type="button" class="btn-sicag btn-primary btn-sm" onclick="filtrarCenso(event)">
         <i class="fas fa-filter"></i> Filtrar
       </button>
     </div>
@@ -216,7 +216,7 @@
   <div class="result-info-row fade-in-up">
     <span id="resultCount">Cargando habitantes...</span>
     <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
-      <button class="btn-sicag btn-sm btn-outline-verde" onclick="exportarExcelCenso()">
+      <button type="button" class="btn-sicag btn-sm btn-outline-verde" onclick="exportarExcelCenso()">
         <i class="fas fa-file-excel"></i> Excel
       </button>
     </div>
@@ -244,9 +244,9 @@
       </table>
     </div>
     <div class="pagination-sicag" id="censoPagination">
-      <button class="page-btn" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
-      <button class="page-btn active">1</button>
-      <button class="page-btn" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+      <button type="button" class="page-btn" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+      <button type="button" class="page-btn active">1</button>
+      <button type="button" class="page-btn" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
     </div>
   </div>
 
@@ -283,12 +283,12 @@
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="habCedula">Cedula de Identidad <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="habCedula" name="cedula_identidad" placeholder="V-12.345.678" required>
+                  <input type="text" class="cv-form-control" id="habCedula" data-mask="cedula" name="cedula_identidad" placeholder="V-12.345.678" required>
                   <span class="cv-form-hint">Llave unica para consultas.</span>
                 </div>
                 <div class="cv-form-group">
                   <label for="habNombre">Nombres y Apellidos <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="habNombre" name="nombres_apellidos" placeholder="Nombre completo" required>
+                  <input type="text" class="cv-form-control" id="habNombre" data-mask="nombre" name="nombres_apellidos" placeholder="Nombre completo" required>
                 </div>
               </div>
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
@@ -314,7 +314,7 @@
               <div class="cv-form-row cv-grid-3">
                 <div class="cv-form-group">
                   <label for="habTelefono">Telefono</label>
-                  <input type="tel" class="cv-form-control" id="habTelefono" name="telefono" placeholder="0412-1234567">
+                  <input type="tel" class="cv-form-control" id="habTelefono" data-mask="telefono" name="telefono" placeholder="0412-1234567">
                 </div>
                 <div class="cv-form-group">
                   <label for="habEmail">Correo Electronico</label>
@@ -450,8 +450,8 @@
           <p style="font-size:.875rem;color:var(--gray4)">El registro sera removido permanentemente del padron poblacional.</p>
         </div>
         <div class="cv-modal-footer" style="justify-content:center;gap:.75rem;">
-          <button class="cv-btn cv-btn-ghost" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
-          <button class="cv-btn" style="background:#C62828;color:#fff;" onclick="eliminarHabitante()">
+          <button type="button" class="cv-btn cv-btn-ghost" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
+          <button type="button" class="cv-btn" style="background:#C62828;color:#fff;" onclick="eliminarHabitante()">
             <i class="fas fa-trash-alt"></i> Si, Eliminar
           </button>
         </div>
@@ -462,7 +462,8 @@
 </main>
 
 <script src="js/roles.js"></script>
-<script src="js/auth.js"></script>
+<script src="js/masks.js"></script>
+  <script src="js/auth.js"></script>
 <script src="js/api.js"></script>
 <script src="js/components.js"></script>
 <script src="js/validators.js"></script>
@@ -672,3 +673,7 @@
 </script>
 </body>
 </html>
+
+
+
+

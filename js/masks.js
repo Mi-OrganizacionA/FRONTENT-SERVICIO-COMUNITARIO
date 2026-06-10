@@ -1,0 +1,327 @@
+/**
+ * SICAG — Máscaras de Entrada de Datos
+ * Archivo: js/masks.js
+ *
+ * Aplica restricciones y formatos a los campos de formulario.
+ * Se activa automáticamente al cargarse el DOM.
+ * Uso: añadir atributo data-mask="tipo" al input, o dejar que
+ * el script lo detecte por ID/placeholder/nombre.
+ */
+
+(function () {
+  'use strict';
+
+  /* ──────────────────────────────────────────────
+     FUNCIONES BASE DE MÁSCARA
+  ────────────────────────────────────────────── */
+
+  /**
+   * Máscara de Cédula venezolana
+   * Permite: V- o E- seguido de números con puntos
+   * Formato: V-00.000.000
+   */
+  function aplicarMascaraCedula(input) {
+    input.setAttribute('maxlength', '12');
+    input.setAttribute('placeholder', input.placeholder || 'V-12.345.678');
+    input.setAttribute('autocomplete', 'off');
+    input.setAttribute('inputmode', 'text');
+
+    input.addEventListener('input', function () {
+      let v = this.value.toUpperCase().replace(/[^VEve0-9]/g, '');
+      // Permitir prefijo V o E
+      let prefix = '';
+      let nums = '';
+      if (v.startsWith('V') || v.startsWith('E')) {
+        prefix = v[0] + '-';
+        nums = v.slice(1).replace(/\D/g, '');
+      } else {
+        // Asumir venezolano si solo escribe números
+        prefix = 'V-';
+        nums = v.replace(/\D/g, '');
+      }
+      // Agregar puntos: 0.000.000
+      if (nums.length > 3 && nums.length <= 6) {
+        nums = nums.slice(0, nums.length - 3) + '.' + nums.slice(nums.length - 3);
+      } else if (nums.length > 6) {
+        nums = nums.slice(0, nums.length - 6) + '.' +
+               nums.slice(nums.length - 6, nums.length - 3) + '.' +
+               nums.slice(nums.length - 3);
+      }
+      const valorFinal = prefix + nums;
+      if (this.value !== valorFinal) this.value = valorFinal;
+    });
+
+    // Bloquear teclas no permitidas (solo letras V/E, números y guión)
+    input.addEventListener('keydown', function (e) {
+      const permitidos = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+      if (permitidos.includes(e.key)) return;
+      if (/^[VvEe0-9]$/.test(e.key)) return;
+      e.preventDefault();
+    });
+  }
+
+  /**
+   * Máscara de Nombres y Apellidos
+   * Permite: letras, espacios, tildes, ñ, apóstrofes
+   * Bloquea: números, caracteres especiales
+   */
+  function aplicarMascaraNombres(input) {
+    input.addEventListener('keydown', function (e) {
+      const permitidos = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight',
+                          'Home', 'End', 'Enter', ' '];
+      if (permitidos.includes(e.key)) return;
+      // Letras del alfabeto incluyendo ñ, tildes, apóstrofe
+      if (/^[a-zA-ZáéíóúÁÉÍÓÚäëïöüÄËÏÖÜñÑüÜ''\-]$/.test(e.key)) return;
+      e.preventDefault();
+    });
+
+    input.addEventListener('input', function () {
+      // Eliminar cualquier número que se haya pegado
+      const nuevo = this.value.replace(/[0-9]/g, '');
+      if (this.value !== nuevo) this.value = nuevo;
+    });
+  }
+
+  /**
+   * Máscara de Teléfono venezolano
+   * Permite: +, números, espacios, guiones, paréntesis
+   */
+  function aplicarMascaraTelefono(input) {
+    input.setAttribute('inputmode', 'tel');
+    input.setAttribute('maxlength', '18');
+
+    input.addEventListener('keydown', function (e) {
+      const permitidos = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight',
+                          'Home', 'End'];
+      if (permitidos.includes(e.key)) return;
+      if (/^[0-9\+\-\s\(\)]$/.test(e.key)) return;
+      e.preventDefault();
+    });
+
+    input.addEventListener('input', function () {
+      const nuevo = this.value.replace(/[^0-9\+\-\s\(\)]/g, '');
+      if (this.value !== nuevo) this.value = nuevo;
+    });
+  }
+
+  /**
+   * Máscara Numérica (solo números y punto decimal)
+   * Para: hectáreas, cantidades, presupuesto, etc.
+   */
+  function aplicarMascaraNumero(input, permitirDecimal = true) {
+    input.setAttribute('inputmode', 'decimal');
+
+    input.addEventListener('keydown', function (e) {
+      const permitidos = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight',
+                          'Home', 'End'];
+      if (permitidos.includes(e.key)) return;
+      if (/^[0-9]$/.test(e.key)) return;
+      if (permitirDecimal && e.key === '.' && !this.value.includes('.')) return;
+      e.preventDefault();
+    });
+
+    input.addEventListener('input', function () {
+      const patron = permitirDecimal ? /[^0-9.]/g : /[^0-9]/g;
+      let nuevo = this.value.replace(patron, '');
+      // Evitar múltiples puntos decimales
+      const partes = nuevo.split('.');
+      if (partes.length > 2) nuevo = partes[0] + '.' + partes.slice(1).join('');
+      if (this.value !== nuevo) this.value = nuevo;
+    });
+  }
+
+  /**
+   * Máscara de Número de Planilla (alfanumérico, sin caracteres raros)
+   */
+  function aplicarMascaraPlanilla(input) {
+    input.setAttribute('maxlength', '20');
+    input.addEventListener('input', function () {
+      const nuevo = this.value.replace(/[^a-zA-Z0-9\-]/g, '').toUpperCase();
+      if (this.value !== nuevo) this.value = nuevo;
+    });
+  }
+
+  /* ──────────────────────────────────────────────
+     APLICACIÓN AUTOMÁTICA POR data-mask
+  ────────────────────────────────────────────── */
+
+  function aplicarPorAtributo() {
+    document.querySelectorAll('[data-mask]').forEach(function (input) {
+      const tipo = input.getAttribute('data-mask');
+      switch (tipo) {
+        case 'cedula':   aplicarMascaraCedula(input);   break;
+        case 'nombre':   aplicarMascaraNombres(input);  break;
+        case 'telefono': aplicarMascaraTelefono(input); break;
+        case 'numero':   aplicarMascaraNumero(input, false); break;
+        case 'decimal':  aplicarMascaraNumero(input, true);  break;
+        case 'planilla': aplicarMascaraPlanilla(input); break;
+      }
+    });
+  }
+
+  /* ──────────────────────────────────────────────
+     APLICACIÓN POR ID PREDEFINIDO (IDs conocidos del sistema)
+  ────────────────────────────────────────────── */
+
+  // IDs de cédulas conocidos en el sistema
+  const IDS_CEDULA = [
+    'habCedula', 'cedulaJefe', 'encuestadorCedula', 'encuestadoCedula',
+    'cNombre' /* No es cédula pero no está en esta lista */,
+    'verifyPasswordInput' /* Contraseña — no aplica */
+  ];
+  // Filtrar solo los que son realmente cédula
+  const IDS_CEDULA_REAL = [
+    'habCedula', 'cedulaJefe', 'encuestadorCedula', 'encuestadoCedula',
+    'habBuscarCedula' /* campo de búsqueda pública */
+  ];
+
+  // IDs de nombres conocidos
+  const IDS_NOMBRES = [
+    'habNombres', 'habApellidos', 'jefNombres', 'jefApellidos',
+    'encuestadorNombre', 'encuestadoNombre', 'projResponsable',
+    'orgNombre', 'cNombre'
+  ];
+
+  // IDs de teléfono conocidos
+  const IDS_TELEFONO = [
+    'orgTelefono', 'cTelefono', 'habTelefono'
+  ];
+
+  // IDs numéricos (enteros)
+  const IDS_NUMERO = [
+    'habEdad', 'cantidadHabitantes', 'cantidadCilindrosGas'
+  ];
+
+  // IDs numéricos decimales
+  const IDS_DECIMAL = [
+    'prodHectareas', 'projPresupuesto', 'projAvance', 'prodRendimiento'
+  ];
+
+  function aplicarPorIds() {
+    IDS_CEDULA_REAL.forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.maskApplied) {
+        aplicarMascaraCedula(el);
+        el.dataset.maskApplied = '1';
+      }
+    });
+
+    IDS_NOMBRES.forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.maskApplied) {
+        aplicarMascaraNombres(el);
+        el.dataset.maskApplied = '1';
+      }
+    });
+
+    IDS_TELEFONO.forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.maskApplied) {
+        aplicarMascaraTelefono(el);
+        el.dataset.maskApplied = '1';
+      }
+    });
+
+    IDS_NUMERO.forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.maskApplied) {
+        aplicarMascaraNumero(el, false);
+        el.dataset.maskApplied = '1';
+      }
+    });
+
+    IDS_DECIMAL.forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el && !el.dataset.maskApplied) {
+        aplicarMascaraNumero(el, true);
+        el.dataset.maskApplied = '1';
+      }
+    });
+  }
+
+  /* ──────────────────────────────────────────────
+     DETECCIÓN AUTOMÁTICA POR PLACEHOLDER Y TIPO
+  ────────────────────────────────────────────── */
+  function aplicarPorDeteccion() {
+    document.querySelectorAll('input:not([data-mask-applied])').forEach(function (input) {
+      if (input.dataset.maskApplied) return;
+      const ph = (input.placeholder || '').toLowerCase();
+      const id = (input.id || '').toLowerCase();
+      const name = (input.name || '').toLowerCase();
+
+      // Detectar cédulas por placeholder/id
+      if (ph.includes('cédula') || ph.includes('cedula') || ph.includes('v-12') ||
+          id.includes('cedula') || name.includes('cedula')) {
+        aplicarMascaraCedula(input);
+        input.dataset.maskApplied = '1';
+        return;
+      }
+
+      // Detectar nombres por id
+      if ((id.includes('nombre') || id.includes('apellido')) &&
+          input.type === 'text') {
+        aplicarMascaraNombres(input);
+        input.dataset.maskApplied = '1';
+        return;
+      }
+
+      // Detectar teléfonos
+      if (input.type === 'tel' || id.includes('telefono') ||
+          ph.includes('+58') || ph.includes('teléfono')) {
+        aplicarMascaraTelefono(input);
+        input.dataset.maskApplied = '1';
+        return;
+      }
+
+      // Detectar hectáreas / cantidades numéricas por id
+      if (id.includes('hectarea') || id.includes('cantidad') ||
+          id.includes('presupuesto') || id.includes('rendimiento')) {
+        aplicarMascaraNumero(input, true);
+        input.dataset.maskApplied = '1';
+        return;
+      }
+    });
+  }
+
+  /* ──────────────────────────────────────────────
+     INICIALIZACIÓN
+  ────────────────────────────────────────────── */
+  function init() {
+    aplicarPorAtributo();
+    aplicarPorIds();
+    aplicarPorDeteccion();
+  }
+
+  // Ejecutar al cargar DOM (también sirve para páginas que cargan dinámicamente)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // Re-ejecutar si algún modal carga campos nuevos (MutationObserver ligero)
+  const observer = new MutationObserver(function (mutations) {
+    let needsApply = false;
+    mutations.forEach(function (m) {
+      if (m.addedNodes.length > 0) needsApply = true;
+    });
+    if (needsApply) {
+      setTimeout(function () {
+        aplicarPorAtributo();
+        aplicarPorIds();
+        aplicarPorDeteccion();
+      }, 100);
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  // Exponer funciones para uso externo si se necesita
+  window.SICAGMasks = {
+    cedula: aplicarMascaraCedula,
+    nombres: aplicarMascaraNombres,
+    telefono: aplicarMascaraTelefono,
+    numero: aplicarMascaraNumero,
+    reinit: init
+  };
+
+})();

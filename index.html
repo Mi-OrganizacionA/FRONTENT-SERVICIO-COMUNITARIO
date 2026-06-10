@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -183,33 +183,27 @@
       <p class="pub-section-sub fade-up">Accede a la información de los habitantes de los 9 consejos comunales. Busca
         por nombre, cédula o consejo comunal.</p>
 
-      <!-- Buscador prominente -->
+      <!-- Buscador prominente — solo cédula, sin login -->
       <div class="pub-search-wrap fade-up">
-        <div class="pub-search-inner">
+        <div class="pub-search-inner" style="grid-template-columns:1fr auto;">
           <label for="habSearch" class="sr-only"
-            style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Buscar
-            habitante</label>
-          <input type="text" id="habSearch" placeholder="🔍 Nombre completo o número de cédula...">
+            style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Número
+            de cédula del habitante</label>
+          <input type="text" id="habSearch" inputmode="numeric"
+            placeholder="Ingresa el N° de Cédula (ej. 12345678)"
+            maxlength="12" autocomplete="off"
+            style="font-size:1rem;letter-spacing:.03em;"
+            aria-label="Número de cédula del habitante">
 
-          <label for="habCC" class="sr-only"
-            style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Seleccionar
-            Consejo Comunal</label>
-          <select id="habCC">
-            <option value="">Todos los Consejos</option>
-            <option value="jobito1">C.C. Jobito I</option>
-            <option value="jobito2">C.C. Jobito II</option>
-            <option value="brisas">C.C. Brisas del Yurubí</option>
-            <option value="aeb">C.C. Andrés Eloy Blanco</option>
-            <option value="mercedes1">C.C. Mercedes I</option>
-            <option value="mercedes2">C.C. Mercedes II</option>
-            <option value="santacruz">C.C. Santa Cruz de las Mercedes</option>
-            <option value="corozo1">C.C. Fortaleza del Corozo</option>
-            <option value="corozo2">C.C. Vencedores del Corozo</option>
-          </select>
-          <button class="pub-search-btn" id="habSearchBtn">
+          <button class="pub-search-btn" id="habSearchBtn" type="button"
+            aria-label="Buscar habitante por cédula">
             <i class="fas fa-search"></i> Consultar
           </button>
         </div>
+        <p style="text-align:center;font-size:.78rem;color:var(--gray4);margin-top:.6rem;">
+          <i class="fas fa-shield-alt" style="color:var(--vv);"></i>
+          Consulta pública y gratuita &middot; Solo se requiere el número de cédula
+        </p>
       </div>
 
       <!-- Cards de acceso -->
@@ -401,11 +395,11 @@
             <div class="pub-form-row">
               <div class="pub-form-group">
                 <label for="cNombre">Nombre Completo *</label>
-                <input type="text" id="cNombre" placeholder="Ej: María González" required>
+                <input type="text" id="cNombre" data-mask="nombre" placeholder="Ej: María González" required>
               </div>
               <div class="pub-form-group">
                 <label for="cTelefono">Teléfono / WhatsApp *</label>
-                <input type="tel" id="cTelefono" placeholder="+58 414 000 0000" required>
+                <input type="tel" id="cTelefono" data-mask="telefono" placeholder="+58 414 000 0000" required>
               </div>
             </div>
             <div class="pub-form-group">
@@ -564,12 +558,119 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════
+       MODAL: Resultado de Búsqueda de Habitante
+  ═══════════════════════════════════════════════════════ -->
+  <div id="modalHabOverlay" role="dialog" aria-modal="true" aria-labelledby="modalHabTitle"
+    style="
+      display:none;
+      position:fixed;inset:0;z-index:9000;
+      background:rgba(0,0,0,.55);backdrop-filter:blur(6px);
+      align-items:center;justify-content:center;
+      padding:1rem;
+    ">
+    <div id="modalHabCard" style="
+      background:#fff;border-radius:20px;padding:2.5rem 2rem;
+      max-width:400px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.28);
+      text-align:center;position:relative;
+      animation:habModalIn .3s cubic-bezier(.34,1.56,.64,1) both;
+    ">
+      <!-- Botón cerrar -->
+      <button id="modalHabClose" type="button"
+        aria-label="Cerrar resultado"
+        style="
+          position:absolute;top:1rem;right:1rem;
+          background:rgba(0,0,0,.07);border:none;border-radius:50%;
+          width:36px;height:36px;font-size:1rem;cursor:pointer;
+          display:flex;align-items:center;justify-content:center;
+          color:#555;transition:background .2s;
+        "
+        onmouseenter="this.style.background='rgba(0,0,0,.14)'"
+        onmouseleave="this.style.background='rgba(0,0,0,.07)'">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <!-- Encabezado fijo del modal -->
+      <div id="modalHabTitle" style="
+        font-size:.7rem;font-weight:800;letter-spacing:.12em;
+        text-transform:uppercase;color:var(--vp,#2E7D32);margin-bottom:1.5rem;
+        display:flex;align-items:center;justify-content:center;gap:.4rem;
+      ">
+        <i class="fas fa-id-card"></i> Consulta del Padrón Comunal
+      </div>
+
+      <!-- Contenido dinámico -->
+      <div id="modalHabBody"></div>
+    </div>
+  </div>
+
+  <!-- Estilos del modal de habitante (inline para portabilidad) -->
+  <style>
+    /* Overlay visible */
+    #modalHabOverlay.open { display:flex !important; }
+
+    /* Avatar circular con iniciales */
+    .mhab-avatar {
+      width:80px;height:80px;border-radius:50%;
+      background:linear-gradient(135deg,#2E7D32,#66BB6A);
+      color:#fff;font-size:1.8rem;font-weight:800;
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 1rem;box-shadow:0 6px 20px rgba(46,125,50,.3);
+    }
+    .mhab-name {
+      font-size:1.25rem;font-weight:800;color:#1a1a1a;line-height:1.3;
+      margin-bottom:.3rem;
+    }
+    .mhab-cedula {
+      font-size:.95rem;color:#555;margin-bottom:1rem;
+      font-family:monospace;letter-spacing:.05em;
+    }
+    .mhab-tags {
+      display:flex;flex-wrap:wrap;gap:.5rem;
+      justify-content:center;margin-bottom:1.25rem;
+    }
+    .mhab-tag {
+      display:inline-flex;align-items:center;gap:.3rem;
+      background:#f1f8f1;color:#2E7D32;border:1px solid #c8e6c9;
+      border-radius:20px;padding:.3rem .75rem;
+      font-size:.78rem;font-weight:600;
+    }
+    .mhab-tag.ok {
+      background:#E8F5E9;color:#1B5E20;
+    }
+    .mhab-disclaimer {
+      font-size:.72rem;color:#999;line-height:1.6;margin-top:1rem;
+    }
+    /* Estados de error / no encontrado */
+    .mhab-icon {
+      font-size:3rem;margin-bottom:1rem;
+    }
+    .mhab-icon.error   { color:#C62828; }
+    .mhab-icon.notfound{ color:#E65100; }
+    .mhab-status {
+      font-size:1rem;font-weight:700;line-height:1.5;
+      margin-bottom:.5rem;
+    }
+    .mhab-status.error   { color:#C62828; }
+    .mhab-status.notfound{ color:#E65100; }
+    .mhab-hint {
+      font-size:.82rem;color:#777;line-height:1.6;
+    }
+    /* Animación de entrada */
+    @keyframes habModalIn {
+      from { opacity:0;transform:scale(.85) translateY(20px); }
+      to   { opacity:1;transform:scale(1)  translateY(0);     }
+    }
+  </style>
+
   <!-- Anime.js v3 — async para no bloquear render -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" async></script>
   <script src="js/api.js"></script>
+  <script src="js/masks.js"></script>
   <script src="js/public.js" defer></script>
   <script src="js/animations.js" defer></script>
   <script type="module" src="js/app.js"></script>
 </body>
 
 </html>
+

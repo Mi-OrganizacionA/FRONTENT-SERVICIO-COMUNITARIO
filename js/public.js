@@ -243,9 +243,12 @@
   function generarHtmlProyecto(p) {
      const estado = (p.estado || 'propuesto').toLowerCase();
      const avance = p.avance || 0;
-     // Usamos JSON.stringify y escape para pasar el objeto al onclick, pero es mejor pasar el ID y buscarlo.
+     const esDestacado = p.destacado === true || p.destacado === 1 ||
+                         p.is_featured === true || p.is_featured === 1;
+
      return `
        <div class="pub-card" style="background:#fff;border:1px solid var(--gray3);border-radius:var(--r-lg);padding:1.5rem;display:flex;flex-direction:column;box-shadow:var(--sh-sm);transition:var(--tr);cursor:pointer;" onclick="abrirModalDetalle(${p.id}, 'proyecto')">
+          ${esDestacado ? `<div style="font-size:.65rem;font-weight:800;color:#E65100;background:#FFF8E1;border:1px solid #FFCC80;border-radius:20px;padding:.18rem .6rem;display:inline-flex;align-items:center;gap:.3rem;align-self:flex-start;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.05em;"><i class="fas fa-star"></i> Destacado</div>` : ''}
           <div style="font-size:0.75rem;font-weight:700;color:var(--vp);text-transform:uppercase;margin-bottom:0.5rem;display:flex;justify-content:space-between;">
              <span><i class="fas fa-hammer"></i> ${estado}</span>
              <span>${avance}%</span>
@@ -263,8 +266,15 @@
     const grid = document.getElementById('indexProyectosGrid');
     if (!grid) return;
     
+    // Ordenar destacados primero
+    const ordenados = [...proyectos].sort((a, b) => {
+      const aD = (a.destacado === true || a.destacado === 1) ? 1 : 0;
+      const bD = (b.destacado === true || b.destacado === 1) ? 1 : 0;
+      return bD - aD;
+    });
+
     let html = '';
-    const ultimos = proyectos.slice(-5).reverse(); // Mostrar 5 max en landing
+    const ultimos = ordenados.slice(-5).reverse(); // Mostrar 5 max en landing
     html += ultimos.map(p => generarHtmlProyecto(p)).join('');
     
     // Siempre agregar tarjeta ver mas
@@ -278,6 +288,7 @@
     
     if(window.reinitCardsAnim) setTimeout(window.reinitCardsAnim, 50);
   }
+
 
   function generarHtmlNoticia(n) {
        const tipo = (n.tipo_publicacion || 'noticia').toLowerCase();
@@ -320,8 +331,15 @@
     const track = document.getElementById('carouselTrack');
     if (!track) return;
 
-    const activas = noticias.slice(-5).reverse();
-    track.style.justifyContent = 'flex-start'; // Reset justify si habian
+    // Ordenar: las publicaciones destacadas van primero
+    const noticiasOrdenadas = [...noticias].sort((a, b) => {
+      const aD = (a.destacada === true || a.destacada === 1) ? 1 : 0;
+      const bD = (b.destacada === true || b.destacada === 1) ? 1 : 0;
+      return bD - aD;
+    });
+
+    const activas = noticiasOrdenadas.slice(-5).reverse();
+    track.style.justifyContent = 'flex-start';
     track.style.gap = '24px';
     
     let html = activas.map(n => generarHtmlNoticia(n)).join('');
@@ -532,44 +550,161 @@
   document.addEventListener('DOMContentLoaded', () => {
      cargarDatosPublicos();
      
-     // Habilitar Buscador de Habitante en Landing Page
-     const searchBtn = document.getElementById('habSearchBtn');
-     if (searchBtn) {
-       searchBtn.addEventListener('click', async () => {
-         const btnOriginHTML = searchBtn.innerHTML;
-         searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
-         searchBtn.disabled = true;
-         
-         const input = document.getElementById('habSearch');
-         const q = (input ? input.value : '').toLowerCase().trim();
-         
+     // ── BUSCADOR PÚBLICO DE HABITANTE (sin login) ──
+     const searchBtn  = document.getElementById('habSearchBtn');
+     const searchInp  = document.getElementById('habSearch');
+
+     /**
+      * Función principal de búsqueda — accesible sin autenticación.
+      * Solo acepta cédula exacta (formato numérico).
+      */
+     window.buscarHabitantePublico = async function () {
+       if (!searchBtn || !searchInp) return;
+
+       const rawValue = (searchInp.value || '').trim();
+       if (!rawValue) {
+         mostrarModalHab({ error: 'Ingresa un número de cédula para buscar.' });
+         return;
+       }
+
+       // Extraer solo los números de la cédula
+       const soloNumeros = rawValue.replace(/[^0-9]/g, '');
+       if (!soloNumeros || soloNumeros.length < 5) {
+         mostrarModalHab({ error: 'Ingresa una cédula válida (solo números, mínimo 5 dígitos).' });
+         return;
+       }
+
+       const btnOriginHTML = searchBtn.innerHTML;
+       searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+       searchBtn.disabled = true;
+
+       try {
+         let habs = [];
+
+         // Intentar API pública del backend primero (no requiere token)
          try {
-            let habs = [];
-            if (window.api && window.api.getHabitantes) {
-              habs = await window.api.getHabitantes();
-            } else {
-              const res = await fetch('http://localhost:3000/api/habitantes').catch(()=>null);
-              if (res && res.ok) habs = await res.json();
-            }
-            
-            const match = habs.find(h => 
-               (h.cedula && h.cedula.toString() === q) || 
-               (h.nombres && h.nombres.toLowerCase().includes(q))
-            );
-            
-            if (match) {
-               alert(`✅ HABITANTE ENCONTRADO:\n\nNombre: ${match.nombres} ${match.apellidos || ''}\nC.I.: V-${match.cedula}\nConsejo Comunal: ${match.consejo ? match.consejo.nombre_comunidad : 'Registrado'}\nEstatus: Censado(a) correctamente en la plataforma SICAG.`);
-            } else {
-               alert(`❌ NO ENCONTRADO:\nNo se hallaron coincidencias para "${q}". Verifica el número de cédula o el nombre.`);
-            }
-         } catch(e) {
-            alert('Error de conexión al consultar habitante.');
+           const baseUrl = (window.api && window.api.baseURL) || 'https://sicag-api.onrender.com/api';
+           const res = await fetch(`${baseUrl}/habitantes/publico/buscar?cedula=${encodeURIComponent(soloNumeros)}`);
+           if (res.ok) {
+             const data = await res.json();
+             // La respuesta puede ser el habitante directamente o un array
+             habs = Array.isArray(data) ? data : (data.habitante ? [data.habitante] : (data.id ? [data] : []));
+           }
+         } catch (_) {
+           // Si no hay endpoint público específico, fallback al endpoint general
          }
-         
+
+         // Fallback: usar window.api.getHabitantes si el anterior no dio resultado
+         if (habs.length === 0 && window.api && window.api.getHabitantes) {
+           try {
+             const todos = await window.api.getHabitantes();
+             habs = todos.filter(h =>
+               h.cedula && h.cedula.toString().replace(/[^0-9]/g, '') === soloNumeros
+             );
+           } catch (_) {}
+         }
+
+         if (habs.length === 0) {
+           // Segundo intento: fetch al backend sin autenticación
+           try {
+             const baseUrl2 = (window.api && window.api.baseURL) || 'https://sicag-api.onrender.com/api';
+             const r2 = await fetch(`${baseUrl2}/habitantes?cedula=${soloNumeros}`);
+             if (r2.ok) {
+               const d2 = await r2.json();
+               habs = Array.isArray(d2) ? d2 : (d2.habitantes || []);
+             }
+           } catch (_) {}
+         }
+
+         if (habs.length > 0) {
+           mostrarModalHab({ habitante: habs[0] });
+         } else {
+           mostrarModalHab({ notFound: soloNumeros });
+         }
+
+       } catch (e) {
+         mostrarModalHab({ error: 'Error de conexión al consultar. Intenta de nuevo.' });
+       } finally {
          searchBtn.innerHTML = btnOriginHTML;
-         searchBtn.disabled = false;
+         searchBtn.disabled  = false;
+       }
+     };
+
+     // Evento del botón y de la tecla Enter
+     if (searchBtn) searchBtn.addEventListener('click', window.buscarHabitantePublico);
+     if (searchInp) {
+       searchInp.addEventListener('keydown', (e) => {
+         if (e.key === 'Enter') window.buscarHabitantePublico();
+       });
+       // Permitir solo números y caracteres de cédula en este campo
+       searchInp.addEventListener('keydown', (e) => {
+         const allowed = ['Backspace','Delete','Tab','ArrowLeft','ArrowRight','Home','End','Enter'];
+         if (allowed.includes(e.key)) return;
+         if (/^[0-9VvEe\-]$/.test(e.key)) return;
+         e.preventDefault();
        });
      }
   });
 
+  /**
+   * Muestra el modal de resultado de búsqueda de habitante.
+   * @param {Object} opts - { habitante, error, notFound }
+   */
+  function mostrarModalHab(opts) {
+    const overlay = document.getElementById('modalHabOverlay');
+    const body    = document.getElementById('modalHabBody');
+    if (!overlay || !body) return;
+
+    if (opts.error) {
+      body.innerHTML = `
+        <div class="mhab-icon error"><i class="fas fa-exclamation-circle"></i></div>
+        <p class="mhab-status error">${opts.error}</p>
+      `;
+    } else if (opts.notFound) {
+      body.innerHTML = `
+        <div class="mhab-icon notfound"><i class="fas fa-user-slash"></i></div>
+        <p class="mhab-status notfound">Cédula <strong>V-${opts.notFound}</strong> no encontrada en el padrón.</p>
+        <p class="mhab-hint">Verifica el número de cédula. Si el habitante no está registrado,<br>acércate a la Sala de Autogobierno.</p>
+      `;
+    } else if (opts.habitante) {
+      const h = opts.habitante;
+      const nombre   = `${h.nombres || ''} ${h.apellidos || ''}`.trim() || 'Sin nombre';
+      const cedula   = h.cedula ? `V-${h.cedula}` : 'Sin cédula';
+      const consejo  = (h.consejo && h.consejo.nombre_comunidad) ||
+                       h.consejo_comunal || h.nombre_comunidad || 'Registrado';
+      const initials = nombre.split(' ').slice(0,2).map(p => p[0]||'').join('').toUpperCase();
+
+      body.innerHTML = `
+        <div class="mhab-avatar">${initials}</div>
+        <div class="mhab-name">${nombre}</div>
+        <div class="mhab-cedula">${cedula}</div>
+        <div class="mhab-tags">
+          <span class="mhab-tag"><i class="fas fa-house-chimney"></i> ${consejo}</span>
+          <span class="mhab-tag ok"><i class="fas fa-circle-check"></i> Censado(a) ✓</span>
+        </div>
+        <p class="mhab-disclaimer">Los datos mostrados corresponden al registro público del padrón comunal.<br>Para más información, contacta a tu Consejo Comunal.</p>
+      `;
+    }
+
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Cerrar modal habitante
+  document.addEventListener('DOMContentLoaded', () => {
+    const closeBtn = document.getElementById('modalHabClose');
+    const overlay  = document.getElementById('modalHabOverlay');
+    if (closeBtn) closeBtn.addEventListener('click', () => {
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+    if (overlay) overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    });
+  });
+
 })();
+

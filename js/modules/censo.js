@@ -39,6 +39,46 @@ class CensoController {
     // Ya no sobrescribimos abrirModalCenso porque censo.html tiene la logica correcta con stepper
   }
 
+  async guardarHabitante(datos) {
+    // Validar cédula duplicada antes de guardar (aplica para vocero y administrador)
+    const cedulaNueva = (datos.cedula || '').trim();
+    if (cedulaNueva) {
+      try {
+        const existentes = await window.api.getHabitantes({ cedula: cedulaNueva });
+        const duplicado = Array.isArray(existentes) && existentes.some(h =>
+          (h.cedula || '').trim().toUpperCase() === cedulaNueva.toUpperCase()
+        );
+        if (duplicado) {
+          // Resaltar el campo de cédula con error visual
+          const cedulaInput = document.getElementById('habCedula');
+          if (cedulaInput) {
+            cedulaInput.style.borderColor = '#C62828';
+            cedulaInput.style.boxShadow = '0 0 0 3px rgba(198,40,40,.15)';
+          }
+          if (window.Components) {
+            Components.showToast('Ya existe un habitante registrado con esa cédula.', 'error');
+          }
+          return; // Bloquear el guardado
+        }
+      } catch (err) {
+        console.warn('No se pudo verificar cédulas duplicadas:', err.message);
+        // Si falla la verificación, continuamos para no bloquear el flujo
+      }
+    }
+
+    // Guardar el habitante si no hay duplicado
+    try {
+      await window.api.crearHabitante(datos);
+      if (window.Components) Components.showToast('Habitante registrado correctamente', 'success');
+      await this.cargarDatos();
+    } catch (error) {
+      console.error('Error guardando habitante:', error);
+      if (window.Components) Components.showToast('Error al guardar el habitante', 'error');
+    }
+  }
+
+
+
   async cargarDatos() {
     try {
       const data = await window.api.getHabitantes();

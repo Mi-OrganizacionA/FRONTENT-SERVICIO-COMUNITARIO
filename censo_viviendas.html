@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -1114,7 +1114,7 @@
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div id="header-placeholder"></div>
   <nav id="sidebar-placeholder"></nav>
-  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral"><i class="fas fa-bars"></i></button>
+  <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral"><i class="fas fa-bars"></i></button>
 
   <main class="app-main">
 
@@ -1140,7 +1140,7 @@
             <p class="cv-header-sub">Registro único por Jefe de Familia · Regla 1:1 · 9 Consejos Comunales</p>
           </div>
         </div>
-        <button class="cv-btn-new" data-bs-toggle="modal" data-bs-target="#modalVivienda" id="btnNuevaVivienda">
+        <button type="button" class="cv-btn-new" data-bs-toggle="modal" data-bs-target="#modalVivienda" id="btnNuevaVivienda">
           <i class="fas fa-plus"></i> Registrar Vivienda
         </button>
       </div>
@@ -1494,7 +1494,7 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="encuestadorCedula">Cédula del Encuestador <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="encuestadorCedula" placeholder="Ej. V-12.345.678" required>
+                  <input type="text" class="cv-form-control" id="encuestadorCedula" data-mask="cedula" placeholder="Ej. V-12.345.678" required>
                 </div>
               </div>
 
@@ -1565,7 +1565,7 @@
                 <div class="cv-form-group">
                   <label for="cedulaJefe">Cédula <span class="req">*</span></label>
                   <div class="cv-input-group">
-                    <input type="text" class="cv-form-control" id="cedulaJefe" placeholder="V-12.345.678" required>
+                    <input type="text" class="cv-form-control" id="cedulaJefe" data-mask="cedula" placeholder="V-12.345.678" required>
                     <button type="button" class="cv-btn-validate" id="btnValidarCedula"><i class="fas fa-magnifying-glass"></i></button>
                   </div>
                   <span class="cv-form-hint">Una cédula = una vivienda</span>
@@ -2472,6 +2472,7 @@
   <div class="cv-toast-wrap" id="cvToastWrap"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/masks.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/layout-menu.js"></script>
   <script src="js/roles.js"></script>
@@ -3506,3 +3507,7 @@
   </script>
 </body>
 </html>
+
+
+
+
