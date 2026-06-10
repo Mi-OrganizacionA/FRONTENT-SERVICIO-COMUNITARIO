@@ -1,52 +1,76 @@
+const { Op } = require('sequelize');
 const logger = require('../utils/logger');
 const AuditService = require('../services/auditService');
 let CarteleraModel = null;
+
+const TIPOS_VALIDOS = ['noticia', 'anuncio', 'encuesta', 'convocatoria', 'aviso'];
 
 class CarteleraDigitalController {
   static setModel(model) {
     CarteleraModel = model;
   }
 
-  // Obtener publicaciones activas
+  static _mapPublicacion(pub) {
+    const data = pub.toJSON ? pub.toJSON() : pub;
+    return {
+      ...data,
+      autor: data.autor?.nombre || 'Sala de Autogobierno'
+    };
+  }
+
+  static _whereActivas() {
+    const hoy = new Date();
+    hoy.setHours(23, 59, 59, 999);
+    return {
+      activo: true,
+      [Op.or]: [
+        { fecha_cierre: null },
+        { fecha_cierre: { [Op.gte]: hoy } }
+      ]
+    };
+  }
+
   static async getActivas(req, res) {
     try {
+      const Usuario = CarteleraModel.sequelize?.models?.Usuario;
       const publicaciones = await CarteleraModel.findAll({
-        where: { activo: true },
-        order: [['fecha_publicacion', 'DESC']],
+        where: this._whereActivas(),
+        include: Usuario ? [{ model: Usuario, as: 'autor', attributes: ['id', 'nombre'] }] : [],
+        order: [['destacada', 'DESC'], ['fecha_publicacion', 'DESC']],
         limit: 50
       });
-      res.json(publicaciones);
+      res.json(publicaciones.map(p => this._mapPublicacion(p)));
     } catch (error) {
       logger.error('Error obteniendo publicaciones activas:', error);
       res.status(500).json({ error: error.message });
     }
   }
 
-  // Obtener publicaciones por tipo
   static async getPorTipo(req, res) {
     try {
       const { tipo } = req.query;
-      if (!['noticia', 'anuncio', 'encuesta'].includes(tipo)) {
+      if (!TIPOS_VALIDOS.includes(tipo)) {
         return res.status(400).json({ error: 'Tipo de publicación no válido' });
       }
 
+      const Usuario = CarteleraModel.sequelize?.models?.Usuario;
       const publicaciones = await CarteleraModel.findAll({
-        where: { tipo_publicacion: tipo, activo: true },
+        where: { ...this._whereActivas(), tipo_publicacion: tipo },
+        include: Usuario ? [{ model: Usuario, as: 'autor', attributes: ['id', 'nombre'] }] : [],
         order: [['fecha_publicacion', 'DESC']],
         limit: 30
       });
-      res.json(publicaciones);
+      res.json(publicaciones.map(p => this._mapPublicacion(p)));
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
 
-  // Crear publicación
   static async crear(req, res) {
     try {
-      const { tipo_publicacion, titulo, contenido } = req.body;
+      const { tipo_publicacion, titulo, contenido, enlace_extra, fecha_cierre, destacada } = req.body;
 
-      if (!['noticia', 'anuncio', 'encuesta'].includes(tipo_publicacion)) {
+      if (!TIPOS_VALIDOS.includes(tipo_publicacion)) {
         return res.status(400).json({ error: 'Tipo de publicación no válido' });
       }
 
@@ -59,6 +83,9 @@ class CarteleraDigitalController {
         tipo_publicacion,
         titulo,
         contenido,
+        enlace_extra: enlace_extra || null,
+        fecha_cierre: fecha_cierre || null,
+        destacada: !!destacada,
         fecha_publicacion: new Date(),
         activo: true
       });
@@ -67,7 +94,7 @@ class CarteleraDigitalController {
 
       res.status(201).json({
         mensaje: 'Publicación creada exitosamente',
-        publicacion
+        publicacion: this._mapPublicacion(publicacion)
       });
     } catch (error) {
       logger.error('Error creando publicación:', error);
@@ -75,27 +102,30 @@ class CarteleraDigitalController {
     }
   }
 
-  // Actualizar publicación
   static async actualizar(req, res) {
     try {
       const { id } = req.params;
-      const { titulo, contenido, activo } = req.body;
+      const { titulo, contenido, activo, enlace_extra, fecha_cierre, destacada, tipo_publicacion } = req.body;
 
       const publicacion = await CarteleraModel.findByPk(id);
       if (!publicacion) return res.status(404).json({ error: 'Publicación no encontrada' });
 
       const datosAntiguos = publicacion.toJSON();
       await publicacion.update({
-        titulo: titulo || publicacion.titulo,
-        contenido: contenido || publicacion.contenido,
-        activo: activo !== undefined ? activo : publicacion.activo
+        titulo: titulo ?? publicacion.titulo,
+        contenido: contenido ?? publicacion.contenido,
+        activo: activo !== undefined ? activo : publicacion.activo,
+        enlace_extra: enlace_extra !== undefined ? enlace_extra : publicacion.enlace_extra,
+        fecha_cierre: fecha_cierre !== undefined ? fecha_cierre : publicacion.fecha_cierre,
+        destacada: destacada !== undefined ? !!destacada : publicacion.destacada,
+        tipo_publicacion: tipo_publicacion && TIPOS_VALIDOS.includes(tipo_publicacion) ? tipo_publicacion : publicacion.tipo_publicacion
       });
 
       await AuditService.log(req.user.id, 'UPDATE', 'cartelera_digital', id, datosAntiguos, publicacion.toJSON());
 
       res.json({
         mensaje: 'Publicación actualizada',
-        publicacion
+        publicacion: this._mapPublicacion(publicacion)
       });
     } catch (error) {
       logger.error('Error actualizando publicación:', error);
@@ -103,7 +133,6 @@ class CarteleraDigitalController {
     }
   }
 
-  // Eliminar publicación (soft delete)
   static async eliminar(req, res) {
     try {
       const { id } = req.params;
@@ -120,13 +149,15 @@ class CarteleraDigitalController {
     }
   }
 
-  // Obtener una publicación
   static async getById(req, res) {
     try {
       const { id } = req.params;
-      const publicacion = await CarteleraModel.findByPk(id);
+      const Usuario = CarteleraModel.sequelize?.models?.Usuario;
+      const publicacion = await CarteleraModel.findByPk(id, {
+        include: Usuario ? [{ model: Usuario, as: 'autor', attributes: ['id', 'nombre'] }] : []
+      });
       if (!publicacion) return res.status(404).json({ error: 'Publicación no encontrada' });
-      res.json(publicacion);
+      res.json(this._mapPublicacion(publicacion));
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

@@ -95,9 +95,12 @@ const bandejaValidacionesSchema = Joi.object({
 });
 
 const carteleraDigitalSchema = Joi.object({
-  tipo_publicacion: Joi.string().valid('noticia', 'anuncio', 'encuesta').required(),
+  tipo_publicacion: Joi.string().valid('noticia', 'anuncio', 'encuesta', 'convocatoria', 'aviso').required(),
   titulo: Joi.string().min(3).max(300).required(),
-  contenido: Joi.string().min(1).max(5000).required()
+  contenido: Joi.string().min(1).max(5000).required(),
+  enlace_extra: Joi.string().max(2000).allow('', null).optional(),
+  fecha_cierre: Joi.date().allow(null).optional(),
+  destacada: Joi.boolean().optional()
 });
 
 const personaGrupoSocialSchema = Joi.object({

@@ -861,7 +861,18 @@
 
           let dbResults = [];
           if (window.api && typeof window.api.globalSearch === 'function') {
-            dbResults = await window.api.globalSearch(q).catch(() => []);
+            try {
+              dbResults = await window.api.globalSearch(q);
+            } catch (searchErr) {
+              if (searchErr.message === 'NO_TOKEN' || searchErr.message === 'TOKEN_EXPIRED') {
+                dropdown.innerHTML = '<div class="search-empty text-danger"><i class="fas fa-lock"></i> Sesión expirada. <a href="login.html">Iniciar sesión</a></div>';
+                return;
+              }
+              dbResults = [];
+            }
+          } else if (!localStorage.getItem('token')) {
+            dropdown.innerHTML = '<div class="search-empty text-warning"><i class="fas fa-lock"></i> Inicie sesión para buscar registros</div>';
+            return;
           }
 
           const combined = [...localMatches, ...dbResults];

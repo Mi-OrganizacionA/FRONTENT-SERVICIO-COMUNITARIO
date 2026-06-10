@@ -35,8 +35,14 @@ class HabitantesController {
       }
 
       const offset = (parseInt(page) - 1) * parseInt(limit);
+      const ConsejoComunal = HabitanteModel.sequelize?.models?.ConsejoComunal;
       const { count, rows } = await HabitanteModel.findAndCountAll({
         where,
+        include: ConsejoComunal ? [{
+          model: ConsejoComunal,
+          as: 'consejo',
+          attributes: ['id', 'nombre_comunidad']
+        }] : [],
         limit: parseInt(limit),
         offset,
         order: [['nombres', 'ASC']]
@@ -285,6 +291,34 @@ class HabitantesController {
       await AuditService.log(req.user?.id, 'DELETE', 'habitantes', id, habitante.toJSON(), null);
 
       res.json({ mensaje: 'Habitante eliminado' });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  /**
+   * Búsqueda pública de habitantes (portal web, sin autenticación)
+   */
+  static async buscarPublico(req, res) {
+    try {
+      const { q } = req.query;
+      if (!q || q.trim().length < 2) {
+        return res.json([]);
+      }
+
+      const resultados = await HabitantesService.buscar(HabitanteModel, q.trim());
+      const publicos = resultados.map(h => ({
+        id: h.id,
+        cedula: h.cedula,
+        nombres: h.nombres,
+        apellidos: h.apellidos,
+        edad: h.edad,
+        genero: h.genero,
+        elector: h.elector,
+        consejo: h.consejo || null
+      }));
+
+      res.json(publicos);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

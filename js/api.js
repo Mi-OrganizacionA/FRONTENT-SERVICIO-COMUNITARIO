@@ -52,17 +52,6 @@ class APIManager {
     });
   }
 
-  // Helper para headers
-  _getHeaders() {
-    const token = localStorage.getItem('token');
-    return {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : ''
-      }
-    };
-  }
-
   // ─────────────────────────────────────────
   // AUTHENTICATION & SECURITY
   // ─────────────────────────────────────────
@@ -177,12 +166,36 @@ class APIManager {
     if (this.isDevelopment) {
       return this._filterHabitantes(this.mockData.habitantes, filtros);
     }
-    // En producción:
     const params = new URLSearchParams(filtros);
-    const response = await fetch(`${this.baseURL}/habitantes?${params}`, this._getHeaders());
-    if (!response.ok) throw new Error('Error fetching habitantes');
+    const response = await this._fetch(`${this.baseURL}/habitantes?${params}`, this._getHeaders());
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || 'Error fetching habitantes');
+    }
     const data = await response.json();
     return data.habitantes || data;
+  }
+
+  async getHabitanteById(id) {
+    await this.waitForMockData();
+    if (this.isDevelopment) {
+      const h = this.mockData.habitantes.find(x => String(x.id) === String(id));
+      if (!h) throw new Error('Habitante no encontrado');
+      return h;
+    }
+    const response = await this._fetch(`${this.baseURL}/habitantes/${id}`, this._getHeaders());
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || 'Habitante no encontrado');
+    }
+    return response.json();
+  }
+
+  async buscarHabitantesPublico(query) {
+    if (!query || query.trim().length < 2) return [];
+    const response = await fetch(`${this.baseURL}/habitantes/publico/buscar?q=${encodeURIComponent(query.trim())}`);
+    if (!response.ok) return [];
+    return response.json();
   }
 
   async crearHabitante(datos) {
@@ -213,13 +226,14 @@ class APIManager {
     }
     
     // En producción:
-    const response = await fetch(`${this.baseURL}/habitantes`, {
+    const response = await this._fetch(`${this.baseURL}/habitantes`, {
       method: 'POST',
       ...this._getHeaders(),
       body: JSON.stringify(datos)
     });
-    if (!response.ok) throw new Error('Error al crear habitante');
-    return response.json();
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'Error al crear habitante');
+    return data;
   }
 
   async registrarHabitante(datos) {
@@ -621,10 +635,20 @@ class APIManager {
   async globalSearch(query) {
     if (!query || query.length < 2) return [];
     try {
-      const response = await fetch(`${this.baseURL}/search?q=${encodeURIComponent(query)}`, this._getHeaders());
-      if (!response.ok) return [];
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('NO_TOKEN');
+      }
+      const response = await this._fetch(`${this.baseURL}/search?q=${encodeURIComponent(query)}`, this._getHeaders());
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.code || err.error || 'SEARCH_FAILED');
+      }
       return await response.json();
     } catch (e) {
+      if (e.message === 'NO_TOKEN' || e.message === 'TOKEN_EXPIRED') {
+        throw e;
+      }
       console.error("Error en búsqueda global", e);
       return [];
     }
@@ -641,6 +665,27 @@ class APIManager {
         ...(token && { 'Authorization': `Bearer ${token}` })
       }
     };
+  }
+
+  async _fetch(url, options = {}) {
+    const response = await fetch(url, options);
+    if (response.status === 401) {
+      const err = await response.clone().json().catch(() => ({}));
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      if (window.auth) {
+        window.auth.token = null;
+        window.auth.user = null;
+      }
+      const isPublicPage = /index\.html$|consulta_habitantes\.html$|login\.html$/.test(window.location.pathname) ||
+        window.location.pathname.endsWith('/');
+      if (!isPublicPage) {
+        alert(err.error || 'Su sesión ha expirado. Por favor inicie sesión nuevamente.');
+        window.location.href = 'login.html';
+      }
+      throw new Error(err.code || 'TOKEN_EXPIRED');
+    }
+    return response;
   }
 
   _filterHabitantes(habitantes, filtros) {

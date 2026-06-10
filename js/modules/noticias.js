@@ -22,6 +22,13 @@ class NoticiasController {
   }
 
   _setupUI() {
+    const autorInput = document.getElementById('notAutor');
+    const user = window.auth?.getUser();
+    if (autorInput && user?.nombre) {
+      autorInput.value = user.nombre;
+      autorInput.readOnly = true;
+    }
+
     const tipoSelect = document.getElementById('notTipo');
     if (tipoSelect) {
       tipoSelect.addEventListener('change', () => this.handleTipoNoticia());
@@ -53,6 +60,7 @@ class NoticiasController {
     try {
       this.noticias = await window.api.getNoticias();
       this.renderNoticias();
+      this._renderDestacadas();
       this.actualizarKPICards();
     } catch (e) {
       console.error(e);
@@ -86,6 +94,24 @@ class NoticiasController {
     if (elAvi) elAvi.textContent = nAvisos;
   }
 
+  _renderDestacadas() {
+    const container = document.getElementById('featuredPubContainer');
+    if (!container) return;
+    const destacadas = this.noticias.filter(n => n.destacada && n.activo !== false);
+    if (!destacadas.length) {
+      container.style.display = 'none';
+      container.innerHTML = '';
+      return;
+    }
+    container.style.display = 'block';
+    container.innerHTML = `
+      <div class="feat-pub-banner">
+        <i class="fas fa-star"></i>
+        <strong>Destacadas:</strong>
+        ${destacadas.map(n => `<span class="feat-pub">${n.titulo}</span>`).join('')}
+      </div>`;
+  }
+
   renderNoticias() {
     const grid = document.getElementById('pubGrid');
     if (!grid) return;
@@ -109,12 +135,14 @@ class NoticiasController {
       card.dataset.id = n.id || n.id_publicacion;
       card.dataset.type = tipo;
 
+      const star = n.destacada ? '<i class="fas fa-star pub-star" title="Destacada"></i>' : '';
       card.innerHTML = `
         <div class="pub-card-bar bar-${tipo === 'aviso' ? 'aviso' : tipo}"></div>
         <div class="pub-card-body">
           <div class="pub-card-top">
             <span class="pub-badge badge-${cssClass}"><i class="fas ${icono}"></i> ${tipo.toUpperCase()}</span>
             <div class="pub-top-right">
+              ${star}
               <span class="pub-status-dot"><i class="fas fa-check-circle"></i> Activa</span>
             </div>
           </div>
@@ -157,14 +185,27 @@ class NoticiasController {
         if (desc) desc.value = n.contenido || '';
         if (fecha && n.fecha_publicacion) fecha.value = n.fecha_publicacion.split('T')[0];
         if (autor) autor.value = n.autor || 'Sala de Autogobierno';
+        const extra = document.getElementById('notExtra');
+        const cierre = document.getElementById('notCierre');
+        const destacada = document.getElementById('notDestacada');
+        if (extra) extra.value = n.enlace_extra || '';
+        if (cierre && n.fecha_cierre) cierre.value = n.fecha_cierre.split('T')[0];
+        if (destacada) destacada.checked = !!n.destacada;
         this.handleTipoNoticia();
+        this._renderDestacadas();
       }
     } else {
       title.innerHTML = '<i class="fas fa-plus-circle" style="color:var(--vv)"></i> Nueva Publicación';
       if (form) form.reset();
       if (idInput) idInput.value = '';
       const autorInput = document.getElementById('notAutor');
-      if (autorInput) autorInput.value = window.auth ? window.auth.getUser()?.nombre : 'Sala de Autogobierno';
+      const user = window.auth?.getUser();
+      if (autorInput) {
+        autorInput.value = user?.nombre || 'Sala de Autogobierno';
+        autorInput.readOnly = true;
+      }
+      const destacada = document.getElementById('notDestacada');
+      if (destacada) destacada.checked = false;
       
       const tipoInput = document.getElementById('notTipo');
       if (tipoInput) tipoInput.value = tipo;
@@ -206,7 +247,9 @@ class NoticiasController {
       titulo: titulo,
       tipo_publicacion: tipo,
       contenido: desc,
-      autor: document.getElementById('notAutor')?.value.trim() || 'Sala de Autogobierno',
+      enlace_extra: extra || null,
+      fecha_cierre: document.getElementById('notCierre')?.value || null,
+      destacada: document.getElementById('notDestacada')?.checked || false,
       fecha_publicacion: document.getElementById('notFecha')?.value || new Date().toISOString()
     };
 

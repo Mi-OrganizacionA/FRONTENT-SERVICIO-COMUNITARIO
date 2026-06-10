@@ -264,6 +264,16 @@ async function guardarVivienda(event) {
 }
 
 async function initPage() {
+  if (!document.getElementById('collapseOne')) {
+    window.editarVivienda = function(id) {
+      const btn = document.getElementById('btnNuevaVivienda');
+      if (btn) btn.click();
+      if (typeof goToStep === 'function') goToStep(1);
+    };
+    window.eliminarVivienda = eliminarVivienda;
+    return;
+  }
+
   tableBody = document.querySelector('#tablaViviendas tbody');
   kpiTotal = document.getElementById('kpi-total');
   kpiRiesgo = document.getElementById('kpi-riesgo');
