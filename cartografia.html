@@ -218,11 +218,7 @@
     </div>
 
 
-    <!-- Leyenda del mapa como Botones Interactivos -->
-    <div class="map-legend-panel fade-in-up" style="display:flex; flex-wrap:wrap; gap:10px; padding:15px; align-items:center;">
-      <strong style="font-size:.8rem;color:var(--txt);margin-right:.25rem;"><i class="fas fa-map-pin" style="color:var(--vp);"></i> Comunidades:</strong>
-      <div id="interactiveLegendContainer" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
-    </div>
+    <!-- Los controles y leyendas redundantes fueron removidos a petición del usuario -->
 
     <!-- MAPA PRINCIPAL -->
     <div class="chart-wrapper fade-in-up" style="padding:0; overflow:hidden; margin-bottom:1.25rem;">
@@ -370,11 +366,10 @@
     ];
 
     const ccLayer = L.layerGroup().addTo(map);
+    const ccLayer = L.layerGroup().addTo(map);
     const ccMarkers = {};
     const ccLayers = {};
 
-    // Contenedor de la leyenda interactiva
-    const legendContainer = document.getElementById('interactiveLegendContainer');
     let totalAreaHectareas = 0;
 
     // Función para calcular área aproximada en hectáreas
@@ -394,8 +389,8 @@
       return Math.abs(area / 2) / 10000;
     }
 
+    // Dibujamos inicialmente con "Cargando..."
     consejos.forEach(cc => {
-      // Calcular área si hay polígono
       if (typeof ccPoligonos !== 'undefined' && ccPoligonos[cc.nombre]) {
         const polygon = L.polygon(ccPoligonos[cc.nombre], {
           color: cc.color, weight: 2, fillColor: cc.color, fillOpacity: 0.2
@@ -404,42 +399,28 @@
         const areaCc = calcularAreaHa(ccPoligonos[cc.nombre]);
         totalAreaHectareas += areaCc;
 
-        polygon.bindPopup(`
+        const infoHtml = `
           <div style="font-family:'Poppins',sans-serif;min-width:200px;padding:4px 0;">
             <div style="font-weight:700;color:${cc.color};font-size:14px;margin-bottom:6px;">${cc.nombre}</div>
             <div style="font-size:12px;color:#555;display:flex;flex-direction:column;gap:4px;">
-              <span><i class="fas fa-users" style="color:${cc.color};width:14px;"></i> Base de Datos (Conectada)</span>
+              <span><i class="fas fa-users" style="color:${cc.color};width:14px;"></i> <span id="pop-fam-${cc.nombre.replace(/\s+/g, '')}">Cargando familias...</span></span>
+              <span><i class="fas fa-user" style="color:${cc.color};width:14px;"></i> <span id="pop-per-${cc.nombre.replace(/\s+/g, '')}">Cargando personas...</span></span>
               <span><i class="fas fa-map" style="color:${cc.color};width:14px;"></i> ${areaCc.toFixed(1)} Ha</span>
               <span><i class="fas fa-seedling" style="color:${cc.color};width:14px;"></i> ${cc.cultivo}</span>
             </div>
           </div>
-        `, { maxWidth: 250 });
+        `;
+
+        polygon.bindPopup(infoHtml, { maxWidth: 250 });
+        polygon.bindTooltip(`<b>${cc.nombre}</b><br>Haz clic para ver más info`, { sticky: true });
+        
         ccLayers[cc.nombre] = polygon;
         
         const m = L.marker(polygon.getBounds().getCenter(), { icon: crearIcono(cc.color, 'fa-home') }).addTo(ccLayer);
-        m.bindPopup(polygon.getPopup().getContent());
+        m.bindPopup(infoHtml);
+        m.bindTooltip(`<b>${cc.nombre}</b>`, { sticky: true });
         ccMarkers[cc.nombre] = m;
       }
-
-      // Crear botón interactivo en la leyenda
-      const btn = document.createElement('button');
-      btn.className = 'ph-btn';
-      btn.style.padding = '4px 10px';
-      btn.style.fontSize = '0.75rem';
-      btn.style.background = 'white';
-      btn.style.border = `1px solid ${cc.color}`;
-      btn.style.color = cc.color;
-      btn.style.cursor = 'pointer';
-      btn.style.borderRadius = '20px';
-      btn.innerHTML = `<i class="fas fa-map-pin"></i> ${cc.nombre.replace('C.C. ', '')}`;
-      
-      btn.addEventListener('mouseenter', () => { btn.style.background = cc.color; btn.style.color = 'white'; });
-      btn.addEventListener('mouseleave', () => { btn.style.background = 'white'; btn.style.color = cc.color; });
-      
-      btn.addEventListener('click', () => {
-        window.postMessage({ action: 'highlightCommunity', community: cc.nombre }, '*');
-      });
-      legendContainer.appendChild(btn);
     });
 
     // Actualizar KPI Área Total dinámicamente
@@ -501,18 +482,63 @@
     // Populate KPIs using API (Base de datos real)
     document.addEventListener('DOMContentLoaded', async () => {
       try {
-        if (window.api && window.api.obtenerEstadisticas) {
-          const stats = await window.api.obtenerEstadisticas();
-          if (stats) {
-            // Actualizar familias (viviendas o familias)
-            const familiasDb = stats.familias || stats.viviendas || 790;
-            animateValue('cartKpiFamilias', 0, familiasDb, 1000);
-            
-            // Actualizar personas si está disponible
-            const personasDb = stats.habitantes || 6000;
-            document.querySelector('#cartKpiFamilias + .kpi-trend').innerHTML = `<i class="fas fa-users"></i> ~${personasDb.toLocaleString()} personas`;
-          }
+        let totalHab = 0;
+        let totalViv = 0;
+        
+        // 1. Cargar Habitantes y distribuirlos por comunidad
+        if (window.api && window.api.getHabitantes) {
+          const habitantes = await window.api.getHabitantes();
+          totalHab = habitantes.length;
+          
+          // Agrupar por consejo
+          const habPorConsejo = {};
+          habitantes.forEach(h => {
+            const cc = h.consejo_comunal || 'Desconocido';
+            habPorConsejo[cc] = (habPorConsejo[cc] || 0) + 1;
+          });
+          
+          // Actualizar tooltips iniciales
+          consejos.forEach(cc => {
+            const count = habPorConsejo[cc.nombre] || 0;
+            if (ccLayers[cc.nombre]) {
+              ccLayers[cc.nombre].setTooltipContent(`<b>${cc.nombre}</b><br>${count} habitantes`);
+            }
+          });
+          
+          // Inyectar en popups abiertos
+          map.on('popupopen', function() {
+            consejos.forEach(cc => {
+              const elId = `pop-per-${cc.nombre.replace(/\s+/g, '')}`;
+              const el = document.getElementById(elId);
+              if (el) el.innerText = `${habPorConsejo[cc.nombre] || 0} personas`;
+            });
+          });
         }
+        
+        // 2. Cargar Viviendas (Familias)
+        if (window.api && window.api.getViviendas) {
+          const viviendas = await window.api.getViviendas();
+          totalViv = viviendas.length;
+          
+          const vivPorConsejo = {};
+          viviendas.forEach(v => {
+            const cc = v.consejo_comunal || 'Desconocido';
+            vivPorConsejo[cc] = (vivPorConsejo[cc] || 0) + 1;
+          });
+          
+          map.on('popupopen', function() {
+            consejos.forEach(cc => {
+              const elId = `pop-fam-${cc.nombre.replace(/\s+/g, '')}`;
+              const el = document.getElementById(elId);
+              if (el) el.innerText = `${vivPorConsejo[cc.nombre] || 0} familias`;
+            });
+          });
+        }
+
+        // 3. Actualizar KPIs globales
+        document.getElementById('cartKpiFamilias').innerText = totalViv.toLocaleString();
+        document.querySelector('#cartKpiFamilias + .kpi-trend').innerHTML = `<i class="fas fa-users"></i> ~${totalHab.toLocaleString()} personas`;
+        
       } catch(e) {
         console.error('Error fetching data for cartografia KPIs', e);
       }
