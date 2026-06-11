@@ -212,6 +212,10 @@ class LoginController {
 
 // Inicializar asegurando que el DOM esté listo o ya cargado
 function initLogin() {
+  if (window.auth && window.auth.isAuthenticated()) {
+    window.location.href = 'dashboard.html';
+    return;
+  }
   if (document.getElementById('loginForm')) {
     window.loginCtrl = new LoginController();
   }

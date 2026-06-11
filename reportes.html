@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -14,6 +14,11 @@
   <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link href="css/admin.css" rel="stylesheet">
+  <script>
+    if (!localStorage.getItem('token') || !localStorage.getItem('user')) {
+      window.location.replace('login.html');
+    }
+  </script>
 </head>
 <body data-search-placeholder="Buscar reportes, consejos...">
 

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -1107,6 +1107,11 @@
       .cv-modal-sub      { display: none; }
     }
   </style>
+  <script>
+    if (!localStorage.getItem('token') || !localStorage.getItem('user')) {
+      window.location.replace('login.html');
+    }
+  </script>
 </head>
 
 <body data-search-placeholder="Buscar cédula, comunidad, servicio...">

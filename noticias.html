@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -303,6 +303,11 @@
       .pub-toolbar { flex-direction: column; align-items: stretch; }
     }
   </style>
+  <script>
+    if (!localStorage.getItem('token') || !localStorage.getItem('user')) {
+      window.location.replace('login.html');
+    }
+  </script>
 </head>
 <body data-search-placeholder="Buscar noticias...">
 
