@@ -11,12 +11,39 @@
     else document.addEventListener('DOMContentLoaded', fn);
   }
 
+  /* ──────────────────────────────────────────────────────────────
+     SAFE ANIME SYSTEM
+     Anime.js oculta elementos vía la clase .js-anime-ready en body.
+     Si Anime.js no carga en 2.5s, se quita la clase → todo visible.
+  ────────────────────────────────────────────────────────────── */
+  let animeActivated = false;
+
+  function activateAnimeReady() {
+    if (typeof anime === 'undefined') return false;
+    document.body.classList.add('js-anime-ready');
+    return true;
+  }
+
+  function deactivateAnimeReady() {
+    document.body.classList.remove('js-anime-ready');
+  }
+
+  // Failsafe: si en 2500ms no se activó Anime.js, liberar todo
+  const failsafeTimer = setTimeout(function() {
+    if (!animeActivated) deactivateAnimeReady();
+  }, 2500);
+
   /* ────────────────────────────────────────────────────────────
      ANIMACIONES DE INDEX.HTML — PORTAL PÚBLICO
   ──────────────────────────────────────────────────────────── */
 
   function initPublicAnimations() {
     if (!document.querySelector('.pub-hero')) return; // No es index
+
+    // Verificar que Anime.js esté disponible antes de ocultar nada
+    if (!activateAnimeReady()) return;
+    animeActivated = true;
+    clearTimeout(failsafeTimer);
 
     /* ── 1. TRICOLOR BAR — wipe de izquierda a derecha ── */
     const tricolorEl = document.querySelector('.pub-tricolor');
@@ -100,6 +127,7 @@
     if (heroScroll) {
       heroTimeline.add({
         targets: heroScroll,
+        translateX: ['-50%', '-50%'],
         translateY: [10, 0],
         opacity: [0, 1],
         duration: 400,
@@ -110,6 +138,7 @@
     if (heroScroll) {
       anime({
         targets: heroScroll,
+        translateX: ['-50%', '-50%'],
         translateY: [0, 6],
         duration: 1000,
         direction: 'alternate',
@@ -191,8 +220,8 @@
             translateY: options.translateY ?? [45, 0],
             translateX: options.translateX ?? [0, 0],
             opacity: [0, 1],
-            duration: options.duration ?? 700,
-            delay: anime.stagger(options.stagger ?? 100),
+            duration: options.duration ?? 400,
+            delay: anime.stagger(options.stagger ?? 50),
             easing: options.easing ?? 'easeOutExpo',
           });
         }
@@ -209,49 +238,53 @@
 
     // Tarjetas Habitante
     createScrollAnimator('.pub-hab-card', {
-      translateY: [50, 0],
-      stagger: 120,
+      translateY: [30, 0],
+      stagger: 60,
+      duration: 400,
       easing: 'easeOutBack',
     });
 
     // Tarjetas 7 Transformaciones
     createScrollAnimator('.pub-7t-card', {
-      translateX: [-40, 0],
-      translateY: [20, 0],
-      stagger: 140,
-      duration: 750,
+      translateX: [-20, 0],
+      translateY: [10, 0],
+      stagger: 70,
+      duration: 400,
       easing: 'easeOutExpo',
     });
 
     // Section labels y títulos
     createScrollAnimator('.pub-section-label', {
-      translateY: [20, 0],
+      translateY: [15, 0],
       stagger: 0,
-      duration: 500,
+      duration: 350,
     });
 
     // Items de lista CC
     createScrollAnimator('.pub-cc-item', {
-      translateX: [-20, 0],
+      translateX: [-15, 0],
       translateY: [0, 0],
-      stagger: 60,
-      duration: 400,
+      stagger: 30,
+      duration: 300,
       easing: 'easeOutSine',
     });
 
     // Cards de noticias (carousel)
-    createScrollAnimator('.pub-news-card', {
-      translateY: [30, 0],
-      stagger: 90,
-      duration: 500,
-    });
+    window.reinitCardsAnim = function() {
+      createScrollAnimator('.pub-news-card, .pub-card', {
+        translateY: [20, 0],
+        stagger: 50,
+        duration: 400,
+      });
+    };
+    window.reinitCardsAnim();
 
     // Contacto grid items
     createScrollAnimator('.pub-contact-item', {
-      translateX: [-25, 0],
+      translateX: [-15, 0],
       translateY: [0, 0],
-      stagger: 80,
-      duration: 500,
+      stagger: 40,
+      duration: 350,
     });
 
     /* ── 6. HOVER MICRO-ANIMATIONS en tarjetas ── */
@@ -754,10 +787,38 @@
   } // end initLoginAnimations
 
 
-  /* ── Inicializar según la página detectada ── */
-  ready(function () {
+  /* ── Inicializar con manejo de carga async de Anime.js ── */
+  function tryInit() {
     initPublicAnimations();
     initLoginAnimations();
+  }
+
+  ready(function () {
+    if (typeof anime !== 'undefined') {
+      // Anime.js ya está disponible (cacheado o cargado antes)
+      tryInit();
+    } else {
+      // Anime.js aún no cargó (carga async) — esperar window load
+      window.addEventListener('load', function() {
+        if (typeof anime !== 'undefined') {
+          tryInit();
+        }
+        // Si anime sigue sin cargar en 'load', el failsafe ya lo maneja
+      }, { once: true });
+
+      // También escuchar si anime llega un poco después via polling corto
+      var pollCount = 0;
+      var poll = setInterval(function() {
+        pollCount++;
+        if (typeof anime !== 'undefined') {
+          clearInterval(poll);
+          tryInit();
+        } else if (pollCount > 25) { // 25 * 100ms = 2.5s
+          clearInterval(poll);
+          // failsafe timer se encarga de mostrar todo
+        }
+      }, 100);
+    }
   });
 
 })();

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Mi Perfil — SICAG.">
+  <title>Mi Perfil — SICAG</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="css/admin.css" rel="stylesheet">
+
+  <style>
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .profile-avatar-lg {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--vp), var(--vv));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(46, 125, 50, 0.3);
+      flex-shrink: 0;
+    }
+    .profile-avatar-lg.vocero {
+      background: linear-gradient(135deg, #1565C0, #42A5F5);
+      box-shadow: 0 10px 25px rgba(21, 101, 192, 0.3);
+    }
+    .profile-info h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.8rem;
+      color: var(--txt);
+      font-weight: 800;
+    }
+    .profile-info p {
+      margin: 0;
+      color: var(--sub);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .profile-details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .detail-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--sub);
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+    }
+    .detail-value {
+      font-size: 0.95rem;
+      color: var(--txt);
+      font-weight: 500;
+    }
+    @media (max-width: 768px) {
+      .perfil-grid-container {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
+  <script>
+    if (!localStorage.getItem('token') || !localStorage.getItem('user')) {
+      window.location.replace('login.html');
+    }
+  </script>
+</head>
+
+<body data-search-placeholder="Buscar configuraciones...">
+  <div class="barra-tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div id="header-placeholder"></div>
+  <nav id="sidebar-placeholder"></nav>
+
+  <main class="app-main" role="main">
+    
+    <!-- ══ PREMIUM HEADER ══ -->
+    <div class="ph-wrap fade-in">
+      <div class="ph-deco-dots" aria-hidden="true"></div>
+      <nav class="ph-breadcrumb" aria-label="Ruta de navegación">
+        <a href="dashboard.html"><i class="fas fa-home"></i></a>
+        <i class="fas fa-chevron-right ph-sep"></i>
+        <span class="ph-cur">Mi Perfil</span>
+      </nav>
+      <div class="ph-body">
+        <div class="ph-left">
+          <div class="ph-icon"><i class="fas fa-user-circle"></i></div>
+          <div>
+            <div class="ph-module"><i class="fas fa-id-card"></i> Cuenta de Usuario</div>
+            <h1 class="ph-title">Mi Perfil</h1>
+            <p class="ph-sub">Visualiza tus datos personales y gestiona la seguridad de tu cuenta de acceso.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CONTENIDO DE PERFIL ══ -->
+    <div class="perfil-grid-container" style="display:grid; grid-template-columns: 1fr; gap: 2rem; max-width: 900px; margin: 0 auto;" class="fade-in-up">
+      
+      <!-- Datos de la Cuenta y Habitante -->
+      <section class="card-sicag" style="align-self: start;">
+        <div class="card-header-sicag">
+          <span><i class="fas fa-address-card"></i> Datos Personales</span>
+        </div>
+        <div class="card-body-sicag">
+          
+          <div class="profile-header">
+            <div class="profile-avatar-lg" id="profileAvatar"></div>
+            <div class="profile-info">
+              <h2 id="profileName">Cargando...</h2>
+              <p><i class="fas fa-id-badge" style="color:var(--vp);"></i> <span id="profileRole">Cargando rol...</span></p>
+              <p id="profileCcContainer" style="display:none; margin-top:0.3rem;">
+                <i class="fas fa-map-pin" style="color:#E65100;"></i> <span id="profileCc"></span>
+              </p>
+            </div>
+          </div>
+
+          <div class="profile-details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Cédula de Identidad</span>
+              <span class="detail-value" id="detCedula">No registrada</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Teléfono</span>
+              <span class="detail-value" id="detTelefono">No registrado</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Correo Electrónico</span>
+              <span class="detail-value" id="detCorreo">usuario@sicag.gob.ve</span>
+            </div>
+            <div class="detail-item" style="grid-column: 1 / -1;">
+              <span class="detail-label">Dirección de Domicilio</span>
+              <span class="detail-value" id="detDireccion">No registrada</span>
+            </div>
+          </div>
+
+          <!-- Alerta / Botón para completar datos (Solo se usa una vez) -->
+          <div id="completarDatosBanner" class="alert-info" style="margin-top: 1.5rem; display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: rgba(46, 125, 50, 0.1); border-left: 4px solid var(--vp); border-radius: 8px;">
+            <div>
+              <h4 style="margin:0 0 0.3rem 0; color: var(--vp); font-size: 1rem;">Perfil Incompleto</h4>
+              <p style="margin:0; font-size: 0.85rem; color: var(--sub);">Aún no has registrado tus datos como habitante en el censo comunal.</p>
+            </div>
+            <button class="btn-sicag btn-primary btn-sm" id="btnCompletarPerfil">
+              <i class="fas fa-user-edit"></i> Completar Datos
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Seguridad y Acceso -->
+      <section class="card-sicag" style="align-self: start;">
+        <div class="card-header-sicag">
+          <span><i class="fas fa-shield-alt"></i> Seguridad de la Cuenta</span>
+        </div>
+        <div class="card-body-sicag">
+
+          <div class="form-section-header form-section-verde" style="margin-bottom:1.1rem; border:none; padding:0; background:transparent;">
+            <i class="fas fa-lock"></i> Cambio de Contraseña
+          </div>
+          
+            <p style="font-size:0.9rem; color:var(--sub); margin-bottom:1rem;">Por tu seguridad, enviaremos un código a tu correo electrónico registrado (<span id="userEmailDisplay">...</span>) para autorizar el cambio.</p>
+
+            <div id="stepRequestCode">
+              <button class="btn-sicag btn-outline-verde" type="button" id="btnReqCodePerfil" style="width:100%;">
+                <i class="fas fa-envelope"></i> Enviar Código a mi Correo
+              </button>
+            </div>
+
+            <div id="stepResetPass" style="display:none; margin-top: 1rem;">
+              <div class="form-group-sicag">
+                <label class="form-label-sicag">Código de Verificación (6 dígitos) <span style="color:var(--ru);">*</span></label>
+                <input type="text" id="passCode" class="form-control-sicag" placeholder="Ej. 123456" maxlength="6" style="letter-spacing: 3px; font-weight: bold; text-align: center;">
+              </div>
+              
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
+                <div class="form-group-sicag" style="margin-bottom:0;">
+                  <label class="form-label-sicag">Nueva Contraseña <span style="color:var(--ru);">*</span></label>
+                  <input type="password" id="passNueva" class="form-control-sicag" placeholder="Mínimo 8 caracteres" minlength="8">
+                </div>
+                <div class="form-group-sicag" style="margin-bottom:0;">
+                  <label class="form-label-sicag">Confirmar Nueva Contraseña <span style="color:var(--ru);">*</span></label>
+                  <input type="password" id="passConfirm" class="form-control-sicag" placeholder="Repite la nueva contraseña" minlength="8">
+                </div>
+              </div>
+
+              <div style="text-align:right; border-top:1px solid var(--border); padding-top:1.5rem;">
+                <button class="btn-sicag btn-primary" type="submit" id="btnChangePass">
+                  <i class="fas fa-key"></i> Guardar Nueva Contraseña
+                </button>
+              </div>
+            </div>
+          </form>
+
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- ══ MODAL COMPLETAR DATOS ══ -->
+  <div class="modal-overlay" id="modalCompletarDatos">
+    <div class="modal-content-sicag" style="max-width: 500px;">
+      <div class="modal-header-sicag" style="background:linear-gradient(135deg,#0D3311,#2E7D32);color:#fff;border-bottom:none;">
+        <h3 style="color:#fff; margin:0;"><i class="fas fa-user-check"></i> Vincular Datos de Habitante</h3>
+        <button class="modal-close" style="background:rgba(255,255,255,.15);color:#fff;" onclick="document.getElementById('modalCompletarDatos').classList.remove('show')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body-sicag">
+        <p style="font-size: 0.9rem; color: var(--sub); margin-bottom: 1.5rem;">
+          Como líder comunal, debes estar registrado en el censo. Llena tus datos a continuación. 
+          <strong>Esta acción se realiza una sola vez.</strong>
+        </p>
+        <form id="formCompletarDatos">
+          <div class="form-group-sicag">
+            <label class="form-label-sicag">Cédula de Identidad <span style="color:var(--ru);">*</span></label>
+            <input type="text" id="cdCedula" class="form-control-sicag" placeholder="Ej. 12345678" required>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag">Fecha de Nacimiento <span style="color:var(--ru);">*</span></label>
+              <input type="date" id="cdFechaNac" class="form-control-sicag" required>
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag">Género <span style="color:var(--ru);">*</span></label>
+              <select id="cdGenero" class="form-control-sicag" required>
+                <option value="">Seleccione...</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group-sicag">
+            <label class="form-label-sicag">Teléfono <span style="color:var(--ru);">*</span></label>
+            <input type="text" id="cdTelefono" class="form-control-sicag" placeholder="Ej. 0414-1234567" required>
+          </div>
+          <div class="form-group-sicag">
+            <label class="form-label-sicag">Dirección de Domicilio <span style="color:var(--ru);">*</span></label>
+            <textarea id="cdDireccion" class="form-control-sicag" rows="2" placeholder="Detalla tu dirección exacta dentro de la comunidad" required></textarea>
+          </div>
+          <div class="modal-footer-sicag" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.5rem; margin-bottom: -1rem; margin-left: -1.5rem; margin-right: -1.5rem; padding-bottom: 0; padding-left: 1.5rem; padding-right: 1.5rem;">
+            <button type="button" class="btn-sicag btn-outline-verde" onclick="document.getElementById('modalCompletarDatos').classList.remove('show')">Cancelar</button>
+            <button type="submit" class="btn-sicag btn-primary"><i class="fas fa-save"></i> Guardar Datos</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- SICAG Scripts -->
+  <script src="js/masks.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/layout-menu.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Cargar datos del usuario
+      const user = window.auth ? window.auth.getUser() : null;
+      if (user) {
+        document.getElementById('profileName').textContent = user.nombre || 'Usuario';
+        
+        const isVocero = user.rol === 'vocero';
+        const avatar = document.getElementById('profileAvatar');
+        
+        // Iniciales
+        avatar.textContent = (user.nombre || 'SA').split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+        
+        if (isVocero) {
+          avatar.classList.add('vocero');
+          document.getElementById('profileRole').textContent = 'Vocero Comunal';
+          if (user.consejoComunal) {
+            document.getElementById('profileCcContainer').style.display = 'flex';
+            document.getElementById('profileCc').textContent = user.consejoComunal;
+          }
+        } else {
+          document.getElementById('profileRole').textContent = 'Administrador General';
+        }
+      }
+
+      // Lógica de Perfil de Habitante (Solo una vez)
+      const isPerfilCompletado = localStorage.getItem('perfilCompletado_' + user.nombre);
+      const btnCompletar = document.getElementById('btnCompletarPerfil');
+      const bannerCompletar = document.getElementById('completarDatosBanner');
+      
+      if (isPerfilCompletado) {
+        const datos = JSON.parse(isPerfilCompletado);
+        document.getElementById('detCedula').textContent = datos.cedula;
+        document.getElementById('detTelefono').textContent = datos.telefono;
+        document.getElementById('detDireccion').textContent = datos.direccion;
+        bannerCompletar.style.display = 'none';
+      } else {
+        btnCompletar.addEventListener('click', () => {
+          document.getElementById('modalCompletarDatos').classList.add('show');
+        });
+        
+        document.getElementById('formCompletarDatos').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const cedula = document.getElementById('cdCedula').value;
+          const fechaNac = document.getElementById('cdFechaNac').value;
+          const genero = document.getElementById('cdGenero').value;
+          const telefono = document.getElementById('cdTelefono').value;
+          const direccion = document.getElementById('cdDireccion').value;
+          
+          const nombresArr = (user.nombre || 'Usuario').split(' ');
+          const nombres = nombresArr[0];
+          const apellidos = nombresArr.slice(1).join(' ') || '.';
+
+          const datosHabitante = { 
+            cedula, 
+            nombres,
+            apellidos,
+            fecha_nacimiento: fechaNac,
+            genero,
+            telefono, 
+            direccion,
+            consejoComunal: user.consejoComunal || 'Desconocido',
+            consejo_comunal_id: 1, // Fallback para bd real
+            clasificacion: 'adulto',
+            elector: true
+          };
+
+          try {
+            // Guardar en la base de datos real / simulación a través de la API
+            if (window.api && window.api.crearHabitante) {
+              await window.api.crearHabitante(datosHabitante);
+            }
+
+            // Guardar bandera en LocalStorage para no volver a pedirlo
+            localStorage.setItem('perfilCompletado_' + user.nombre, JSON.stringify({ cedula, telefono, direccion }));
+            
+            // Actualizar UI
+            document.getElementById('detCedula').textContent = cedula;
+            document.getElementById('detTelefono').textContent = telefono;
+            document.getElementById('detDireccion').textContent = direccion;
+            
+            document.getElementById('modalCompletarDatos').classList.remove('show');
+            bannerCompletar.style.display = 'none';
+            
+            if(window.Components) Components.showToast('Datos de habitante guardados en el censo con éxito', 'success');
+          } catch (error) {
+            console.error('Error guardando habitante:', error);
+            if(window.Components) Components.showToast('Error al guardar en el censo: ' + error.message, 'error');
+          }
+        });
+      }
+
+      // Lógica de recuperación de contraseña por correo en Perfil
+      const form = document.getElementById('formPassword');
+      const btnReqCode = document.getElementById('btnReqCodePerfil');
+      const userEmail = user.email || user.usuario; // Usar el correo del token
+
+      if (userEmail) {
+        document.getElementById('userEmailDisplay').textContent = userEmail;
+      }
+
+      btnReqCode.addEventListener('click', async () => {
+        btnReqCode.disabled = true;
+        btnReqCode.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        try {
+          if (!window.api) throw new Error("La API no está conectada");
+          await window.api.requestCode(userEmail);
+          Components.showToast('¡Código enviado a tu correo!', 'success');
+          document.getElementById('stepRequestCode').style.display = 'none';
+          document.getElementById('stepResetPass').style.display = 'block';
+        } catch (error) {
+          Components.showToast('Error al enviar código: ' + error.message, 'error');
+        } finally {
+          btnReqCode.disabled = false;
+          btnReqCode.innerHTML = '<i class="fas fa-envelope"></i> Enviar Código a mi Correo';
+        }
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const code = document.getElementById('passCode').value;
+        const nueva = document.getElementById('passNueva').value;
+        const confirm = document.getElementById('passConfirm').value;
+
+        if (!code || !nueva || !confirm) {
+           Components.showToast('Por favor, completa todos los campos.', 'error');
+           return;
+        }
+
+        if (nueva !== confirm) {
+          Components.showToast('Las contraseñas nuevas no coinciden.', 'error');
+          return;
+        }
+
+        const btn = document.getElementById('btnChangePass');
+        const oldHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Actualizando...';
+        btn.disabled = true;
+
+        try {
+          if (!window.api) throw new Error("La API no está conectada");
+          await window.api.resetPassword(userEmail, code, nueva);
+          
+          form.reset();
+          document.getElementById('stepRequestCode').style.display = 'block';
+          document.getElementById('stepResetPass').style.display = 'none';
+          Components.showToast('Tu contraseña ha sido actualizada con éxito.', 'success');
+        } catch (error) {
+          Components.showToast(error.message || 'Ocurrió un error al cambiar la contraseña.', 'error');
+        } finally {
+          btn.innerHTML = oldHtml;
+          btn.disabled = false;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+

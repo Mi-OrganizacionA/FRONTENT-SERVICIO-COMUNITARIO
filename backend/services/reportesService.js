@@ -1,4 +1,4 @@
-class ReportesService {
+﻿class ReportesService {
   static async list(reporteModel, filters = {}) {
     return await reporteModel.findAll({ where: filters, order: [['fecha','DESC']] });
   }

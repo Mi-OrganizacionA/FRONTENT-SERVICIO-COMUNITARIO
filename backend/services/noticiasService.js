@@ -1,4 +1,4 @@
-class NoticiasService {
+﻿class NoticiasService {
   static async list(noticiaModel, onlyPublished = true) {
     const where = {};
     if (onlyPublished) where.publicado = true;

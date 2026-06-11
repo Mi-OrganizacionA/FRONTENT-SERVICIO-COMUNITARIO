@@ -28,6 +28,32 @@ class ReportesController {
 
   static async create(req, res) {
     try {
+      const { id_comunidad, ...data } = req.body;
+      const Configuracion = ReporteModel.sequelize.models.Configuracion;
+      const BandejaValidaciones = ReporteModel.sequelize.models.BandejaValidaciones;
+
+      let requiereValidacion = false;
+
+      if (req.user?.rol === 'vocero') {
+        if (id_comunidad && parseInt(id_comunidad) !== req.user.id_comunidad_asignada) {
+          const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Reportes' } });
+          const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+          const autoApprove = (globalConfig && globalConfig.valor === 'true') || (config && config.valor === 'true');
+          if (!autoApprove) requiereValidacion = true;
+        }
+      }
+
+      if (requiereValidacion) {
+        await BandejaValidaciones.create({
+          id_vocero: req.user.id,
+          tabla_afectada: 'reportes',
+          tipo_accion: 'CREATE',
+          datos_temporales: req.body,
+          estado_tramite: 'Pendiente'
+        });
+        return res.status(202).json({ mensaje: 'Solicitud de reporte inter-comunal enviada a validación.' });
+      }
+
       const reporte = await ReportesService.create(ReporteModel, req.body);
       await AuditService.log(req.user.id, 'CREATE', 'reportes', reporte.id, null, reporte);
       res.status(201).json(reporte);

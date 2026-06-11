@@ -1,0 +1,25 @@
+Error: 
+    at Database.<anonymous> (C:\Users\J\Documents\GitHub\FRONTENT-SERVICIO-COMUNITARIO\FRONTENT-SERVICIO-COMUNITARIO\backend\node_modules\sequelize\src\dialects\sqlite\query.js:236:27)
+    at C:\Users\J\Documents\GitHub\FRONTENT-SERVICIO-COMUNITARIO\FRONTENT-SERVICIO-COMUNITARIO\backend\node_modules\sequelize\src\dialects\sqlite\query.js:234:50
+    at new Promise (<anonymous>)
+    at Query.run (C:\Users\J\Documents\GitHub\FRONTENT-SERVICIO-COMUNITARIO\FRONTENT-SERVICIO-COMUNITARIO\backend\node_modules\sequelize\src\dialects\sqlite\query.js:234:12)
+    at C:\Users\J\Documents\GitHub\FRONTENT-SERVICIO-COMUNITARIO\FRONTENT-SERVICIO-COMUNITARIO\backend\node_modules\sequelize\src\sequelize.js:650:28
+    at SQLiteQueryInterface.insert (C:\Users\J\Documents\GitHub\FRONTENT-SERVICIO-COMUNITARIO\FRONTENT-SERVICIO-COMUNITARIO\backend\node_modules\sequelize\src\dialects\abstract\query-interface.js:795:21)
+    at model.save (C:\Users\J\Documents\GitHub\FRONTENT-SERVICIO-COMUNITARIO\FRONTENT-SERVICIO-COMUNITARIO\backend\node_modules\sequelize\src\model.js:4154:35)
+    at Usuario.create (C:\Users\J\Documents\GitHub\FRONTENT-SERVICIO-COMUNITARIO\FRONTENT-SERVICIO-COMUNITARIO\backend\node_modules\sequelize\src\model.js:2305:12)
+    at Object.<anonymous> (C:\Users\J\Documents\GitHub\FRONTENT-SERVICIO-COMUNITARIO\FRONTENT-SERVICIO-COMUNITARIO\backend\tests\api_habitantes.test.js:37:7) {
+  name: 'SequelizeUniqueConstraintError',
+  errors: [],
+  parent: [Error: SQLITE_CONSTRAINT: NOT NULL constraint failed: usuarios.usuario] {
+    errno: 19,
+    code: 'SQLITE_CONSTRAINT',
+    sql: 'INSERT INTO `usuarios` (`id`,`nombre`,`email`,`credenciales`,`rol`,`id_comunidad_asignada`,`fecha_creacion`,`activo`) VALUES ($1,$2,$3,$4,$5,$6,$7,$8);'
+  },
+  original: [Error: SQLITE_CONSTRAINT: NOT NULL constraint failed: usuarios.usuario] {
+    errno: 19,
+    code: 'SQLITE_CONSTRAINT',
+    sql: 'INSERT INTO `usuarios` (`id`,`nombre`,`email`,`credenciales`,`rol`,`id_comunidad_asignada`,`fecha_creacion`,`activo`) VALUES ($1,$2,$3,$4,$5,$6,$7,$8);'
+  },
+  fields: [],
+  sql: 'INSERT INTO `usuarios` (`id`,`nombre`,`email`,`credenciales`,`rol`,`id_comunidad_asignada`,`fecha_creacion`,`activo`) VALUES ($1,$2,$3,$4,$5,$6,$7,$8);'
+}

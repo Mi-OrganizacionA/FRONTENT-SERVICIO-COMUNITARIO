@@ -1,5 +1,5 @@
 /**
- * Módulo de Autenticación Centralizado (SICAG v5.0)
+ * Módulo de Autenticación Centralizado (SICAG v2.5)
  * Gestiona tokens JWT (simulados), roles y permisos.
  */
 class AuthManager {
@@ -14,31 +14,29 @@ class AuthManager {
   // ─────────────────────────────────────────
   async login(usuario, contraseña) {
     try {
-      // Simulación de validación (en producción haría fetch a /api/auth/login)
-      const DEMO_USERS = {
-        'admin': { nombre: 'Administrador General', rol: 'admin', consejoComunal: 'Todos' },
-        'vocero': { nombre: 'Vocero Jobito I', rol: 'vocero', consejoComunal: 'Jobito I' }
-      };
-
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          if (DEMO_USERS[usuario] && contraseña.length > 3) {
-            const userData = DEMO_USERS[usuario];
-            const fakeToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.simulado.' + Date.now();
-            
-            this.token = fakeToken;
-            this.user = userData;
-            
-            localStorage.setItem('token', fakeToken);
-            localStorage.setItem('user', JSON.stringify(userData));
-            
-            this._notifyObservers({ tipo: 'login', usuario: userData });
-            resolve(userData);
-          } else {
-            reject(new Error('Credenciales inválidas. Usuario no encontrado.'));
-          }
-        }, 1200); // delay simulado
+      // Producción: Petición real al backend
+      const baseURL = window.API_BASE_URL || window.api?.baseURL || 'https://sicag-api.onrender.com/api';
+      const response = await fetch(`${baseURL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: usuario, password: contraseña })
       });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Credenciales inválidas. Usuario no encontrado.');
+      }
+
+      const data = await response.json();
+      
+      this.token = data.token;
+      this.user = data.usuario;
+      
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.usuario));
+      
+      this._notifyObservers({ tipo: 'login', usuario: data.usuario });
+      return data.usuario;
     } catch (error) {
       console.error('Error en login:', error);
       throw error;
@@ -58,7 +56,16 @@ class AuthManager {
   // VERIFICACIÓN Y PERMISOS
   // ─────────────────────────────────────────
   isAuthenticated() {
-    return !!this.token && !!this.user;
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    if (token && user) {
+      this.token = token;
+      this.user = this._parseUser(user);
+      return true;
+    }
+    this.token = null;
+    this.user = null;
+    return false;
   }
 
   hasRole(role) {
@@ -118,3 +125,36 @@ if (document.readyState === 'loading') {
 } else {
   checkAuthMiddleware();
 }
+
+// Escuchar cualquier clic en la página para proteger acciones si la sesión se cerró (ej. en otra pestaña)
+document.addEventListener('click', (e) => {
+  const path = window.location.pathname;
+  const isPublicPage = path.includes('login.html') || 
+                       path.includes('index.html') || 
+                       path.includes('consulta_habitantes.html') || 
+                       path.endsWith('/');
+  
+  if (!isPublicPage && !window.auth.isAuthenticated()) {
+    e.preventDefault();
+    e.stopPropagation();
+    alert('Tu sesión ha expirado o fue cerrada desde otra pestaña.');
+    window.location.href = 'login.html';
+  }
+}, true); // Fase de captura para interceptar antes que cualquier otro evento
+
+// Redirigir directamente al dashboard desde index.html si ya está logueado
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.auth.isAuthenticated()) {
+    const loginLinks = document.querySelectorAll('a[href="login.html"]');
+    loginLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'dashboard.html';
+      });
+      // Opcional: Cambiar texto del botón
+      if (link.innerHTML.includes('Acceso Voceros')) {
+        link.innerHTML = '<i class="fas fa-chart-line"></i> Ir al Dashboard';
+      }
+    });
+  }
+});

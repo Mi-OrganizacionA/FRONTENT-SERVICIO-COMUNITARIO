@@ -1,3 +1,23 @@
+import { authService } from './services/auth-service.js';
+import { habitantesService } from './services/habitantes-service.js';
+import { produccionService } from './services/produccion-service.js';
+import { gruposService } from './services/grupos-service.js';
+import { censoService } from './services/censo-service.js';
+
+window.authService = authService;
+window.habitantesService = habitantesService;
+window.produccionService = produccionService;
+window.gruposService = gruposService;
+window.censoService = censoService;
+
+authService.onAuthChange(user => {
+  if (user) {
+    console.log('Firebase authenticated user:', user.uid);
+  } else {
+    console.log('Firebase session closed.');
+  }
+});
+
 /**
  * ============================================================
  * SICAG — Sistema de Información Comunal Agroecológica
@@ -200,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   console.log(
-    '%c🌿 SICAG v1.0 — Sistema de Información Comunal Agroecológica',
+    '%c🌿 SICAG v2.5 — Sistema de Información Comunal Agroecológica',
     'color: #4CAF50; font-size: 14px; font-weight: bold;'
   );
   console.log(

@@ -1,4 +1,4 @@
-class ProyectosService {
+﻿class ProyectosService {
   static async list(proyectoModel, filters = {}) {
     const where = { ...filters };
     return await proyectoModel.findAll({ where, order: [['fecha_creacion','DESC']] });

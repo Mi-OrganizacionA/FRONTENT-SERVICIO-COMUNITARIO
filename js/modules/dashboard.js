@@ -1,5 +1,5 @@
 /**
- * Módulo de Dashboard (SICAG v5.0)
+ * Módulo de Dashboard (SICAG v2.5)
  * Archivo: js/dashboard.js
  */
 
@@ -30,23 +30,110 @@ class DashboardController {
 
   async cargarDatos() {
     try {
-      // Cargamos todos los habitantes y proyectos
-      this.habitantes = await window.api.getHabitantes();
-      this.proyectos = await window.api.getProyectos();
+      const pStats = window.api.getDashboardStats().catch(() => ({ habitantes: 0, proyectos: 0, consejos: 0, viviendas: 0 }));
+      const pHabitantes = window.api.getHabitantes().catch(() => []);
+      const pNoticias = window.api.getNoticias().catch(() => []);
+      const pResumen = window.api.getDashboardResumen().catch(() => []);
+      
+      this.stats = await pStats;
+      this.habitantes = await pHabitantes;
+      this.noticias = await pNoticias;
+      this.resumen = await pResumen;
+      this.habitantesTotales = await window.api.getHabitantes({ limit: 5000 }).catch(() => this.habitantes);
     } catch (err) {
+      console.error(err);
       throw err;
     }
   }
 
   actualizarKPIs() {
-    // Si tenemos elementos para actualizar (este prototipo asume que los KPIs están fijos,
-    // pero demostramos cómo actualizarlos con datos reales)
+    // Actualizar tarjetas numéricas
+    const totalHab = document.getElementById('kpiTotalHab');
+    if (totalHab) totalHab.textContent = this.stats?.habitantes || 0;
+
+    const elNoticias = document.getElementById('kpiNoticias');
+    if (elNoticias) elNoticias.textContent = this.noticias?.length || 0;
+
+    // Calcular electores ficticios o reales si vienen en el array
+    const elElectores = document.getElementById('kpiElectores');
+    const elNinos = document.getElementById('kpiNinos');
     
-    // Contar Familias (aproximado usando cedulas unicas para el demo)
-    const totalHabitantes = this.habitantes.length;
+    if (this.habitantes && this.habitantes.length > 0) {
+      let electores = 0;
+      let ninos = 0;
+      const today = new Date();
+      this.habitantes.forEach(h => {
+        if (h.fecha_nacimiento) {
+          const fnac = new Date(h.fecha_nacimiento);
+          let age = today.getFullYear() - fnac.getFullYear();
+          if (today.getMonth() < fnac.getMonth() || (today.getMonth() === fnac.getMonth() && today.getDate() < fnac.getDate())) {
+            age--;
+          }
+          if (age >= 18) electores++;
+          if (age <= 11) ninos++;
+        }
+      });
+      if (elElectores) elElectores.textContent = electores;
+      if (elNinos) elNinos.textContent = ninos;
+    } else {
+      if (elElectores) elElectores.textContent = 0;
+      if (elNinos) elNinos.textContent = 0;
+    }
+
+    // Actualizar tabla resumen consejos
+    const tbConsejos = document.getElementById('tbConsejos');
+    if (tbConsejos && this.resumen) {
+      tbConsejos.innerHTML = '';
+      const dataResumen = this.resumen.filter(r => r.consejo !== 'TOTAL' && r.total_hab > 0);
+      if (dataResumen.length === 0) {
+        tbConsejos.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#666;">Sin datos en la base de datos.</td></tr>';
+      } else {
+        dataResumen.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${r.consejo}</td>
+            <td>${r.total_hab}</td>
+            <td>${r.electores}</td>
+            <td>${r.ninos}</td>
+          `;
+          tbConsejos.appendChild(tr);
+        });
+      }
+    }
+
+    // Actualizar tabla recientes
+    const tbody = document.querySelector('#recentTable tbody');
+    if (tbody && this.habitantes) {
+      tbody.innerHTML = '';
+      // Tomamos los ultimos 5
+      const recientes = [...this.habitantes].slice(-5).reverse();
+      if (recientes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#666;">Sin registros recientes.</td></tr>';
+      } else {
+        recientes.forEach(h => {
+          let age = '-';
+          if (h.fecha_nacimiento) {
+            const today = new Date();
+            const fnac = new Date(h.fecha_nacimiento);
+            age = today.getFullYear() - fnac.getFullYear();
+            if (today.getMonth() < fnac.getMonth() || (today.getMonth() === fnac.getMonth() && today.getDate() < fnac.getDate())) age--;
+          }
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${h.cedula || 'S/C'}</td>
+            <td>${h.nombres || ''} ${h.apellidos || ''}</td>
+            <td>${age}</td>
+            <td>${h.genero || '-'}</td>
+            <td>${h.consejo?.nombre_comunidad || 'No asignado'}</td>
+            <td><span class="badge ${age >= 18 ? 'bg-verde' : 'bg-amarillo'}">${age >= 18 ? 'Adulto' : 'Menor'}</span></td>
+            <td>${age >= 18 ? '<i class="fas fa-check-circle text-success"></i>' : '-'}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
     
-    // En este punto, solo notificamos en consola para el demo
-    console.log(`[Dashboard] Datos cargados: ${totalHabitantes} habitantes, ${this.proyectos?.length || 0} proyectos.`);
+    console.log(`[Dashboard] Datos cargados: ${this.stats?.habitantes} habitantes.`);
     
     // Animación de los botones de reload
     document.querySelectorAll('.kpi-reload').forEach(btn => {
@@ -54,10 +141,7 @@ class DashboardController {
         e.preventDefault();
         const icon = this.querySelector('i');
         icon.classList.add('fa-spin');
-        
-        // Simular recarga
         await new Promise(r => setTimeout(r, 1000));
-        
         icon.classList.remove('fa-spin');
         if (window.Components) Components.showToast('Datos actualizados', 'success');
       });
@@ -69,16 +153,57 @@ class DashboardController {
 
     var palVerde = ['#2E7D32','#388E3C','#43A047','#4CAF50','#66BB6A','#81C784','#A5D6A7','#C8E6C9','#E8F5E9'];
 
+    // Procesar datos para Donut Consejos
+    let labelsConsejos = [];
+    let dataConsejos = [];
+    if (this.resumen && this.resumen.length > 0) {
+      const filtered = this.resumen.filter(r => r.consejo !== 'TOTAL' && r.total_hab > 0);
+      labelsConsejos = filtered.map(r => r.consejo);
+      dataConsejos = filtered.map(r => r.total_hab);
+    }
+    if (dataConsejos.length === 0) { labelsConsejos = ['Sin Datos']; dataConsejos = [1]; }
+
+    // Procesar datos para Bar Clasificaciones
+    let ninos = 0, adol = 0, mayores = 0, embaraz = 0, lactantes = 0, discap = 0, electores = 0;
+    if (this.habitantesTotales && this.habitantesTotales.length > 0) {
+      const today = new Date();
+      this.habitantesTotales.forEach(h => {
+        if (h.fecha_nacimiento) {
+          const fnac = new Date(h.fecha_nacimiento);
+          let age = today.getFullYear() - fnac.getFullYear();
+          if (today.getMonth() < fnac.getMonth() || (today.getMonth() === fnac.getMonth() && today.getDate() < fnac.getDate())) age--;
+          if (age <= 11) ninos++;
+          else if (age >= 12 && age <= 17) adol++;
+          if (age >= 60) mayores++;
+          if (age >= 18) electores++;
+        }
+        if (h.condicion_salud === 'discapacidad') discap++;
+        if (h.condicion_salud === 'embarazada' || h.condicion_salud === 'embarazo') embaraz++;
+        if (h.condicion_salud === 'lactante') lactantes++;
+      });
+    }
+    const dataClasificaciones = [ninos, adol, mayores, embaraz, lactantes, discap, electores];
+
+    // Procesar datos para Line Registros (Por Mes del Año Actual)
+    const registrosPorMes = new Array(12).fill(0);
+    const currentYear = new Date().getFullYear();
+    if (this.habitantesTotales && this.habitantesTotales.length > 0) {
+      this.habitantesTotales.forEach(h => {
+        const d = h.fecha_registro ? new Date(h.fecha_registro) : new Date();
+        if (d.getFullYear() === currentYear) {
+          registrosPorMes[d.getMonth()]++;
+        }
+      });
+    }
+
     // --- Donut Consejos ---
     const ctxConsejos = document.getElementById('chartConsejos');
     if (ctxConsejos) {
-      // Extraemos etiquetas de los datos si quisiéramos, pero para el demo usamos la data dura
-      // que coincide con el diseño visual del usuario
       new Chart(ctxConsejos.getContext('2d'), {
         type: 'doughnut',
         data: {
-          labels: ['Jobito I','Jobito II','Brisas del Yurubí','A. E. Blanco','Mercedes I','Mercedes II','Santa Cruz','Fortaleza Corozo','Vencedores Corozo'],
-          datasets: [{ data: [52,45,41,38,36,35,38,32,30], backgroundColor: palVerde, borderWidth: 3, borderColor: '#fff', hoverOffset: 8 }]
+          labels: labelsConsejos,
+          datasets: [{ data: dataConsejos, backgroundColor: palVerde, borderWidth: 3, borderColor: '#fff', hoverOffset: 8 }]
         },
         options: {
           responsive: true, maintainAspectRatio: false, cutout: '52%',
@@ -98,7 +223,7 @@ class DashboardController {
         type: 'bar',
         data: {
           labels: ['Niños\n(0-11)','Adolesc.','Adultos\nMayores','Embaraz.','Lactantes','Discap.','Electores'],
-          datasets: [{ label: 'Personas', data: [62,48,39,14,8,12,231],
+          datasets: [{ label: 'Personas', data: dataClasificaciones,
             backgroundColor: ['rgba(249,168,37,.85)','rgba(255,140,0,.85)','rgba(198,40,40,.85)','rgba(233,30,99,.85)','rgba(156,39,176,.85)','rgba(21,101,192,.85)','rgba(46,125,50,.85)'],
             borderRadius: 6, borderSkipped: false
           }]
@@ -121,7 +246,7 @@ class DashboardController {
         type: 'line',
         data: {
           labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
-          datasets: [{ label: 'Nuevos registros', data: [45,38,52,41,36,28,22,18,25,20,12,10],
+          datasets: [{ label: 'Nuevos registros', data: registrosPorMes,
             borderColor: '#43A047', backgroundColor: gR, borderWidth: 3, fill: true, tension: 0.4,
             pointBackgroundColor: '#43A047', pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 7
           }]

@@ -6,11 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description"
     content="Cartografía Social — Mapeo interactivo del territorio de la Comuna Socialista Simón Rodríguez, SICAG.">
-  <title>Cartografía Social — SICAG v3.0</title>
+  <title>Cartografía Social — SICAG v2.5</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <link href="css/admin.css" rel="stylesheet">
   <style>
@@ -128,6 +132,11 @@
       color: var(--vp);
     }
   </style>
+  <script>
+    if (!localStorage.getItem('token') || !localStorage.getItem('user')) {
+      window.location.replace('login.html');
+    }
+  </script>
 </head>
 
 <body data-search-placeholder="Buscar ubicación, consejo comunal...">
@@ -148,6 +157,7 @@
 
     <!-- ══ PREMIUM HEADER ══ -->
     <div class="ph-wrap fade-in">
+      <div class="ph-deco-dots" aria-hidden="true"></div>
       <nav class="ph-breadcrumb" aria-label="Ruta de navegación">
         <a href="dashboard.html"><i class="fas fa-home"></i></a>
         <i class="fas fa-chevron-right ph-sep"></i>
@@ -181,7 +191,7 @@
           <div class="kpi-icon verde"><i class="fas fa-map"></i></div>
           <div class="kpi-info">
             <h3>Área Total</h3>
-            <div class="kpi-value" style="font-size:1.3rem;">850 Ha</div>
+            <div class="kpi-value" id="cartKpiArea" style="font-size:1.3rem;">850 Ha</div>
             <span class="kpi-trend up">Vocación agrícola</span>
           </div>
         </div>
@@ -189,7 +199,7 @@
           <div class="kpi-icon amarillo"><i class="fas fa-home"></i></div>
           <div class="kpi-info">
             <h3>Consejos Comunales</h3>
-            <div class="kpi-value" style="font-size:1.3rem;">9</div>
+            <div class="kpi-value" id="cartKpiCc" style="font-size:1.3rem;">9</div>
             <span class="kpi-trend up">Las Mercedes</span>
           </div>
         </div>
@@ -197,7 +207,7 @@
           <div class="kpi-icon azul"><i class="fas fa-seedling"></i></div>
           <div class="kpi-info">
             <h3>Ha Cultivadas</h3>
-            <div class="kpi-value" style="font-size:1.3rem;">156</div>
+            <div class="kpi-value" id="cartKpiHa" style="font-size:1.3rem;">156</div>
             <span class="kpi-trend up">6 tipos de cultivo</span>
           </div>
         </div>
@@ -205,7 +215,7 @@
           <div class="kpi-icon rojo"><i class="fas fa-users"></i></div>
           <div class="kpi-info">
             <h3>Familias</h3>
-            <div class="kpi-value" style="font-size:1.3rem;">790</div>
+            <div class="kpi-value" id="cartKpiFamilias" style="font-size:1.3rem;">790</div>
             <span class="kpi-trend up">~6.000 personas</span>
           </div>
         </div>
@@ -213,22 +223,10 @@
     </div>
 
 
-    <!-- Leyenda del mapa -->
-    <div class="map-legend-panel fade-in-up">
-      <strong style="font-size:.8rem;color:var(--txt);margin-right:.25rem;"><i class="fas fa-map-pin"
-          style="color:var(--vp);"></i> Leyenda:</strong>
-      <div class="legend-item"><span class="legend-dot" style="background:#4CAF50;"></span> Consejo Comunal</div>
-      <div class="legend-item"><span class="legend-dot" style="background:#F9A825;"></span> Zona Productiva</div>
-      <div class="legend-item"><span class="legend-dot" style="background:#1565C0;"></span> Sede Comunal</div>
-      <div class="legend-item"><span class="legend-dot" style="background:#C62828;"></span> Área Especial</div>
-    </div>
-
-    <!-- Filtros del mapa -->
-    <div class="map-controls fade-in-up">
-      <button class="map-filter-btn active" data-layer="all">Todos</button>
-      <button class="map-filter-btn" data-layer="cc">Consejos Comunales</button>
-      <button class="map-filter-btn" data-layer="prod">Zonas Productivas</button>
-      <button class="map-filter-btn" data-layer="sedes">Sedes</button>
+    <!-- Leyenda del mapa como Botones Interactivos -->
+    <div class="map-legend-panel fade-in-up" style="display:flex; flex-wrap:wrap; gap:10px; padding:15px; align-items:center;">
+      <strong style="font-size:.8rem;color:var(--txt);margin-right:.25rem;"><i class="fas fa-map-pin" style="color:var(--vp);"></i> Comunidades:</strong>
+      <div id="interactiveLegendContainer" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
     </div>
 
     <!-- MAPA PRINCIPAL -->
@@ -239,90 +237,10 @@
       <div id="mapaCartografia" class="map-full"></div>
     </div>
 
-    <!-- CONSEJOS COMUNALES CARDS -->
-    <div class="card-sicag fade-in-up">
-      <div class="card-header-sicag">
-        <span><i class="fas fa-landmark" style="color:var(--vp);"></i> 9 Consejos Comunales — Distribución
-          Territorial</span>
-      </div>
-      <div style="padding:1.25rem 1.5rem;">
-        <div class="cc-grid">
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i>
-            </div>
-            <div>
-              <strong>C.C. Jobito I</strong>
-              <span>Zona norte · 185 familias · Maíz y caraotas</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i>
-            </div>
-            <div>
-              <strong>C.C. Jobito II</strong>
-              <span>Zona norte-este · 170 familias · Maíz</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(249,168,37,.12);color:#E65100;"><i class="fas fa-flag"></i></div>
-            <div>
-              <strong>C.C. Brisas del Yurubí</strong>
-              <span>Zona este · 210 familias · Cacao y frutales</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(249,168,37,.12);color:#E65100;"><i class="fas fa-flag"></i></div>
-            <div>
-              <strong>C.C. Andrés Eloy Blanco</strong>
-              <span>Zona central · 160 familias · Hortalizas</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(21,101,192,.1);color:var(--az);"><i class="fas fa-flag"></i>
-            </div>
-            <div>
-              <strong>C.C. Mercedes I</strong>
-              <span>Zona central-sur · 145 familias · Café</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(21,101,192,.1);color:var(--az);"><i class="fas fa-flag"></i>
-            </div>
-            <div>
-              <strong>C.C. Mercedes II</strong>
-              <span>Zona sur · 130 familias · Yuca y tubérculos</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(198,40,40,.1);color:var(--ru);"><i class="fas fa-flag"></i></div>
-            <div>
-              <strong>C.C. Santa Cruz de las Mercedes</strong>
-              <span>Zona oeste · 140 familias · Ganadería menor</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i>
-            </div>
-            <div>
-              <strong>C.C. Fortaleza del Corozo</strong>
-              <span>Zona sur-este · 110 familias · Maíz colectivo</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i>
-            </div>
-            <div>
-              <strong>C.C. Vencedores del Corozo</strong>
-              <span>Zona montañosa · 95 familias · Café de altura</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </main>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="js/poligonos.js"></script>
   <script>
     /* ── LEAFLET MAP ── */
     const CENTER = [10.351969522108448, -68.73344284186831];
@@ -332,6 +250,24 @@
       attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
       maxZoom: 18
     }).addTo(map);
+
+    // Cargar capa GeoJSON de Venezuela
+    fetch('venezuela.geojson')
+      .then(response => response.json())
+      .then(data => {
+        L.geoJSON(data, {
+          style: function (feature) {
+            const isYaracuy = feature.properties && feature.properties.name && feature.properties.name.toLowerCase().includes('yaracuy');
+            return {
+              color: isYaracuy ? '#2E7D32' : '#888',
+              weight: isYaracuy ? 2 : 1,
+              fillColor: isYaracuy ? '#43A047' : '#cccccc',
+              fillOpacity: isYaracuy ? 0.1 : 0.05
+            };
+          }
+        }).addTo(map);
+      })
+      .catch(err => console.log('No se pudo cargar el GeoJSON de Venezuela:', err));
 
     /* Función crear icono circular */
     function crearIcono(color, icon = 'fa-seedling') {
@@ -350,37 +286,102 @@
       { lat: 10.360, lng: -68.722, nombre: 'C.C. Jobito II', hab: 170, color: '#388E3C', cultivo: 'Maíz' },
       { lat: 10.345, lng: -68.728, nombre: 'C.C. Brisas del Yurubí', hab: 210, color: '#F9A825', cultivo: 'Cacao y frutales' },
       { lat: 10.352, lng: -68.733, nombre: 'C.C. Andrés Eloy Blanco', hab: 160, color: '#FF8C00', cultivo: 'Hortalizas' },
-      { lat: 10.347, lng: -68.738, nombre: 'C.C. Mercedes I', hab: 145, color: '#1565C0', cultivo: 'Café' },
-      { lat: 10.350, lng: -68.742, nombre: 'C.C. Mercedes II', hab: 130, color: '#1976D2', cultivo: 'Yuca y tubérculos' },
+      { lat: 10.347, lng: -68.738, nombre: 'C.C. Las Mercedes I', hab: 145, color: '#1565C0', cultivo: 'Café' },
+      { lat: 10.350, lng: -68.742, nombre: 'C.C. Las Mercedes II', hab: 130, color: '#1976D2', cultivo: 'Yuca y tubérculos' },
       { lat: 10.340, lng: -68.745, nombre: 'C.C. Santa Cruz de las Mercedes', hab: 140, color: '#C62828', cultivo: 'Ganadería menor' },
       { lat: 10.362, lng: -68.726, nombre: 'C.C. Fortaleza del Corozo', hab: 110, color: '#43A047', cultivo: 'Maíz colectivo' },
       { lat: 10.335, lng: -68.750, nombre: 'C.C. Vencedores del Corozo', hab: 95, color: '#66BB6A', cultivo: 'Café de altura' },
     ];
 
-    const ccLayer = L.layerGroup();
+    const ccLayer = L.layerGroup().addTo(map);
+    const ccMarkers = {};
+    const ccLayers = {};
+
+    let totalAreaHectareas = 0;
+    const legendContainer = document.getElementById('interactiveLegendContainer');
+
+    // Función para calcular área aproximada en hectáreas
+    function calcularAreaHa(latLngs) {
+      if (!latLngs || latLngs.length < 3) return 0;
+      let area = 0;
+      const r = 6378137; // Radio de la Tierra en metros
+      for (let i = 0; i < latLngs.length; i++) {
+        let p1 = latLngs[i];
+        let p2 = latLngs[(i + 1) % latLngs.length];
+        let x1 = p1[1] * Math.PI / 180 * r * Math.cos(p1[0] * Math.PI / 180);
+        let y1 = p1[0] * Math.PI / 180 * r;
+        let x2 = p2[1] * Math.PI / 180 * r * Math.cos(p2[0] * Math.PI / 180);
+        let y2 = p2[0] * Math.PI / 180 * r;
+        area += (x1 * y2 - x2 * y1);
+      }
+      return Math.abs(area / 2) / 10000;
+    }
+
+    // Dibujamos inicialmente con "Cargando..."
     consejos.forEach(cc => {
-      L.marker([cc.lat, cc.lng], { icon: crearIcono(cc.color, 'fa-home') })
-        .addTo(ccLayer)
-        .bindPopup(`
+      if (typeof ccPoligonos !== 'undefined' && ccPoligonos[cc.nombre]) {
+        const polygon = L.polygon(ccPoligonos[cc.nombre], {
+          color: cc.color, weight: 2, fillColor: cc.color, fillOpacity: 0.2
+        }).addTo(ccLayer);
+        
+        const areaCc = calcularAreaHa(ccPoligonos[cc.nombre]);
+        totalAreaHectareas += areaCc;
+
+        const infoHtml = `
           <div style="font-family:'Poppins',sans-serif;min-width:200px;padding:4px 0;">
             <div style="font-weight:700;color:${cc.color};font-size:14px;margin-bottom:6px;">${cc.nombre}</div>
             <div style="font-size:12px;color:#555;display:flex;flex-direction:column;gap:4px;">
-              <span><i class="fas fa-users" style="color:${cc.color};width:14px;"></i> ${cc.hab} familias</span>
+              <span><i class="fas fa-users" style="color:${cc.color};width:14px;"></i> <span id="pop-fam-${cc.nombre.replace(/\s+/g, '')}">Cargando familias...</span></span>
+              <span><i class="fas fa-user" style="color:${cc.color};width:14px;"></i> <span id="pop-per-${cc.nombre.replace(/\s+/g, '')}">Cargando personas...</span></span>
+              <span><i class="fas fa-map" style="color:${cc.color};width:14px;"></i> ${areaCc.toFixed(1)} Ha</span>
               <span><i class="fas fa-seedling" style="color:${cc.color};width:14px;"></i> ${cc.cultivo}</span>
             </div>
           </div>
-        `, { maxWidth: 250 });
+        `;
+
+        polygon.bindPopup(infoHtml, { maxWidth: 250 });
+        polygon.bindTooltip(`<b>${cc.nombre}</b><br>Haz clic para ver más info`, { sticky: true });
+        
+        ccLayers[cc.nombre] = polygon;
+        
+        const m = L.marker(polygon.getBounds().getCenter(), { icon: crearIcono(cc.color, 'fa-home') }).addTo(ccLayer);
+        m.bindPopup(infoHtml);
+        m.bindTooltip(`<b>${cc.nombre}</b>`, { sticky: true });
+        ccMarkers[cc.nombre] = m;
+      }
+
+      // Crear botón interactivo en la leyenda
+      if (legendContainer) {
+        const btn = document.createElement('button');
+        btn.className = 'ph-btn';
+        btn.style.padding = '4px 10px';
+        btn.style.fontSize = '0.75rem';
+        btn.style.background = 'white';
+        btn.style.border = `1px solid ${cc.color}`;
+        btn.style.color = cc.color;
+        btn.style.cursor = 'pointer';
+        btn.style.borderRadius = '20px';
+        btn.innerHTML = `<i class="fas fa-map-pin"></i> ${cc.nombre.replace('C.C. ', '')}`;
+        
+        btn.addEventListener('mouseenter', () => { btn.style.background = cc.color; btn.style.color = 'white'; });
+        btn.addEventListener('mouseleave', () => { btn.style.background = 'white'; btn.style.color = cc.color; });
+        
+        btn.addEventListener('click', () => {
+          window.postMessage({ action: 'highlightCommunity', community: cc.nombre }, '*');
+        });
+        legendContainer.appendChild(btn);
+      }
     });
-    ccLayer.addTo(map);
+
+    // Actualizar KPI Área Total dinámicamente
+    document.getElementById('cartKpiArea').innerText = totalAreaHectareas.toFixed(1) + ' Ha';
 
     /* Centrar botón */
     document.getElementById('btnCentrar').addEventListener('click', () => map.setView(CENTER, 13));
-
-    /* Fullscreen aproximado */
     document.getElementById('btnFullscreen').addEventListener('click', () => {
-      const el = document.getElementById('mapaCartografia');
-      if (!document.fullscreenElement) el.requestFullscreen?.() || el.webkitRequestFullscreen?.();
-      else document.exitFullscreen?.();
+      const elem = document.getElementById('mapaCartografia');
+      if (!document.fullscreenElement) elem.requestFullscreen().catch(err => console.log(err));
+      else document.exitFullscreen();
     });
 
     setTimeout(() => map.invalidateSize(), 400);
@@ -392,7 +393,109 @@
         btn.classList.add('active');
       });
     });
+
+    // Función para animar números
+    function animateValue(id, start, end, duration) {
+      const obj = document.getElementById(id);
+      let startTime = null;
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        let progress = Math.min((timestamp - startTime) / duration, 1);
+        obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+        if (progress < 1) window.requestAnimationFrame(step);
+      }
+      window.requestAnimationFrame(step);
+    }
+
+    // Escuchar mensajes desde index.html
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.action === 'highlightCommunity') {
+        const targetName = event.data.community;
+        const targetPolygon = ccLayers[targetName];
+        const targetMarker = ccMarkers[targetName];
+        
+        if (targetPolygon) {
+          map.fitBounds(targetPolygon.getBounds());
+          targetPolygon.openPopup();
+          targetPolygon.getElement()?.animate([
+            { fillOpacity: 0.1, weight: 2 },
+            { fillOpacity: 0.6, weight: 5 },
+            { fillOpacity: 0.2, weight: 2 }
+          ], { duration: 1500, iterations: 3 });
+        } else if (targetMarker) {
+          map.setView(targetMarker.getLatLng(), 16);
+          targetMarker.openPopup();
+        }
+      }
+    });
+
+    // Populate KPIs using API (Base de datos real)
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        let totalHab = 0;
+        let totalViv = 0;
+        
+        // 1. Cargar Habitantes y distribuirlos por comunidad
+        if (window.api && window.api.getHabitantes) {
+          const habitantes = await window.api.getHabitantes();
+          totalHab = habitantes.length;
+          
+          // Agrupar por consejo
+          const habPorConsejo = {};
+          habitantes.forEach(h => {
+            const cc = h.consejo_comunal || 'Desconocido';
+            habPorConsejo[cc] = (habPorConsejo[cc] || 0) + 1;
+          });
+          
+          // Actualizar tooltips iniciales
+          consejos.forEach(cc => {
+            const count = habPorConsejo[cc.nombre] || 0;
+            if (ccLayers[cc.nombre]) {
+              ccLayers[cc.nombre].setTooltipContent(`<b>${cc.nombre}</b><br>${count} habitantes`);
+            }
+          });
+          
+          // Inyectar en popups abiertos
+          map.on('popupopen', function() {
+            consejos.forEach(cc => {
+              const elId = `pop-per-${cc.nombre.replace(/\s+/g, '')}`;
+              const el = document.getElementById(elId);
+              if (el) el.innerText = `${habPorConsejo[cc.nombre] || 0} personas`;
+            });
+          });
+        }
+        
+        // 2. Cargar Viviendas (Familias)
+        if (window.api && window.api.getViviendas) {
+          const viviendas = await window.api.getViviendas();
+          totalViv = viviendas.length;
+          
+          const vivPorConsejo = {};
+          viviendas.forEach(v => {
+            const cc = v.consejo_comunal || 'Desconocido';
+            vivPorConsejo[cc] = (vivPorConsejo[cc] || 0) + 1;
+          });
+          
+          map.on('popupopen', function() {
+            consejos.forEach(cc => {
+              const elId = `pop-fam-${cc.nombre.replace(/\s+/g, '')}`;
+              const el = document.getElementById(elId);
+              if (el) el.innerText = `${vivPorConsejo[cc.nombre] || 0} familias`;
+            });
+          });
+        }
+
+        // 3. Actualizar KPIs globales
+        document.getElementById('cartKpiFamilias').innerText = totalViv.toLocaleString();
+        document.querySelector('#cartKpiFamilias + .kpi-trend').innerHTML = `<i class="fas fa-users"></i> ~${totalHab.toLocaleString()} personas`;
+        
+      } catch(e) {
+        console.error('Error fetching data for cartografia KPIs', e);
+      }
+    });
   </script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/layout-menu.js"></script>
   <script src="js/roles.js"></script>
 </body>

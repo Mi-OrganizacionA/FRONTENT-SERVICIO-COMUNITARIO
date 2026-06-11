@@ -5,8 +5,8 @@
       title: 'Gestión Principal',
       items: [
         { href: 'dashboard.html', icon: 'tachometer-alt', label: 'Dashboard' },
-        { href: 'censo.html', icon: 'users', label: 'Censo Comunitario', badge: '347' },
-        { href: 'noticias.html', icon: 'newspaper', label: 'Cartelera Digital', badge: '12' }
+        { href: 'censo.html', icon: 'users', label: 'Censo Comunitario' },
+        { href: 'noticias.html', icon: 'newspaper', label: 'Cartelera Digital' }
       ]
     },
     {
@@ -19,7 +19,7 @@
     {
       title: 'Información Comunal',
       items: [
-        { href: 'institucional.html', icon: 'landmark', label: 'Info Institucional' }
+        { href: 'notificaciones.html', icon: 'bell', label: 'Centro de Notificaciones' }
       ]
     },
     {
@@ -72,12 +72,12 @@
         <div class="sidebar-brand-icon"><i class="fas fa-seedling"></i></div>
         <div class="sidebar-brand-text">
           <strong>SICAG</strong>
-          <small>Panel Administrativo v3.0</small>
+          <small>Panel Administrativo v2.5</small>
         </div>
       </div>
       ${htmlSections}
       <div class="sidebar-footer">
-        <small>SICAG v3.0 · Sala de Autogobierno · 2026</small>
+        <small>SICAG v2.5 · Sala de Autogobierno · 2026</small>
       </div>`;
   }
 

@@ -27,6 +27,27 @@ class NoticiasController {
 
   static async create(req, res) {
     try {
+      const Configuracion = NoticiaModel.sequelize.models.Configuracion;
+      const BandejaValidaciones = NoticiaModel.sequelize.models.BandejaValidaciones;
+      
+      const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Noticias' } });
+      const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+      
+      const autoApprove = (globalConfig && globalConfig.valor === 'true') || 
+                          (config && config.valor === 'true') || 
+                          req.user?.rol === 'admin';
+
+      if (!autoApprove) {
+        await BandejaValidaciones.create({
+          id_vocero: req.user.id,
+          tabla_afectada: 'cartelera_digital',
+          tipo_accion: 'CREATE',
+          datos_temporales: req.body,
+          estado_tramite: 'Pendiente'
+        });
+        return res.status(202).json({ mensaje: 'Solicitud enviada a la bandeja de validaciones.' });
+      }
+
       const noticia = await NoticiasService.create(NoticiaModel, req.body);
       await AuditService.log(req.user.id, 'CREATE', 'noticias', noticia.id, null, noticia);
       res.status(201).json(noticia);

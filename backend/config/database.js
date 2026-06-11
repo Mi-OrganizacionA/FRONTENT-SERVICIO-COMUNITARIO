@@ -5,7 +5,7 @@ const logger = require('../utils/logger');
 async function initSQLite() {
   const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: env.db.sqlite_storage || 'database.sqlite',
+    storage: process.env.SQLITE_STORAGE || env.db.sqlite_storage || 'database.sqlite',
     logging: env.node_env === 'development' ? console.log : false
   });
 
@@ -20,18 +20,34 @@ async function initSQLite() {
 }
 
 async function initPostgres() {
-  const sequelize = new Sequelize(
-    env.db.name,
-    env.db.user,
-    env.db.password,
-    {
-      host: env.db.host,
-      port: env.db.port,
+  let sequelize;
+
+  if (process.env.DATABASE_URL) {
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
       dialect: 'postgres',
       logging: env.node_env === 'development' ? console.log : false,
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false
+        }
+      },
       pool: { max: 5, min: 0, acquire: 30000, idle: 10000 }
-    }
-  );
+    });
+  } else {
+    sequelize = new Sequelize(
+      env.db.name,
+      env.db.user,
+      env.db.password,
+      {
+        host: env.db.host,
+        port: env.db.port,
+        dialect: 'postgres',
+        logging: env.node_env === 'development' ? console.log : false,
+        pool: { max: 5, min: 0, acquire: 30000, idle: 10000 }
+      }
+    );
+  }
 
   try {
     await sequelize.authenticate();

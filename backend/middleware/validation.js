@@ -1,4 +1,4 @@
-const Joi = require('joi');
+﻿const Joi = require('joi');
 
 function validate(schemas) {
   if (Joi.isSchema(schemas)) {
@@ -20,7 +20,14 @@ function validate(schemas) {
       });
 
       if (error) {
-        return res.status(400).json({ error: error.details.map(d => d.message).join(', ') });
+        return res.status(400).json({
+          error: 'Datos inválidos',
+          details: error.details.map(d => ({
+            message: d.message,
+            path: d.path,
+            type: d.type
+          }))
+        });
       }
 
       req[source] = value;

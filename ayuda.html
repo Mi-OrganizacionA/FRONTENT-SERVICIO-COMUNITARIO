@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Centro de Ayuda Administrativa - SICAG v2.5</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="css/admin.css" rel="stylesheet">
+
+  <style>
+    /* Contenedor principal */
+    .docs-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    /* Índice superior */
+    .docs-index {
+      background: var(--card);
+      border-radius: var(--r-lg);
+      padding: 2rem;
+      margin-bottom: 3rem;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      animation: fadeInUp 0.5s ease both;
+    }
+
+    .docs-index-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--txt);
+      margin-bottom: 1.5rem;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .docs-nav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .docs-nav-grid a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: rgba(67, 160, 71, 0.05);
+      border-radius: var(--r-md);
+      text-decoration: none;
+      color: var(--txt);
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+      border: 1px solid transparent;
+    }
+
+    .docs-nav-grid a i {
+      color: var(--vp);
+      font-size: 1.2rem;
+    }
+
+    .docs-nav-grid a:hover {
+      background: var(--vp);
+      color: #fff;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(67, 160, 71, 0.2);
+    }
+
+    .docs-nav-grid a:hover i {
+      color: #fff;
+    }
+
+    /* Secciones de Contenido */
+    .docs-section {
+      background: var(--card);
+      border-radius: var(--r-lg);
+      padding: 3rem;
+      margin-bottom: 2.5rem;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      scroll-margin-top: 100px; /* Margen para el ancla */
+      animation: fadeInUp 0.6s ease both;
+    }
+
+    .docs-section-header {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid rgba(67, 160, 71, 0.1);
+    }
+
+    .docs-section-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: var(--r-md);
+      background: linear-gradient(135deg, var(--vv), var(--vd));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      box-shadow: 0 4px 15px rgba(46, 125, 50, 0.2);
+      flex-shrink: 0;
+    }
+
+    .docs-section-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--txt);
+      margin: 0;
+    }
+
+    .docs-text {
+      font-size: 1rem;
+      color: var(--sub);
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Listas dentro de contenido */
+    .docs-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.5rem 0;
+      display: grid;
+      gap: 1.2rem;
+    }
+
+    .docs-list li {
+      position: relative;
+      padding-left: 2.5rem;
+      font-size: 0.95rem;
+      color: var(--txt);
+      line-height: 1.6;
+      background: rgba(0,0,0,0.02);
+      padding: 1rem 1rem 1rem 3rem;
+      border-radius: var(--r-sm);
+    }
+
+    .docs-list li i {
+      position: absolute;
+      left: 1rem;
+      top: 1.1rem;
+      color: var(--vp);
+      font-size: 1.2rem;
+    }
+
+    /* Colores personalizados por sección */
+    #organizaciones .docs-section-icon { background: linear-gradient(135deg, #42A5F5, #1565C0); box-shadow: 0 4px 15px rgba(21, 101, 192, 0.2); }
+    #organizaciones .docs-section-header { border-bottom-color: rgba(21, 101, 192, 0.1); }
+    #organizaciones .docs-list li i { color: #1565C0; }
+
+    #produccion .docs-section-icon { background: linear-gradient(135deg, #FF7043, #E64A19); box-shadow: 0 4px 15px rgba(230, 74, 25, 0.2); }
+    #produccion .docs-section-header { border-bottom-color: rgba(230, 74, 25, 0.1); }
+    #produccion .docs-list li i { color: #E64A19; }
+
+    #cartelera .docs-section-icon { background: linear-gradient(135deg, #AB47BC, #6A1B9A); box-shadow: 0 4px 15px rgba(106, 27, 154, 0.2); }
+    #cartelera .docs-section-header { border-bottom-color: rgba(106, 27, 154, 0.1); }
+    #cartelera .docs-list li i { color: #6A1B9A; }
+
+    /* Flujo de Validación Integrado */
+    .flow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .flow-step-row {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      background: var(--bg);
+      padding: 1.5rem;
+      border-radius: var(--r-md);
+      border: 1px solid var(--border);
+    }
+
+    .flow-step-number {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--vp);
+      border: 3px solid var(--vp);
+      box-shadow: 0 4px 10px rgba(67, 160, 71, 0.1);
+      flex-shrink: 0;
+    }
+
+    .step-pending .flow-step-number { color: #E65100; border-color: #F9A825; box-shadow: 0 4px 10px rgba(249, 168, 37, 0.1); }
+    .step-admin .flow-step-number { color: #1565C0; border-color: #1565C0; box-shadow: 0 4px 10px rgba(21, 101, 192, 0.1); }
+
+    .flow-step-text h4 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--txt);
+      margin-bottom: 0.3rem;
+    }
+
+    .flow-step-text p {
+      font-size: 0.95rem;
+      color: var(--sub);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .docs-section { padding: 2rem; }
+      .flow-step-row { flex-direction: column; text-align: center; }
+    }
+  </style>
+  <script>
+    if (!localStorage.getItem('token') || !localStorage.getItem('user')) {
+      window.location.replace('login.html');
+    }
+  </script>
+</head>
+
+<body data-search-placeholder="Buscar manuales...">
+
+  <div class="barra-tricolor"></div>
+  <div id="header-placeholder"></div>
+  <div id="sidebar-placeholder"></div>
+
+  <main class="app-main">
+    
+    <!-- HERO SECTION -->
+    <div class="ph-wrap fade-in" style="margin: 0 auto; max-width: 1000px; border-radius: 0 0 var(--r-lg) var(--r-lg);">
+      <div class="ph-deco-dots" aria-hidden="true"></div>
+      <nav class="ph-breadcrumb" aria-label="Ruta de navegación">
+        <a href="dashboard.html"><i class="fas fa-home"></i></a>
+        <i class="fas fa-chevron-right ph-sep"></i>
+        <span class="ph-cur">Documentación</span>
+      </nav>
+      <div class="ph-body">
+        <div class="ph-left">
+          <div class="ph-icon"><i class="fas fa-book"></i></div>
+          <div>
+            <div class="ph-module">SICAG — Guía Administrativa</div>
+            <h1 class="ph-title">Manual de Operaciones</h1>
+            <p class="ph-sub" style="max-width: 800px;">
+              Una guía clara y directa sobre cómo funciona el sistema, los diferentes módulos disponibles y los procesos de revisión de información.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WRAPPER DOCUMENTACIÓN -->
+    <div class="docs-container">
+      
+      <!-- ÍNDICE SUPERIOR -->
+      <div class="docs-index">
+        <h3 class="docs-index-title">Índice de Contenido</h3>
+        <div class="docs-nav-grid">
+          <a href="#censo"><i class="fas fa-users-viewfinder"></i> Censo y Familias</a>
+          <a href="#organizaciones"><i class="fas fa-hands-holding-circle"></i> Organizaciones</a>
+          <a href="#produccion"><i class="fas fa-tractor"></i> Producción Agrícola</a>
+          <a href="#cartelera"><i class="fas fa-newspaper"></i> Cartelera Digital</a>
+          <a href="#validaciones"><i class="fas fa-shield-halved"></i> Flujo de Revisión</a>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 1: CENSO -->
+      <section id="censo" class="docs-section">
+        <div class="docs-section-header">
+          <div class="docs-section-icon"><i class="fas fa-users-viewfinder"></i></div>
+          <h2 class="docs-section-title">Censo Comunitario y Familiar</h2>
+        </div>
+        <p class="docs-text">
+          Este es el módulo central del sistema. Aquí se gestiona la información de todos los habitantes, agrupándolos de forma ordenada según su núcleo familiar y la vivienda en la que residen.
+        </p>
+        <ul class="docs-list">
+          <li><i class="fas fa-microchip"></i> <strong>Cálculos Inteligentes:</strong> El sistema calcula automáticamente la edad y determina si un habitante está en edad de votar, basándose únicamente en su fecha de nacimiento. No es necesario actualizar estos datos cada año.</li>
+          <li><i class="fas fa-house-chimney"></i> <strong>Estructura Familiar:</strong> Las personas se agrupan en familias, las cuales habitan en una vivienda específica. Cada familia cuenta con un representante o Jefe de Familia asignado.</li>
+          <li><i class="fas fa-eye-slash"></i> <strong>Privacidad por Sector:</strong> Para garantizar el orden y la privacidad, cada Vocero solo puede visualizar y gestionar a los habitantes que pertenecen a su propio Consejo Comunal.</li>
+        </ul>
+      </section>
+
+      <!-- SECCIÓN 2: ORGANIZACIONES -->
+      <section id="organizaciones" class="docs-section">
+        <div class="docs-section-header">
+          <div class="docs-section-icon"><i class="fas fa-hands-holding-circle"></i></div>
+          <h2 class="docs-section-title">Organizaciones y Proyectos</h2>
+        </div>
+        <p class="docs-text">
+          Este apartado permite registrar y hacer seguimiento a la vida social y a las obras de infraestructura que se desarrollan dentro de la comunidad.
+        </p>
+        <ul class="docs-list">
+          <li><i class="fas fa-users"></i> <strong>Participación Ciudadana:</strong> Un habitante puede inscribirse y participar activamente en múltiples grupos sociales al mismo tiempo, como Comités de Salud, Mesas Técnicas de Agua o Clubes Deportivos.</li>
+          <li><i class="fas fa-seedling"></i> <strong>Seguimiento de Obras:</strong> Permite registrar proyectos comunitarios, detallando la inversión realizada y el porcentaje de avance, manteniendo un historial claro de las mejoras en el sector.</li>
+        </ul>
+      </section>
+
+      <!-- SECCIÓN 3: PRODUCCIÓN AGRÍCOLA -->
+      <section id="produccion" class="docs-section">
+        <div class="docs-section-header">
+          <div class="docs-section-icon"><i class="fas fa-tractor"></i></div>
+          <h2 class="docs-section-title">Producción Agrícola</h2>
+        </div>
+        <p class="docs-text">
+          Un módulo especializado para llevar un inventario de la siembra, los rubros cosechados y las capacidades productivas de las parcelas locales.
+        </p>
+        <ul class="docs-list">
+          <li><i class="fas fa-user-tag"></i> <strong>Perfil de Productor:</strong> Al registrar a un habitante en este módulo, el sistema lo reconoce de forma automática como un productor activo de la comunidad.</li>
+          <li><i class="fas fa-layer-group"></i> <strong>Gestión de Parcelas:</strong> Un mismo productor puede tener a su cargo varias parcelas diferentes, permitiendo registrar distintos rubros (por ejemplo, hortalizas en una y tubérculos en otra).</li>
+          <li><i class="fas fa-map-location-dot"></i> <strong>Ubicación Geográfica:</strong> Cada parcela puede incluir coordenadas, lo que facilita su ubicación visual en el mapa de la comunidad.</li>
+        </ul>
+      </section>
+
+      <!-- SECCIÓN 4: CARTELERA -->
+      <section id="cartelera" class="docs-section">
+        <div class="docs-section-header">
+          <div class="docs-section-icon"><i class="fas fa-newspaper"></i></div>
+          <h2 class="docs-section-title">Cartelera y Votaciones</h2>
+        </div>
+        <p class="docs-text">
+          Es el canal de comunicación directa con los ciudadanos a través de la página pública del sistema. Fomenta la información y la participación democrática.
+        </p>
+        <ul class="docs-list">
+          <li><i class="fas fa-bullhorn"></i> <strong>Noticias y Avisos:</strong> Las novedades y eventos importantes se publican aquí para que toda la comunidad pueda leerlas desde la página principal.</li>
+          <li><i class="fas fa-user-check"></i> <strong>Encuestas Seguras:</strong> Cuando se crea una consulta ciudadana, el sistema verifica automáticamente la edad de quien intenta votar, permitiendo la participación solo a los mayores de 15 años.</li>
+        </ul>
+      </section>
+
+      <!-- SECCIÓN 5: VALIDACIONES Y BANDEJA -->
+      <section id="validaciones" class="docs-section">
+        <div class="docs-section-header">
+          <div class="docs-section-icon"><i class="fas fa-shield-halved"></i></div>
+          <h2 class="docs-section-title">Seguridad: Flujo de Revisión</h2>
+        </div>
+        <p class="docs-text">
+          Para asegurar que la información del sistema sea siempre correcta y confiable, se ha implementado un proceso de revisión en dos pasos. Ningún registro se guarda permanentemente sin haber sido auditado.
+        </p>
+        
+        <div class="flow-steps">
+          <div class="flow-step-row">
+            <div class="flow-step-number"><i class="fas fa-pen"></i></div>
+            <div class="flow-step-text">
+              <h4>1. Solicitud de Registro</h4>
+              <p>El Vocero llena el formulario correspondiente con los datos nuevos (por ejemplo, al registrar una nueva vivienda o habitante).</p>
+            </div>
+          </div>
+
+          <div class="flow-step-row step-pending">
+            <div class="flow-step-number"><i class="fas fa-box"></i></div>
+            <div class="flow-step-text">
+              <h4>2. Estado Pendiente</h4>
+              <p>La información ingresada no se guarda de inmediato. En su lugar, se empaqueta de forma segura y se envía a la "Bandeja de Validaciones" a la espera de revisión.</p>
+            </div>
+          </div>
+
+          <div class="flow-step-row step-admin">
+            <div class="flow-step-number"><i class="fas fa-user-shield"></i></div>
+            <div class="flow-step-text">
+              <h4>3. Revisión Administrativa</h4>
+              <p>El Administrador recibe una notificación. Puede abrir la solicitud, revisar que todos los datos sean correctos e incluso corregir pequeños errores antes de continuar.</p>
+            </div>
+          </div>
+
+          <div class="flow-step-row">
+            <div class="flow-step-number"><i class="fas fa-check-double"></i></div>
+            <div class="flow-step-text">
+              <h4>4. Aprobación Final</h4>
+              <p>Una vez que el Administrador hace clic en "Aceptar", el sistema toma la información revisada y la guarda de manera oficial y permanente en los registros de la comunidad.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/layout-menu.js"></script>
+
+</body>
+
+</html>

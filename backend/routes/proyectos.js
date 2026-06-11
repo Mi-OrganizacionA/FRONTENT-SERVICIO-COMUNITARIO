@@ -5,6 +5,7 @@ const { verifyToken, requireRole } = require('../middleware/auth');
 const { validate } = require('../middleware/validation');
 const { proyectoSchema, idParamSchema, paginationSchema } = require('../utils/validators');
 
+router.get('/publico', validate({ query: paginationSchema }), proyectosController.getPublicos);
 router.get('/', validate({ query: paginationSchema }), verifyToken, proyectosController.getAll);
 router.get('/:id', validate({ params: idParamSchema }), verifyToken, proyectosController.getById);
 router.post('/', verifyToken, requireRole(['vocero','admin']), validate(proyectoSchema), proyectosController.create);

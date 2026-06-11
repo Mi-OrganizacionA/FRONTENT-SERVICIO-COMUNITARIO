@@ -1,0 +1,197 @@
+const puppeteer = require('puppeteer');
+const fs = require('fs');
+const path = require('path');
+
+class PdfGeneradorViviendas {
+  /**
+   * Genera el PDF completo usando Puppeteer
+   */
+  static async generarPdf(vivienda, habitantes, consejoComunal) {
+    // 1. Leer las plantillas
+    const p1Path = path.join(__dirname, '../templates/censo_p1.html');
+    const p2Path = path.join(__dirname, '../templates/censo_p2.html');
+    
+    let htmlP1 = fs.existsSync(p1Path) ? fs.readFileSync(p1Path, 'utf8') : '<h1>P1 no encontrada</h1>';
+    let htmlP2 = fs.existsSync(p2Path) ? fs.readFileSync(p2Path, 'utf8') : '<h1>P2 no encontrada</h1>';
+
+    // 2. Extraer solo el div.page de P2 (y sus tags internos)
+    // Para ello usamos un regex o split simple, ya que asuminos que tiene <div class="page">
+    let page2Content = '';
+    const matchP2 = htmlP2.match(/<div class="page">([\s\S]*?)<\/div>\s*<\/body>/);
+    if (matchP2) {
+      page2Content = `<div class="page" style="page-break-before: always; margin-top:20px;">${matchP2[1]}</div>`;
+    } else {
+      page2Content = `<div class="page" style="page-break-before: always; margin-top:20px;">${htmlP2}</div>`;
+    }
+
+    // 3. Preparar los datos a inyectar en JSON puro
+    const payload = {
+      vivienda: vivienda || {},
+      habitantes: habitantes || [],
+      consejo: consejoComunal || {}
+    };
+
+    // 4. Script inyector masivo (se ejecuta dentro de Chromium)
+    const inyectorJS = `
+    <script>
+      const dbData = ${JSON.stringify(payload)};
+      
+      document.addEventListener("DOMContentLoaded", () => {
+        try {
+          // Llenar Datos Geográficos (Sección I)
+          const geoCells = document.querySelectorAll('.geo-cell .cell-value');
+          if (geoCells.length >= 6) {
+            geoCells[0].innerHTML = 'Yaracuy'; // Estado
+            geoCells[1].innerHTML = 'San Felipe'; // Municipio
+            geoCells[2].innerHTML = 'Albarico'; // Parroquia
+            geoCells[4].innerHTML = dbData.consejo.nombre_comunidad || ''; 
+            geoCells[5].innerHTML = dbData.vivienda.direccion || '';
+          }
+
+          // Separar habitantes: Jefe de familia vs resto
+          const jefe = dbData.habitantes.find(h => h.es_jefe_familia) || dbData.habitantes[0] || {};
+          const familiaResto = dbData.habitantes.filter(h => h.id !== jefe.id);
+
+          // Llenar Datos Personales del Jefe (Sección II)
+          const fields = document.querySelectorAll('.jefe-nombres .line');
+          if (fields.length >= 2) {
+            fields[0].innerHTML = '&nbsp;' + (jefe.nombres || '');
+            fields[1].innerHTML = '&nbsp;' + (jefe.apellidos || '');
+          }
+
+          // CI
+          const ciLine = document.querySelector('.jefe-ci .line');
+          if(ciLine) ciLine.innerHTML = '&nbsp;' + (jefe.cedula || '');
+
+          // Fechas y Edades
+          const jNacimiento = document.querySelector('.jefe-nacimiento');
+          if (jNacimiento) {
+            const dateLine = jNacimiento.querySelectorAll('.line');
+            if (dateLine[0] && jefe.fecha_nacimiento) dateLine[0].innerHTML = '&nbsp;' + new Date(jefe.fecha_nacimiento).toLocaleDateString();
+            
+            // Calculo simple de edad
+            if (dateLine[1] && jefe.fecha_nacimiento) {
+              const diff = Date.now() - new Date(jefe.fecha_nacimiento).getTime();
+              const age = Math.abs(new Date(diff).getUTCFullYear() - 1970);
+              dateLine[1].innerHTML = '&nbsp;' + age;
+            }
+          }
+
+          // Marcar Checkboxes si es CNE inscrito
+          if (jNacimiento && jNacimiento.querySelectorAll('input[type="checkbox"]').length >= 2) {
+            const chks = jNacimiento.querySelectorAll('input[type="checkbox"]');
+            if (jefe.inscrito_cne) chks[0].setAttribute('checked', 'true');
+            else chks[1].setAttribute('checked', 'true');
+          }
+
+          // Sexo
+          const jSexo = document.querySelector('.jefe-sexo');
+          if(jSexo && jSexo.querySelectorAll('input[type="checkbox"]').length >= 2) {
+            const chks = jSexo.querySelectorAll('input[type="checkbox"]');
+            if (jefe.genero === 'M') chks[0].setAttribute('checked', 'true');
+            if (jefe.genero === 'F') chks[1].setAttribute('checked', 'true');
+          }
+
+          // Multi-hoja Familia
+          // Si hay más de 10 personas, clonar page1.
+          const pageContainer = document.body;
+          const originalPage1 = document.querySelector('.page');
+          const allFamily = dbData.habitantes;
+          const pagesNeeded = Math.ceil(allFamily.length / 10) || 1;
+
+          for(let p = 1; p < pagesNeeded; p++) {
+             // Clona
+             const cln = originalPage1.cloneNode(true);
+             cln.style.pageBreakBefore = 'always';
+             // Limpia el tbody clonado
+             cln.querySelector('.familia-table tbody').innerHTML = '';
+             // Inserta el clon ANTES de la pagina 2 (la cual ya inyecté por replace abajo)
+             pageContainer.insertBefore(cln, pageContainer.lastElementChild);
+          }
+
+          // Ahora llenar en los tbody correspondientes
+          const tbodyList = document.querySelectorAll('.familia-table tbody');
+          
+          let famIdx = 0;
+          for(let tb = 0; tb < pagesNeeded; tb++) {
+            const currentTbody = tbodyList[tb];
+            if(!currentTbody) continue;
+            currentTbody.innerHTML = '';
+            
+            for(let i = 0; i < 10; i++) {
+              const tr = document.createElement('tr');
+              if (famIdx < allFamily.length) {
+                const hab = allFamily[famIdx];
+                let age = '';
+                let fnac = '';
+                if (hab.fecha_nacimiento) {
+                  fnac = new Date(hab.fecha_nacimiento).toLocaleDateString();
+                  const diff = Date.now() - new Date(hab.fecha_nacimiento).getTime();
+                  age = Math.abs(new Date(diff).getUTCFullYear() - 1970);
+                }
+
+                tr.innerHTML = \`
+                  <td class="num">\${famIdx + 1}</td>
+                  <td>\${hab.nombres} \${hab.apellidos}</td>
+                  <td>\${hab.genero || ''}</td>
+                  <td>\${hab.cedula || ''}</td>
+                  <td>\${fnac}</td>
+                  <td>\${age}</td>
+                  <td>\${hab.incapacitado_tipo || ''}</td>
+                  <td></td>
+                  <td>\${hab.es_jefe_familia ? 'Jefe' : 'Familiar'}</td>
+                  <td>\${hab.nivel_academico || ''}</td>
+                  <td>\${hab.inscrito_cne ? 'SI' : 'NO'}</td>
+                  <td>\${hab.ocupacion || ''}</td>
+                  <td></td>
+                  <td></td>
+                \`;
+                famIdx++;
+              } else {
+                tr.innerHTML = \`<td class="num">\${famIdx + 1}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>\`;
+                famIdx++;
+              }
+              currentTbody.appendChild(tr);
+            }
+          }
+
+        } catch(e) {
+          console.error("Error injectando data", e);
+        }
+      });
+    </script>
+    `;
+
+    // 5. Unir Todo el HTML
+    // Reemplazamos </body> por la Página 2 + el inyector JS + </body>
+    const finalHTML = htmlP1.replace('</body>', page2Content + inyectorJS + '</body>');
+
+    // 6. Lanzar Puppeteer
+    const browser = await puppeteer.launch({ 
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+    
+    const page = await browser.newPage();
+    
+    // Forzamos un tamaño de ventana para que coincida con .page width: 950px o carta
+    await page.setViewport({ width: 1024, height: 1200 });
+
+    // Cargamos el HTML y esperamos a que el script de inyección modifique el DOM
+    await page.setContent(finalHTML, { waitUntil: 'networkidle0' });
+
+    // 7. Generar el PDF
+    // Las plantillas tienen un ancho fijo. Ajustamos el formato para que entre bien.
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: { top: '10px', bottom: '10px', left: '10px', right: '10px' }
+    });
+
+    await browser.close();
+
+    return pdfBuffer;
+  }
+}
+
+module.exports = PdfGeneradorViviendas;

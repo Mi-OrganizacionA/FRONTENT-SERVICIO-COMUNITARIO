@@ -4,16 +4,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SICAG | Comuna Socialista Agroecológica Simón Rodríguez — Las Mercedes</title>
   <meta name="description"
-    content="Portal público de la Comuna Socialista Agrícola Simón Rodríguez — Consulta habitantes, proyectos agroecológicos, cartelera digital y mapa de los 9 consejos comunales. Las Mercedes, San Felipe, Yaracuy.">
-  <title>Comuna Simón Rodríguez — Gestión Digital Comunal · SICAG</title>
+    content="SICAG Consulta de habitantes, proyectos y noticias de los 9 consejos comunales del sector Las Mercedes, San Felipe, Yaracuy.">
+
+  <meta name="keywords"
+    content="SICAG, Comuna Socialista Agroecológica Simón Rodríguez, Las Mercedes, San Felipe, Yaracuy, consejos comunales, sistema comunal, agroecología, Venezuela">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SICAG Comuna Socialista Agroecológica Simón Rodríguez">
+  <meta property="og:title" content="Portal Oficial - Comuna Socialista Agroecológica Simón Rodríguez">
+  <meta property="og:description"
+    content="Ingresa al SICAG para consultar la cartelera digital, el registro poblacional y los proyectos de nuestro sector.">
+  <meta property="og:url" content="https://sicag-oficial.web.app/">
+  <meta property="og:image" content="https://sicag-oficial.web.app/assets/img/logo_comuna_fondoremovido.png">
+  <link rel="icon" type="image/png" href="assets/img/logo_comuna_fondoremovido.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap"
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link href="css/public.css" rel="stylesheet">
-  <!-- Anime.js v3 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  <link rel="preload" href="assets/img/hero_banner.png" as="image">
 </head>
 
 <body class="public-page">
@@ -29,14 +41,14 @@
       <img src="assets/img/logo_comuna.png" alt="Logo SICAG" width="42" height="42">
       <div>
         <span>SICAG</span>
-        <span class="brand-sub">Comuna Simón Rodríguez</span>
+        <span class="brand-sub">Sistema de Información Comunal Agroecológica</span>
       </div>
     </a>
 
     <ul class="pub-nav-links" id="pubNavLinks" role="list">
       <li><a href="#inicio" class="active">Inicio</a></li>
       <li><a href="#habitantes">Habitantes</a></li>
-
+      <li><a href="#proyectos">Proyectos</a></li>
       <li><a href="#cartelera">Cartelera</a></li>
       <li><a href="#mapa">Mapa</a></li>
       <li><a href="#contacto">Contacto</a></li>
@@ -57,8 +69,34 @@
        HERO SECTION
        ══════════════════════════════════════════════════════ -->
   <section class="pub-hero" id="inicio" aria-label="Sección principal">
-    <div class="pub-hero-bg" id="heroBg" role="img" aria-label="Paisaje agrícola Las Mercedes"></div>
+    <div class="pub-hero-bg" id="heroBg" role="img" aria-label="Paisaje agrícola Las Mercedes"
+      style="background-size:cover;background-position:center center;"></div>
     <div class="pub-hero-overlay"></div>
+
+    <!-- Controles para cambiar imágenes (verticales a la derecha) -->
+    <div class="pub-hero-controls" aria-hidden="false"
+      style="position:absolute;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:6">
+      <button id="heroPrev" class="hero-btn" aria-label="Anterior"
+        style="background:rgba(0,0,0,.35);border:none;color:#fff;padding:8px;border-radius:6px"><i
+          class="fas fa-chevron-up"></i></button>
+      <div id="heroDots" class="hero-dots" style="display:flex;flex-direction:column;gap:2px;align-items:center;">
+        <button class="hero-dot active" data-index="0"
+          style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.9);background-clip:padding-box;box-sizing:border-box;cursor:pointer;"
+          aria-label="Ver imagen 1"></button>
+        <button class="hero-dot" data-index="1"
+          style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.5);background-clip:padding-box;box-sizing:border-box;cursor:pointer;"
+          aria-label="Ver imagen 2"></button>
+        <button class="hero-dot" data-index="2"
+          style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.5);background-clip:padding-box;box-sizing:border-box;cursor:pointer;"
+          aria-label="Ver imagen 3"></button>
+        <button class="hero-dot" data-index="3"
+          style="width:44px;height:44px;border-radius:50%;border:16px solid transparent;background:rgba(255,255,255,.5);background-clip:padding-box;box-sizing:border-box;cursor:pointer;"
+          aria-label="Ver imagen 4"></button>
+      </div>
+      <button id="heroNext" class="hero-btn" aria-label="Siguiente"
+        style="background:rgba(0,0,0,.35);border:none;color:#fff;padding:8px;border-radius:6px"><i
+          class="fas fa-chevron-down"></i></button>
+    </div>
 
     <div class="pub-hero-content">
       <div class="pub-hero-badge">
@@ -83,26 +121,53 @@
       <span>Explorar</span>
       <i class="fas fa-chevron-down"></i>
     </div>
+
+    <script>
+      (function () {
+        const images = ['assets/img/hero_banner.png', 'assets/img/proyecto_siembra.png', 'assets/img/proyecto_maiz.png', 'assets/img/proyecto_hortalizas.png'];
+        let idx = 0;
+        const heroBg = document.getElementById('heroBg');
+        const dots = () => Array.from(document.querySelectorAll('.hero-dot'));
+        function setImage(i) {
+          idx = (i + images.length) % images.length;
+          heroBg.style.backgroundImage = `url('${images[idx]}')`;
+          dots().forEach(d => {
+            d.classList.toggle('active', Number(d.dataset.index) === idx);
+            d.style.background = Number(d.dataset.index) === idx ? 'rgba(255,255,255,.95)' : 'rgba(255,255,255,.5)';
+          });
+
+          // Pre-carga diferida (lazy load) de la siguiente imagen
+          const nextImg = new Image();
+          nextImg.src = images[(idx + 1) % images.length];
+        }
+        setImage(0);
+        let timer = setInterval(() => setImage(idx + 1), 5000);
+        function resetTimer() { clearInterval(timer); timer = setInterval(() => setImage(idx + 1), 5000); }
+        document.getElementById('heroPrev').addEventListener('click', () => { setImage(idx - 1); resetTimer(); });
+        document.getElementById('heroNext').addEventListener('click', () => { setImage(idx + 1); resetTimer(); });
+        document.getElementById('heroDots').addEventListener('click', (e) => { if (e.target && e.target.classList.contains('hero-dot')) { setImage(Number(e.target.dataset.index)); resetTimer(); } });
+      })();
+    </script>
   </section>
 
   <!-- ══════════════════════════════════════════════════════
        STATS BANNER
        ══════════════════════════════════════════════════════ -->
   <section class="pub-stats" aria-label="Estadísticas de la comuna">
-    <div class="pub-stats-grid">
+    <div class="pub-stats-grid" id="indexStatsRow">
       <div class="pub-stat-item fade-up">
         <div class="pub-stat-icon"><i class="fas fa-users"></i></div>
-        <div class="pub-stat-num" data-count="6000" data-suffix="+">6.000+</div>
+        <div class="pub-stat-num" id="idxHab">0</div>
         <div class="pub-stat-label">Habitantes Registrados</div>
       </div>
       <div class="pub-stat-item fade-up fade-up-d1">
         <div class="pub-stat-icon"><i class="fas fa-map-marked-alt"></i></div>
-        <div class="pub-stat-num" data-count="9">9</div>
+        <div class="pub-stat-num" id="idxCC">0</div>
         <div class="pub-stat-label">Consejos Comunales</div>
       </div>
       <div class="pub-stat-item fade-up fade-up-d2">
         <div class="pub-stat-icon"><i class="fas fa-tractor"></i></div>
-        <div class="pub-stat-num" data-count="156">156</div>
+        <div class="pub-stat-num" id="idxHectareas">0</div>
         <div class="pub-stat-label">Hectáreas Cultivadas</div>
       </div>
     </div>
@@ -118,58 +183,72 @@
       <p class="pub-section-sub fade-up">Accede a la información de los habitantes de los 9 consejos comunales. Busca
         por nombre, cédula o consejo comunal.</p>
 
-      <!-- Buscador prominente -->
+      <!-- Buscador prominente — solo cédula, sin login -->
       <div class="pub-search-wrap fade-up">
-        <div class="pub-search-inner">
-          <input type="text" id="habSearch" placeholder="🔍 Nombre completo o número de cédula..."
-            aria-label="Buscar habitante">
-          <select id="habCC" aria-label="Seleccionar Consejo Comunal">
-            <option value="">Todos los Consejos</option>
-            <option value="jobito1">C.C. Jobito I</option>
-            <option value="jobito2">C.C. Jobito II</option>
-            <option value="brisas">C.C. Brisas del Yurubí</option>
-            <option value="aeb">C.C. Andrés Eloy Blanco</option>
-            <option value="mercedes1">C.C. Mercedes I</option>
-            <option value="mercedes2">C.C. Mercedes II</option>
-            <option value="santacruz">C.C. Santa Cruz de las Mercedes</option>
-            <option value="corozo1">C.C. Fortaleza del Corozo</option>
-            <option value="corozo2">C.C. Vencedores del Corozo</option>
-          </select>
-          <button class="pub-search-btn" id="habSearchBtn">
+        <div class="pub-search-inner" style="grid-template-columns:1fr auto;">
+          <label for="habSearch" class="sr-only"
+            style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Número
+            de cédula del habitante</label>
+          <input type="text" id="habSearch" inputmode="numeric"
+            placeholder="Ingresa el N° de Cédula (ej. 12345678)"
+            maxlength="12" autocomplete="off"
+            style="font-size:1rem;letter-spacing:.03em;"
+            aria-label="Número de cédula del habitante">
+
+          <button class="pub-search-btn" id="habSearchBtn" type="button"
+            aria-label="Buscar habitante por cédula">
             <i class="fas fa-search"></i> Consultar
           </button>
         </div>
+        <p style="text-align:center;font-size:.78rem;color:var(--gray4);margin-top:.6rem;">
+          <i class="fas fa-shield-alt" style="color:var(--vv);"></i>
+          Consulta pública y gratuita &middot; Solo se requiere el número de cédula
+        </p>
       </div>
 
       <!-- Cards de acceso -->
       <div class="pub-grid-4">
-        <div class="pub-hab-card fade-up fade-up-d1" role="button" tabindex="0" aria-label="Buscar por nombre o cédula">
+        <div class="pub-hab-card fade-up fade-up-d1" aria-label="Buscar por nombre o cédula">
           <div class="pub-hab-icon verde"><i class="fas fa-id-card"></i></div>
           <h3>Buscar por Nombre / Cédula</h3>
           <p>Consulta los datos de cualquier habitante registrado en la plataforma SICAG.</p>
-          <span class="pub-hab-link">Consultar ahora <i class="fas fa-arrow-right"></i></span>
         </div>
-        <div class="pub-hab-card fade-up fade-up-d2" role="button" tabindex="0" aria-label="Mi consejo comunal">
+        <div class="pub-hab-card fade-up fade-up-d2" aria-label="Mi consejo comunal">
           <div class="pub-hab-icon amarillo"><i class="fas fa-house-chimney"></i></div>
           <h3>Mi Consejo Comunal</h3>
-          <p>Jobito I/II · Brisas del Yurubí · Andrés Eloy Blanco · Mercedes I/II y más.</p>
-          <span class="pub-hab-link">Ver directorio <i class="fas fa-arrow-right"></i></span>
+          <p>Jobito I/II · Brisas del Yurubí · Andrés Eloy Blanco · Las Mercedes I/II y más.</p>
         </div>
-        <div class="pub-hab-card fade-up fade-up-d3" role="button" tabindex="0" aria-label="Estadísticas demográficas">
+        <div class="pub-hab-card fade-up fade-up-d3" aria-label="Estadísticas demográficas">
           <div class="pub-hab-icon azul"><i class="fas fa-chart-pie"></i></div>
           <h3>Estadísticas Demográficas</h3>
           <p>Niños 0–10 años, adultos mayores, personas con discapacidad, distribución por género.</p>
-          <span class="pub-hab-link">Ver estadísticas <i class="fas fa-arrow-right"></i></span>
         </div>
-        <div class="pub-hab-card fade-up fade-up-d4" role="button" tabindex="0" aria-label="Control electoral">
+        <div class="pub-hab-card fade-up fade-up-d4" aria-label="Control electoral">
           <div class="pub-hab-icon rojo"><i class="fas fa-vote-yea"></i></div>
           <h3>Control Electoral</h3>
           <p>Centros CNE y centros comunales de votación. Padrón electoral actualizado.</p>
-          <span class="pub-hab-link">Verificar registro <i class="fas fa-arrow-right"></i></span>
         </div>
       </div>
     </div>
   </section>
+  <!-- ══════════════════════════════════════════════════════
+       PROYECTOS AGROECOLOGICOS
+       ══════════════════════════════════════════════════════ -->
+  <section class="pub-section" id="proyectos" aria-labelledby="projTitle">
+    <div class="pub-container">
+      <div class="pub-section-label fade-up"><i class="fas fa-seedling"></i> Obras e Iniciativas</div>
+      <h2 class="pub-section-title fade-up" id="projTitle">Proyectos <span>Agroecológicos</span></h2>
+      <p class="pub-section-sub fade-up">Conoce los proyectos en ejecución, propuestos y finalizados por los 9 consejos
+        comunales.</p>
+
+      <div class="pub-grid fade-up" id="indexProyectosGrid"
+        style="display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:1.5rem;">
+        <!-- Proyectos inyectados via JS -->
+        <p style="color:var(--muted)">Cargando proyectos...</p>
+      </div>
+    </div>
+  </section>
+
   <!-- ══════════════════════════════════════════════════════
        CARTELERA DIGITAL
        ══════════════════════════════════════════════════════ -->
@@ -181,94 +260,9 @@
         comunales de la Comuna Simón Rodríguez.</p>
 
       <div class="pub-carousel-wrap fade-up">
-        <div class="pub-carousel-track" id="carouselTrack">
-          <div class="pub-news-card">
-            <div class="pub-news-img"
-              style="background:linear-gradient(135deg,#1B5E20,#43A047);display:flex;align-items:center;justify-content:center">
-              <i class="fas fa-calendar-alt" style="font-size:3rem;color:rgba(255,255,255,.3)"></i>
-            </div>
-            <div class="pub-news-body">
-              <span class="pub-news-tag tag-convocatoria">Convocatoria</span>
-              <h4>Asamblea de Ciudadanos — Junio 2026</h4>
-              <p>Reunión ordinaria de los 9 consejos comunales para aprobación del presupuesto participativo 2026.</p>
-              <a href="#" class="pub-news-link">Leer más <i class="fas fa-arrow-right"></i></a>
-            </div>
-          </div>
-          <div class="pub-news-card">
-            <div class="pub-news-img"
-              style="background:linear-gradient(135deg,#1565C0,#42A5F5);display:flex;align-items:center;justify-content:center">
-              <i class="fas fa-seedling" style="font-size:3rem;color:rgba(255,255,255,.3)"></i>
-            </div>
-            <div class="pub-news-body">
-              <span class="pub-news-tag tag-noticia">Noticia</span>
-              <h4>Cosecha récord de cacao en el Corozo</h4>
-              <p>Los productores del C.C. Vencedores del Corozo superaron las 8 toneladas de cacao orgánico esta
-                temporada.</p>
-              <a href="#" class="pub-news-link">Leer más <i class="fas fa-arrow-right"></i></a>
-            </div>
-          </div>
-          <div class="pub-news-card">
-            <div class="pub-news-img"
-              style="background:linear-gradient(135deg,#E65100,#FFA726);display:flex;align-items:center;justify-content:center">
-              <i class="fas fa-poll" style="font-size:3rem;color:rgba(255,255,255,.3)"></i>
-            </div>
-            <div class="pub-news-body">
-              <span class="pub-news-tag tag-encuesta">Encuesta</span>
-              <h4>¿Qué proyecto priorizar en 2026?</h4>
-              <p>Participa en la encuesta popular para decidir el próximo proyecto socioproductivo de la comunidad.</p>
-              <a href="#" class="pub-news-link">Participar <i class="fas fa-arrow-right"></i></a>
-            </div>
-          </div>
-          <div class="pub-news-card">
-            <div class="pub-news-img"
-              style="background:linear-gradient(135deg,#4A148C,#7B1FA2);display:flex;align-items:center;justify-content:center">
-              <i class="fas fa-hand-holding-water" style="font-size:3rem;color:rgba(255,255,255,.3)"></i>
-            </div>
-            <div class="pub-news-body">
-              <span class="pub-news-tag tag-noticia">Noticia</span>
-              <h4>Nuevo sistema de riego para Brisas del Yurubí</h4>
-              <p>Inaugurado el sistema de riego por goteo en las 10 hectáreas del proyecto frutales tropicales.</p>
-              <a href="#" class="pub-news-link">Leer más <i class="fas fa-arrow-right"></i></a>
-            </div>
-          </div>
-          <div class="pub-news-card">
-            <div class="pub-news-img"
-              style="background:linear-gradient(135deg,#B71C1C,#EF5350);display:flex;align-items:center;justify-content:center">
-              <i class="fas fa-graduation-cap" style="font-size:3rem;color:rgba(255,255,255,.3)"></i>
-            </div>
-            <div class="pub-news-body">
-              <span class="pub-news-tag tag-convocatoria">Convocatoria</span>
-              <h4>Talleres UNEFA de Agroecología — Julio</h4>
-              <p>La UNEFA ofrece talleres gratuitos de agroecología para productores comunales de Las Mercedes.</p>
-              <a href="#" class="pub-news-link">Inscribirse <i class="fas fa-arrow-right"></i></a>
-            </div>
-          </div>
-          <div class="pub-news-card">
-            <div class="pub-news-img"
-              style="background:linear-gradient(135deg,#00695C,#26A69A);display:flex;align-items:center;justify-content:center">
-              <i class="fas fa-truck" style="font-size:3rem;color:rgba(255,255,255,.3)"></i>
-            </div>
-            <div class="pub-news-body">
-              <span class="pub-news-tag tag-noticia">Noticia</span>
-              <h4>Entrega de insumos agrícolas — Jobito I y II</h4>
-              <p>Semillas certificadas, fertilizantes orgánicos y herramientas entregados a 120 productores de la zona.
-              </p>
-              <a href="#" class="pub-news-link">Leer más <i class="fas fa-arrow-right"></i></a>
-            </div>
-          </div>
+        <div class="pub-carousel-track" id="carouselTrack" style="display:flex;justify-content:center;padding:2rem;">
+          <p style="color:var(--muted)">Sin noticias recientes.</p>
         </div>
-      </div>
-      <div class="pub-carousel-controls">
-        <button class="pub-carousel-btn" id="carouselPrev" aria-label="Anterior"><i
-            class="fas fa-chevron-left"></i></button>
-        <div class="pub-carousel-dots">
-          <button class="pub-dot active" aria-label="Slide 1"></button>
-          <button class="pub-dot" aria-label="Slide 2"></button>
-          <button class="pub-dot" aria-label="Slide 3"></button>
-          <button class="pub-dot" aria-label="Slide 4"></button>
-        </div>
-        <button class="pub-carousel-btn" id="carouselNext" aria-label="Siguiente"><i
-            class="fas fa-chevron-right"></i></button>
       </div>
     </div>
   </section>
@@ -289,9 +283,9 @@
           <p>Productores de café y cacao, proyectos agroecológicos activos y estadísticas de producción en las 156
             hectáreas cultivadas de la comuna.</p>
           <div class="pub-7t-stats">
-            <div class="pub-7t-stat"><span>156</span><small>Ha cultivadas</small></div>
-            <div class="pub-7t-stat"><span>24</span><small>Proyectos</small></div>
-            <div class="pub-7t-stat"><span>12.450</span><small>Kg producidos</small></div>
+            <div class="pub-7t-stat"><span id="t1Ha">0</span><small>Ha cultivadas</small></div>
+            <div class="pub-7t-stat"><span id="t1Proj">0</span><small>Proyectos</small></div>
+            <div class="pub-7t-stat"><span id="t1Prod">0</span><small>Kg producidos</small></div>
           </div>
         </div>
         <div class="pub-7t-card fade-up fade-up-d2">
@@ -301,20 +295,20 @@
           <p>Estado de los servicios de gas doméstico, agua potable y electrificación en los 9 consejos comunales del
             sector Las Mercedes.</p>
           <div class="pub-7t-stats">
-            <div class="pub-7t-stat"><span>87%</span><small>Electrificación</small></div>
-            <div class="pub-7t-stat"><span>73%</span><small>Agua potable</small></div>
-            <div class="pub-7t-stat"><span>91%</span><small>Gas doméstico</small></div>
+            <div class="pub-7t-stat"><span id="t2Elec">0%</span><small>Electrificación</small></div>
+            <div class="pub-7t-stat"><span id="t2Agua">0%</span><small>Agua potable</small></div>
+            <div class="pub-7t-stat"><span id="t2Gas">0%</span><small>Gas doméstico</small></div>
           </div>
         </div>
         <div class="pub-7t-card fade-up fade-up-d3">
           <div class="pub-7t-icon" style="background:rgba(249,168,37,.15);color:#FFD54F"><i class="fas fa-heart"></i>
           </div>
           <h4>T4 — Transformación Social</h4>
-          <p>Censos de niños 0–10 años, adultos mayores y personas con discapacidad. Registro actualizado 2026.</p>
+          <p>Censos de niños 0–10 años, adultos mayores y personas con discapacidad. Registro actualizado.</p>
           <div class="pub-7t-stats">
-            <div class="pub-7t-stat"><span>1.240</span><small>Niños 0-10</small></div>
-            <div class="pub-7t-stat"><span>680</span><small>Adultos mayores</small></div>
-            <div class="pub-7t-stat"><span>145</span><small>Discapacidad</small></div>
+            <div class="pub-7t-stat"><span id="t4Ninos">0</span><small>Niños 0-11</small></div>
+            <div class="pub-7t-stat"><span id="t4AdultosM">0</span><small>Adultos mayores</small></div>
+            <div class="pub-7t-stat"><span id="t4Disc">0</span><small>Discapacidad</small></div>
           </div>
         </div>
         <div class="pub-7t-card fade-up fade-up-d4">
@@ -323,9 +317,9 @@
           <h4>Dashboard Estadístico</h4>
           <p>Totales de habitantes por consejo comunal, padrón electoral y proyecciones demográficas del sector.</p>
           <div class="pub-7t-stats">
-            <div class="pub-7t-stat"><span>6.000+</span><small>Habitantes</small></div>
-            <div class="pub-7t-stat"><span>3.850</span><small>Electores</small></div>
-            <div class="pub-7t-stat"><span>9</span><small>CC activos</small></div>
+            <div class="pub-7t-stat"><span id="dashHab">0</span><small>Habitantes</small></div>
+            <div class="pub-7t-stat"><span id="dashElec">0</span><small>Electores</small></div>
+            <div class="pub-7t-stat"><span id="dashCC">0</span><small>CC activos</small></div>
           </div>
         </div>
       </div>
@@ -340,21 +334,18 @@
       <p class="pub-section-sub fade-up">Explora la ubicación de los 9 consejos comunales. Sector Las Mercedes, San
         Felipe, estado Yaracuy, Venezuela.</p>
       <div class="pub-map-wrap fade-up">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d60000!2d-68.7348!3d10.3472!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1ses!2sve!4v1"
-          allowfullscreen="" loading="lazy"
-          title="Mapa de la Comuna Simón Rodríguez — Las Mercedes, San Felipe, Yaracuy"></iframe>
+        <iframe id="mapaIframe" src="map_embed.html" class="pub-map-frame" title="Mapa de la Comuna Simón Rodríguez — Las Mercedes, San Felipe, Yaracuy"></iframe>
       </div>
       <div class="pub-cc-list fade-up">
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Jobito I</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Jobito II</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Brisas del Yurubí</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Andrés Eloy Blanco</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Mercedes I</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Mercedes II</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Santa Cruz de las Mercedes</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Fortaleza del Corozo</div>
-        <div class="pub-cc-item"><i class="fas fa-map-pin"></i> C.C. Vencedores del Corozo</div>
+        <div class="pub-cc-item" data-map-target="C.C. Jobito I" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Jobito I</div>
+        <div class="pub-cc-item" data-map-target="C.C. Jobito II" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Jobito II</div>
+        <div class="pub-cc-item" data-map-target="C.C. Brisas del Yurubí" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Brisas del Yurubí</div>
+        <div class="pub-cc-item" data-map-target="C.C. Andrés Eloy Blanco" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Andrés Eloy Blanco</div>
+        <div class="pub-cc-item" data-map-target="C.C. Las Mercedes I" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Las Mercedes I</div>
+        <div class="pub-cc-item" data-map-target="C.C. Las Mercedes II" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Las Mercedes II</div>
+        <div class="pub-cc-item" data-map-target="C.C. Santa Cruz de las Mercedes" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Santa Cruz de las Mercedes</div>
+        <div class="pub-cc-item" data-map-target="C.C. Fortaleza del Corozo" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Fortaleza del Corozo</div>
+        <div class="pub-cc-item" data-map-target="C.C. Vencedores del Corozo" style="cursor:pointer;"><i class="fas fa-map-pin"></i> C.C. Vencedores del Corozo</div>
       </div>
     </div>
   </section>
@@ -401,11 +392,11 @@
             <div class="pub-form-row">
               <div class="pub-form-group">
                 <label for="cNombre">Nombre Completo *</label>
-                <input type="text" id="cNombre" placeholder="Ej: María González" required>
+                <input type="text" id="cNombre" data-mask="nombre" placeholder="Ej: María González" required>
               </div>
               <div class="pub-form-group">
                 <label for="cTelefono">Teléfono / WhatsApp *</label>
-                <input type="tel" id="cTelefono" placeholder="+58 414 000 0000" required>
+                <input type="tel" id="cTelefono" data-mask="telefono" placeholder="+58 414 000 0000" required>
               </div>
             </div>
             <div class="pub-form-group">
@@ -416,8 +407,8 @@
                 <option>C.C. Jobito II</option>
                 <option>C.C. Brisas del Yurubí</option>
                 <option>C.C. Andrés Eloy Blanco</option>
-                <option>C.C. Mercedes I</option>
-                <option>C.C. Mercedes II</option>
+                <option>C.C. Las Mercedes I</option>
+                <option>C.C. Las Mercedes II</option>
                 <option>C.C. Santa Cruz de las Mercedes</option>
                 <option>C.C. Fortaleza del Corozo</option>
                 <option>C.C. Vencedores del Corozo</option>
@@ -466,14 +457,14 @@
       <div>
         <h4>Consejos Comunales</h4>
         <ul>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Jobito I</a></li>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Jobito II</a></li>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Brisas del Yurubí</a></li>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Andrés Eloy Blanco</a></li>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Mercedes I y II</a></li>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Santa Cruz de las Mercedes</a></li>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Fortaleza del Corozo</a></li>
-          <li><a href="#mapa"><i class="fas fa-chevron-right"></i> C.C. Vencedores del Corozo</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Jobito I"><i class="fas fa-chevron-right"></i> C.C. Jobito I</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Jobito II"><i class="fas fa-chevron-right"></i> C.C. Jobito II</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Brisas del Yurubí"><i class="fas fa-chevron-right"></i> C.C. Brisas del Yurubí</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Andrés Eloy Blanco"><i class="fas fa-chevron-right"></i> C.C. Andrés Eloy Blanco</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Las Mercedes I"><i class="fas fa-chevron-right"></i> C.C. Las Mercedes I y II</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Santa Cruz de las Mercedes"><i class="fas fa-chevron-right"></i> C.C. Santa Cruz de las Mercedes</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Fortaleza del Corozo"><i class="fas fa-chevron-right"></i> C.C. Fortaleza del Corozo</a></li>
+          <li><a href="#mapa" class="footer-map-link" data-map-target="C.C. Vencedores del Corozo"><i class="fas fa-chevron-right"></i> C.C. Vencedores del Corozo</a></li>
         </ul>
       </div>
       <div>
@@ -490,7 +481,7 @@
       </div>
     </div>
     <div class="pub-footer-bottom">
-      <span>© 2026 Comuna Socialista Agrícola Simón Rodríguez · SICAG v2.0</span>
+      <span>© 2026 Comuna Socialista Agroecológica Simón Rodríguez · SICAG v2.5</span>
       <span>Desarrollado con <i class="fas fa-heart" style="color:#EF5350"></i> para el Poder Popular · Yaracuy</span>
     </div>
     <div class="pub-footer-tricolor" role="presentation" aria-hidden="true"></div>
@@ -500,8 +491,190 @@
     <i class="fas fa-chevron-up"></i>
   </button>
 
+  <!-- =========================================================
+       MODALES (Detalle y Explorador)
+       ========================================================= -->
+  <!-- Modal de Detalle Individual -->
+  <div class="pub-modal-overlay" id="modalDetalleOverlay" aria-hidden="true">
+    <div class="pub-modal" role="dialog" aria-modal="true" aria-labelledby="modalDetalleTitle">
+      <button class="pub-modal-close" id="modalDetalleClose" aria-label="Cerrar detalle"><i
+          class="fas fa-times"></i></button>
+      <div class="pub-modal-img" id="modalDetalleImg" style="display:none; height: 180px;"></div>
+      <div class="pub-modal-body">
+        <h3 id="modalDetalleTitle">Título</h3>
+        <div class="pub-modal-info" id="modalDetalleInfo">
+          <!-- Info dinámica -->
+        </div>
+        <div style="font-size:0.9rem; color:var(--gray4); line-height:1.6;" id="modalDetalleDesc">
+          <!-- Contenido -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Explorador Pantalla Completa -->
+  <div class="pub-fullscreen-overlay" id="modalExploradorOverlay" aria-hidden="true">
+    <div class="pub-fullscreen-modal" role="dialog" aria-modal="true">
+      <div class="pub-fs-header">
+        <div class="pub-fs-header-left">
+          <div class="pub-fs-icon" id="fsIcon"><i class="fas fa-folder-open"></i></div>
+          <div>
+            <h2 id="fsTitle">Explorador</h2>
+            <p id="fsSub">Navega y filtra todos los registros</p>
+          </div>
+        </div>
+        <button class="pub-fs-close" id="modalExploradorClose"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div class="pub-fs-search-bar">
+        <div class="pub-fs-search-inner">
+          <input type="text" id="fsSearch" placeholder="Buscar por palabra clave...">
+          <select id="fsFilterCC">
+            <option value="">Todos los Consejos</option>
+            <option value="jobito1">C.C. Jobito I</option>
+            <option value="jobito2">C.C. Jobito II</option>
+            <option value="brisas">C.C. Brisas del Yurubí</option>
+            <option value="aeb">C.C. Andrés Eloy Blanco</option>
+            <option value="mercedes1">C.C. Las Mercedes I / II</option>
+            <option value="santacruz">C.C. Santa Cruz de las Mercedes</option>
+            <option value="corozo">C.C. El Corozo</option>
+          </select>
+          <select id="fsFilterStatus" style="display:none;">
+            <!-- Opciones inyectadas por JS dependiendo si es Proyecto o Noticia -->
+          </select>
+        </div>
+      </div>
+
+      <div class="pub-fs-body">
+        <div class="pub-grid" id="fsGrid"
+          style="display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));gap:1.5rem;">
+        </div>
+        <div class="pub-pagination" id="fsPagination">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       MODAL: Resultado de Búsqueda de Habitante
+  ═══════════════════════════════════════════════════════ -->
+  <div id="modalHabOverlay" role="dialog" aria-modal="true" aria-labelledby="modalHabTitle"
+    style="
+      display:none;
+      position:fixed;inset:0;z-index:9000;
+      background:rgba(0,0,0,.55);backdrop-filter:blur(6px);
+      align-items:center;justify-content:center;
+      padding:1rem;
+    ">
+    <div id="modalHabCard" style="
+      background:#fff;border-radius:20px;padding:2.5rem 2rem;
+      max-width:400px;width:100%;box-shadow:0 24px 80px rgba(0,0,0,.28);
+      text-align:center;position:relative;
+      animation:habModalIn .3s cubic-bezier(.34,1.56,.64,1) both;
+    ">
+      <!-- Botón cerrar -->
+      <button id="modalHabClose" type="button"
+        aria-label="Cerrar resultado"
+        style="
+          position:absolute;top:1rem;right:1rem;
+          background:rgba(0,0,0,.07);border:none;border-radius:50%;
+          width:36px;height:36px;font-size:1rem;cursor:pointer;
+          display:flex;align-items:center;justify-content:center;
+          color:#555;transition:background .2s;
+        "
+        onmouseenter="this.style.background='rgba(0,0,0,.14)'"
+        onmouseleave="this.style.background='rgba(0,0,0,.07)'">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <!-- Encabezado fijo del modal -->
+      <div id="modalHabTitle" style="
+        font-size:.7rem;font-weight:800;letter-spacing:.12em;
+        text-transform:uppercase;color:var(--vp,#2E7D32);margin-bottom:1.5rem;
+        display:flex;align-items:center;justify-content:center;gap:.4rem;
+      ">
+        <i class="fas fa-id-card"></i> Consulta del Padrón Comunal
+      </div>
+
+      <!-- Contenido dinámico -->
+      <div id="modalHabBody"></div>
+    </div>
+  </div>
+
+  <!-- Estilos del modal de habitante (inline para portabilidad) -->
+  <style>
+    /* Overlay visible */
+    #modalHabOverlay.open { display:flex !important; }
+
+    /* Avatar circular con iniciales */
+    .mhab-avatar {
+      width:80px;height:80px;border-radius:50%;
+      background:linear-gradient(135deg,#2E7D32,#66BB6A);
+      color:#fff;font-size:1.8rem;font-weight:800;
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 1rem;box-shadow:0 6px 20px rgba(46,125,50,.3);
+    }
+    .mhab-name {
+      font-size:1.25rem;font-weight:800;color:#1a1a1a;line-height:1.3;
+      margin-bottom:.3rem;
+    }
+    .mhab-cedula {
+      font-size:.95rem;color:#555;margin-bottom:1rem;
+      font-family:monospace;letter-spacing:.05em;
+    }
+    .mhab-tags {
+      display:flex;flex-wrap:wrap;gap:.5rem;
+      justify-content:center;margin-bottom:1.25rem;
+    }
+    .mhab-tag {
+      display:inline-flex;align-items:center;gap:.3rem;
+      background:#f1f8f1;color:#2E7D32;border:1px solid #c8e6c9;
+      border-radius:20px;padding:.3rem .75rem;
+      font-size:.78rem;font-weight:600;
+    }
+    .mhab-tag.ok {
+      background:#E8F5E9;color:#1B5E20;
+    }
+    .mhab-disclaimer {
+      font-size:.72rem;color:#999;line-height:1.6;margin-top:1rem;
+    }
+    /* Estados de error / no encontrado */
+    .mhab-icon {
+      font-size:3rem;margin-bottom:1rem;
+    }
+    .mhab-icon.error   { color:#C62828; }
+    .mhab-icon.notfound{ color:#E65100; }
+    .mhab-status {
+      font-size:1rem;font-weight:700;line-height:1.5;
+      margin-bottom:.5rem;
+    }
+    .mhab-status.error   { color:#C62828; }
+    .mhab-status.notfound{ color:#E65100; }
+    .mhab-hint {
+      font-size:.82rem;color:#777;line-height:1.6;
+    }
+    /* Animación de entrada */
+    @keyframes habModalIn {
+      from { opacity:0;transform:scale(.85) translateY(20px); }
+      to   { opacity:1;transform:scale(1)  translateY(0);     }
+    }
+  </style>
+
+  <!-- Indicador de carga de backend -->
+  <div id="backendLoader" style="position: fixed; bottom: 20px; right: 20px; background: var(--card, #fff); border: 1px solid var(--border, #e0e0e0); box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 12px 18px; border-radius: 8px; display: flex; align-items: center; gap: 12px; z-index: 9999; font-size: 0.85rem; font-weight: 600; color: var(--sub, #555); transition: opacity 0.4s ease, transform 0.4s ease; font-family: 'Poppins', sans-serif;">
+    <i class="fas fa-spinner fa-spin" style="color: var(--vp, #2E7D32); font-size: 1.2rem;"></i>
+    Iniciando Sistema...
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" async></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/masks.js"></script>
   <script src="js/public.js" defer></script>
   <script src="js/animations.js" defer></script>
+  <script type="module" src="js/app.js"></script>
 </body>
 
 </html>
+
+

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa Embebido</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #e0e0e0; }
+    #map { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="js/poligonos.js"></script>
+  <script>
+    const CENTER = [10.360155, -68.729731];
+    const map = L.map('map').setView(CENTER, 14);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; CARTO &copy; OSM',
+      maxZoom: 18
+    }).addTo(map);
+
+    // Cargar capa GeoJSON de Venezuela
+    fetch('venezuela.geojson')
+      .then(response => response.json())
+      .then(data => {
+        L.geoJSON(data, {
+          style: function (feature) {
+            // Resaltar el estado Yaracuy si existe la propiedad
+            const isYaracuy = feature.properties && feature.properties.name && feature.properties.name.toLowerCase().includes('yaracuy');
+            return {
+              color: isYaracuy ? '#2E7D32' : '#888',
+              weight: isYaracuy ? 2 : 1,
+              fillColor: isYaracuy ? '#43A047' : '#cccccc',
+              fillOpacity: isYaracuy ? 0.1 : 0.05
+            };
+          }
+        }).addTo(map);
+      })
+      .catch(err => console.log('No se pudo cargar el GeoJSON de Venezuela:', err));
+
+    function crearIcono(color, icon = 'fa-seedling') {
+      return L.divIcon({
+        className: '',
+        html: `<div style="width:28px;height:28px;border-radius:50%;background:${color};border:2px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;"><i class="fas ${icon}" style="color:#fff;font-size:12px;"></i></div>`,
+        iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -14]
+      });
+    }
+
+    const consejos = [
+      { lat: 10.358, lng: -68.718, nombre: 'C.C. Jobito I', color: '#2E7D32' },
+      { lat: 10.360, lng: -68.722, nombre: 'C.C. Jobito II', color: '#388E3C' },
+      { lat: 10.345, lng: -68.728, nombre: 'C.C. Brisas del Yurubí', color: '#F9A825' },
+      { lat: 10.352, lng: -68.733, nombre: 'C.C. Andrés Eloy Blanco', color: '#FF8C00' },
+      { lat: 10.347, lng: -68.738, nombre: 'C.C. Las Mercedes I', color: '#1565C0' },
+      { lat: 10.350, lng: -68.742, nombre: 'C.C. Las Mercedes II', color: '#1976D2' },
+      { lat: 10.340, lng: -68.745, nombre: 'C.C. Santa Cruz de las Mercedes', color: '#C62828' },
+      { lat: 10.362, lng: -68.726, nombre: 'C.C. Fortaleza del Corozo', color: '#43A047' },
+      { lat: 10.335, lng: -68.750, nombre: 'C.C. Vencedores del Corozo', color: '#66BB6A' }
+    ];
+
+    const ccMarkers = {};
+    const ccLayers = {};
+
+    consejos.forEach(cc => {
+      // 1. Dibujar el Polígono si existe
+      if (typeof ccPoligonos !== 'undefined' && ccPoligonos[cc.nombre]) {
+        const polygon = L.polygon(ccPoligonos[cc.nombre], {
+          color: cc.color,
+          weight: 2,
+          fillColor: cc.color,
+          fillOpacity: 0.2
+        }).addTo(map);
+        
+        polygon.bindPopup(`<div style="font-family:sans-serif;font-weight:bold;color:${cc.color}">${cc.nombre}</div>`);
+        ccLayers[cc.nombre] = polygon;
+        
+        // Centrar el marcador dentro del polígono
+        const bounds = polygon.getBounds();
+        const m = L.marker(bounds.getCenter(), { icon: crearIcono(cc.color, 'fa-home') })
+          .addTo(map)
+          .bindPopup(`<div style="font-family:sans-serif;font-weight:bold;color:${cc.color}">${cc.nombre}</div>`);
+        ccMarkers[cc.nombre] = m;
+      } else {
+        // Fallback al marcador original si no hay polígono
+        const m = L.marker([cc.lat, cc.lng], { icon: crearIcono(cc.color, 'fa-home') })
+          .addTo(map)
+          .bindPopup(`<div style="font-family:sans-serif;font-weight:bold;color:${cc.color}">${cc.nombre}</div>`);
+        ccMarkers[cc.nombre] = m;
+      }
+    });
+
+    // Ajustar la vista para que se vean todos los polígonos
+    const allPolygons = Object.values(ccLayers);
+    if (allPolygons.length > 0) {
+      const group = new L.featureGroup(allPolygons);
+      map.fitBounds(group.getBounds());
+    }
+
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.action === 'highlightCommunity') {
+        const targetName = event.data.community;
+        const targetPolygon = ccLayers[targetName];
+        const targetMarker = ccMarkers[targetName];
+        
+        if (targetPolygon) {
+          map.fitBounds(targetPolygon.getBounds());
+          targetPolygon.openPopup();
+          
+          // Efecto de pulso en el polígono real
+          targetPolygon.getElement()?.animate([
+            { fillOpacity: 0.1, weight: 2 },
+            { fillOpacity: 0.6, weight: 5 },
+            { fillOpacity: 0.2, weight: 2 }
+          ], { duration: 1500, iterations: 3 });
+          
+        } else if (targetMarker) {
+          map.setView(targetMarker.getLatLng(), 16);
+          targetMarker.openPopup();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

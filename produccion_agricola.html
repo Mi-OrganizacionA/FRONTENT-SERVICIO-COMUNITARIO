@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Producción Agrícola — Control y seguimiento de los cultivos en la Comuna Socialista Simón Rodríguez — SICAG.">
+  <title>Producción Agrícola — SICAG</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"></noscript>
+  <link rel="preload" href="css/admin.css" as="style">
+  <link href="css/admin.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+
+  <style>
+    /* ══════════════════════════════════════════════
+       PRODUCCIÓN AGRÍCOLA — Premium Styles
+    ══════════════════════════════════════════════ */
+
+    .prod-toolbar {
+      background: var(--card); border-radius: var(--r-md);
+      padding: .9rem 1.25rem; display: flex; align-items: center;
+      gap: .85rem; flex-wrap: wrap; margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+    }
+    .prod-search { position: relative; flex: 1; min-width: 200px; }
+    .prod-search i { position: absolute; left: .9rem; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: .85rem; pointer-events: none; }
+    .prod-search input {
+      width: 100%; padding: .55rem .75rem .55rem 2.5rem;
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      font-size: .84rem; font-family: inherit; background: var(--bg);
+      color: var(--txt); outline: none;
+      transition: border-color var(--tr), box-shadow var(--tr);
+    }
+    .prod-search input:focus { border-color: var(--vv); box-shadow: 0 0 0 3px rgba(67,160,71,.1); }
+
+    /* ── Cultivo Cards Grid ── */
+    .prod-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem; margin-bottom: 1.75rem;
+    }
+    .prod-card {
+      background: var(--card); border-radius: var(--r-lg);
+      border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+      overflow: hidden; transition: transform var(--tr), box-shadow var(--tr);
+      display: flex; flex-direction: column;
+    }
+    .prod-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+
+    /* Accent bar */
+    .prod-bar { height: 5px; background: linear-gradient(90deg, #388E3C, #81C784); }
+
+    .prod-card-body { padding: 1.25rem; flex: 1; display: flex; flex-direction: column; }
+    .prod-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; margin-bottom: .8rem; }
+
+    .prod-badge {
+      display: inline-flex; align-items: center; gap: .28rem;
+      font-size: .66rem; font-weight: 700; padding: .22rem .65rem;
+      border-radius: 20px; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap;
+      background: rgba(56,142,60,.1); color: #388E3C;
+    }
+
+    .prod-card-title { font-size: .95rem; font-weight: 700; color: var(--txt); line-height: 1.45; margin-bottom: .45rem; }
+    .prod-card-desc  { font-size: .79rem; color: var(--muted); line-height: 1.65; flex: 1; margin-bottom: .9rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+    .prod-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: .8rem; border-top: 1px solid var(--border); gap: .5rem; flex-wrap: wrap;
+    }
+    .prod-meta-info { display: flex; flex-direction: column; gap: .2rem; }
+    .prod-meta-row  { display: flex; align-items: center; gap: .35rem; font-size: .73rem; color: var(--muted); }
+    .prod-meta-row i { color: var(--vv); font-size: .68rem; width: 12px; text-align: center; }
+    .prod-card-btns { display: flex; gap: .3rem; flex-shrink: 0; }
+
+    .prod-yield {
+      display: inline-flex; align-items: center; gap: .3rem;
+      background: rgba(21,101,192,.1); color: #1565C0;
+      font-size: .72rem; font-weight: 700; padding: .2rem .6rem;
+      border-radius: 10px; border: 1px solid rgba(21,101,192,.2);
+    }
+
+    .section-row  { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1.1rem; flex-wrap:wrap; }
+    .section-label { font-size:.8rem; font-weight:700; color:var(--sub); text-transform:uppercase; letter-spacing:.06em; display:flex; align-items:center; gap:.5rem; }
+    .section-label i { color:var(--vp); }
+    .count-badge { background:rgba(46,125,50,.1); color:var(--vp); font-size:.68rem; font-weight:700; padding:2px 9px; border-radius:10px; }
+
+    .prod-empty { text-align:center; padding:3.5rem 1rem; background:var(--card); border-radius:var(--r-lg); border:2px dashed var(--border); color:var(--muted); }
+    .prod-empty i { font-size:2.5rem; opacity:.3; display:block; margin-bottom:1rem; }
+    .prod-empty strong { display:block; font-size:.95rem; color:var(--sub); margin-bottom:.4rem; }
+
+    .mfg-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
+    .mfg-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin-bottom:1rem; }
+    .mfg-2 .form-group-sicag, .mfg-3 .form-group-sicag { margin-bottom:0; }
+
+    @media (max-width: 640px) {
+      .prod-grid { grid-template-columns:1fr; }
+      .mfg-2, .mfg-3 { grid-template-columns:1fr; }
+      .prod-toolbar { flex-direction:column; align-items:stretch; }
+    }
+  </style>
+  <script>
+    if (!localStorage.getItem('token') || !localStorage.getItem('user')) {
+      window.location.replace('login.html');
+    }
+  </script>
+</head>
+<body data-search-placeholder="Buscar cultivos, rubros, responsables...">
+
+  <div class="barra-tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div id="header-placeholder"></div>
+  <nav id="sidebar-placeholder"></nav>
+  <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral"><i class="fas fa-bars"></i></button>
+
+  <main class="app-main" role="main">
+
+    <!-- ══ PREMIUM HEADER ══ -->
+    <div class="ph-wrap fade-in">
+      <div class="ph-deco-dots" aria-hidden="true"></div>
+      <nav class="ph-breadcrumb" aria-label="Ruta de navegación">
+        <a href="dashboard.html"><i class="fas fa-home"></i></a>
+        <i class="fas fa-chevron-right ph-sep"></i>
+        <span class="ph-cur">Producción Agrícola</span>
+      </nav>
+      <div class="ph-body">
+        <div class="ph-left">
+          <div class="ph-icon"><i class="fas fa-tractor"></i></div>
+          <div>
+            <div class="ph-module"><i class="fas fa-leaf"></i> Módulo de Soberanía Alimentaria</div>
+            <h1 class="ph-title">Producción Agrícola</h1>
+            <p class="ph-sub">Gestión de cultivos, hectáreas productivas y estimación de cosechas en la Comuna.</p>
+          </div>
+        </div>
+        <div class="ph-actions" style="display:flex;gap:.6rem;flex-wrap:wrap;">
+          <button type="button" class="ph-btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)" onclick="exportarProduccion()">
+            <i class="fas fa-file-excel"></i> Exportar
+          </button>
+          <button type="button" class="ph-btn" onclick="abrirModalProduccion()">
+            <i class="fas fa-plus"></i> Nuevo Registro
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ KPI FLOAT ══ -->
+    <div class="ph-kpi-float">
+      <div class="kpi-grid stagger fade-in-up">
+        <div class="kpi-card border-verde">
+          <div class="kpi-icon verde"><i class="fas fa-tractor"></i></div>
+          <div class="kpi-info">
+            <h3>Parcelas Activas</h3>
+            <div class="kpi-value" id="kpiParcelas">0</div>
+            <span class="kpi-trend up">En la Comuna</span>
+          </div>
+        </div>
+        <div class="kpi-card border-azul">
+          <div class="kpi-icon azul"><i class="fas fa-map"></i></div>
+          <div class="kpi-info">
+            <h3>Hectáreas Cultivadas</h3>
+            <div class="kpi-value" id="kpiHectareas">0</div>
+            <span class="kpi-trend up">Superficie Total</span>
+          </div>
+        </div>
+        <div class="kpi-card border-terracota">
+          <div class="kpi-icon terracota"><i class="fas fa-seedling"></i></div>
+          <div class="kpi-info">
+            <h3>Rubro Principal</h3>
+            <div class="kpi-value" id="kpiRubro">N/A</div>
+            <span class="kpi-trend up">Mayor extensión</span>
+          </div>
+        </div>
+        <div class="kpi-card border-amarillo">
+          <div class="kpi-icon amarillo"><i class="fas fa-box-open"></i></div>
+          <div class="kpi-info">
+            <h3>Rendimiento (Ton)</h3>
+            <div class="kpi-value" id="kpiRendimiento">0</div>
+            <span class="kpi-trend up">Estimado Total</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TOOLBAR ══ -->
+    <div class="prod-toolbar fade-in-up">
+      <div class="prod-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="prodSearchInput" placeholder="Buscar por rubro, tipo de cultivo, ubicación...">
+      </div>
+    </div>
+
+    <!-- ══ SECTION ROW ══ -->
+    <div class="section-row fade-in-up">
+      <div class="section-label">
+        <i class="fas fa-list"></i>
+        Registros de Producción
+        <span class="count-badge" id="prodCount">0</span>
+      </div>
+    </div>
+
+    <!-- ══ GRID ══ -->
+    <div class="prod-grid" id="prodGrid"></div>
+
+    <!-- ══ EMPTY STATE ══ -->
+    <div class="prod-empty" id="prodEmpty" style="display:none">
+      <i class="fas fa-tractor"></i>
+      <strong>No hay registros de producción que coincidan</strong>
+      <span>Registra una nueva parcela agrícola en el sistema.</span>
+    </div>
+
+  </main>
+
+  <!-- ════════════════════════════════════════
+       MODAL: Nuevo / Editar Producción
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modalProduccion" role="dialog" aria-modal="true" aria-labelledby="modalProdTitle">
+    <div class="modal-content-sicag" style="max-width:720px;">
+      <div class="modal-header-sicag" style="background:linear-gradient(135deg,#0D3311,#2E7D32);color:#fff;border-bottom:none;">
+        <h3 id="modalProdTitle" style="color:#fff;">
+          <i class="fas fa-tractor" style="color:rgba(165,214,167,.9)"></i>
+          <span id="modalProdTitleText">Nuevo Registro Agrícola</span>
+        </h3>
+        <button type="button" class="modal-close" style="background:rgba(255,255,255,.15);color:#fff;" onclick="cerrarModalProduccion()" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body-sicag">
+        <form id="formProduccion" novalidate>
+          <input type="hidden" id="prodId" value="">
+
+          <div class="form-section-header form-section-verde" style="margin-bottom:1.1rem;">
+            <i class="fas fa-seedling"></i> Detalles del Cultivo
+          </div>
+
+          <div class="mfg-2">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="prodRubro">Rubro Principal *</label>
+              <input type="text" class="form-control-sicag" id="prodRubro" placeholder="Ej: Maíz Amarillo" required>
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="prodTipo">Tipo de Cultivo *</label>
+              <select class="form-control-sicag" id="prodTipo" required>
+                <option value="">Seleccionar...</option>
+                <option value="Ciclo Corto">Ciclo Corto</option>
+                <option value="Ciclo Largo">Ciclo Largo</option>
+                <option value="Perenne">Perenne</option>
+                <option value="Organopónico">Organopónico</option>
+                <option value="Invernadero">Invernadero</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mfg-3">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="prodHectareas">Hectáreas *</label>
+              <input type="number" class="form-control-sicag" id="prodHectareas" data-mask="decimal" placeholder="0.00" min="0" step="0.01" required>
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="prodRendimiento">Rendimiento Est. *</label>
+              <input type="text" class="form-control-sicag" id="prodRendimiento" placeholder="Ej: 5 Toneladas" required>
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="prodFechaInicio">Fecha de Siembra</label>
+              <input type="date" class="form-control-sicag" id="prodFechaInicio">
+            </div>
+          </div>
+
+          <div class="form-section-header form-section-verde" style="margin-bottom:1.1rem;margin-top:.25rem;">
+            <i class="fas fa-map-marker-alt"></i> Ubicación de la Parcela
+          </div>
+
+          <div class="form-group-sicag" style="margin-bottom:1rem;">
+            <label class="form-label-sicag" for="prodUbicacion">Dirección / Sector *</label>
+            <input type="text" class="form-control-sicag" id="prodUbicacion" placeholder="Descripción de la ubicación..." required>
+          </div>
+
+          <div class="mfg-2">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="prodLatitud">Latitud</label>
+              <input type="text" class="form-control-sicag" id="prodLatitud" placeholder="Ej: 10.123456">
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="prodLongitud">Longitud</label>
+              <input type="text" class="form-control-sicag" id="prodLongitud" placeholder="Ej: -68.123456">
+            </div>
+          </div>
+
+          <div class="form-section-header form-section-verde" style="margin-bottom:1.1rem;margin-top:.25rem;">
+            <i class="fas fa-info-circle"></i> Información Adicional
+          </div>
+
+          <div class="form-group-sicag" style="margin-bottom:1rem;">
+            <label class="form-label-sicag" for="prodSecundarios">Productos Secundarios</label>
+            <input type="text" class="form-control-sicag" id="prodSecundarios" placeholder="Ej: Frijol, Auyama (Si hay cultivos asociados)">
+          </div>
+
+          <div class="form-group-sicag" style="margin-bottom:0;">
+            <label class="form-label-sicag" for="prodObservaciones">Observaciones</label>
+            <textarea class="form-control-sicag" id="prodObservaciones" rows="2" placeholder="Necesidades de insumos, plagas, etc."></textarea>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer-sicag">
+        <button type="button" class="btn-sicag btn-outline-verde" onclick="cerrarModalProduccion()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+        <button type="button" class="btn-sicag btn-primary" onclick="guardarProduccion()">
+          <i class="fas fa-save"></i> <span id="btnGuardarText">Guardar Registro</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/masks.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/layout-menu.js"></script>
+  <script src="js/roles.js"></script>
+
+  <script>
+  let produccion = [];
+
+  async function init() {
+    try {
+      produccion = await window.api.getProduccion();
+    } catch (error) {
+      console.error(error);
+      if(window.Components) Components.showToast('Error al cargar la producción agrícola', 'error');
+    }
+    renderKPIs();
+    renderGrid();
+  }
+
+  function renderKPIs() {
+    document.getElementById('kpiParcelas').textContent = produccion.length;
+    const hectareas = produccion.reduce((sum, p) => sum + (parseFloat(p.hectareas_cultivadas) || 0), 0);
+    document.getElementById('kpiHectareas').textContent = hectareas.toFixed(2);
+    
+    // Calcular rubro principal
+    let rubros = {};
+    produccion.forEach(p => {
+      rubros[p.rubro] = (rubros[p.rubro] || 0) + (parseFloat(p.hectareas_cultivadas) || 0);
+    });
+    let maxRubro = 'N/A';
+    let maxHect = 0;
+    for(let r in rubros) { if(rubros[r] > maxHect) { maxHect = rubros[r]; maxRubro = r; } }
+    document.getElementById('kpiRubro').textContent = maxRubro;
+
+    // Sumar toneladas estimadas si es posible extraer número
+    let ton = 0;
+    produccion.forEach(p => {
+      // Guarda defensiva: rendimiento_estimado puede ser nulo o undefined
+      const rendStr = (p.rendimiento_estimado || '').toString();
+      let num = parseFloat(rendStr.replace(/[^0-9.]/g, ''));
+      if(!isNaN(num)) ton += num;
+    });
+    document.getElementById('kpiRendimiento').textContent = ton > 0 ? ton.toFixed(1) : '0';
+
+  }
+
+  function renderGrid() {
+    const q = (document.getElementById('prodSearchInput')?.value || '').toLowerCase();
+    const list = produccion.filter(p => 
+      !q || p.rubro.toLowerCase().includes(q) || p.tipo_cultivo.toLowerCase().includes(q) || p.ubicacion_cultivo.toLowerCase().includes(q)
+    );
+
+    const grid = document.getElementById('prodGrid');
+    const empty = document.getElementById('prodEmpty');
+    const count = document.getElementById('prodCount');
+    if (count) count.textContent = list.length;
+
+    if (list.length === 0) {
+      grid.innerHTML = '';
+      if (empty) empty.style.display = '';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+
+    grid.innerHTML = list.map(p => `
+      <div class="prod-card fade-in-up" data-id="${p.id}">
+        <div class="prod-bar"></div>
+        <div class="prod-card-body">
+          <div class="prod-card-top">
+            <span class="prod-badge"><i class="fas fa-leaf"></i> ${escapeHtml(p.tipo_cultivo)}</span>
+            <span class="prod-yield"><i class="fas fa-balance-scale"></i> ${escapeHtml(p.rendimiento_estimado)}</span>
+          </div>
+          <div class="prod-card-title">${escapeHtml(p.rubro)}</div>
+          <div class="prod-card-desc"><i class="fas fa-map-marker-alt" style="color:var(--muted)"></i> ${escapeHtml(p.ubicacion_cultivo)}</div>
+          <div class="prod-card-footer">
+            <div class="prod-meta-info">
+              <div class="prod-meta-row"><i class="fas fa-vector-square"></i> ${p.hectareas_cultivadas} Hectáreas</div>
+              ${p.fecha_inicio_cultivo ? `<div class="prod-meta-row"><i class="fas fa-calendar-alt"></i> Siembra: ${formatDate(p.fecha_inicio_cultivo)}</div>` : ''}
+            </div>
+            <div class="prod-card-btns">
+              <button type="button" class="btn-sicag btn-sm btn-warning btn-icon" title="Editar" onclick="abrirModalProduccion(${p.id})"><i class="fas fa-pencil-alt"></i></button>
+              <button type="button" class="btn-sicag btn-sm btn-danger btn-icon" title="Eliminar" onclick="eliminarProduccion(${p.id})"><i class="fas fa-trash-alt"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function abrirModalProduccion(id = null) {
+    const modal = document.getElementById('modalProduccion');
+    limpiarForm();
+    if(id) {
+      const p = produccion.find(x => x.id === id);
+      if(!p) return;
+      document.getElementById('prodId').value = p.id;
+      document.getElementById('prodRubro').value = p.rubro;
+      document.getElementById('prodTipo').value = p.tipo_cultivo;
+      document.getElementById('prodHectareas').value = p.hectareas_cultivadas;
+      document.getElementById('prodRendimiento').value = p.rendimiento_estimado;
+      document.getElementById('prodFechaInicio').value = p.fecha_inicio_cultivo || '';
+      document.getElementById('prodUbicacion').value = p.ubicacion_cultivo;
+      document.getElementById('prodLatitud').value = p.latitud || '';
+      document.getElementById('prodLongitud').value = p.longitud || '';
+      document.getElementById('prodSecundarios').value = p.productos_secundarios || '';
+      document.getElementById('prodObservaciones').value = p.observaciones || '';
+      document.getElementById('modalProdTitleText').textContent = 'Editar Registro Agrícola';
+      document.getElementById('btnGuardarText').textContent = 'Guardar Cambios';
+    } else {
+      document.getElementById('modalProdTitleText').textContent = 'Nuevo Registro Agrícola';
+      document.getElementById('btnGuardarText').textContent = 'Guardar Registro';
+    }
+    modal.classList.add('show');
+  }
+
+  function cerrarModalProduccion() {
+    document.getElementById('modalProduccion').classList.remove('show');
+  }
+
+  function limpiarForm() {
+    ['prodId','prodRubro','prodTipo','prodHectareas','prodRendimiento','prodFechaInicio','prodUbicacion','prodLatitud','prodLongitud','prodSecundarios','prodObservaciones'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+  }
+
+  async function guardarProduccion() {
+    const rubro = document.getElementById('prodRubro').value.trim();
+    const tipo = document.getElementById('prodTipo').value;
+    const hectareas = parseFloat(document.getElementById('prodHectareas').value);
+    const ubicacion = document.getElementById('prodUbicacion').value.trim();
+    if(!rubro || !tipo || isNaN(hectareas) || !ubicacion) {
+      if(window.Components) Components.showToast('Por favor, completa los campos obligatorios.', 'error');
+      return;
+    }
+    const id = document.getElementById('prodId').value;
+    const data = {
+      rubro, tipo_cultivo: tipo, hectareas_cultivadas: hectareas,
+      rendimiento_estimado: document.getElementById('prodRendimiento').value.trim(),
+      ubicacion_cultivo: ubicacion,
+      latitud: document.getElementById('prodLatitud').value.trim(),
+      longitud: document.getElementById('prodLongitud').value.trim(),
+      fecha_inicio_cultivo: document.getElementById('prodFechaInicio').value,
+      productos_secundarios: document.getElementById('prodSecundarios').value.trim(),
+      observaciones: document.getElementById('prodObservaciones').value.trim()
+    };
+
+    try {
+      if(id) {
+        await window.api.actualizarProduccion(id, data);
+        if(window.Components) Components.showToast('Registro actualizado.', 'success');
+      } else {
+        await window.api.crearProduccion(data);
+        if(window.Components) Components.showToast('Registro guardado.', 'success');
+      }
+      cerrarModalProduccion();
+      await init();
+    } catch(err) {
+      if(window.Components) Components.showToast('Error al guardar.', 'error');
+    }
+  }
+
+  async function eliminarProduccion(id) {
+    if(confirm('¿Eliminar este registro agrícola?')) {
+      try {
+        await window.api.eliminarProduccion(id);
+        if(window.Components) Components.showToast('Registro eliminado.', 'success');
+        await init();
+      } catch(err) {
+        if(window.Components) Components.showToast('Error al eliminar.', 'error');
+      }
+    }
+  }
+
+  function exportarProduccion() {
+    if(window.Components) Components.showToast('Exportación de producción próxima a implementar.', 'info');
+  }
+
+  function escapeHtml(str) { return str ? str.toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
+  function formatDate(val) { try { return new Date(val + 'T00:00:00').toLocaleDateString('es-VE', { day:'2-digit', month:'short', year:'numeric' }); } catch { return val; } }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('prodSearchInput').addEventListener('input', renderGrid);
+    init();
+  });
+  </script>
+</body>
+</html>
+
+
+

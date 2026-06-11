@@ -1,12 +1,12 @@
 /**
- * Módulo de Censo Comunitario (SICAG v5.0)
+ * Modulo de Censo Comunitario (SICAG v2.5)
  * Archivo: js/modules/censo.js
  */
 
 class CensoController {
   constructor() {
     this.habitantes = [];
-    this.form = new FormValidator('formCenso', 'habitante');
+    this.editingId = null;
     this.init();
   }
 
@@ -16,56 +16,115 @@ class CensoController {
       await this.cargarDatos();
     } catch (error) {
       console.error('Error inicializando Censo:', error);
-      if (window.Components) Components.showToast('Error al cargar módulo de Censo', 'error');
+      if (window.Components) Components.showToast('Error al cargar modulo de Censo', 'error');
     }
   }
 
   _setupUI() {
-    // Calculo automático de edad y estatus
     const fechaNacInput = document.getElementById('habFechaNac');
     if (fechaNacInput) {
       fechaNacInput.addEventListener('change', () => this.calcularDatosNacimiento(fechaNacInput.value));
     }
 
-    // Toggle para rubro productor
     const productorSelect = document.getElementById('habProductor');
     if (productorSelect) {
       productorSelect.addEventListener('change', () => this.toggleRubroProduccion());
     }
 
-    // Escuchar el evento de formulario válido de FormValidator
-    const formElement = document.getElementById('formCenso');
-    if (formElement) {
-      formElement.addEventListener('validSubmit', (e) => this.guardarHabitante(e.detail));
+    window.censoCtrl = this;
+  }
+
+  async guardarHabitante(datos) {
+    // Validar cédula duplicada antes de guardar (aplica para vocero y administrador)
+    const cedulaNueva = (datos.cedula || '').trim();
+    if (cedulaNueva) {
+      try {
+        const existentes = await window.api.getHabitantes({ cedula: cedulaNueva });
+        const duplicado = Array.isArray(existentes) && existentes.some(h =>
+          (h.cedula || '').trim().toUpperCase() === cedulaNueva.toUpperCase()
+        );
+        if (duplicado) {
+          // Resaltar el campo de cédula con error visual
+          const cedulaInput = document.getElementById('habCedula');
+          if (cedulaInput) {
+            cedulaInput.style.borderColor = '#C62828';
+            cedulaInput.style.boxShadow = '0 0 0 3px rgba(198,40,40,.15)';
+          }
+          if (window.Components) {
+            Components.showToast('Ya existe un habitante registrado con esa cédula.', 'error');
+          }
+          return; // Bloquear el guardado
+        }
+      } catch (err) {
+        console.warn('No se pudo verificar cédulas duplicadas:', err.message);
+        // Si falla la verificación, continuamos para no bloquear el flujo
+      }
     }
 
-    // Exponer métodos globalmente para botones onClick en HTML (legacy support temporal)
-    window.abrirModalCenso = (id) => this.abrirModalCenso(id);
-    window.cerrarModalCenso = () => this.cerrarModalCenso();
-    window.confirmarEliminarHab = (id) => this.confirmarEliminarHab(id);
-    window.filtrarCenso = (e) => this.filtrarCenso(e);
-    window.exportarExcelCenso = () => this.exportarExcelCenso();
-    window.cerrarModalElimHab = () => this.cerrarModalElimHab();
+    // Guardar el habitante si no hay duplicado
+    try {
+      await window.api.crearHabitante(datos);
+      if (window.Components) Components.showToast('Habitante registrado correctamente', 'success');
+      await this.cargarDatos();
+    } catch (error) {
+      console.error('Error guardando habitante:', error);
+      if (window.Components) Components.showToast('Error al guardar el habitante', 'error');
+    }
   }
+
+
 
   async cargarDatos() {
-    const tbody = document.getElementById('censoBody');
-    if (!tbody) return;
-    
-    // Mostramos un spinner inicial si la tabla está vacía
-    if (tbody.innerHTML.trim() === '') {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">${Components.createLoadingSpinner()}</td></tr>`;
-    }
-
     try {
-      this.habitantes = await window.api.getHabitantes();
-      this.renderizarTabla();
-    } catch (err) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:red;">Error cargando datos</td></tr>`;
+      const data = await window.api.getHabitantes();
+      this.habitantes = data.map(h => {
+         let age = h.edad ?? 0;
+         if (!age && h.fecha_nacimiento) {
+            const today = new Date();
+            const fnac = new Date(h.fecha_nacimiento);
+            age = today.getFullYear() - fnac.getFullYear();
+            if (today.getMonth() < fnac.getMonth() || (today.getMonth() === fnac.getMonth() && today.getDate() < fnac.getDate())) age--;
+         }
+         return {
+            id: h.id,
+            nombre: h.nombres,
+            apellido: h.apellidos,
+            cedula: h.cedula,
+            edad: age,
+            genero: h.genero,
+            consejoComunal: h.consejo?.nombre_comunidad || 'No asignado',
+            telefono: h.telefono,
+            clasificacion: age >= 60 ? 'adulto_mayor' : age <= 11 ? 'niño' : 'adulto',
+            elector: h.elector ?? age >= 18
+         };
+      });
+
+      this.actualizarKpis();
+      this.renderTabla();
+    } catch (error) {
+      console.error('Error cargando habitantes:', error);
+      const tbody = document.getElementById('censoBody');
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#C62828;">Error cargando datos. Verifique que haya iniciado sesión.</td></tr>`;
+      }
     }
   }
 
-  renderizarTabla() {
+  actualizarKpis() {
+     const total = this.habitantes.length;
+     const electores = this.habitantes.filter(h => h.elector).length;
+     
+     const elTotal = document.getElementById('kpiHabitantes');
+     const elElec = document.getElementById('kpiElectores');
+     
+     if (elTotal) elTotal.textContent = total;
+     if (elElec) elElec.textContent = electores;
+     
+     const elCC = document.getElementById('kpiCC') || document.getElementById('kpiConsejos');
+     if (elCC) elCC.textContent = 9;
+  }
+
+  renderTabla(highlightId = null) {
     const tbody = document.getElementById('censoBody');
     if (!tbody) return;
 
@@ -74,117 +133,99 @@ class CensoController {
       return;
     }
 
-    tbody.innerHTML = this.habitantes.map(h => `
-      <tr>
+    tbody.innerHTML = this.habitantes.map((h, idx) => `
+      <tr data-hab-id="${h.id}" class="${highlightId && String(h.id) === String(highlightId) ? 'row-highlight' : ''}">
+        <td>${idx + 1}</td>
+        <td><span class="cv-cedula">V-${h.cedula}</span></td>
         <td>
-          <div style="display:flex;align-items:center;gap:12px;">
-            <div class="user-avatar-sm">${h.nombre.charAt(0).toUpperCase()}${h.apellido ? h.apellido.charAt(0).toUpperCase() : ''}</div>
-            <div>
-              <strong>${h.nombre} ${h.apellido || ''}</strong><br>
-              <small class="text-gris">C.I. V-${h.cedula}</small>
-            </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="user-avatar-sm">${(h.nombre||'?').charAt(0).toUpperCase()}${(h.apellido||'').charAt(0).toUpperCase()}</div>
+            <strong>${h.nombre} ${h.apellido || ''}</strong>
           </div>
         </td>
         <td>${h.edad} años</td>
-        <td>${h.genero}</td>
+        <td>${h.genero || '—'}</td>
         <td>${h.consejoComunal}</td>
-        <td>${h.telefono || 'N/A'}</td>
         <td><span class="badge ${this._getColorClasificacion(h.clasificacion)}">${this._formatClasificacion(h.clasificacion)}</span></td>
         <td>${h.elector ? '<span class="status-indicator active">Sí</span>' : '<span class="status-indicator inactive">No</span>'}</td>
         <td>
           <div class="table-actions">
-            <button class="btn-action view" title="Ver Expediente" onclick="abrirModalCenso(${h.id})"><i class="fas fa-file-alt"></i></button>
-            <button class="btn-action edit" title="Editar" onclick="abrirModalCenso(${h.id})"><i class="fas fa-edit"></i></button>
-            <button class="btn-action delete" title="Eliminar" onclick="confirmarEliminarHab(${h.id})"><i class="fas fa-trash-alt"></i></button>
+            <button class="btn-action view" title="Ver Expediente" onclick="censoCtrl.verExpediente(${h.id})"><i class="fas fa-id-card"></i></button>
+            <button class="btn-action edit" title="Editar" onclick="censoCtrl.editarHabitante(${h.id})"><i class="fas fa-pen-to-square"></i></button>
+            <button class="btn-action delete" title="Eliminar" onclick="confirmarEliminarHab(${h.id})"><i class="fas fa-trash-can"></i></button>
           </div>
         </td>
       </tr>
     `).join('');
-  }
 
-  abrirModalCenso(id) {
-    const modal = document.getElementById('modalCenso');
-    const title = document.getElementById('modalCensoTitle');
-    const formElement = document.getElementById('formCenso');
-    
-    if (id) {
-      title.innerHTML = '<i class="fas fa-user-edit" style="color:var(--au);"></i> Editar Habitante #' + id;
-      // TODO: Cargar datos en el formulario
-    } else {
-      title.innerHTML = '<i class="fas fa-user-plus" style="color:var(--vv);"></i> Registrar Habitante';
-      if (formElement) {
-        formElement.reset();
-        this.form.limpiarErrores();
+    if (highlightId) {
+      const row = tbody.querySelector(`tr[data-hab-id="${highlightId}"]`);
+      if (row) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => row.classList.remove('row-highlight'), 4000);
       }
-      this.toggleRubroProduccion();
     }
-    
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
   }
 
-  cerrarModalCenso() {
-    document.getElementById('modalCenso').classList.remove('show');
-    document.body.style.overflow = '';
-  }
-
-  async guardarHabitante(datosForm) {
-    const btn = document.querySelector('#modalCenso .modal-footer-sicag .btn-primary');
-    if (btn) {
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-      btn.disabled = true;
-    }
-
+  async editarHabitante(id) {
     try {
-      // Simular guardado a API
-      const nuevoHabitante = await window.api.crearHabitante({
-        cedula: datosForm.cedula,
-        nombre: datosForm.nombre_completo.split(' ')[0],
-        apellido: datosForm.nombre_completo.split(' ').slice(1).join(' '),
-        edad: parseInt(document.getElementById('habEdad').value) || 0,
-        genero: datosForm.genero,
-        consejoComunal: document.getElementById('habCC').options[document.getElementById('habCC').selectedIndex]?.text || 'Desconocido',
-        telefono: datosForm.telefono,
-        clasificacion: document.getElementById('t4Status').value.toLowerCase().replace(' ', '_'),
-        elector: document.getElementById('electoralStatus').value.includes('Elector')
-      });
-
-      if (window.Components) Components.showToast('Habitante registrado con éxito', 'success');
-      
-      this.cerrarModalCenso();
-      await this.cargarDatos(); // Recargar la tabla
-    } catch (error) {
-      console.error(error);
-      if (window.Components) Components.showToast('Error al guardar habitante', 'error');
-    } finally {
-      if (btn) {
-        btn.innerHTML = '<i class="fas fa-save"></i> Guardar Habitante';
-        btn.disabled = false;
-      }
+      const h = await window.api.getHabitanteById(id);
+      this.editingId = id;
+      this._llenarFormulario(h);
+      const title = document.getElementById('modalCensoTitle');
+      if (title) title.textContent = 'Editar Habitante #' + id;
+      const modalEl = document.getElementById('modalCenso');
+      if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
+      if (typeof goTo === 'function') goTo(1);
+    } catch (e) {
+      console.error(e);
+      if (window.Components) Components.showToast('No se pudo cargar el habitante.', 'error');
     }
   }
 
-  confirmarEliminarHab(id) {
-    Components.confirmDialog(
-      `¿Está seguro de que desea eliminar al habitante con ID #${id}? Esta acción no se puede deshacer.`,
-      async () => {
-        try {
-          await window.api.eliminarHabitante(id);
-          Components.showToast('Habitante eliminado correctamente', 'success');
-          await this.cargarDatos();
-        } catch(e) {
-          Components.showToast('Error al eliminar', 'error');
-        }
-      }
-    );
+  verExpediente(id) {
+    const h = this.habitantes.find(x => String(x.id) === String(id));
+    if (!h) return;
+    this.renderTabla(id);
+    const info = [
+      `Nombre: ${h.nombre} ${h.apellido || ''}`,
+      `Cédula: V-${h.cedula}`,
+      `Edad: ${h.edad} años`,
+      `Género: ${h.genero}`,
+      `Consejo Comunal: ${h.consejoComunal}`,
+      `Teléfono: ${h.telefono || 'No registrado'}`,
+      `Clasificación: ${this._formatClasificacion(h.clasificacion)}`,
+      `Elector: ${h.elector ? 'Sí' : 'No'}`
+    ].join('\n');
+    if (window.Components) {
+      Components.showToast('Expediente resaltado en la tabla', 'info');
+    }
+    alert('EXPEDIENTE DEL HABITANTE\n\n' + info);
   }
 
-  cerrarModalElimHab() {
-    const modal = document.getElementById('modalEliminarHab');
-    if (modal) {
-      modal.classList.remove('show');
-      document.body.style.overflow = '';
-    }
+  _llenarFormulario(h) {
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.value = val ?? '';
+    };
+    setVal('habCedula', h.cedula);
+    setVal('habNombre', `${h.nombres || ''} ${h.apellidos || ''}`.trim());
+    setVal('habFechaNac', h.fecha_nacimiento ? h.fecha_nacimiento.split('T')[0] : '');
+    setVal('habGenero', h.genero);
+    setVal('habTelefono', h.telefono);
+    setVal('habEmail', h.email);
+    setVal('habDireccion', h.direccion);
+    setVal('habCC', h.consejo_comunal_id);
+    setVal('condicionSalud', h.condicion_salud || 'saludable');
+    const chk = document.getElementById('tieneCedulaAmpliada');
+    if (chk) chk.checked = !!h.tiene_cedula_ampliada;
+    this.calcularDatosNacimiento(h.fecha_nacimiento ? h.fecha_nacimiento.split('T')[0] : '');
+  }
+
+  resetFormulario() {
+    this.editingId = null;
+    const form = document.getElementById('formCenso');
+    if (form) form.reset();
   }
 
   calcularDatosNacimiento(fechaStr) {
@@ -192,9 +233,12 @@ class CensoController {
     const today = new Date();
     
     if (!fechaStr || isNaN(birthDate.getTime())) {
-      document.getElementById('habEdad').value = '';
-      document.getElementById('t4Status').value = '';
-      document.getElementById('electoralStatus').value = '';
+      const edad = document.getElementById('habEdad');
+      const t4 = document.getElementById('t4Status');
+      const elec = document.getElementById('electoralStatus');
+      if (edad) edad.value = '';
+      if (t4) t4.value = '';
+      if (elec) elec.value = '';
       return;
     }
 
@@ -202,13 +246,16 @@ class CensoController {
     const m = today.getMonth() - birthDate.getMonth();
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
     
-    document.getElementById('habEdad').value = age >= 0 ? age : '';
+    const edadEl = document.getElementById('habEdad');
+    if (edadEl) edadEl.value = age >= 0 ? age : '';
 
     const t4Value = age >= 0 && age <= 10 ? 'Niño' : age >= 60 ? 'Adulto Mayor' : 'Adulto';
     const electoralValue = age < 15 ? 'Inactivo electoralmente' : age < 18 ? 'Elector Comunal' : 'Elector Universal';
 
-    document.getElementById('t4Status').value = age >= 0 ? t4Value : '';
-    document.getElementById('electoralStatus').value = age >= 0 ? electoralValue : '';
+    const t4El = document.getElementById('t4Status');
+    const elecEl = document.getElementById('electoralStatus');
+    if (t4El) t4El.value = age >= 0 ? t4Value : '';
+    if (elecEl) elecEl.value = age >= 0 ? electoralValue : '';
   }
 
   toggleRubroProduccion() {
@@ -225,33 +272,6 @@ class CensoController {
     }
   }
 
-  filtrarCenso(e) {
-    const btn = (e && e.target) ? e.target.closest('.btn-sicag') : null;
-    if (!btn) return;
-    const oldHtml = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Filtrando...';
-    setTimeout(() => { 
-      btn.innerHTML = oldHtml;
-      Components.showToast('Filtros aplicados (Simulación)', 'info');
-    }, 600);
-  }
-
-  exportarExcelCenso() {
-    const btn = document.getElementById('btnExportCenso');
-    if (btn) {
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
-      btn.disabled = true;
-      setTimeout(() => {
-        btn.innerHTML = '<i class="fas fa-check"></i> ¡Listo!';
-        Components.showToast('Descargando archivo Excel...', 'success');
-        setTimeout(() => {
-          btn.innerHTML = '<i class="fas fa-file-pdf"></i> Exportar Censo';
-          btn.disabled = false;
-        }, 1500);
-      }, 1500);
-    }
-  }
-
   _getColorClasificacion(clasif) {
     const map = { 'adulto_mayor': 'badge-danger', 'niño': 'badge-warning', 'adulto': 'badge-primary' };
     return map[clasif] || 'badge-secondary';
@@ -263,7 +283,6 @@ class CensoController {
   }
 }
 
-// Inicialización vía SPA Router o recarga directa
 document.addEventListener('DOMContentLoaded', () => {
   window.censoCtrl = new CensoController();
 });

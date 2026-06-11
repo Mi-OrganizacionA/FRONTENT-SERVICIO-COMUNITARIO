@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bandeja de Validaciones - SICAG v2.5</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+  <link rel="preload" href="css/admin.css" as="style">
+  <link href="css/admin.css" rel="stylesheet">
+  <script>
+    if (!localStorage.getItem('token') || !localStorage.getItem('user')) {
+      window.location.replace('login.html');
+    }
+  </script>
+</head>
+<body data-search-placeholder="Buscar solicitudes y notificaciones...">
+  <div class="barra-tricolor"></div>
+  <div id="header-placeholder"></div>
+  <div id="sidebar-placeholder"></div>
+  <main class="app-main">
+    <div class="ph-wrap fade-in">
+      <div class="ph-deco-dots" aria-hidden="true"></div>
+      <nav class="ph-breadcrumb" aria-label="Ruta de navegación">
+        <a href="dashboard.html"><i class="fas fa-home"></i></a>
+        <i class="fas fa-chevron-right ph-sep"></i>
+        <span class="ph-cur">Bandeja de Validaciones</span>
+      </nav>
+      <div class="ph-body">
+        <div class="ph-left">
+          <div class="ph-icon"><i class="fas fa-bell"></i></div>
+          <div>
+            <div class="ph-module">SICAG — Validaciones</div>
+            <h1 class="ph-title">Bandeja de Validaciones</h1>
+            <p class="ph-sub">Administra las solicitudes de registro enviadas por los voceros. Revisa, aprueba o rechaza datos que ingresarán al sistema (noticias, proyectos, reportes, habitantes) de manera centralizada.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:.6rem;align-self:center;flex-wrap:wrap">
+          <a href="dashboard.html" class="ph-btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+          <button class="ph-btn" type="button" onclick="location.reload()"><i class="fas fa-rotate-right"></i> Actualizar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ph-kpi-float">
+      <div class="kpi-grid stagger fade-in-up" id="notificationStats"></div>
+    </div>
+
+    <section class="notificaciones-grid">
+      <div class="card-sicag">
+        <div class="card-header-sicag">
+          <span>Solicitudes en revisión</span>
+          <span id="notificationCount" class="badge-sicag badge-pendiente">Cargando...</span>
+        </div>
+        <div id="notificationsList" class="card-body-sicag notification-list"></div>
+      </div>
+
+      <div class="card-sicag">
+        <div class="card-header-sicag">
+          <span>Detalle de solicitud</span>
+          <span id="detailStatus" class="badge-sicag badge-pendiente">Selecciona una notificación</span>
+        </div>
+        <div id="notificationDetail" class="card-body-sicag notification-detail"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/notificaciones.js"></script>
+  <script src="js/layout-menu.js"></script>
+  <script src="js/roles.js"></script>
+</body>
+</html>
