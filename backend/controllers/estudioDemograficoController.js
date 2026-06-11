@@ -133,7 +133,12 @@ class EstudioDemograficoController {
 
   static async guardarPaso(req, res, next) {
     const db = require('../models').initModels ? require('../models').initModels : require('../models');
-    const t = await db.sequelize.transaction();
+    // db may be an object with models or a function; derive sequelize instance reliably
+    const sequelize = db && db.sequelize ? db.sequelize : (EstudioDemografico && EstudioDemografico.sequelize);
+    if (!sequelize) {
+      throw new Error('Sequelize instance no disponible para transacciones');
+    }
+    const t = await sequelize.transaction();
     try {
       const { paso, id_estudio, datos } = req.body;
       

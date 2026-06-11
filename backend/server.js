@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const env = require('./config/environment');
 const { initDatabase } = require('./config/database');
@@ -30,11 +31,24 @@ const { captureClientInfo } = require('./middleware/auditMiddleware');
 
 const app = express();
 app.use(helmet());
+if (env.trust_proxy) {
+  app.set('trust proxy', 1);
+}
 app.use(cors(env.cors));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
 app.use(captureClientInfo);
+
+const apiLimiter = rateLimit({
+  windowMs: env.rate_limit.window_ms,
+  max: env.rate_limit.max_requests,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Demasiadas peticiones. Vuelva a intentarlo más tarde.' }
+});
+
+app.use('/api/', apiLimiter);
 
 app.use((req, res, next) => { logger.info(`${req.method} ${req.path}`); next(); });
 

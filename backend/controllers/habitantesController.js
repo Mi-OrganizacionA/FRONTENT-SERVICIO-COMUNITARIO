@@ -204,7 +204,19 @@ class HabitantesController {
       });
     } catch (error) {
       logger.error('Error creando habitante:', error);
-      res.status(400).json({ error: error.message });
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        return res.status(409).json({
+          error: 'Cédula ya registrada',
+          details: error.errors.map(e => ({ field: e.path, message: e.message }))
+        });
+      }
+      if (error.name === 'SequelizeValidationError') {
+        return res.status(422).json({
+          error: 'Datos inválidos',
+          details: error.errors.map(e => ({ field: e.path, message: e.message }))
+        });
+      }
+      res.status(500).json({ error: 'Error interno creando habitante' });
     }
   }
 
@@ -216,6 +228,22 @@ class HabitantesController {
       const { id } = req.params;
       const habitanteAntiguos = await HabitanteModel.findByPk(id);
       if (!habitanteAntiguos) return res.status(404).json({ error: 'Habitante no encontrado' });
+
+      if (req.body.cedula && req.body.cedula !== habitanteAntiguos.cedula) {
+        const { Op } = require('sequelize');
+        const existe = await HabitanteModel.findOne({
+          where: {
+            cedula: req.body.cedula,
+            id: { [Op.ne]: id }
+          }
+        });
+        if (existe) {
+          return res.status(409).json({
+            error: 'Cédula ya registrada',
+            details: [{ field: 'cedula', message: 'La cédula ya se encuentra en uso' }]
+          });
+        }
+      }
 
       // Lógica de Aprobación Automática
       const Configuracion = HabitanteModel.sequelize.models.Configuracion;
@@ -250,7 +278,19 @@ class HabitantesController {
       });
     } catch (error) {
       logger.error('Error actualizando habitante:', error);
-      res.status(400).json({ error: error.message });
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        return res.status(409).json({
+          error: 'Cédula ya registrada',
+          details: error.errors.map(e => ({ field: e.path, message: e.message }))
+        });
+      }
+      if (error.name === 'SequelizeValidationError') {
+        return res.status(422).json({
+          error: 'Datos inválidos',
+          details: error.errors.map(e => ({ field: e.path, message: e.message }))
+        });
+      }
+      res.status(500).json({ error: 'Error interno actualizando habitante' });
     }
   }
 

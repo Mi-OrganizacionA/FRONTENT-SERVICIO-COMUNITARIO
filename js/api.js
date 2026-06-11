@@ -5,11 +5,15 @@
 class APIManager {
   constructor() {
     const host = window.location.hostname;
-    this.isLocal = host === 'localhost' || host === '127.0.0.1';
-    this.baseURL = this.isLocal ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api';
+    this.isLocal = host === 'localhost' || host === '127.0.0.1' || host === '::1';
+    this.baseURL = window.API_BASE_URL || (this.isLocal ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api');
     this.mockData = null;
-    this.isDevelopment = false;
+    this.isDevelopment = Boolean(window.API_FORCE_MOCK || false);
     this.initMockData();
+    // Intentar sincronizar pendientes al reconectar
+    window.addEventListener('online', () => this.flushPendingPasos());
+    // Intentar flush inicial de pendientes
+    try { this.flushPendingPasos(); } catch(e) { /* ignore */ }
   }
 
   // Cargar datos de ejemplo
@@ -52,6 +56,55 @@ class APIManager {
         }
       }, 50);
     });
+  }
+
+  _enableMockMode(error) {
+    if (!this.isDevelopment) {
+      console.warn('API no disponible, activando modo local de simulación:', error?.message || error);
+      this.isDevelopment = true;
+    }
+  }
+
+  // Pending queue helpers (for pasos de censo guardados offline)
+  _getPendingQueue() {
+    try {
+      const raw = localStorage.getItem('sicag_censo_queue');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  _savePendingQueue(queue) {
+    try {
+      localStorage.setItem('sicag_censo_queue', JSON.stringify(queue));
+      // Dispatch event with current count
+      window.dispatchEvent(new CustomEvent('censo:pendingCount', { detail: { count: queue.length } }));
+    } catch (e) { console.error('No se pudo guardar la cola de pasos', e); }
+  }
+
+  _enqueuePendingPaso(paso, idEstudio, datos) {
+    const queue = this._getPendingQueue();
+    queue.push({ paso, id_estudio: idEstudio, datos, ts: Date.now() });
+    this._savePendingQueue(queue);
+  }
+
+  async flushPendingPasos() {
+    const queue = this._getPendingQueue();
+    if (!queue.length) return;
+    const remaining = [];
+    for (const item of queue) {
+      try {
+        const resp = await this._fetch(`${this.baseURL}/estudios-demograficos/paso`, {
+          method: 'POST',
+          ...this._getHeaders(),
+          body: JSON.stringify(item)
+        });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      } catch (e) {
+        console.warn('No se pudo sincronizar paso en la cola:', e);
+        remaining.push(item);
+      }
+    }
+    this._savePendingQueue(remaining);
   }
 
   // ─────────────────────────────────────────
@@ -110,9 +163,16 @@ class APIManager {
     if (this.isDevelopment) {
       return this.mockData.config || {};
     }
-    const response = await fetch(`${this.baseURL}/system/config`, this._getHeaders());
-    const data = await response.json();
-    return data.config || {};
+    try {
+      const response = await this._fetch(`${this.baseURL}/system/config`, this._getHeaders());
+      const data = await response.json().catch(() => ({}));
+      return data.config || {};
+    } catch (error) {
+      if (this.isDevelopment) {
+        return this.mockData.config || {};
+      }
+      throw error;
+    }
   }
 
   async saveSystemConfig(configKey, value) {
@@ -169,13 +229,20 @@ class APIManager {
       return this._filterHabitantes(this.mockData.habitantes, filtros);
     }
     const params = new URLSearchParams(filtros);
-    const response = await this._fetch(`${this.baseURL}/habitantes?${params}`, this._getHeaders());
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || 'Error fetching habitantes');
+    try {
+      const response = await this._fetch(`${this.baseURL}/habitantes?${params}`, this._getHeaders());
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || 'Error fetching habitantes');
+      }
+      const data = await response.json();
+      return data.habitantes || data;
+    } catch (error) {
+      if (this.isDevelopment) {
+        return this._filterHabitantes(this.mockData.habitantes, filtros);
+      }
+      throw error;
     }
-    const data = await response.json();
-    return data.habitantes || data;
   }
 
   async getHabitanteById(id) {
@@ -185,19 +252,38 @@ class APIManager {
       if (!h) throw new Error('Habitante no encontrado');
       return h;
     }
-    const response = await this._fetch(`${this.baseURL}/habitantes/${id}`, this._getHeaders());
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || 'Habitante no encontrado');
+    try {
+      const response = await this._fetch(`${this.baseURL}/habitantes/${id}`, this._getHeaders());
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || 'Habitante no encontrado');
+      }
+      return response.json();
+    } catch (error) {
+      if (this.isDevelopment) {
+        const h = this.mockData.habitantes.find(x => String(x.id) === String(id));
+        if (!h) throw new Error('Habitante no encontrado');
+        return h;
+      }
+      throw error;
     }
-    return response.json();
   }
 
   async buscarHabitantesPublico(query) {
     if (!query || query.trim().length < 2) return [];
-    const response = await fetch(`${this.baseURL}/habitantes/publico/buscar?q=${encodeURIComponent(query.trim())}`);
-    if (!response.ok) return [];
-    return response.json();
+    try {
+      const response = await this._fetch(`${this.baseURL}/habitantes/publico/buscar?q=${encodeURIComponent(query.trim())}`);
+      if (!response.ok) return [];
+      return response.json();
+    } catch (error) {
+      if (this.isDevelopment) {
+        const normalizedQuery = query.trim().toLowerCase();
+        return (this.mockData.habitantes || [])
+          .filter(h => String(h.cedula).includes(normalizedQuery) || h.nombre?.toLowerCase().includes(normalizedQuery))
+          .slice(0, 10);
+      }
+      return [];
+    }
   }
 
   async crearHabitante(datos) {
@@ -321,9 +407,16 @@ class APIManager {
       return this._filterProyectos(this.mockData.proyectos, filtros);
     }
     const params = new URLSearchParams(filtros);
-    const response = await fetch(`${this.baseURL}/proyectos?${params}`, this._getHeaders());
-    if (!response.ok) throw new Error('Error fetching proyectos');
-    return response.json();
+    try {
+      const response = await this._fetch(`${this.baseURL}/proyectos?${params}`, this._getHeaders());
+      if (!response.ok) throw new Error('Error fetching proyectos');
+      return response.json();
+    } catch (error) {
+      if (this.isDevelopment) {
+        return this._filterProyectos(this.mockData.proyectos, filtros);
+      }
+      throw error;
+    }
   }
 
   async getProyectosPublicos(filtros = {}) {
@@ -333,10 +426,13 @@ class APIManager {
     }
     try {
       const params = new URLSearchParams(filtros);
-      const response = await fetch(`${this.baseURL}/proyectos/publico?${params}`, this._getHeaders());
+      const response = await this._fetch(`${this.baseURL}/proyectos/publico?${params}`, this._getHeaders());
       if (!response.ok) throw new Error('Error fetching proyectos publicos');
       return await response.json();
     } catch (error) {
+      if (this.isDevelopment) {
+        return this._filterProyectos(this.mockData?.proyectos || [], filtros);
+      }
       console.warn('API pública falló, usando datos locales como respaldo:', error.message);
       return this._filterProyectos(this.mockData?.proyectos || [], filtros);
     }
@@ -523,9 +619,17 @@ class APIManager {
     await this.waitForMockData();
     if (this.isDevelopment) return this.mockData?.noticias || [];
     const params = new URLSearchParams(filtros);
-    const response = await fetch(`${this.baseURL}/cartelera/publico/activas`, this._getHeaders());
-    if (!response.ok) throw new Error('Error fetching noticias');
-    return response.json();
+    try {
+      const response = await this._fetch(`${this.baseURL}/cartelera/publico/activas`, this._getHeaders());
+      if (!response.ok) throw new Error('Error fetching noticias');
+      return response.json();
+    } catch (error) {
+      if (this.isDevelopment) {
+        return this.mockData?.noticias || [];
+      }
+      console.warn('No se pudo cargar noticias desde la API; usando datos locales:', error.message);
+      return this.mockData?.noticias || [];
+    }
   }
 
   async crearNoticia(datos) {
@@ -599,9 +703,9 @@ class APIManager {
     // Obtenemos los totales haciendo llamadas a los endpoints
     try {
       const [habRes, vivRes, proyRes] = await Promise.all([
-        fetch(`${this.baseURL}/habitantes`, this._getHeaders()),
-        fetch(`${this.baseURL}/viviendas`, this._getHeaders()),
-        fetch(`${this.baseURL}/proyectos`, this._getHeaders())
+        this._fetch(`${this.baseURL}/habitantes`, this._getHeaders()),
+        this._fetch(`${this.baseURL}/viviendas`, this._getHeaders()),
+        this._fetch(`${this.baseURL}/proyectos`, this._getHeaders())
       ]);
       
       const habitantes = habRes.ok ? await habRes.json() : [];
@@ -615,6 +719,9 @@ class APIManager {
         consejos: 8
       };
     } catch (e) {
+      if (this.isDevelopment) {
+        return { habitantes: this.mockData?.habitantes?.length || 0, viviendas: 0, proyectos: this.mockData?.proyectos?.length || 0, consejos: 8 };
+      }
       console.error("Error obteniendo stats del dashboard", e);
       return { habitantes: 0, viviendas: 0, proyectos: 0, consejos: 0 };
     }
@@ -622,10 +729,13 @@ class APIManager {
 
   async getDashboardResumen() {
     try {
-      const response = await fetch(`${this.baseURL}/censo-reportes/resumen`, this._getHeaders());
+      const response = await this._fetch(`${this.baseURL}/censo-reportes/resumen`, this._getHeaders());
       if (!response.ok) return [];
       return await response.json();
     } catch (e) {
+      if (this.isDevelopment) {
+        return [];
+      }
       console.error(e);
       return [];
     }
@@ -670,24 +780,29 @@ class APIManager {
   }
 
   async _fetch(url, options = {}) {
-    const response = await fetch(url, options);
-    if (response.status === 401) {
-      const err = await response.clone().json().catch(() => ({}));
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      if (window.auth) {
-        window.auth.token = null;
-        window.auth.user = null;
+    try {
+      const response = await fetch(url, options);
+      if (response.status === 401) {
+        const err = await response.clone().json().catch(() => ({}));
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        if (window.auth) {
+          window.auth.token = null;
+          window.auth.user = null;
+        }
+        const isPublicPage = /index\.html$|consulta_habitantes\.html$|login\.html$/.test(window.location.pathname) ||
+          window.location.pathname.endsWith('/');
+        if (!isPublicPage) {
+          alert(err.error || 'Su sesión ha expirado. Por favor inicie sesión nuevamente.');
+          window.location.href = 'login.html';
+        }
+        throw new Error(err.code || 'TOKEN_EXPIRED');
       }
-      const isPublicPage = /index\.html$|consulta_habitantes\.html$|login\.html$/.test(window.location.pathname) ||
-        window.location.pathname.endsWith('/');
-      if (!isPublicPage) {
-        alert(err.error || 'Su sesión ha expirado. Por favor inicie sesión nuevamente.');
-        window.location.href = 'login.html';
-      }
-      throw new Error(err.code || 'TOKEN_EXPIRED');
+      return response;
+    } catch (error) {
+      this._enableMockMode(error);
+      throw error;
     }
-    return response;
   }
 
   _filterHabitantes(habitantes, filtros) {
@@ -702,14 +817,46 @@ class APIManager {
     if (this.isDevelopment) {
       return new Promise(r => setTimeout(() => r({ success: true, id_estudio: idEstudio || Math.floor(Math.random() * 90000000) }), 500));
     }
-    const response = await fetch(`${this.baseURL}/estudios-demograficos/paso`, {
-      method: 'POST',
-      ...this._getHeaders(),
-      body: JSON.stringify({ paso, id_estudio: idEstudio, datos })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || `Error en paso ${paso}`);
-    return data;
+
+    try {
+      const response = await this._fetch(`${this.baseURL}/estudios-demograficos/paso`, {
+        method: 'POST',
+        ...this._getHeaders(),
+        body: JSON.stringify({ paso, id_estudio: idEstudio, datos })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || `Error en paso ${paso}`);
+      return data;
+    } catch (error) {
+      // Si falla por red, encolamos el paso para sincronizar luego
+      try {
+        this._enqueuePendingPaso(paso, idEstudio, datos);
+        return { success: true, id_estudio: idEstudio || Math.floor(Math.random() * 90000000), queued: true };
+      } catch (e) {
+        this._enableMockMode(error);
+        if (this.isDevelopment) {
+          return { success: true, id_estudio: idEstudio || Math.floor(Math.random() * 90000000) };
+        }
+        throw error;
+      }
+    }
+  }
+
+  async finalizarEstudio(idEstudio) {
+    if (this.isDevelopment) return { success: true };
+    try {
+      const response = await this._fetch(`${this.baseURL}/estudios-demograficos/${idEstudio}/finalizar`, {
+        method: 'PUT',
+        ...this._getHeaders()
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Error finalizando estudio');
+      return data;
+    } catch (error) {
+      this._enableMockMode(error);
+      if (this.isDevelopment) return { success: true };
+      throw error;
+    }
   }
 
   _filterProyectos(proyectos, filtros) {

@@ -15,7 +15,7 @@ class AuthManager {
   async login(usuario, contraseña) {
     try {
       // Producción: Petición real al backend
-      const baseURL = window.api ? window.api.baseURL : 'https://sicag-api.onrender.com/api';
+      const baseURL = window.API_BASE_URL || window.api?.baseURL || 'https://sicag-api.onrender.com/api';
       const response = await fetch(`${baseURL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

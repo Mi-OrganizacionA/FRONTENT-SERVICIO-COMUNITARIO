@@ -1,5 +1,10 @@
 require('dotenv').config();
 
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || process.env.FRONTEND_URL || 'http://localhost:8080')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
 module.exports = {
   node_env: process.env.NODE_ENV || 'development',
   port: process.env.PORT || 3000,
@@ -32,12 +37,23 @@ module.exports = {
 
   cors: {
     origin: function (origin, callback) {
-      // Permitir cualquier origen en desarrollo local
-      callback(null, true);
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS no permitido por origen: ${origin}`));
+      }
     },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
   },
 
   frontend_url: process.env.FRONTEND_URL || 'http://localhost:8080',
+  allowed_origins: (process.env.ALLOWED_ORIGINS || process.env.FRONTEND_URL || 'http://localhost:8080').split(',').map(origin => origin.trim()).filter(Boolean),
+  trust_proxy: process.env.TRUST_PROXY === 'true' || false,
+  rate_limit: {
+    window_ms: Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+    max_requests: Number(process.env.RATE_LIMIT_MAX) || 100
+  },
   log_level: process.env.LOG_LEVEL || 'info'
 };
