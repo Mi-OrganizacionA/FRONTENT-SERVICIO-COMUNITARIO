@@ -225,6 +225,11 @@
       .flow-step-row { flex-direction: column; text-align: center; }
     }
   </style>
+  <script>
+    if (!localStorage.getItem('token') || !localStorage.getItem('user')) {
+      window.location.replace('login.html');
+    }
+  </script>
 </head>
 
 <body data-search-placeholder="Buscar manuales...">
