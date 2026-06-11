@@ -91,10 +91,11 @@
     const target = item.target ? ` target="${item.target}"` : '';
     const style = item.style ? ` style="${item.style}"` : '';
     const badge = item.badge ? `<span class="sidebar-badge">${item.badge}</span>` : '';
+    const onclick = item.href === 'login.html' ? ` onclick="event.preventDefault(); if(window.auth) window.auth.logout(); else window.location.href='login.html';"` : '';
 
     return `
       <li class="sidebar-nav-item">
-        <a href="${item.href}" class="sidebar-nav-link${isActive ? ' active' : ''}"${ariaCurrent}${target}${style}>
+        <a href="${item.href}" class="sidebar-nav-link${isActive ? ' active' : ''}"${ariaCurrent}${target}${style}${onclick}>
           <i class="fas fa-${item.icon}"></i>
           <span>${item.label}</span>
           ${badge}
