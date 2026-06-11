@@ -418,6 +418,13 @@
   },
   {
     "tipo": "seccion",
+    "titulo": "Mapa Interactivo",
+    "subtitulo": "Apartado en Cartografía",
+    "url": "cartografia.html?highlightSection=mapa%20interactivo",
+    "keywords": "mapa interactivo poligonos leyendas seccion cartografia"
+  },
+  {
+    "tipo": "seccion",
     "titulo": "Habitantes Censados",
     "subtitulo": "Apartado en Censo Comunitario",
     "url": "censo.html?highlightSection=habitantes%20censados",
