@@ -218,7 +218,11 @@
     </div>
 
 
-    <!-- Los controles y leyendas redundantes fueron removidos a petición del usuario -->
+    <!-- Leyenda del mapa como Botones Interactivos -->
+    <div class="map-legend-panel fade-in-up" style="display:flex; flex-wrap:wrap; gap:10px; padding:15px; align-items:center;">
+      <strong style="font-size:.8rem;color:var(--txt);margin-right:.25rem;"><i class="fas fa-map-pin" style="color:var(--vp);"></i> Comunidades:</strong>
+      <div id="interactiveLegendContainer" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+    </div>
 
     <!-- MAPA PRINCIPAL -->
     <div class="chart-wrapper fade-in-up" style="padding:0; overflow:hidden; margin-bottom:1.25rem;">
@@ -226,87 +230,6 @@
         <i class="fas fa-globe-americas"></i> Mapa Interactivo — Las Mercedes, San Felipe, Yaracuy
       </div>
       <div id="mapaCartografia" class="map-full"></div>
-    </div>
-
-    <!-- CONSEJOS COMUNALES CARDS -->
-    <div class="card-sicag fade-in-up">
-      <div class="card-header-sicag">
-        <span><i class="fas fa-landmark" style="color:var(--vp);"></i> 9 Consejos Comunales — Distribución
-          Territorial</span>
-      </div>
-      <div style="padding:1.25rem 1.5rem;">
-        <div class="cc-grid">
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i>
-            </div>
-            <div>
-              <strong>C.C. Jobito I</strong>
-              <span>Zona norte · 185 familias · Maíz y caraotas</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i>
-            </div>
-            <div>
-              <strong>C.C. Jobito II</strong>
-              <span>Zona norte-este · 170 familias · Maíz</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(249,168,37,.12);color:#E65100;"><i class="fas fa-flag"></i></div>
-            <div>
-              <strong>C.C. Brisas del Yurubí</strong>
-              <span>Zona este · 210 familias · Cacao y frutales</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(249,168,37,.12);color:#E65100;"><i class="fas fa-flag"></i></div>
-            <div>
-              <strong>C.C. Andrés Eloy Blanco</strong>
-              <span>Zona central · 160 familias · Hortalizas</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(21,101,192,.1);color:var(--az);"><i class="fas fa-flag"></i>
-            </div>
-            <div>
-              <strong>C.C. Las Mercedes I</strong>
-              <span>Zona central-sur · 145 familias · Café</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(21,101,192,.1);color:var(--az);"><i class="fas fa-flag"></i>
-            </div>
-            <div>
-              <strong>C.C. Las Mercedes II</strong>
-              <span>Zona sur · 130 familias · Yuca y tubérculos</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(198,40,40,.1);color:var(--ru);"><i class="fas fa-flag"></i></div>
-            <div>
-              <strong>C.C. Santa Cruz de las Mercedes</strong>
-              <span>Zona oeste · 140 familias · Ganadería menor</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i>
-            </div>
-            <div>
-              <strong>C.C. Fortaleza del Corozo</strong>
-              <span>Zona sur-este · 110 familias · Maíz colectivo</span>
-            </div>
-          </div>
-          <div class="cc-card">
-            <div class="cc-dot" style="background:rgba(46,125,50,.12);color:var(--vp);"><i class="fas fa-flag"></i>
-            </div>
-            <div>
-              <strong>C.C. Vencedores del Corozo</strong>
-              <span>Zona montañosa · 95 familias · Café de altura</span>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
   </main>
@@ -371,6 +294,7 @@
     const ccLayers = {};
 
     let totalAreaHectareas = 0;
+    const legendContainer = document.getElementById('interactiveLegendContainer');
 
     // Función para calcular área aproximada en hectáreas
     function calcularAreaHa(latLngs) {
@@ -420,6 +344,28 @@
         m.bindPopup(infoHtml);
         m.bindTooltip(`<b>${cc.nombre}</b>`, { sticky: true });
         ccMarkers[cc.nombre] = m;
+      }
+
+      // Crear botón interactivo en la leyenda
+      if (legendContainer) {
+        const btn = document.createElement('button');
+        btn.className = 'ph-btn';
+        btn.style.padding = '4px 10px';
+        btn.style.fontSize = '0.75rem';
+        btn.style.background = 'white';
+        btn.style.border = `1px solid ${cc.color}`;
+        btn.style.color = cc.color;
+        btn.style.cursor = 'pointer';
+        btn.style.borderRadius = '20px';
+        btn.innerHTML = `<i class="fas fa-map-pin"></i> ${cc.nombre.replace('C.C. ', '')}`;
+        
+        btn.addEventListener('mouseenter', () => { btn.style.background = cc.color; btn.style.color = 'white'; });
+        btn.addEventListener('mouseleave', () => { btn.style.background = 'white'; btn.style.color = cc.color; });
+        
+        btn.addEventListener('click', () => {
+          window.postMessage({ action: 'highlightCommunity', community: cc.nombre }, '*');
+        });
+        legendContainer.appendChild(btn);
       }
     });
 
