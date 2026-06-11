@@ -328,6 +328,7 @@
   </main>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="js/poligonos.js"></script>
   <script>
     /* ── LEAFLET MAP ── */
     const CENTER = [10.351969522108448, -68.73344284186831];
@@ -344,7 +345,6 @@
       .then(data => {
         L.geoJSON(data, {
           style: function (feature) {
-            // Resaltar el estado Yaracuy si existe la propiedad
             const isYaracuy = feature.properties && feature.properties.name && feature.properties.name.toLowerCase().includes('yaracuy');
             return {
               color: isYaracuy ? '#2E7D32' : '#888',
@@ -381,11 +381,20 @@
       { lat: 10.335, lng: -68.750, nombre: 'C.C. Vencedores del Corozo', hab: 95, color: '#66BB6A', cultivo: 'Café de altura' },
     ];
 
-    const ccLayer = L.layerGroup();
+    const ccLayer = L.layerGroup().addTo(map);
+    const ccMarkers = {};
+    const ccLayers = {};
+
     consejos.forEach(cc => {
-      L.marker([cc.lat, cc.lng], { icon: crearIcono(cc.color, 'fa-home') })
-        .addTo(ccLayer)
-        .bindPopup(`
+      if (typeof ccPoligonos !== 'undefined' && ccPoligonos[cc.nombre]) {
+        const polygon = L.polygon(ccPoligonos[cc.nombre], {
+          color: cc.color,
+          weight: 2,
+          fillColor: cc.color,
+          fillOpacity: 0.2
+        }).addTo(ccLayer);
+        
+        polygon.bindPopup(`
           <div style="font-family:'Poppins',sans-serif;min-width:200px;padding:4px 0;">
             <div style="font-weight:700;color:${cc.color};font-size:14px;margin-bottom:6px;">${cc.nombre}</div>
             <div style="font-size:12px;color:#555;display:flex;flex-direction:column;gap:4px;">
@@ -394,8 +403,35 @@
             </div>
           </div>
         `, { maxWidth: 250 });
+        ccLayers[cc.nombre] = polygon;
+        
+        const m = L.marker(polygon.getBounds().getCenter(), { icon: crearIcono(cc.color, 'fa-home') })
+          .addTo(ccLayer)
+          .bindPopup(`
+            <div style="font-family:'Poppins',sans-serif;min-width:200px;padding:4px 0;">
+              <div style="font-weight:700;color:${cc.color};font-size:14px;margin-bottom:6px;">${cc.nombre}</div>
+              <div style="font-size:12px;color:#555;display:flex;flex-direction:column;gap:4px;">
+                <span><i class="fas fa-users" style="color:${cc.color};width:14px;"></i> ${cc.hab} familias</span>
+                <span><i class="fas fa-seedling" style="color:${cc.color};width:14px;"></i> ${cc.cultivo}</span>
+              </div>
+            </div>
+          `, { maxWidth: 250 });
+        ccMarkers[cc.nombre] = m;
+      } else {
+        const m = L.marker([cc.lat, cc.lng], { icon: crearIcono(cc.color, 'fa-home') })
+          .addTo(ccLayer)
+          .bindPopup(`
+            <div style="font-family:'Poppins',sans-serif;min-width:200px;padding:4px 0;">
+              <div style="font-weight:700;color:${cc.color};font-size:14px;margin-bottom:6px;">${cc.nombre}</div>
+              <div style="font-size:12px;color:#555;display:flex;flex-direction:column;gap:4px;">
+                <span><i class="fas fa-users" style="color:${cc.color};width:14px;"></i> ${cc.hab} familias</span>
+                <span><i class="fas fa-seedling" style="color:${cc.color};width:14px;"></i> ${cc.cultivo}</span>
+              </div>
+            </div>
+          `, { maxWidth: 250 });
+        ccMarkers[cc.nombre] = m;
+      }
     });
-    ccLayer.addTo(map);
 
     /* Centrar botón */
     document.getElementById('btnCentrar').addEventListener('click', () => map.setView(CENTER, 13));
@@ -417,58 +453,24 @@
       });
     });
 
-    // Guardar referencia a los markers para abrirlos externamente
-    const ccMarkers = {};
-    ccLayer.eachLayer(layer => {
-      // Intentamos extraer el nombre del popup
-      const popupContent = layer.getPopup().getContent();
-      consejos.forEach(cc => {
-        if (popupContent.includes(cc.nombre)) {
-          ccMarkers[cc.nombre] = layer;
-        }
-      });
-    });
-
-    let currentHighlight = null;
-
     // Escuchar mensajes desde index.html
     window.addEventListener('message', (event) => {
       if (event.data && event.data.action === 'highlightCommunity') {
         const targetName = event.data.community;
+        const targetPolygon = ccLayers[targetName];
         const targetMarker = ccMarkers[targetName];
         
-        if (targetMarker) {
-          // Centrar el mapa en la comunidad
-          map.setView(targetMarker.getLatLng(), 15);
-          // Abrir popup
+        if (targetPolygon) {
+          map.fitBounds(targetPolygon.getBounds());
+          targetPolygon.openPopup();
+          targetPolygon.getElement()?.animate([
+            { fillOpacity: 0.1, weight: 2 },
+            { fillOpacity: 0.6, weight: 5 },
+            { fillOpacity: 0.2, weight: 2 }
+          ], { duration: 1500, iterations: 3 });
+        } else if (targetMarker) {
+          map.setView(targetMarker.getLatLng(), 16);
           targetMarker.openPopup();
-
-          // Eliminar el resaltado anterior
-          if (currentHighlight) {
-            map.removeLayer(currentHighlight);
-          }
-
-          // Crear un polígono representativo (un círculo) mientras no haya coordenadas exactas
-          // El color lo tomamos de la info del consejo
-          const ccInfo = consejos.find(c => c.nombre === targetName);
-          if (ccInfo) {
-            currentHighlight = L.circle(targetMarker.getLatLng(), {
-              color: ccInfo.color,
-              fillColor: ccInfo.color,
-              fillOpacity: 0.3,
-              radius: 400 // Radio en metros para abarcar la zona aproximadamente
-            }).addTo(map);
-
-            // Hacer un pequeño efecto pulsante
-            currentHighlight.getElement()?.animate([
-              { fillOpacity: 0.2 },
-              { fillOpacity: 0.5 },
-              { fillOpacity: 0.2 }
-            ], {
-              duration: 1500,
-              iterations: 3
-            });
-          }
         }
       }
     });

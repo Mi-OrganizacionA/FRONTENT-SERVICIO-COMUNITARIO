@@ -14,8 +14,9 @@
 <body>
   <div id="map"></div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="js/poligonos.js"></script>
   <script>
-    const CENTER = [10.351969, -68.733442];
+    const CENTER = [10.360155, -68.729731];
     const map = L.map('map').setView(CENTER, 14);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
@@ -63,32 +64,63 @@
     ];
 
     const ccMarkers = {};
+    const ccLayers = {};
+
     consejos.forEach(cc => {
-      const m = L.marker([cc.lat, cc.lng], { icon: crearIcono(cc.color, 'fa-home') })
-        .addTo(map)
-        .bindPopup(`<div style="font-family:sans-serif;font-weight:bold;color:${cc.color}">${cc.nombre}</div>`);
-      ccMarkers[cc.nombre] = m;
+      // 1. Dibujar el Polígono si existe
+      if (typeof ccPoligonos !== 'undefined' && ccPoligonos[cc.nombre]) {
+        const polygon = L.polygon(ccPoligonos[cc.nombre], {
+          color: cc.color,
+          weight: 2,
+          fillColor: cc.color,
+          fillOpacity: 0.2
+        }).addTo(map);
+        
+        polygon.bindPopup(`<div style="font-family:sans-serif;font-weight:bold;color:${cc.color}">${cc.nombre}</div>`);
+        ccLayers[cc.nombre] = polygon;
+        
+        // Centrar el marcador dentro del polígono
+        const bounds = polygon.getBounds();
+        const m = L.marker(bounds.getCenter(), { icon: crearIcono(cc.color, 'fa-home') })
+          .addTo(map)
+          .bindPopup(`<div style="font-family:sans-serif;font-weight:bold;color:${cc.color}">${cc.nombre}</div>`);
+        ccMarkers[cc.nombre] = m;
+      } else {
+        // Fallback al marcador original si no hay polígono
+        const m = L.marker([cc.lat, cc.lng], { icon: crearIcono(cc.color, 'fa-home') })
+          .addTo(map)
+          .bindPopup(`<div style="font-family:sans-serif;font-weight:bold;color:${cc.color}">${cc.nombre}</div>`);
+        ccMarkers[cc.nombre] = m;
+      }
     });
 
-    let currentHighlight = null;
+    // Ajustar la vista para que se vean todos los polígonos
+    const allPolygons = Object.values(ccLayers);
+    if (allPolygons.length > 0) {
+      const group = new L.featureGroup(allPolygons);
+      map.fitBounds(group.getBounds());
+    }
 
     window.addEventListener('message', (event) => {
       if (event.data && event.data.action === 'highlightCommunity') {
         const targetName = event.data.community;
+        const targetPolygon = ccLayers[targetName];
         const targetMarker = ccMarkers[targetName];
-        if (targetMarker) {
-          map.setView(targetMarker.getLatLng(), 15);
+        
+        if (targetPolygon) {
+          map.fitBounds(targetPolygon.getBounds());
+          targetPolygon.openPopup();
+          
+          // Efecto de pulso en el polígono real
+          targetPolygon.getElement()?.animate([
+            { fillOpacity: 0.1, weight: 2 },
+            { fillOpacity: 0.6, weight: 5 },
+            { fillOpacity: 0.2, weight: 2 }
+          ], { duration: 1500, iterations: 3 });
+          
+        } else if (targetMarker) {
+          map.setView(targetMarker.getLatLng(), 16);
           targetMarker.openPopup();
-          if (currentHighlight) map.removeLayer(currentHighlight);
-          const ccInfo = consejos.find(c => c.nombre === targetName);
-          if (ccInfo) {
-            currentHighlight = L.circle(targetMarker.getLatLng(), {
-              color: ccInfo.color, fillOpacity: 0.3, radius: 400
-            }).addTo(map);
-            currentHighlight.getElement()?.animate([
-              { fillOpacity: 0.2 }, { fillOpacity: 0.5 }, { fillOpacity: 0.2 }
-            ], { duration: 1500, iterations: 3 });
-          }
         }
       }
     });
