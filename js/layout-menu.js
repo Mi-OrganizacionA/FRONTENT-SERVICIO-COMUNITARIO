@@ -886,4 +886,27 @@
       }, 600); // Dar tiempo a que otras cosas rendericen
     }
   });
+
+  // ─────────────────────────────────────────
+  // Restricción global de Consejo Comunal para Voceros en Modales
+  // ─────────────────────────────────────────
+  document.addEventListener('show.bs.modal', (e) => {
+    if (window.auth && window.auth.user && window.auth.user.rol === 'vocero') {
+      const user = window.auth.user;
+      const val = user.id_comunidad_asignada || user.consejo_comunal_id || user.consejoComunal || '';
+      if (!val) return;
+      const modal = e.target;
+      const selects = modal.querySelectorAll('select');
+      selects.forEach(sel => {
+        const idLower = (sel.id || '').toLowerCase();
+        const nameLower = (sel.name || '').toLowerCase();
+        if (idLower.includes('consejo') || idLower.includes('comunidad') || idLower.includes('cc') ||
+            nameLower.includes('consejo') || nameLower.includes('comunidad')) {
+          sel.value = val;
+          sel.style.pointerEvents = 'none';
+          sel.style.background = 'var(--gray2)';
+        }
+      });
+    }
+  });
 })();

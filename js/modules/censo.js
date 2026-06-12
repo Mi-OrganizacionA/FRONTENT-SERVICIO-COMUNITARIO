@@ -217,8 +217,6 @@ class CensoController {
     setVal('habDireccion', h.direccion);
     setVal('habCC', h.consejo_comunal_id);
     setVal('condicionSalud', h.condicion_salud || 'saludable');
-    const chk = document.getElementById('tieneCedulaAmpliada');
-    if (chk) chk.checked = !!h.tiene_cedula_ampliada;
     this.calcularDatosNacimiento(h.fecha_nacimiento ? h.fecha_nacimiento.split('T')[0] : '');
   }
 

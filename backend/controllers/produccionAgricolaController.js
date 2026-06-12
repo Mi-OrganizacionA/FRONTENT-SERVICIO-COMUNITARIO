@@ -19,7 +19,7 @@ class ProduccionAgricolaController {
 
       const producciones = await ProduccionAgricolaModel.findAll({
         where,
-        order: [['fecha_creacion', 'DESC']],
+        order: [['fecha_registro', 'DESC']],
         limit: 100
       });
 
@@ -118,7 +118,7 @@ class ProduccionAgricolaController {
         {
           ...req.body,
           activo: true,
-          fecha_creacion: new Date()
+          fecha_registro: new Date()
         }
       );
 

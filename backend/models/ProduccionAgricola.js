@@ -1,4 +1,4 @@
-﻿const { DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
   const ProduccionAgricola = sequelize.define('ProduccionAgricola', {
@@ -6,12 +6,12 @@ module.exports = (sequelize) => {
     id_habitante: { 
       type: DataTypes.INTEGER, 
       references: { model: 'habitantes', key: 'id' }, 
-      allowNull: false 
+      allowNull: true 
     },
     rubro: { type: DataTypes.STRING(150), allowNull: false },
     hectareas_cultivadas: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
     tipo_cultivo: { 
-      type: DataTypes.ENUM('orgánico', 'convencional', 'agroforestal', 'otro'), 
+      type: DataTypes.ENUM('orgánico', 'convencional', 'agroforestal', 'otro', 'Ciclo Corto', 'Ciclo Largo', 'Perenne', 'Organopónico', 'Invernadero'), 
       allowNull: false 
     },
     ubicacion_cultivo: DataTypes.TEXT,

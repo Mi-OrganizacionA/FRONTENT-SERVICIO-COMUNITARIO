@@ -400,11 +400,18 @@
           const sectionConfig = document.getElementById('sectionConfigPortal');
           if (sectionConfig) sectionConfig.style.display = 'block';
           
-          // Ocultar sección de Solicitud de Cambio de Correo
           const wrapperCorreo = document.getElementById('wrapperPerdidaCorreo');
           const sepCorreo = document.getElementById('sepPerdidaCorreo');
-          if (wrapperCorreo) wrapperCorreo.style.display = 'none';
-          if (sepCorreo) sepCorreo.style.display = 'none';
+          
+          // Cambiar el título y texto para el Administrador
+          if (wrapperCorreo) {
+            wrapperCorreo.querySelector('.form-section-header').innerHTML = '<i class="fas fa-envelope"></i> Cambiar Correo de Acceso';
+            wrapperCorreo.querySelector('p').textContent = 'Actualiza tu correo electrónico utilizado para iniciar sesión en el sistema.';
+            document.getElementById('reqEmailReason').closest('.form-group-sicag').style.display = 'none';
+            document.getElementById('btnReqEmail').innerHTML = '<i class="fas fa-save"></i> Guardar Nuevo Correo';
+            // Quitar required del motivo
+            document.getElementById('reqEmailReason').required = false;
+          }
         }
       }
 
@@ -552,27 +559,43 @@
           btn.disabled = true;
 
           try {
-            if (window.api && window.api.crearNotificacion) {
-              await window.api.crearNotificacion({
-                tipo_accion: 'UPDATE',
-                tabla_afectada: 'usuarios',
-                registro_id: user.id,
-                datos_temporales: {
-                  nuevo_correo: nuevoCorreo,
-                  motivo: motivo,
-                  nombre_solicitante: user.nombre
-                }
-              });
+            if (!isVocero) {
+               // Es Admin, cambiar correo directamente
+               if (window.api && window.api.changeEmail) {
+                 await window.api.changeEmail(nuevoCorreo);
+                 Components.showToast('Tu correo ha sido actualizado exitosamente. Usa este nuevo correo la próxima vez que inicies sesión.', 'success');
+                 document.getElementById('userEmailDisplay').textContent = nuevoCorreo;
+                 // Actualizar el correo en el session/local storage si existe ahí
+                 if (window.auth && window.auth.getUser) {
+                   const currentUser = window.auth.getUser();
+                   currentUser.email = nuevoCorreo;
+                   sessionStorage.setItem('sicag_user', JSON.stringify(currentUser));
+                 }
+               }
             } else {
-              // Fallback
-              await new Promise(r => setTimeout(r, 1000));
+              // Es vocero, solicitar al administrador
+              if (window.api && window.api.crearNotificacion) {
+                await window.api.crearNotificacion({
+                  tipo_accion: 'UPDATE',
+                  tabla_afectada: 'usuarios',
+                  registro_id: user.id,
+                  datos_temporales: {
+                    nuevo_correo: nuevoCorreo,
+                    motivo: motivo,
+                    nombre_solicitante: user.nombre
+                  }
+                });
+              } else {
+                // Fallback
+                await new Promise(r => setTimeout(r, 1000));
+              }
+              Components.showToast('Solicitud enviada al administrador exitosamente.', 'success');
             }
-            Components.showToast('Solicitud enviada al administrador exitosamente.', 'success');
             formEmailReq.reset();
           } catch (error) {
-            Components.showToast('Error al enviar la solicitud.', 'error');
+            Components.showToast(error.message || 'Error al procesar la solicitud.', 'error');
           } finally {
-            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Solicitud al Admin';
+            btn.innerHTML = isVocero ? '<i class="fas fa-paper-plane"></i> Enviar Solicitud al Admin' : '<i class="fas fa-save"></i> Guardar Nuevo Correo';
             btn.disabled = false;
           }
         });

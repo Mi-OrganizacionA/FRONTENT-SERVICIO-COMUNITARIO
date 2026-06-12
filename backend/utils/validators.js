@@ -22,8 +22,8 @@ const habitanteCreateSchema = Joi.object({
   centro_electoral: Joi.string().max(100).when('elector', { is: true, then: Joi.required(), otherwise: Joi.allow('', null) }),
   pensionado: Joi.boolean(),
   pensionado_institucion: Joi.string().max(150).when('pensionado', { is: true, then: Joi.required(), otherwise: Joi.allow('', null) }),
-  foto_cedula_url: Joi.string().uri().allow('', null)
-});
+  condicion_salud: Joi.string().valid('saludable', 'enfermedad_cronica', 'discapacidad', 'encamado').allow('', null)
+}).unknown(true);
 
 const habitanteUpdateSchema = Joi.object({
   cedula: Joi.string().min(6).max(12),
@@ -40,8 +40,8 @@ const habitanteUpdateSchema = Joi.object({
   centro_electoral: Joi.string().max(100).when('elector', { is: true, then: Joi.required(), otherwise: Joi.allow('', null) }),
   pensionado: Joi.boolean(),
   pensionado_institucion: Joi.string().max(150).when('pensionado', { is: true, then: Joi.required(), otherwise: Joi.allow('', null) }),
-  foto_cedula_url: Joi.string().uri().allow('', null)
-});
+  condicion_salud: Joi.string().valid('saludable', 'enfermedad_cronica', 'discapacidad', 'encamado').allow('', null)
+}).unknown(true);
 
 const votacionSchema = Joi.object({
   titulo: Joi.string().min(5).max(200).required(),
@@ -124,14 +124,18 @@ const personaGrupoSalidaSchema = Joi.object({
 });
 
 const produccionAgricolaSchema = Joi.object({
-  id_habitante: Joi.number().integer().positive().required(),
-  rubro: Joi.string().min(1).max(100).required(),
-  hectareas_cultivadas: Joi.number().min(0.01).required(),
-  tipo_cultivo: Joi.string().valid('orgánico', 'convencional', 'agroforestal', 'otro').required(),
-  productos_secundarios: Joi.array().items(Joi.string()),
-  latitud: Joi.number().allow(null),
-  longitud: Joi.number().allow(null)
-});
+  id_habitante: Joi.number().integer().positive().allow(null, ''),
+  rubro: Joi.string().min(1).max(150).required(),
+  hectareas_cultivadas: Joi.number().min(0).required(),
+  tipo_cultivo: Joi.string().valid('orgánico', 'convencional', 'agroforestal', 'otro', 'Ciclo Corto', 'Ciclo Largo', 'Perenne', 'Organopónico', 'Invernadero').required(),
+  rendimiento_estimado: Joi.alternatives().try(Joi.number(), Joi.string()).allow('', null),
+  ubicacion_cultivo: Joi.string().allow('', null),
+  latitud: Joi.alternatives().try(Joi.number(), Joi.string()).allow('', null),
+  longitud: Joi.alternatives().try(Joi.number(), Joi.string()).allow('', null),
+  fecha_inicio_cultivo: Joi.date().iso().allow('', null),
+  productos_secundarios: Joi.string().allow('', null),
+  observaciones: Joi.string().allow('', null)
+}).unknown(true);
 
 const viviendasSchema = Joi.object({
   id_comunidad: Joi.number().integer().positive().required(),
@@ -145,13 +149,15 @@ const viviendasSchema = Joi.object({
 });
 
 const organizacionSocialSchema = Joi.object({
-  id_comunidad: Joi.number().integer().positive().required(),
+  id_comunidad: Joi.number().integer().positive().allow(null, ''),
   nombre_organizacion: Joi.string().min(3).max(200).required(),
   tipo_organizacion: Joi.string().min(1).max(100).required(),
   descripcion: Joi.string().allow('', null),
   mision: Joi.string().allow('', null),
-  id_habitante_responsable: Joi.number().integer().positive().allow(null)
-});
+  contacto_telefono: Joi.string().allow('', null),
+  contacto_email: Joi.string().email().allow('', null),
+  id_habitante_responsable: Joi.number().integer().positive().allow(null, '')
+}).unknown(true);
 
 module.exports = {
   authLoginSchema,

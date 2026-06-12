@@ -398,19 +398,7 @@
                   <input type="text" class="cv-form-control" id="electoralStatus" name="estado_electoral" readonly placeholder="Por fecha de nacimiento" style="background:var(--gray1);font-weight:700;color:var(--az);border-style:dashed;" tabindex="-1">
                 </div>
               </div>
-              <div class="cv-form-row cv-grid-2">
-                <div class="cv-form-group">
-                  <label for="habFoto">Fotografia del Habitante</label>
-                  <input type="file" class="cv-form-control" id="habFoto" name="fotografia_cedula_url" accept="image/*">
-                  <span class="cv-form-hint">Opcional. JPG / PNG (max. 5MB).</span>
-                </div>
-                <div class="cv-form-group" style="justify-content:flex-end;padding-bottom:.25rem;">
-                  <label style="display:flex;align-items:center;gap:10px;font-size:.87rem;cursor:pointer;color:var(--gray5);font-weight:600;padding-top:1.6rem;">
-                    <input type="checkbox" id="tieneCedulaAmpliada" name="tiene_cedula_ampliada" style="accent-color:var(--vp);width:18px;height:18px">
-                    &iquest;Entrego Cedula Ampliada?
-                  </label>
-                </div>
-              </div>
+                <!-- Imagen y Cedula Ampliada eliminadas -->
             </div>
           </div>
           <div class="cv-modal-footer">
@@ -566,6 +554,19 @@
         form.reset();
       }
     }
+
+    if (window.auth && window.auth.user) {
+      var user = window.auth.user;
+      if (user.rol === 'vocero') {
+        var ccSelect = document.getElementById('habCC');
+        if (ccSelect) {
+          ccSelect.value = user.id_comunidad_asignada || user.consejo_comunal_id || user.consejoComunal || '';
+          ccSelect.style.pointerEvents = 'none';
+          ccSelect.style.background = 'var(--gray2)';
+        }
+      }
+    }
+
     goTo(1);
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
   };
@@ -622,7 +623,7 @@
       consejo_comunal_id: parseInt(document.getElementById('habCC').value),
       direccion: document.getElementById('habDireccion').value.trim(),
       condicion_salud: condicionSalud || 'saludable',
-      tiene_cedula_ampliada: document.getElementById('tieneCedulaAmpliada')?.checked || false
+      clasificacion: clasificacion
     };
 
     try {

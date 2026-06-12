@@ -1,4 +1,4 @@
-﻿const { DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
   const OrganizacionSocial = sequelize.define('OrganizacionSocial', {
@@ -6,12 +6,12 @@ module.exports = (sequelize) => {
     id_comunidad: { 
       type: DataTypes.INTEGER, 
       references: { model: 'consejos_comunales', key: 'id' }, 
-      allowNull: false 
+      allowNull: true 
     },
     id_habitante_responsable: { 
       type: DataTypes.INTEGER, 
       references: { model: 'habitantes', key: 'id' }, 
-      allowNull: false 
+      allowNull: true 
     },
     nombre_organizacion: { type: DataTypes.STRING(200), allowNull: false, unique: true },
     tipo_organizacion: { type: DataTypes.STRING(100), allowNull: false },

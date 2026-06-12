@@ -246,6 +246,19 @@ class APIManager {
     if (!response.ok) throw new Error(data.error);
     return data;
   }
+  async changeEmail(nuevoCorreo) {
+    if (this.isDevelopment) {
+      return new Promise(r => setTimeout(() => r({ success: true }), 1000));
+    }
+    const response = await this._fetch(`${this.baseURL}/auth/email`, {
+      method: 'PUT',
+      headers: { ...this._getHeaders().headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nuevoCorreo })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error);
+    return data;
+  }
 
   // ─────────────────────────────────────────
   // CONFIGURACIÓN DEL SISTEMA Y RECOVERY PASS
