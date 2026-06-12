@@ -130,6 +130,7 @@ async function start() {
       AuditService.setModel(models.LogAuditoria);
       SystemController.setConfiguracionModel(models.Configuracion);
       SystemController.setUsuarioModel(models.Usuario);
+      SystemController.setModels(models);
       SearchController.setModels(models);
 
       await runMigrations(sequelize);

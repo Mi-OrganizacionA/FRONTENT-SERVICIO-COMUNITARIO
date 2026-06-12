@@ -3,9 +3,6 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const env = require('../config/environment');
 const logger = require('../utils/logger');
-const { Habitante } = require('../models/Habitante');
-const { Proyecto } = require('../models/Proyecto');
-const { Vivienda } = require('../models/Vivienda');
 let ConfiguracionModel = null;
 
 class SystemController {
@@ -15,6 +12,9 @@ class SystemController {
   }
   static setUsuarioModel(model) {
     this.UsuarioModel = model;
+  }
+  static setModels(models) {
+    this.models = models;
   }
 
   static async getConfig(req, res) {
@@ -31,9 +31,9 @@ class SystemController {
 
   static async getPublicStats(req, res) {
     try {
-      const countHab = await Habitante.count();
-      const countProy = await Proyecto.count();
-      const countViv = await Vivienda.count();
+      const countHab = this.models && this.models.Habitante ? await this.models.Habitante.count({ where: { activo: true } }) : 0;
+      const countProy = this.models && this.models.Proyecto ? await this.models.Proyecto.count() : 0;
+      const countViv = this.models && this.models.Vivienda ? await this.models.Vivienda.count() : 0;
       // Si el modelo ConsejoComunal existiera, podríamos contar, pero son 9 estáticos
       res.json({
         habitantes: countHab,
