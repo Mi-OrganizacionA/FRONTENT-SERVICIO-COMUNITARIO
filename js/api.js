@@ -465,6 +465,58 @@ class APIManager {
     return { success: true, simulado: true, data: datos };
   }
 
+  /**
+   * Interceptor de validaciones:
+   * Revisa si el usuario actual es un vocero y si debe pasar por la bandeja de validaciones
+   * o si la "Aprobación Automática Global" está activa.
+   */
+  async _interceptarValidacion(tabla, accion, datos, callbackOriginal) {
+    const user = window.auth ? window.auth.getUser() : null;
+    const isVocero = user && user.rol === 'vocero';
+    const autoGlobal = localStorage.getItem('sicag_auto_global') === 'true';
+
+    // Si es vocero y la aprobación automática NO está activa, va a la bandeja
+    if (isVocero && !autoGlobal) {
+      console.log(`[API] Interceptado: Enviando ${accion} de ${tabla} a validaciones.`);
+      return await this.crearNotificacion({
+        tabla_afectada: tabla,
+        tipo_accion: accion,
+        id_vocero: user.id,
+        datos_temporales: datos
+      });
+    }
+
+    // De lo contrario (es admin, o autoGlobal está activo), ejecuta directo
+    console.log(`[API] Ejecución directa permitida para ${accion} en ${tabla}.`);
+    return await callbackOriginal();
+  }
+
+  /**
+   * Interceptor de validaciones:
+   * Revisa si el usuario actual es un vocero y si debe pasar por la bandeja de validaciones
+   * o si la "Aprobación Automática Global" está activa.
+   */
+  async _interceptarValidacion(tabla, accion, datos, callbackOriginal) {
+    const user = window.auth ? window.auth.getUser() : null;
+    const isVocero = user && user.rol === 'vocero';
+    const autoGlobal = localStorage.getItem('sicag_auto_global') === 'true';
+
+    // Si es vocero y la aprobación automática NO está activa, va a la bandeja
+    if (isVocero && !autoGlobal) {
+      console.log(`[API] Interceptado: Enviando ${accion} de ${tabla} a validaciones.`);
+      return await this.crearNotificacion({
+        tabla_afectada: tabla,
+        tipo_accion: accion,
+        id_vocero: user.id,
+        datos_temporales: datos
+      });
+    }
+
+    // De lo contrario (es admin, o autoGlobal está activo), ejecuta directo
+    console.log(`[API] Ejecución directa permitida para ${accion} en ${tabla}.`);
+    return await callbackOriginal();
+  }
+
   async aprobarNotificacion(id, comentarios) {
     if (!this.isDevelopment) {
       const response = await fetch(`${this.baseURL}/validaciones/${id}/aprobar`, {
@@ -547,56 +599,62 @@ class APIManager {
   }
 
   async crearProyecto(datos) {
-    await this.waitForMockData();
-    if (this.isDevelopment) {
-      const nuevoId = this.mockData.proyectos.length > 0 ? Math.max(...this.mockData.proyectos.map(p => p.id)) + 1 : 1;
-      const registro = { id: nuevoId, ...datos, fecha_registro: new Date().toISOString() };
-      this.mockData.proyectos.push(registro);
-      this.saveMockData();
-      return registro;
-    }
-    const response = await fetch(`${this.baseURL}/proyectos`, {
-      method: 'POST',
-      ...this._getHeaders(),
-      body: JSON.stringify(datos)
+    return await this._interceptarValidacion('proyectos', 'INSERT', datos, async () => {
+      await this.waitForMockData();
+      if (this.isDevelopment) {
+        const nuevoId = this.mockData.proyectos.length > 0 ? Math.max(...this.mockData.proyectos.map(p => p.id)) + 1 : 1;
+        const registro = { id: nuevoId, ...datos, fecha_registro: new Date().toISOString() };
+        this.mockData.proyectos.push(registro);
+        this.saveMockData();
+        return registro;
+      }
+      const response = await fetch(`${this.baseURL}/proyectos`, {
+        method: 'POST',
+        ...this._getHeaders(),
+        body: JSON.stringify(datos)
+      });
+      if (!response.ok) throw new Error('Error al crear proyecto');
+      return response.json();
     });
-    if (!response.ok) throw new Error('Error al crear proyecto');
-    return response.json();
   }
 
   async actualizarProyecto(id, cambios) {
-    await this.waitForMockData();
-    if (this.isDevelopment) {
-      const index = this.mockData.proyectos.findIndex(p => p.id === id);
-      if (index !== -1) {
-        this.mockData.proyectos[index] = { ...this.mockData.proyectos[index], ...cambios };
-        this.saveMockData();
-        return this.mockData.proyectos[index];
+    return await this._interceptarValidacion('proyectos', 'UPDATE', { id, ...cambios }, async () => {
+      await this.waitForMockData();
+      if (this.isDevelopment) {
+        const index = this.mockData.proyectos.findIndex(p => p.id === id);
+        if (index !== -1) {
+          this.mockData.proyectos[index] = { ...this.mockData.proyectos[index], ...cambios };
+          this.saveMockData();
+          return this.mockData.proyectos[index];
+        }
+        throw new Error('Proyecto no encontrado');
       }
-      throw new Error('Proyecto no encontrado');
-    }
-    const response = await fetch(`${this.baseURL}/proyectos/${id}`, {
-      method: 'PUT',
-      ...this._getHeaders(),
-      body: JSON.stringify(cambios)
+      const response = await fetch(`${this.baseURL}/proyectos/${id}`, {
+        method: 'PUT',
+        ...this._getHeaders(),
+        body: JSON.stringify(cambios)
+      });
+      if (!response.ok) throw new Error('Error al actualizar proyecto');
+      return response.json();
     });
-    if (!response.ok) throw new Error('Error al actualizar proyecto');
-    return response.json();
   }
 
   async eliminarProyecto(id) {
-    await this.waitForMockData();
-    if (this.isDevelopment) {
-      this.mockData.proyectos = this.mockData.proyectos.filter(p => p.id !== id);
-      this.saveMockData();
-      return { success: true };
-    }
-    const response = await fetch(`${this.baseURL}/proyectos/${id}`, {
-      method: 'DELETE',
-      ...this._getHeaders()
+    return await this._interceptarValidacion('proyectos', 'DELETE', { id }, async () => {
+      await this.waitForMockData();
+      if (this.isDevelopment) {
+        this.mockData.proyectos = this.mockData.proyectos.filter(p => p.id !== id);
+        this.saveMockData();
+        return { success: true };
+      }
+      const response = await fetch(`${this.baseURL}/proyectos/${id}`, {
+        method: 'DELETE',
+        ...this._getHeaders()
+      });
+      if (!response.ok) throw new Error('Error al eliminar proyecto');
+      return response.json();
     });
-    if (!response.ok) throw new Error('Error al eliminar proyecto');
-    return response.json();
   }
 
   // ─────────────────────────────────────────
@@ -611,24 +669,30 @@ class APIManager {
   }
 
   async crearProduccion(datos) {
-    if (this.isDevelopment) return datos;
-    const response = await fetch(`${this.baseURL}/produccion_agricola`, { method: 'POST', ...this._getHeaders(), body: JSON.stringify(datos) });
-    if (!response.ok) throw new Error('Error creando produccion agricola');
-    return response.json();
+    return await this._interceptarValidacion('produccion_agricola', 'INSERT', datos, async () => {
+      if (this.isDevelopment) return datos;
+      const response = await fetch(`${this.baseURL}/produccion_agricola`, { method: 'POST', ...this._getHeaders(), body: JSON.stringify(datos) });
+      if (!response.ok) throw new Error('Error creando produccion agricola');
+      return response.json();
+    });
   }
 
   async actualizarProduccion(id, cambios) {
-    if (this.isDevelopment) return cambios;
-    const response = await fetch(`${this.baseURL}/produccion_agricola/${id}`, { method: 'PUT', ...this._getHeaders(), body: JSON.stringify(cambios) });
-    if (!response.ok) throw new Error('Error actualizando produccion agricola');
-    return response.json();
+    return await this._interceptarValidacion('produccion_agricola', 'UPDATE', { id, ...cambios }, async () => {
+      if (this.isDevelopment) return cambios;
+      const response = await fetch(`${this.baseURL}/produccion_agricola/${id}`, { method: 'PUT', ...this._getHeaders(), body: JSON.stringify(cambios) });
+      if (!response.ok) throw new Error('Error actualizando produccion agricola');
+      return response.json();
+    });
   }
 
   async eliminarProduccion(id) {
-    if (this.isDevelopment) return { success: true };
-    const response = await fetch(`${this.baseURL}/produccion_agricola/${id}`, { method: 'DELETE', ...this._getHeaders() });
-    if (!response.ok) throw new Error('Error eliminando produccion agricola');
-    return response.json();
+    return await this._interceptarValidacion('produccion_agricola', 'DELETE', { id }, async () => {
+      if (this.isDevelopment) return { success: true };
+      const response = await fetch(`${this.baseURL}/produccion_agricola/${id}`, { method: 'DELETE', ...this._getHeaders() });
+      if (!response.ok) throw new Error('Error eliminando produccion agricola');
+      return response.json();
+    });
   }
 
   // ─────────────────────────────────────────
@@ -643,24 +707,30 @@ class APIManager {
   }
 
   async crearOrganizacion(datos) {
-    if (this.isDevelopment) return datos;
-    const response = await fetch(`${this.baseURL}/organizaciones`, { method: 'POST', ...this._getHeaders(), body: JSON.stringify(datos) });
-    if (!response.ok) throw new Error('Error creando organizacion');
-    return response.json();
+    return await this._interceptarValidacion('organizaciones', 'INSERT', datos, async () => {
+      if (this.isDevelopment) return datos;
+      const response = await fetch(`${this.baseURL}/organizaciones`, { method: 'POST', ...this._getHeaders(), body: JSON.stringify(datos) });
+      if (!response.ok) throw new Error('Error creando organizacion');
+      return response.json();
+    });
   }
 
   async actualizarOrganizacion(id, cambios) {
-    if (this.isDevelopment) return cambios;
-    const response = await fetch(`${this.baseURL}/organizaciones/${id}`, { method: 'PUT', ...this._getHeaders(), body: JSON.stringify(cambios) });
-    if (!response.ok) throw new Error('Error actualizando organizacion');
-    return response.json();
+    return await this._interceptarValidacion('organizaciones', 'UPDATE', { id, ...cambios }, async () => {
+      if (this.isDevelopment) return cambios;
+      const response = await fetch(`${this.baseURL}/organizaciones/${id}`, { method: 'PUT', ...this._getHeaders(), body: JSON.stringify(cambios) });
+      if (!response.ok) throw new Error('Error actualizando organizacion');
+      return response.json();
+    });
   }
 
   async eliminarOrganizacion(id) {
-    if (this.isDevelopment) return { success: true };
-    const response = await fetch(`${this.baseURL}/organizaciones/${id}`, { method: 'DELETE', ...this._getHeaders() });
-    if (!response.ok) throw new Error('Error eliminando organizacion');
-    return response.json();
+    return await this._interceptarValidacion('organizaciones', 'DELETE', { id }, async () => {
+      if (this.isDevelopment) return { success: true };
+      const response = await fetch(`${this.baseURL}/organizaciones/${id}`, { method: 'DELETE', ...this._getHeaders() });
+      if (!response.ok) throw new Error('Error eliminando organizacion');
+      return response.json();
+    });
   }
 
   // ─────────────────────────────────────────
@@ -675,24 +745,30 @@ class APIManager {
   }
 
   async crearVivienda(datos) {
-    if (this.isDevelopment) return datos;
-    const response = await fetch(`${this.baseURL}/viviendas`, { method: 'POST', ...this._getHeaders(), body: JSON.stringify(datos) });
-    if (!response.ok) throw new Error('Error creando vivienda');
-    return response.json();
+    return await this._interceptarValidacion('viviendas', 'INSERT', datos, async () => {
+      if (this.isDevelopment) return datos;
+      const response = await fetch(`${this.baseURL}/viviendas`, { method: 'POST', ...this._getHeaders(), body: JSON.stringify(datos) });
+      if (!response.ok) throw new Error('Error creando vivienda');
+      return response.json();
+    });
   }
 
   async actualizarVivienda(id, cambios) {
-    if (this.isDevelopment) return cambios;
-    const response = await fetch(`${this.baseURL}/viviendas/${id}`, { method: 'PUT', ...this._getHeaders(), body: JSON.stringify(cambios) });
-    if (!response.ok) throw new Error('Error actualizando vivienda');
-    return response.json();
+    return await this._interceptarValidacion('viviendas', 'UPDATE', { id, ...cambios }, async () => {
+      if (this.isDevelopment) return cambios;
+      const response = await fetch(`${this.baseURL}/viviendas/${id}`, { method: 'PUT', ...this._getHeaders(), body: JSON.stringify(cambios) });
+      if (!response.ok) throw new Error('Error actualizando vivienda');
+      return response.json();
+    });
   }
 
   async eliminarVivienda(id) {
-    if (this.isDevelopment) return { success: true };
-    const response = await fetch(`${this.baseURL}/viviendas/${id}`, { method: 'DELETE', ...this._getHeaders() });
-    if (!response.ok) throw new Error('Error eliminando vivienda');
-    return response.json();
+    return await this._interceptarValidacion('viviendas', 'DELETE', { id }, async () => {
+      if (this.isDevelopment) return { success: true };
+      const response = await fetch(`${this.baseURL}/viviendas/${id}`, { method: 'DELETE', ...this._getHeaders() });
+      if (!response.ok) throw new Error('Error eliminando vivienda');
+      return response.json();
+    });
   }
 
   // ─────────────────────────────────────────
@@ -707,17 +783,21 @@ class APIManager {
   }
 
   async crearVocero(datos) {
-    if (this.isDevelopment) return datos;
-    const response = await fetch(`${this.baseURL}/voceros`, { method: 'POST', ...this._getHeaders(), body: JSON.stringify(datos) });
-    if (!response.ok) throw new Error('Error creando vocero');
-    return response.json();
+    return await this._interceptarValidacion('voceros', 'INSERT', datos, async () => {
+      if (this.isDevelopment) return datos;
+      const response = await fetch(`${this.baseURL}/voceros`, { method: 'POST', ...this._getHeaders(), body: JSON.stringify(datos) });
+      if (!response.ok) throw new Error('Error creando vocero');
+      return response.json();
+    });
   }
 
   async eliminarVocero(id) {
-    if (this.isDevelopment) return { success: true };
-    const response = await fetch(`${this.baseURL}/voceros/${id}`, { method: 'DELETE', ...this._getHeaders() });
-    if (!response.ok) throw new Error('Error eliminando vocero');
-    return response.json();
+    return await this._interceptarValidacion('voceros', 'DELETE', { id }, async () => {
+      if (this.isDevelopment) return { success: true };
+      const response = await fetch(`${this.baseURL}/voceros/${id}`, { method: 'DELETE', ...this._getHeaders() });
+      if (!response.ok) throw new Error('Error eliminando vocero');
+      return response.json();
+    });
   }
 
   // ─────────────────────────────────────────
@@ -741,57 +821,63 @@ class APIManager {
   }
 
   async crearNoticia(datos) {
-    await this.waitForMockData();
-    if (this.isDevelopment) {
-      const nuevoId = (this.mockData.noticias && this.mockData.noticias.length > 0) ? Math.max(...this.mockData.noticias.map(n => n.id)) + 1 : 1;
-      const registro = { id: nuevoId, ...datos, fecha_publicacion: new Date().toISOString() };
-      if(!this.mockData.noticias) this.mockData.noticias = [];
-      this.mockData.noticias.push(registro);
-      this.saveMockData();
-      return registro;
-    }
-    const response = await fetch(`${this.baseURL}/cartelera`, {
-      method: 'POST',
-      ...this._getHeaders(),
-      body: JSON.stringify(datos)
+    return await this._interceptarValidacion('noticias', 'INSERT', datos, async () => {
+      await this.waitForMockData();
+      if (this.isDevelopment) {
+        const nuevoId = (this.mockData.noticias && this.mockData.noticias.length > 0) ? Math.max(...this.mockData.noticias.map(n => n.id)) + 1 : 1;
+        const registro = { id: nuevoId, ...datos, fecha_publicacion: new Date().toISOString() };
+        if(!this.mockData.noticias) this.mockData.noticias = [];
+        this.mockData.noticias.push(registro);
+        this.saveMockData();
+        return registro;
+      }
+      const response = await fetch(`${this.baseURL}/cartelera`, {
+        method: 'POST',
+        ...this._getHeaders(),
+        body: JSON.stringify(datos)
+      });
+      if (!response.ok) throw new Error('Error al crear noticia');
+      return response.json();
     });
-    if (!response.ok) throw new Error('Error al crear noticia');
-    return response.json();
   }
 
   async actualizarNoticia(id, cambios) {
-    await this.waitForMockData();
-    if (this.isDevelopment) {
-      const index = this.mockData.noticias.findIndex(n => n.id === id);
-      if (index !== -1) {
-        this.mockData.noticias[index] = { ...this.mockData.noticias[index], ...cambios };
-        this.saveMockData();
-        return this.mockData.noticias[index];
+    return await this._interceptarValidacion('noticias', 'UPDATE', { id, ...cambios }, async () => {
+      await this.waitForMockData();
+      if (this.isDevelopment) {
+        const index = this.mockData.noticias.findIndex(n => n.id === id);
+        if (index !== -1) {
+          this.mockData.noticias[index] = { ...this.mockData.noticias[index], ...cambios };
+          this.saveMockData();
+          return this.mockData.noticias[index];
+        }
+        throw new Error('Noticia no encontrada');
       }
-      throw new Error('Noticia no encontrada');
-    }
-    const response = await fetch(`${this.baseURL}/cartelera/${id}`, {
-      method: 'PUT',
-      ...this._getHeaders(),
-      body: JSON.stringify(cambios)
+      const response = await fetch(`${this.baseURL}/cartelera/${id}`, {
+        method: 'PUT',
+        ...this._getHeaders(),
+        body: JSON.stringify(cambios)
+      });
+      if (!response.ok) throw new Error('Error al actualizar noticia');
+      return response.json();
     });
-    if (!response.ok) throw new Error('Error al actualizar noticia');
-    return response.json();
   }
 
   async eliminarNoticia(id) {
-    await this.waitForMockData();
-    if (this.isDevelopment) {
-      this.mockData.noticias = this.mockData.noticias.filter(n => n.id !== id);
-      this.saveMockData();
-      return { success: true };
-    }
-    const response = await fetch(`${this.baseURL}/cartelera/${id}`, {
-      method: 'DELETE',
-      ...this._getHeaders()
+    return await this._interceptarValidacion('noticias', 'DELETE', { id }, async () => {
+      await this.waitForMockData();
+      if (this.isDevelopment) {
+        this.mockData.noticias = this.mockData.noticias.filter(n => n.id !== id);
+        this.saveMockData();
+        return { success: true };
+      }
+      const response = await fetch(`${this.baseURL}/cartelera/${id}`, {
+        method: 'DELETE',
+        ...this._getHeaders()
+      });
+      if (!response.ok) throw new Error('Error al eliminar noticia');
+      return response.json();
     });
-    if (!response.ok) throw new Error('Error al eliminar noticia');
-    return response.json();
   }
 
   // ─────────────────────────────────────────

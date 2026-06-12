@@ -1,32 +1,45 @@
 /* js/roles.js — control de páginas según rol de usuario (Integrado con AuthManager v2.5) */
 (() => {
-  const ROLE_RULES = {
-    vocero: {
-      allowedPages: ['dashboard.html', 'censo.html', 'censo_viviendas.html', 'cartografia.html', 'index.html'],
-      redirectTo: 'censo.html'
-    }
-  };
+  // Páginas permitidas para el Vocero
+  // El Admin tiene acceso a todo, sin restricción
+  const VOCERO_ALLOWED = [
+    'dashboard.html',
+    'censo.html',
+    'censo_viviendas.html',
+    'cartografia.html',
+    'noticias.html',
+    'proyectos.html',
+    'produccion_agricola.html',
+    'organizaciones.html',
+    'notificaciones.html',
+    'perfil.html',
+    'ayuda.html',
+    'index.html',
+    ''  // raíz
+  ];
 
   const getCurrentPage = () => window.location.pathname.split('/').pop() || 'dashboard.html';
 
   const isPageAllowed = (role, page) => {
-    if (!role || role === 'admin' || !ROLE_RULES[role]) return true;
-    return ROLE_RULES[role].allowedPages.includes(page);
+    // Admin puede ver todo
+    if (!role || role === 'admin' || !role) return true;
+    // Vocero: solo sus páginas
+    if (role === 'vocero') return VOCERO_ALLOWED.includes(page);
+    return false;
   };
 
   const protectPage = () => {
-    // Usar el AuthManager en lugar de sessionStorage
     if (!window.auth || !window.auth.isAuthenticated()) {
-      return; // auth.js ya se encarga de redirigir si no hay sesión
+      return; // auth.js ya maneja la redirección si no hay sesión
     }
-    
+
     const user = window.auth.getUser();
     const role = user ? user.rol : null;
     const page = getCurrentPage();
 
     if (role && !isPageAllowed(role, page)) {
-      const destination = ROLE_RULES[role].redirectTo || 'dashboard.html';
-      window.location.replace(destination);
+      // Redirigir al Vocero a su página principal
+      window.location.replace('censo_viviendas.html');
     }
   };
 
