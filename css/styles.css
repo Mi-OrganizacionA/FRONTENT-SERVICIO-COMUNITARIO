@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    SICAG — Sistema de Información Comunal Agroecológica
    Design System CSS — Comuna Socialista Simón Rodríguez
    ============================================================ */
@@ -1901,7 +1901,7 @@ h4 {
   }
 
   .kpi-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .page-header {
@@ -1969,6 +1969,22 @@ h4 {
   .table-sicag thead th,
   .table-sicag tbody td {
     padding: 8px 10px;
+  }
+}
+
+/* ---- Very Small Mobile (400px) ---- */
+@media (max-width: 400px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .app-main {
+    padding: 0.75rem;
   }
 }
 
