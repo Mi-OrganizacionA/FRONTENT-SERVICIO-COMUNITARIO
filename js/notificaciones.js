@@ -86,6 +86,7 @@ class NotificacionesController {
         if (n.datos_temporales.titulo) subtitulo = `Noticia: ${n.datos_temporales.titulo}`;
         if (n.datos_temporales.nombre_proyecto) subtitulo = `Proyecto: ${n.datos_temporales.nombre_proyecto}`;
         if (n.datos_temporales.nombre) subtitulo = `Organización: ${n.datos_temporales.nombre}`;
+        if (n.tabla_afectada === 'usuarios' && n.datos_temporales.nuevo_correo) subtitulo = `Solicitud de Cambio de Correo (${n.datos_temporales.nuevo_correo})`;
       }
 
       return `
@@ -155,14 +156,14 @@ class NotificacionesController {
         </div>
 
         <div class="notification-detail-group">
-          <h3>Datos del Registro a Insertar</h3>
+          <h3>Datos Proporcionados</h3>
           <div class="notification-detail-grid">
             ${detallesHtml}
           </div>
         </div>
 
         <div class="detail-actions" style="margin-top: 1.5rem;">
-          <button class="btn-sicag btn-primary" onclick="window.notificaciones.acceptNotification(${notification.id})"><i class="fas fa-check"></i> Aprobar Inserción</button>
+          <button class="btn-sicag btn-primary" onclick="window.notificaciones.acceptNotification(${notification.id})"><i class="fas fa-check"></i> Aprobar Solicitud</button>
           <button class="btn-sicag btn-danger" onclick="window.notificaciones.rejectNotification(${notification.id})"><i class="fas fa-times"></i> Rechazar Solicitud</button>
         </div>
       </div>

@@ -546,13 +546,14 @@
           try {
             if (window.api && window.api.crearNotificacion) {
               await window.api.crearNotificacion({
-                tipo: 'cambio_correo',
-                titulo: `Solicitud de Cambio de Correo: ${user.nombre}`,
-                mensaje: `El usuario solicita cambiar su correo a ${nuevoCorreo}. Motivo: ${motivo}`,
-                status: 'pendiente',
-                vocero: user.nombre,
-                consejoComunal: user.consejoComunal || 'S/C',
-                datosHabitante: { nuevoCorreo, motivo, userId: user.id } // Guardamos info extra
+                tipo_accion: 'UPDATE',
+                tabla_afectada: 'usuarios',
+                registro_id: user.id,
+                datos_temporales: {
+                  nuevo_correo: nuevoCorreo,
+                  motivo: motivo,
+                  nombre_solicitante: user.nombre
+                }
               });
             } else {
               // Fallback

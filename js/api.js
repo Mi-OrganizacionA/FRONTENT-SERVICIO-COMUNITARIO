@@ -444,16 +444,30 @@ class APIManager {
 
   async getNotificaciones() {
     if (!this.isDevelopment) {
-      const response = await this._fetch(`${this.baseURL}/validaciones/pendientes`, this._getHeaders());
+      const response = await this._fetch(`${this.baseURL}/bandeja-validaciones/pendientes`, this._getHeaders());
       if (!response.ok) throw new Error('Error al obtener notificaciones');
       return response.json();
     }
     return [];
   }
 
+  async crearNotificacion(datos) {
+    if (!this.isDevelopment) {
+      const response = await fetch(`${this.baseURL}/bandeja-validaciones`, {
+        method: 'POST',
+        ...this._getHeaders(),
+        body: JSON.stringify(datos)
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Error al crear solicitud');
+      return data;
+    }
+    return { success: true, simulado: true, data: datos };
+  }
+
   async aprobarNotificacion(id, comentarios) {
     if (!this.isDevelopment) {
-      const response = await fetch(`${this.baseURL}/validaciones/${id}/aprobar`, {
+      const response = await fetch(`${this.baseURL}/bandeja-validaciones/${id}/aprobar`, {
         method: 'PUT',
         ...this._getHeaders(),
         body: JSON.stringify({ comentarios })
@@ -466,7 +480,7 @@ class APIManager {
 
   async rechazarNotificacion(id, motivo) {
     if (!this.isDevelopment) {
-      const response = await fetch(`${this.baseURL}/validaciones/${id}/rechazar`, {
+      const response = await fetch(`${this.baseURL}/bandeja-validaciones/${id}/rechazar`, {
         method: 'PUT',
         ...this._getHeaders(),
         body: JSON.stringify({ motivo })

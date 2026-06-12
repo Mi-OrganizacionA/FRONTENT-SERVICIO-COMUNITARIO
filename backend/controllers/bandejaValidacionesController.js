@@ -94,8 +94,17 @@ class BandejaValidacionesController {
         nuevoRegistro = await models.OrganizacionSocial.create(datos);
       } else if (tabla === 'reportes_7t') {
         nuevoRegistro = await models.Reporte7T.create(datos);
+      } else if (tabla === 'usuarios' && validacion.tipo_accion === 'UPDATE') {
+        nuevoRegistro = await models.Usuario.findByPk(validacion.registro_id);
+        if (!nuevoRegistro) throw new Error('El usuario a actualizar no existe');
+        
+        // El nuevo correo puede venir como "nuevo_correo" o "email" según el frontend
+        const nuevoCorreo = datos.nuevo_correo || datos.email;
+        if (!nuevoCorreo) throw new Error('No se especificó un nuevo correo en la solicitud');
+        
+        await nuevoRegistro.update({ email: nuevoCorreo });
       } else {
-        throw new Error(`Tabla afectada desconocida o no soportada: ${tabla}`);
+        throw new Error(`Tabla afectada o tipo de acción desconocida: ${tabla} - ${validacion.tipo_accion}`);
       }
 
       await validacion.update({
