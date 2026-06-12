@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
@@ -156,6 +156,20 @@
           const fullName = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
           if (inputNombre) inputNombre.value = fullName;
           if (buscarResult) buscarResult.textContent = `✅ Habitante encontrado: ${fullName}`;
+          
+          // Autoselect community
+          const nombreComunidad = datos.consejo?.nombre_comunidad || datos.consejoComunal;
+          if (nombreComunidad) {
+             const sel = document.getElementById('selComunidad');
+             if (sel) {
+                for (let i = 0; i < sel.options.length; i++) {
+                   if (sel.options[i].value === nombreComunidad) {
+                       sel.selectedIndex = i;
+                       break;
+                   }
+                }
+             }
+          }
         });
 
         const btnLupa = document.getElementById('btnValidarVocero');

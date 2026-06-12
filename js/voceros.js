@@ -91,9 +91,13 @@
     return records.find((record) => record.cedula_jefe_familia === cedula) || null;
   };
 
-  const validateAdminPassword = (value) => {
-    const adminPass = sessionStorage.getItem('sicag_pass');
-    return value && adminPass && value === adminPass;
+  const validateAdminPassword = async (value) => {
+    try {
+      await window.api.verifyPassword(value);
+      return true;
+    } catch (e) {
+      return false;
+    }
   };
 
   const createVoceroAccount = (cedula) => {
@@ -116,7 +120,8 @@
       return alert('Completa todos los campos antes de continuar.');
     }
 
-    if (!validateAdminPassword(password)) {
+    const isValidPassword = await validateAdminPassword(password);
+    if (!isValidPassword) {
       return alert('Contraseña de administrador incorrecta.');
     }
 

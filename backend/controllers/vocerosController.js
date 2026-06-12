@@ -12,12 +12,24 @@ module.exports = {
 
   create: async (req, res, next) => {
     try {
-      // Para un vocero, usamos la cédula como nombre de usuario por defecto
+      const bcrypt = require('bcryptjs');
+      const ConsejoComunal = Usuario.sequelize.models.ConsejoComunal;
+      let id_comunidad_asignada = req.body.comunidad_id || null;
+
+      if (!id_comunidad_asignada && req.body.comunidad && ConsejoComunal) {
+        const consejo = await ConsejoComunal.findOne({ where: { nombre_comunidad: req.body.comunidad } });
+        if (consejo) id_comunidad_asignada = consejo.id;
+      }
+
+      // Para un vocero, usamos la cédula y nombre, con un correo genérico si no lo hay
       const data = await Usuario.create({
-        nombre_usuario: req.body.cedula,
-        contrasena: 'vocero123', // Contraseña por defecto
+        nombre: req.body.nombre || `Vocero ${req.body.cedula}`,
+        email: req.body.email || `vocero_${req.body.cedula}@sicag.com`,
+        telefono: req.body.telefono || null,
+        cedula: req.body.cedula,
+        credenciales: bcrypt.hashSync('vocero123', 10), // Contraseña por defecto
         rol: 'vocero',
-        ...req.body
+        id_comunidad_asignada: id_comunidad_asignada
       });
       res.status(201).json(data);
     } catch (error) { next(error); }

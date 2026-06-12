@@ -246,6 +246,18 @@ class APIManager {
     if (!response.ok) throw new Error(data.error);
     return data;
   }
+  async verifyPassword(password) {
+    if (this.isDevelopment) return { success: true };
+    const response = await this._fetch(`${this.baseURL}/auth/verify-password`, {
+      method: 'POST',
+      headers: { ...this._getHeaders().headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error);
+    return data;
+  }
+  
   async changeEmail(nuevoCorreo) {
     if (this.isDevelopment) {
       return new Promise(r => setTimeout(() => r({ success: true }), 1000));
