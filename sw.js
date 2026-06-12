@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sicag-cache-v1';
+const CACHE_NAME = 'sicag-cache-v2';
 
 // Assets base para que el portal cargue al instante (Habitantes)
 const PRECACHE_ASSETS = [
