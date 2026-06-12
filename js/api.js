@@ -472,44 +472,35 @@ class APIManager {
    */
   async _interceptarValidacion(tabla, accion, datos, callbackOriginal) {
     const user = window.auth ? window.auth.getUser() : null;
-    const isVocero = user && user.rol === 'vocero';
+    const isVocero = user && user.rol && user.rol.toLowerCase() === 'vocero';
     const autoGlobal = localStorage.getItem('sicag_auto_global') === 'true';
 
     // Si es vocero y la aprobación automática NO está activa, va a la bandeja
     if (isVocero && !autoGlobal) {
       console.log(`[API] Interceptado: Enviando ${accion} de ${tabla} a validaciones.`);
-      return await this.crearNotificacion({
+      const res = await this.crearNotificacion({
         tabla_afectada: tabla,
         tipo_accion: accion,
         id_vocero: user.id,
         datos_temporales: datos
       });
-    }
 
-    // De lo contrario (es admin, o autoGlobal está activo), ejecuta directo
-    console.log(`[API] Ejecución directa permitida para ${accion} en ${tabla}.`);
-    return await callbackOriginal();
-  }
+      // Notificación clara para que el Vocero sepa que no se ejecutó inmediatamente
+      if (window.Components) {
+        let accionText = accion === 'INSERT' ? 'Creación' : (accion === 'UPDATE' ? 'Edición' : 'Eliminación');
+        Components.showToast(`Solicitud de ${accionText} enviada a validación.`, 'info');
+        
+        // Bloquear temporalmente los mensajes de éxito/error genéricos que tengan las vistas
+        // para que no se sobreescriba el mensaje informativo anterior.
+        const originalToast = Components.showToast;
+        Components.showToast = function(msg, type) {
+           if (type === 'success' || type === 'error') return; // ignoramos el éxito/error falso
+           originalToast.apply(this, arguments);
+        };
+        setTimeout(() => { Components.showToast = originalToast; }, 500);
+      }
 
-  /**
-   * Interceptor de validaciones:
-   * Revisa si el usuario actual es un vocero y si debe pasar por la bandeja de validaciones
-   * o si la "Aprobación Automática Global" está activa.
-   */
-  async _interceptarValidacion(tabla, accion, datos, callbackOriginal) {
-    const user = window.auth ? window.auth.getUser() : null;
-    const isVocero = user && user.rol === 'vocero';
-    const autoGlobal = localStorage.getItem('sicag_auto_global') === 'true';
-
-    // Si es vocero y la aprobación automática NO está activa, va a la bandeja
-    if (isVocero && !autoGlobal) {
-      console.log(`[API] Interceptado: Enviando ${accion} de ${tabla} a validaciones.`);
-      return await this.crearNotificacion({
-        tabla_afectada: tabla,
-        tipo_accion: accion,
-        id_vocero: user.id,
-        datos_temporales: datos
-      });
+      return res;
     }
 
     // De lo contrario (es admin, o autoGlobal está activo), ejecuta directo
