@@ -1,9 +1,11 @@
 const Joi = require('joi');
 
 const authLoginSchema = Joi.object({
-  email: Joi.string().min(3).max(100).required(),
+  identifier: Joi.string().min(3).max(100),
+  email: Joi.string().email(),
+  telefono: Joi.string().max(20),
   password: Joi.string().min(6).max(128).required()
-});
+}).or('identifier', 'email', 'telefono');
 
 const habitanteCreateSchema = Joi.object({
   cedula: Joi.string().min(6).max(12).required(),
