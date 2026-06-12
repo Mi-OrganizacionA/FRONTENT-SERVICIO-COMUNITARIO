@@ -617,6 +617,12 @@ ul {
   gap: 1.75rem
 }
 
+.pub-grid-scrollable {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
 .pub-hab-card {
   background: #fff;
   border-radius: var(--r-lg);
@@ -2019,13 +2025,66 @@ ul {
     gap: 1rem;
   }
 
+  .pub-grid-scrollable {
+    display: flex !important;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  .pub-grid-scrollable > div {
+    flex: 0 0 85%;
+    max-width: 85%;
+    scroll-snap-align: center;
+  }
+
+  /* Ocultar scrollbar visual para que sea más limpio en móvil */
+  .pub-grid-scrollable::-webkit-scrollbar {
+    display: none;
+  }
+  .pub-grid-scrollable {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
   .pub-hab-card {
     padding: 1.5rem 1.25rem;
   }
 
-  /* ─ Carousel ─ */
+  /* ─ Carousel (Cartelera) Scrollable Móvil ─ */
+  .pub-carousel-wrap {
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 1.5rem;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  .pub-carousel-wrap::-webkit-scrollbar {
+    display: none;
+  }
+  .pub-carousel-wrap {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .pub-carousel-track {
+    transform: none !important; /* Desactiva la traslación JS en móvil */
+    justify-content: flex-start !important;
+    gap: 1rem;
+    width: max-content; /* Permite que los hijos estiren el ancho */
+  }
+
   .pub-news-card {
-    flex: 0 0 calc(100% - .75rem);
+    flex: 0 0 85% !important;
+    max-width: 85% !important;
+    scroll-snap-align: center;
   }
 
   /* ─ 7T Grid ─ */
