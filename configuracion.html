@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -170,6 +170,12 @@
         justify-content: center;
       }
     }
+    
+    @media(max-width: 575px) {
+      .config-2col-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
   </style>
   <script>
     if (!sessionStorage.getItem('sicag_user')) { // Token en memoria, usuario en sessionStorage
@@ -313,7 +319,7 @@
                 <input type="text" class="form-control-sicag" value="Comuna Socialista Agroecológica Simón Rodríguez"
                   readonly style="background:#f5f5f5; cursor:not-allowed;">
               </div>
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+              <div class="config-2col-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
                 <div class="form-group-sicag" style="margin-bottom:0;">
                   <label class="form-label-sicag">Estado</label>
                   <input type="text" class="form-control-sicag" value="Yaracuy" readonly
@@ -367,6 +373,42 @@
   <script src="js/layout-menu.js"></script>
   <script src="js/roles.js"></script>
   <script src="js/voceros.js"></script>
+  
+  <script>
+    // Lógica para Switches de Configuración
+    document.addEventListener('DOMContentLoaded', () => {
+      // Cargar estado inicial de Aprobación Global
+      const isAutoGlobal = localStorage.getItem('sicag_auto_global') === 'true';
+      const autoGlobalCheckbox = document.getElementById('toggleAutoGlobal');
+      if (autoGlobalCheckbox) {
+        autoGlobalCheckbox.checked = isAutoGlobal;
+      }
+    });
+
+    function toggleSetting(nombre, activado, esGlobal = false) {
+      if (esGlobal) {
+        if (activado) {
+          Components.confirmDialog(
+            '⚠️ ADVERTENCIA: Estás a punto de activar la Aprobación Automática Global. Todas las peticiones de los voceros se guardarán directamente en la base de datos sin requerir validación. ¿Deseas continuar?',
+            () => {
+              localStorage.setItem('sicag_auto_global', 'true');
+              Components.showToast('Aprobación Automática Global ACTIVADA.', 'warning');
+            },
+            () => {
+              // Revertir switch si cancela
+              document.getElementById('toggleAutoGlobal').checked = false;
+            }
+          );
+        } else {
+          localStorage.setItem('sicag_auto_global', 'false');
+          Components.showToast('Aprobación Automática Global DESACTIVADA.', 'success');
+        }
+      } else {
+        const estado = activado ? 'ACTIVADA' : 'DESACTIVADA';
+        Components.showToast(`Política de ${nombre}: ${estado}`, activado ? 'success' : 'info');
+      }
+    }
+  </script>
 </body>
 
 </html>

@@ -46,7 +46,17 @@
       title: 'Mi Trabajo',
       items: [
         { href: 'censo_viviendas.html', icon: 'house-chimney-crack', label: 'Censo de Viviendas' },
-        { href: 'censo.html',           icon: 'users',               label: 'Consultar Habitantes' }
+        { href: 'censo.html',           icon: 'users',               label: 'Consultar Habitantes' },
+        { href: 'noticias.html',        icon: 'newspaper',            label: 'Cartelera Digital' },
+        { href: 'proyectos.html',       icon: 'seedling',             label: 'Proyectos Agroecológicos' },
+        { href: 'produccion_agricola.html', icon: 'tractor',          label: 'Producción Agrícola' },
+        { href: 'organizaciones.html',  icon: 'hands-holding-circle', label: 'Organizaciones Sociales' }
+      ]
+    },
+    {
+      title: 'Mis Solicitudes',
+      items: [
+        { href: 'notificaciones.html', icon: 'paper-plane', label: 'Mis Solicitudes' }
       ]
     },
     {
@@ -60,7 +70,8 @@
     {
       title: 'Sesión',
       items: [
-        { href: 'login.html', icon: 'right-from-bracket', label: 'Cerrar Sesión', style: 'color:rgba(255,130,100,.9);' }
+        { href: 'perfil.html',  icon: 'user-circle',          label: 'Mi Perfil' },
+        { href: 'login.html',   icon: 'right-from-bracket',   label: 'Cerrar Sesión', style: 'color:rgba(255,130,100,.9);' }
       ]
     }
   ];

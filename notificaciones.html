@@ -1,74 +1,440 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bandeja de Validaciones - SICAG v2.5</title>
+  <meta name="description" content="Bandeja de Validaciones — SICAG v2.5. Revisa, aprueba o rechaza solicitudes de los voceros.">
+  <title>Bandeja de Validaciones — SICAG v2.5</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
-  <link rel="preload" href="css/admin.css" as="style">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="css/admin.css" rel="stylesheet">
+  <style>
+    /* ── Tabla de Validaciones ── */
+    .validaciones-table-wrap {
+      background: var(--card);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    .validaciones-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(67,160,71,.03);
+    }
+    .validaciones-toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .validaciones-toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    /* Filtros */
+    .toolbar-filter {
+      padding: 0.4rem 0.75rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      font-size: 0.82rem;
+      font-family: inherit;
+      color: var(--txt);
+      background: var(--bg);
+      outline: none;
+      transition: border-color var(--tr);
+    }
+    .toolbar-filter:focus { border-color: var(--vv); }
+
+    /* Tabla */
+    .v-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+    .v-table thead th {
+      background: var(--bg);
+      color: var(--sub);
+      font-size: 0.71rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding: 0.7rem 1rem;
+      text-align: left;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+    .v-table thead th.th-check { width: 44px; text-align: center; }
+    .v-table thead th.th-num  { width: 60px; }
+    .v-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background var(--tr);
+      cursor: pointer;
+    }
+    .v-table tbody tr:last-child { border-bottom: none; }
+    .v-table tbody tr:hover { background: rgba(67,160,71,.04); }
+    .v-table tbody tr.selected { background: rgba(67,160,71,.08); }
+    .v-table tbody td { padding: 0.75rem 1rem; vertical-align: middle; }
+    .v-table tbody td.td-check { text-align: center; }
+
+    /* Tipo badge en tabla */
+    .v-tipo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.3rem 0.7rem;
+      border-radius: 999px;
+    }
+    .v-tipo-habitante  { background: rgba(46,125,50,.10);  color: var(--vp); }
+    .v-tipo-usuario    { background: rgba(21,101,192,.10);  color: var(--az); }
+    .v-tipo-noticia    { background: rgba(249,168,37,.12);  color: #E65100; }
+    .v-tipo-proyecto   { background: rgba(230,81,0,.10);    color: #BF360C; }
+    .v-tipo-organizacion { background: rgba(156,39,176,.10); color: #6A1B9A; }
+    .v-tipo-produccion { background: rgba(0,150,136,.10);   color: #00796B; }
+    .v-tipo-otro       { background: rgba(96,96,96,.08);    color: var(--sub); }
+
+    /* Celda de solicitante */
+    .v-solicitante { font-weight: 600; color: var(--txt); }
+    .v-solicitante-sub { font-size: 0.76rem; color: var(--muted); margin-top: 0.15rem; }
+
+    /* Acciones inline en la tabla */
+    .v-inline-actions { display: flex; gap: 0.4rem; align-items: center; }
+    .v-btn-sm {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.3rem 0.6rem; border-radius: var(--r-sm);
+      font-size: 0.75rem; font-weight: 600; font-family: inherit;
+      border: none; cursor: pointer; white-space: nowrap;
+      transition: all var(--tr);
+    }
+    .v-btn-sm:hover { transform: translateY(-1px); }
+    .v-btn-ver      { background: rgba(67,160,71,.1);  color: var(--vp); }
+    .v-btn-aprobar  { background: rgba(46,125,50,.12); color: var(--vd); }
+    .v-btn-rechazar { background: rgba(198,40,40,.1);  color: var(--ru); }
+
+    /* Checkbox personalizado */
+    .v-checkbox {
+      width: 17px; height: 17px; accent-color: var(--vp);
+      cursor: pointer; border-radius: 4px;
+    }
+
+    /* ── Barra flotante de acciones masivas ── */
+    .bulk-actions-bar {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(120%);
+      background: var(--vx);
+      color: #fff;
+      border-radius: 50px;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,.3);
+      z-index: 800;
+      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+      white-space: nowrap;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .bulk-actions-bar.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+    .bulk-count {
+      font-weight: 700;
+      font-size: 0.9rem;
+      background: rgba(255,255,255,.15);
+      padding: 0.3rem 0.75rem;
+      border-radius: 50px;
+    }
+    .bulk-btn {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.5rem 1rem; border-radius: 50px;
+      font-size: 0.82rem; font-weight: 700; font-family: inherit;
+      border: none; cursor: pointer; transition: all var(--tr);
+    }
+    .bulk-btn-approve { background: var(--vv); color: #fff; }
+    .bulk-btn-approve:hover { background: #2E7D32; }
+    .bulk-btn-reject  { background: var(--ru); color: #fff; }
+    .bulk-btn-reject:hover  { background: #8B0000; }
+    .bulk-btn-clear   { background: rgba(255,255,255,.12); color: #fff; }
+    .bulk-btn-clear:hover   { background: rgba(255,255,255,.22); }
+
+    /* ── Modal de Detalle ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 2000;
+      background: rgba(10,20,10,.55); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-det {
+      background: var(--card); border-radius: var(--r-lg);
+      box-shadow: var(--shadow-lg); width: 100%; max-width: 680px;
+      max-height: 90vh; overflow-y: auto;
+      animation: fadeInUp .25s ease both;
+    }
+    .modal-det-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 1.5rem; border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: var(--card); z-index: 1;
+    }
+    .modal-det-header h3 { font-size: 1rem; font-weight: 700; color: var(--txt); display: flex; align-items: center; gap: .5rem; }
+    .modal-close {
+      width: 30px; height: 30px; border-radius: 50%; border: none;
+      background: var(--bg); color: var(--muted); font-size: 1rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all var(--tr);
+    }
+    .modal-close:hover { background: rgba(198,40,40,.1); color: var(--ru); }
+    .modal-det-body { padding: 1.5rem; }
+    .modal-det-footer {
+      display: flex; align-items: center; justify-content: flex-end; gap: .75rem;
+      padding: 1rem 1.5rem; border-top: 1px solid var(--border);
+      position: sticky; bottom: 0; background: var(--card);
+    }
+
+    /* Grilla de detalles en modal */
+    .det-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+    .det-meta-item {
+      background: var(--bg);
+      border-radius: var(--r-sm);
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+    }
+    .det-meta-key   { font-size: 0.72rem; color: var(--sub); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 0.3rem; font-weight: 600; }
+    .det-meta-value { font-size: 0.92rem; font-weight: 700; color: var(--txt); word-break: break-word; overflow-wrap: anywhere; }
+
+    .det-data-group {
+      background: rgba(67,160,71,.05);
+      border: 1px solid rgba(67,160,71,.15);
+      border-radius: var(--r-md);
+      padding: 1rem 1.1rem;
+      margin-bottom: 1rem;
+    }
+    .det-data-group h4 { font-size: 0.9rem; font-weight: 700; color: var(--vd); margin-bottom: 0.85rem; }
+    .det-data-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem;
+    }
+
+    /* ── Modal de Confirmación Masiva ── */
+    .modal-confirm {
+      background: var(--card); border-radius: var(--r-lg);
+      box-shadow: var(--shadow-lg); width: 100%; max-width: 420px;
+      padding: 2rem 1.75rem;
+      text-align: center;
+      animation: fadeInUp .2s ease both;
+    }
+    .modal-confirm-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .modal-confirm h3 { font-size: 1.1rem; font-weight: 800; color: var(--txt); margin-bottom: 0.5rem; }
+    .modal-confirm p { font-size: 0.9rem; color: var(--sub); margin-bottom: 1.5rem; line-height: 1.6; }
+    .modal-confirm-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+
+    /* Vista Vocero */
+    .vocero-solicitudes-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1rem; flex-wrap: wrap;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .validaciones-toolbar { flex-direction: column; align-items: stretch; }
+      .validaciones-toolbar-right { justify-content: flex-start; }
+      .v-table thead th.th-accion { display: none; }
+      .v-table tbody td.td-accion { display: none; }
+      .bulk-actions-bar { left: 1rem; right: 1rem; transform: translateY(120%); border-radius: var(--r-lg); bottom: 1rem; }
+      .bulk-actions-bar.visible { transform: translateY(0); }
+      .det-meta-grid { grid-template-columns: 1fr 1fr; }
+      .det-data-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .det-meta-grid { grid-template-columns: 1fr; }
+      .modal-confirm-actions .btn-sicag { width: 100%; justify-content: center; }
+    }
+  </style>
   <script>
-    if (!sessionStorage.getItem('sicag_user')) { // Token en memoria, usuario en sessionStorage
+    if (!sessionStorage.getItem('sicag_user')) {
       window.location.replace('login.html');
     }
   </script>
 </head>
 <body data-search-placeholder="Buscar solicitudes y notificaciones...">
-  <div class="barra-tricolor"></div>
+  <div class="barra-tricolor" aria-hidden="true"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div id="header-placeholder"></div>
-  <div id="sidebar-placeholder"></div>
-  <main class="app-main">
-    <div class="ph-wrap fade-in">
+  <nav id="sidebar-placeholder"></nav>
+
+  <main class="app-main" role="main">
+
+    <!-- PREMIUM HEADER -->
+    <div class="ph-wrap fade-in" id="phWrap">
       <div class="ph-deco-dots" aria-hidden="true"></div>
       <nav class="ph-breadcrumb" aria-label="Ruta de navegación">
         <a href="dashboard.html"><i class="fas fa-home"></i></a>
         <i class="fas fa-chevron-right ph-sep"></i>
-        <span class="ph-cur">Bandeja de Validaciones</span>
+        <span class="ph-cur" id="phTitle">Bandeja de Validaciones</span>
       </nav>
       <div class="ph-body">
         <div class="ph-left">
-          <div class="ph-icon"><i class="fas fa-bell"></i></div>
+          <div class="ph-icon"><i class="fas fa-inbox" id="phIcon"></i></div>
           <div>
-            <div class="ph-module">SICAG — Validaciones</div>
-            <h1 class="ph-title">Bandeja de Validaciones</h1>
-            <p class="ph-sub">Administra las solicitudes de registro enviadas por los voceros. Revisa, aprueba o rechaza datos que ingresarán al sistema (noticias, proyectos, reportes, habitantes) de manera centralizada.</p>
+            <div class="ph-module" id="phModule">SICAG — Administración</div>
+            <h1 class="ph-title" id="phMainTitle">Bandeja de Validaciones</h1>
+            <p class="ph-sub" id="phSub">Revisa, aprueba o rechaza las solicitudes enviadas por los voceros.</p>
           </div>
         </div>
         <div style="display:flex;gap:.6rem;align-self:center;flex-wrap:wrap">
-          <a href="dashboard.html" class="ph-btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
-          <button class="ph-btn" type="button" onclick="location.reload()"><i class="fas fa-rotate-right"></i> Actualizar</button>
+          <a href="dashboard.html" class="ph-btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)">
+            <i class="fas fa-arrow-left"></i> Volver
+          </a>
+          <button class="ph-btn" type="button" id="btnRefresh">
+            <i class="fas fa-rotate-right"></i> Actualizar
+          </button>
         </div>
       </div>
     </div>
 
+    <!-- KPIs -->
     <div class="ph-kpi-float">
       <div class="kpi-grid stagger fade-in-up" id="notificationStats"></div>
     </div>
 
-    <section class="notificaciones-grid">
-      <div class="card-sicag">
-        <div class="card-header-sicag">
-          <span>Solicitudes en revisión</span>
-          <span id="notificationCount" class="badge-sicag badge-pendiente">Cargando...</span>
+    <!-- TABLA DE VALIDACIONES -->
+    <div class="validaciones-table-wrap fade-in-up" id="tableSection">
+      <div class="validaciones-toolbar">
+        <div class="validaciones-toolbar-left">
+          <span style="font-weight:700; font-size:.9rem; color:var(--txt);">
+            <i class="fas fa-list-check" style="color:var(--vp);"></i>
+            <span id="tableTitle">Solicitudes</span>
+          </span>
+          <span id="countBadge" class="badge-sicag badge-pendiente">Cargando...</span>
         </div>
-        <div id="notificationsList" class="card-body-sicag notification-list"></div>
+        <div class="validaciones-toolbar-right">
+          <!-- Filtro por tipo (solo admin) -->
+          <select class="toolbar-filter" id="filterTipo" title="Filtrar por tipo">
+            <option value="">Todos los tipos</option>
+            <option value="habitantes">Habitantes</option>
+            <option value="usuarios">Usuarios</option>
+            <option value="noticias">Noticias</option>
+            <option value="proyectos">Proyectos</option>
+            <option value="organizaciones">Organizaciones</option>
+            <option value="produccion_agricola">Producción Agrícola</option>
+          </select>
+          <!-- Filtro por estado -->
+          <select class="toolbar-filter" id="filterEstado" title="Filtrar por estado">
+            <option value="pendiente">Pendientes</option>
+            <option value="">Todos</option>
+            <option value="aceptado">Aprobados</option>
+            <option value="rechazado">Rechazados</option>
+          </select>
+          <!-- Búsqueda rápida -->
+          <div style="position:relative; display:flex; align-items:center;">
+            <i class="fas fa-search" style="position:absolute; left:0.6rem; color:var(--muted); font-size:.8rem; pointer-events:none;"></i>
+            <input type="search" id="filterSearch" class="toolbar-filter" placeholder="Buscar..." style="padding-left:1.8rem; min-width:140px;">
+          </div>
+        </div>
       </div>
 
-      <div class="card-sicag">
-        <div class="card-header-sicag">
-          <span>Detalle de solicitud</span>
-          <span id="detailStatus" class="badge-sicag badge-pendiente">Selecciona una notificación</span>
-        </div>
-        <div id="notificationDetail" class="card-body-sicag notification-detail"></div>
+      <!-- Tabla -->
+      <div style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
+        <table class="v-table" id="validacionesTable">
+          <thead>
+            <tr>
+              <th class="th-check" id="thCheck">
+                <input type="checkbox" class="v-checkbox" id="checkAll" title="Seleccionar todos" style="display:none;">
+              </th>
+              <th class="th-num">#</th>
+              <th>Tipo / Acción</th>
+              <th>Solicitante</th>
+              <th>Descripción</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th class="th-accion">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="validacionesTbody">
+            <tr>
+              <td colspan="8" style="text-align:center; padding:2.5rem; color:var(--muted);">
+                <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i>
+                <p style="margin-top:.5rem;">Cargando solicitudes...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-    </section>
+    </div>
+
+    <!-- Vista vacía -->
+    <div id="emptyState" style="display:none;" class="fade-in-up">
+      <div style="text-align:center; padding:4rem 2rem; color:var(--sub);">
+        <i class="fas fa-inbox" style="font-size:3rem; color:var(--muted); margin-bottom:1rem; display:block;"></i>
+        <h3 style="font-size:1.2rem; font-weight:700; margin-bottom:.5rem; color:var(--txt);" id="emptyTitle">No hay solicitudes pendientes</h3>
+        <p id="emptyMsg">Todo está en orden. Cuando los voceros envíen nuevas solicitudes, aparecerán aquí.</p>
+      </div>
+    </div>
+
   </main>
+
+  <!-- BARRA FLOTANTE DE ACCIONES MASIVAS (solo Admin) -->
+  <div class="bulk-actions-bar" id="bulkActionsBar" role="toolbar" aria-label="Acciones masivas">
+    <span class="bulk-count"><span id="bulkCount">0</span> seleccionada(s)</span>
+    <button class="bulk-btn bulk-btn-approve" id="btnBulkApprove" type="button">
+      <i class="fas fa-check-double"></i> Aprobar Seleccionados
+    </button>
+    <button class="bulk-btn bulk-btn-reject" id="btnBulkReject" type="button">
+      <i class="fas fa-times-circle"></i> Rechazar Seleccionados
+    </button>
+    <button class="bulk-btn bulk-btn-clear" id="btnBulkClear" type="button">
+      <i class="fas fa-xmark"></i> Cancelar
+    </button>
+  </div>
+
+  <!-- MODAL DE DETALLE DE SOLICITUD -->
+  <div class="modal-overlay" id="modalDetalle" role="dialog" aria-modal="true" aria-labelledby="modalDetTitle">
+    <div class="modal-det">
+      <div class="modal-det-header">
+        <h3 id="modalDetTitle"><i class="fas fa-file-alt"></i> Detalle de Solicitud</h3>
+        <button class="modal-close" id="btnCloseDetalle" aria-label="Cerrar"><i class="fas fa-xmark"></i></button>
+      </div>
+      <div class="modal-det-body" id="modalDetBody">
+        <!-- Contenido renderizado por JS -->
+      </div>
+      <div class="modal-det-footer" id="modalDetFooter">
+        <!-- Botones de acción (solo Admin) -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE CONFIRMACIÓN MASIVA -->
+  <div class="modal-overlay" id="modalConfirm" role="dialog" aria-modal="true" aria-labelledby="modalConfTitle">
+    <div class="modal-confirm">
+      <div class="modal-confirm-icon" id="confirmIcon">⚠️</div>
+      <h3 id="modalConfTitle">Confirmar Acción</h3>
+      <p id="modalConfMsg">¿Estás seguro?</p>
+      <div class="modal-confirm-actions">
+        <button class="btn-sicag" id="btnConfirmCancel" style="background:var(--bg); color:var(--sub); border:1px solid var(--border);">
+          <i class="fas fa-xmark"></i> Cancelar
+        </button>
+        <button class="btn-sicag" id="btnConfirmOk">
+          <i class="fas fa-check"></i> <span id="confirmBtnLabel">Confirmar</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script src="js/auth.js"></script>
   <script src="js/api.js"></script>
