@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -15,7 +15,7 @@
   <link rel="preload" href="css/admin.css" as="style">
   <link href="css/admin.css" rel="stylesheet">
   <script>
-    if (!localStorage.getItem('token') || !localStorage.getItem('user')) {
+    if (!sessionStorage.getItem('sicag_user')) { // Token en memoria, usuario en sessionStorage
       window.location.replace('login.html');
     }
   </script>

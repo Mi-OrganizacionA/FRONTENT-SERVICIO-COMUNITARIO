@@ -813,7 +813,7 @@
               }
               dbResults = [];
             }
-          } else if (!localStorage.getItem('token')) {
+          } else if (!window.auth?.isAuthenticated()) {
             dropdown.innerHTML = '<div class="search-empty text-warning"><i class="fas fa-lock"></i> Inicie sesión para buscar registros</div>';
             return;
           }

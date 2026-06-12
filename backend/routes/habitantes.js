@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const habitantesController = require('../controllers/habitantesController');
 const { verifyToken, requireRole } = require('../middleware/auth');
@@ -8,6 +8,9 @@ const { habitanteCreateSchema, habitanteUpdateSchema, idParamSchema, paginationS
 // Endpoints públicos (portal web, sin autenticación)
 router.get('/publico/buscar', habitantesController.buscarPublico);
 router.get('/publico/:consejo_id', habitantesController.getPublico);
+
+// Verificación de cédula en tiempo real (sin autenticación, para formulario de registro)
+router.get('/check-cedula/:cedula', habitantesController.checkCedula);
 
 // Obtener todos los habitantes (con paginación y filtros)
 router.get('/', validate({ query: paginationSchema }), verifyToken, habitantesController.getAll);

@@ -92,7 +92,9 @@
     .input-icon{position:absolute;left:.95rem;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:.9rem;}
   </style>
   <script>
-    if (!localStorage.getItem('token') || !localStorage.getItem('user')) {
+    // Verificación de sesión usando sessionStorage (datos de usuario) en vez de localStorage (token)
+    // El token ahora vive en memoria (auth.js), pero los datos del usuario en sessionStorage
+    if (!sessionStorage.getItem('sicag_user')) {
       window.location.replace('login.html');
     }
   </script>
@@ -549,7 +551,21 @@
     if (window.censoCtrl) window.censoCtrl.editingId = null;
     if (title) title.textContent = 'Registro de Habitante';
     var form = document.getElementById('formCenso');
-    if (form) form.reset();
+    if (form) {
+      // Intentar recuperar borrador guardado (PROBLEMA 5)
+      var borrador = _recuperarBorradorCenso();
+      if (borrador && Object.keys(borrador).length > 0) {
+        var confirmar = confirm('¿Deseas continuar con el borrador anterior guardado? (Clic en Cancelar para empezar de nuevo)');
+        if (confirmar) {
+          _restaurarBorradorEnFormulario(form, borrador);
+        } else {
+          form.reset();
+          _eliminarBorradorCenso();
+        }
+      } else {
+        form.reset();
+      }
+    }
     goTo(1);
     bootstrap.Modal.getOrCreateInstance(modalEl).show();
   };
@@ -630,6 +646,9 @@
         if (window.Components) Components.showToast('Habitante registrado correctamente.', 'success');
       }
 
+      // Limpiar borrador al guardar exitosamente (PROBLEMA 5)
+      _eliminarBorradorCenso();
+
       var modalEl = document.getElementById('modalCenso');
       if (modalEl) {
         var bsModal = bootstrap.Modal.getInstance(modalEl);
@@ -642,9 +661,15 @@
       }
     } catch(err) {
       console.error(err);
-      var msg = err.message && err.message.includes('Cédula') ? err.message : 'Error al guardar habitante.';
-      if (window.Components) Components.showToast(msg, 'error');
-      else alert(msg);
+      // Usar manejo de errores tipados (PROBLEMA 6)
+      var contenedor = document.getElementById('formCenso');
+      if (window.manejarErrorApi) {
+        window.manejarErrorApi(err, { contenedor: contenedor });
+      } else {
+        var msg = err.message && err.message.includes('Cédula') ? err.message : 'Error al guardar habitante.';
+        if (window.Components) Components.showToast(msg, 'error');
+        else alert(msg);
+      }
     }
   };
 
@@ -675,7 +700,83 @@
   window.filtrarCenso = function(e) { if (e) e.preventDefault(); };
   window.exportarExcelCenso = function() { alert('Exportar Excel - proximamente.'); };
 
+  // ─────────────────────────────────────────
+  // BORRADOR AUTOMÁTICO DEL CENSO (PROBLEMA 5)
+  // Guarda y recupera el formulario del habitante en localStorage
+  // para sobrevivir cierres accidentales del navegador.
+  // ─────────────────────────────────────────
+  var BORRADOR_KEY = 'sicag_censo_borrador';
+  var _borradorTimer = null;
+
+  function _guardarBorradorCenso() {
+    var form = document.getElementById('formCenso');
+    if (!form) return;
+    var datos = {};
+    form.querySelectorAll('[name]').forEach(function(campo) {
+      if (campo.type === 'file') return; // No se puede guardar archivos
+      if (campo.type === 'checkbox') {
+        datos[campo.name] = campo.checked;
+      } else {
+        datos[campo.name] = campo.value;
+      }
+    });
+    try {
+      localStorage.setItem(BORRADOR_KEY, JSON.stringify({ datos: datos, ts: Date.now(), paso: current }));
+      // Mostrar indicador visual de guardado
+      var indicador = document.getElementById('indicadorBorrador');
+      if (indicador) {
+        indicador.textContent = '✓ Borrador guardado';
+        indicador.style.color = 'var(--vv)';
+        setTimeout(function() { if(indicador) indicador.textContent = ''; }, 2000);
+      }
+    } catch(e) { /* Sin capacidad de almacenamiento */ }
+  }
+
+  function _recuperarBorradorCenso() {
+    try {
+      var raw = localStorage.getItem(BORRADOR_KEY);
+      if (!raw) return null;
+      var obj = JSON.parse(raw);
+      // El borrador expira después de 24 horas
+      if (Date.now() - obj.ts > 24 * 60 * 60 * 1000) {
+        localStorage.removeItem(BORRADOR_KEY);
+        return null;
+      }
+      return obj.datos;
+    } catch(e) { return null; }
+  }
+
+  function _eliminarBorradorCenso() {
+    localStorage.removeItem(BORRADOR_KEY);
+  }
+
+  function _restaurarBorradorEnFormulario(form, datos) {
+    Object.keys(datos).forEach(function(nombre) {
+      var campo = form.querySelector('[name="' + nombre + '"]');
+      if (!campo) return;
+      if (campo.type === 'checkbox') {
+        campo.checked = !!datos[nombre];
+      } else {
+        campo.value = datos[nombre];
+        // Disparar change para actualizar campos calculados (edad, T4, estado electoral)
+        campo.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+  }
+
+  // Guardar borrador automáticamente cada vez que el usuario modifica el formulario
+  document.addEventListener('input', function(e) {
+    var form = document.getElementById('formCenso');
+    if (form && form.contains(e.target)) {
+      // Debounce: esperar 800ms de inactividad antes de guardar
+      clearTimeout(_borradorTimer);
+      _borradorTimer = setTimeout(_guardarBorradorCenso, 800);
+    }
+  });
+
+  // También guardar al cambiar selects y checkboxes
   document.addEventListener('change', function(e) {
+    var form = document.getElementById('formCenso');
     if (e.target && e.target.id === 'habFechaNac') {
       var val = e.target.value;
       if (!val) return;
@@ -690,6 +791,68 @@
       if (t4El) t4El.value = t4;
       var elEl = document.getElementById('electoralStatus');
       if (elEl) elEl.value = age >= 18 ? 'Habilitado para votar' : 'No habilitado (menor de edad)';
+    }
+    // Guardar borrador en selects y checkboxes también
+    if (form && form.contains(e.target)) {
+      clearTimeout(_borradorTimer);
+      _borradorTimer = setTimeout(_guardarBorradorCenso, 500);
+    }
+  });
+
+  // Validación asíncrona de cédula única en tiempo real (PROBLEMA 4)
+  document.addEventListener('blur', function(e) {
+    if (e.target && e.target.id === 'habCedula') {
+      var cedulaInput = e.target;
+      var cedulaVal = cedulaInput.value.trim().replace(/[.\s-]/g, '').replace(/^[VE]/i, '');
+      if (cedulaVal.length >= 7 && window.verificarCedulaUnica) {
+        // Solo verificar si no estamos editando (un habitante ya existente)
+        var estaEditando = window.censoCtrl?.editingId;
+        if (!estaEditando) {
+          window.verificarCedulaUnica(cedulaVal).then(function(resultado) {
+            if (!resultado.unica) {
+              cedulaInput.style.borderColor = '#C62828';
+              var hint = cedulaInput.parentElement.querySelector('.cv-form-hint');
+              if (hint) {
+                hint.textContent = resultado.error;
+                hint.style.color = '#C62828';
+              }
+              if (window.Components) Components.showToast(resultado.error, 'warning');
+            } else {
+              cedulaInput.style.borderColor = '';
+              var hint2 = cedulaInput.parentElement.querySelector('.cv-form-hint');
+              if (hint2) {
+                hint2.textContent = 'Llave unica para consultas.';
+                hint2.style.color = '';
+              }
+            }
+          });
+        }
+      }
+    }
+  }, true); // Fase de captura para blur
+
+  // Limpiar borrador al cerrar el modal sin guardar (si el usuario decide descartar)
+  document.addEventListener('hide.bs.modal', function(e) {
+    if (e.target && e.target.id === 'modalCenso') {
+      // Preguntar si desea guardar el borrador antes de cerrar
+      var form = document.getElementById('formCenso');
+      var hayDatos = form && Array.from(form.querySelectorAll('[name]'))
+        .some(function(c) { return c.type !== 'file' && c.value; });
+      if (hayDatos && !window.censoCtrl?.editingId) {
+        // Guardar borrador silenciosamente para recuperarlo despues
+        _guardarBorradorCenso();
+      }
+    }
+  });
+
+  // Indicador de borrador en el footer del modal
+  document.addEventListener('DOMContentLoaded', function() {
+    var footer = document.querySelector('.cv-footer-left');
+    if (footer) {
+      var indicador = document.createElement('span');
+      indicador.id = 'indicadorBorrador';
+      indicador.style.cssText = 'font-size:.75rem;color:var(--gray4);margin-left:.75rem;transition:color .3s;';
+      footer.appendChild(indicador);
     }
   });
 

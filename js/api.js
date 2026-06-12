@@ -1,7 +1,30 @@
 /**
- * Módulo centralizado de API (SICAG v2.5)
- * Gestiona todas las llamadas a datos (simulado con seed.json local en desarrollo)
+ * Módulo centralizado de API (SICAG v3.0)
+ *
+ * Mejoras de seguridad y robustez:
+ * - Token leído desde window.auth.getToken() (memoria), nunca desde localStorage.
+ * - Refresh automático de JWT al recibir 401 (PROBLEMA 2).
+ * - Errores tipados con clase ApiError diferenciando 401/403/409/422/500 (PROBLEMA 6).
+ * - Cola offline con deduplicación y límite de tamaño (PROBLEMA 3).
+ * - Mutex isSubmitting/isSyncing para prevenir race conditions (PROBLEMA 7).
  */
+
+/**
+ * Error tipado de la API con código HTTP y código de negocio.
+ * Permite al frontend diferencial el tipo de error y reaccionar apropiadamente.
+ */
+class ApiError extends Error {
+  constructor(mensaje, status, codigo, detalles = null) {
+    super(mensaje);
+    this.name = 'ApiError';
+    this.status = status;     // Código HTTP (401, 409, 422, 500, etc.)
+    this.codigo = codigo;     // Código de negocio ('CEDULA_DUPLICADA', 'TOKEN_EXPIRED', etc.)
+    this.detalles = detalles; // Array de detalles por campo (para errores 422)
+  }
+}
+
+window.ApiError = ApiError;
+
 class APIManager {
   constructor() {
     const host = window.location.hostname;
@@ -9,6 +32,9 @@ class APIManager {
     this.baseURL = window.API_BASE_URL || (this.isLocal ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api');
     this.mockData = null;
     this.isDevelopment = Boolean(window.API_FORCE_MOCK || false);
+    // Mutex para prevenir race conditions (PROBLEMA 7)
+    this.isSyncing = false;
+    this.isSubmitting = false;
     this.initMockData();
     // Intentar sincronizar pendientes al reconectar
     window.addEventListener('online', () => this.flushPendingPasos());
@@ -65,7 +91,13 @@ class APIManager {
     }
   }
 
-  // Pending queue helpers (for pasos de censo guardados offline)
+  // ─────────────────────────────────────────
+  // COLA OFFLINE ROBUSTA (PROBLEMA 3)
+  // ─────────────────────────────────────────
+
+  /** Límite máximo de ítems en la cola offline para evitar saturar localStorage */
+  get MAX_QUEUE_SIZE() { return 100; }
+
   _getPendingQueue() {
     try {
       const raw = localStorage.getItem('sicag_censo_queue');
@@ -75,36 +107,97 @@ class APIManager {
 
   _savePendingQueue(queue) {
     try {
-      localStorage.setItem('sicag_censo_queue', JSON.stringify(queue));
-      // Dispatch event with current count
+      const serializado = JSON.stringify(queue);
+      // Verificar tamaño aproximado (localStorage limita ~5MB)
+      if (serializado.length > 4 * 1024 * 1024) {
+        console.error('[Cola] La cola offline supera 4MB, algunos ítems no se guardarán.');
+        window.dispatchEvent(new CustomEvent('censo:queueOverflow', { detail: { count: queue.length } }));
+        return;
+      }
+      localStorage.setItem('sicag_censo_queue', serializado);
       window.dispatchEvent(new CustomEvent('censo:pendingCount', { detail: { count: queue.length } }));
-    } catch (e) { console.error('No se pudo guardar la cola de pasos', e); }
+    } catch (e) {
+      console.error('No se pudo guardar la cola de pasos:', e);
+      window.dispatchEvent(new CustomEvent('censo:queueError', { detail: { error: e.message } }));
+    }
   }
 
+  /**
+   * Encola un paso de censo para sincronización futura.
+   * Incluye deduplicación: si ya existe un ítem con el mismo paso + id_estudio,
+   * se reemplaza en vez de agregar un duplicado.
+   */
   _enqueuePendingPaso(paso, idEstudio, datos) {
     const queue = this._getPendingQueue();
-    queue.push({ paso, id_estudio: idEstudio, datos, ts: Date.now() });
+
+    if (queue.length >= this.MAX_QUEUE_SIZE) {
+      console.error('[Cola] Límite de cola offline alcanzado. No se puede encolar más pasos.');
+      throw new Error('La cola de sincronización está llena. Conéctate a internet para sincronizar.');
+    }
+
+    // Deduplicación: reemplazar ítem existente si tiene mismo paso + id_estudio
+    const indiceExistente = queue.findIndex(
+      item => item.paso === paso && String(item.id_estudio) === String(idEstudio)
+    );
+
+    const nuevoItem = { paso, id_estudio: idEstudio, datos, ts: Date.now(), intentos: 0 };
+
+    if (indiceExistente >= 0) {
+      // Actualizar ítem existente (no duplicar)
+      queue[indiceExistente] = nuevoItem;
+      console.info(`[Cola] Paso ${paso} actualizado en la cola offline (reemplazó duplicado).`);
+    } else {
+      queue.push(nuevoItem);
+      console.info(`[Cola] Paso ${paso} agregado a la cola offline. Total: ${queue.length}`);
+    }
+
     this._savePendingQueue(queue);
   }
 
+  /**
+   * Sincroniza todos los pasos pendientes en la cola offline.
+   * Usa mutex isSyncing para prevenir ejecuciones concurrentes (PROBLEMA 7).
+   */
   async flushPendingPasos() {
+    // Prevenir sincronización concurrente (race condition)
+    if (this.isSyncing) {
+      console.info('[Cola] Sincronización ya en progreso, omitiendo llamada concurrente.');
+      return;
+    }
+
     const queue = this._getPendingQueue();
     if (!queue.length) return;
+
+    this.isSyncing = true;
+    console.info(`[Cola] Iniciando sincronización de ${queue.length} pasos pendientes...`);
+
     const remaining = [];
-    for (const item of queue) {
-      try {
-        const resp = await this._fetch(`${this.baseURL}/estudios-demograficos/paso`, {
-          method: 'POST',
-          ...this._getHeaders(),
-          body: JSON.stringify(item)
-        });
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-      } catch (e) {
-        console.warn('No se pudo sincronizar paso en la cola:', e);
-        remaining.push(item);
+    let sincronizados = 0;
+
+    try {
+      for (const item of queue) {
+        try {
+          const resp = await this._fetch(`${this.baseURL}/estudios-demograficos/paso`, {
+            method: 'POST',
+            ...this._getHeaders(),
+            body: JSON.stringify(item)
+          });
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          sincronizados++;
+        } catch (e) {
+          console.warn(`[Cola] No se pudo sincronizar paso ${item.paso}:`, e.message);
+          // Incrementar contador de intentos
+          remaining.push({ ...item, intentos: (item.intentos || 0) + 1 });
+        }
       }
+    } finally {
+      this._savePendingQueue(remaining);
+      this.isSyncing = false;
+      console.info(`[Cola] Sincronización completada. Sincronizados: ${sincronizados}, Pendientes: ${remaining.length}`);
+      window.dispatchEvent(new CustomEvent('censo:syncCompleted', {
+        detail: { sincronizados, pendientes: remaining.length }
+      }));
     }
-    this._savePendingQueue(remaining);
   }
 
   // ─────────────────────────────────────────
@@ -197,7 +290,8 @@ class APIManager {
     if (this.isDevelopment) {
       return new Promise(r => setTimeout(() => r(true), 1500));
     }
-    const token = localStorage.getItem('token');
+    // Usar token desde memoria (no desde localStorage)
+    const token = window.auth?.getToken();
     const a = document.createElement('a');
     a.href = `${this.baseURL}/system/backup?token=${token}`;
     a.target = '_blank';
@@ -350,7 +444,7 @@ class APIManager {
 
   async getNotificaciones() {
     if (!this.isDevelopment) {
-      const response = await fetch(`${this.baseURL}/validaciones/pendientes`, this._getHeaders());
+      const response = await this._fetch(`${this.baseURL}/validaciones/pendientes`, this._getHeaders());
       if (!response.ok) throw new Error('Error al obtener notificaciones');
       return response.json();
     }
@@ -497,7 +591,7 @@ class APIManager {
   async getProduccion(filtros = {}) {
     if (this.isDevelopment) return [];
     const params = new URLSearchParams(filtros);
-    const response = await fetch(`${this.baseURL}/produccion_agricola?${params}`, this._getHeaders());
+    const response = await this._fetch(`${this.baseURL}/produccion_agricola?${params}`, this._getHeaders());
     if (!response.ok) throw new Error('Error fetching produccion agricola');
     return response.json();
   }
@@ -529,7 +623,7 @@ class APIManager {
   async getOrganizaciones(filtros = {}) {
     if (this.isDevelopment) return [];
     const params = new URLSearchParams(filtros);
-    const response = await fetch(`${this.baseURL}/organizaciones?${params}`, this._getHeaders());
+    const response = await this._fetch(`${this.baseURL}/organizaciones?${params}`, this._getHeaders());
     if (!response.ok) throw new Error('Error fetching organizaciones');
     return response.json();
   }
@@ -561,7 +655,7 @@ class APIManager {
   async getViviendas(filtros = {}) {
     if (this.isDevelopment) return [];
     const params = new URLSearchParams(filtros);
-    const response = await fetch(`${this.baseURL}/viviendas?${params}`, this._getHeaders());
+    const response = await this._fetch(`${this.baseURL}/viviendas?${params}`, this._getHeaders());
     if (!response.ok) throw new Error('Error fetching viviendas');
     return response.json();
   }
@@ -593,7 +687,7 @@ class APIManager {
   async getVoceros(filtros = {}) {
     if (this.isDevelopment) return [];
     const params = new URLSearchParams(filtros);
-    const response = await fetch(`${this.baseURL}/voceros?${params}`, this._getHeaders());
+    const response = await this._fetch(`${this.baseURL}/voceros?${params}`, this._getHeaders());
     if (!response.ok) throw new Error('Error fetching voceros');
     return response.json();
   }
@@ -747,8 +841,9 @@ class APIManager {
   async globalSearch(query) {
     if (!query || query.length < 2) return [];
     try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('NO_TOKEN');
+      // Leer token desde memoria (no desde localStorage)
+      const token = window.auth?.getToken();
+      if (!token && !this.isDevelopment) throw new Error('NO_TOKEN');
 
       const lowerQ = query.toLowerCase();
       
@@ -836,39 +931,104 @@ class APIManager {
   // ─────────────────────────────────────────
   // MÉTODOS AUXILIARES
   // ─────────────────────────────────────────
+
+  /**
+   * Construye los headers de autenticación leyendo el token DESDE MEMORIA.
+   * Nunca se accede a localStorage para el token (PROBLEMA 1 + 2).
+   */
   _getHeaders() {
-    const token = localStorage.getItem('token');
+    // Token leído exclusivamente desde la instancia en memoria de AuthManager
+    const token = window.auth?.getToken();
     return {
       headers: {
         'Content-Type': 'application/json',
         ...(token && { 'Authorization': `Bearer ${token}` })
-      }
+      },
+      // credentials: 'include' es necesario para que el navegador envíe la httpOnly cookie
+      credentials: 'include'
     };
   }
 
+  /**
+   * Wrapper de fetch con:
+   * - Refresh automático de token al recibir 401 (PROBLEMA 2)
+   * - Errores tipados con ApiError diferenciando status HTTP (PROBLEMA 6)
+   */
   async _fetch(url, options = {}) {
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url, { credentials: 'include', ...options });
+
+      // Si el token expiró, intentar refresh automático (PROBLEMA 2)
       if (response.status === 401) {
-        const err = await response.clone().json().catch(() => ({}));
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        const errData = await response.clone().json().catch(() => ({}));
+
+        // Intentar renovar el token con el refreshToken (httpOnly cookie)
         if (window.auth) {
-          window.auth.token = null;
-          window.auth.user = null;
+          console.info('[API] Token expirado, intentando refresh automático...');
+          const nuevoToken = await window.auth.intentarRefresh();
+
+          if (nuevoToken) {
+            // Refresh exitoso: reintentar el request original con el nuevo token
+            console.info('[API] Refresh exitoso, reintentando request original.');
+            const opcionesActualizadas = {
+              ...options,
+              headers: {
+                ...(options.headers || {}),
+                'Authorization': `Bearer ${nuevoToken}`
+              },
+              credentials: 'include'
+            };
+            return await fetch(url, opcionesActualizadas);
+          } else {
+            // Refresh falló → sesión expirada definitivamente
+            console.warn('[API] Refresh fallido. Cerrando sesión.');
+            window.auth.token = null;
+            window.auth.user = null;
+            sessionStorage.removeItem('sicag_user');
+
+            const esPublica = /index\.html$|consulta_habitantes\.html$|login\.html$/.test(window.location.pathname) ||
+              window.location.pathname.endsWith('/');
+            if (!esPublica) {
+              alert(errData.error || 'Su sesión ha expirado. Por favor inicie sesión nuevamente.');
+              window.location.href = 'login.html';
+            }
+            throw new ApiError('Sesión expirada', 401, 'TOKEN_EXPIRED');
+          }
         }
-        const isPublicPage = /index\.html$|consulta_habitantes\.html$|login\.html$/.test(window.location.pathname) ||
-          window.location.pathname.endsWith('/');
-        if (!isPublicPage) {
-          alert(err.error || 'Su sesión ha expirado. Por favor inicie sesión nuevamente.');
-          window.location.href = 'login.html';
-        }
-        throw new Error(err.code || 'TOKEN_EXPIRED');
       }
+
       return response;
     } catch (error) {
+      // Si ya es un ApiError, propagarlo directamente
+      if (error instanceof ApiError) throw error;
       this._enableMockMode(error);
       throw error;
+    }
+  }
+
+  /**
+   * Procesa una respuesta HTTP y lanza ApiError tipado si no fue exitosa.
+   * Diferencia entre 401, 403, 409 (duplicado), 422 (validación) y 500 (PROBLEMA 6).
+   */
+  async _procesarRespuesta(response) {
+    if (response.ok) return response;
+
+    const cuerpo = await response.json().catch(() => ({}));
+
+    switch (response.status) {
+      case 401:
+        throw new ApiError(cuerpo.error || 'No autenticado', 401, 'NO_AUTENTICADO');
+      case 403:
+        throw new ApiError(cuerpo.error || 'Sin permisos suficientes', 403, 'SIN_PERMISO');
+      case 404:
+        throw new ApiError(cuerpo.error || 'Recurso no encontrado', 404, 'NO_ENCONTRADO');
+      case 409:
+        throw new ApiError(cuerpo.error || 'Registro duplicado', 409, 'DUPLICADO', cuerpo.details || null);
+      case 422:
+        throw new ApiError(cuerpo.error || 'Datos inválidos', 422, 'VALIDACION', cuerpo.details || null);
+      case 500:
+      default:
+        throw new ApiError(cuerpo.error || 'Error interno del servidor', response.status, 'ERROR_SERVIDOR');
     }
   }
 
@@ -880,10 +1040,26 @@ class APIManager {
     return resultado;
   }
 
+  /**
+   * Guarda un paso del censo en el servidor o en la cola offline si no hay red.
+   * Usa mutex isSubmitting para prevenir envíos concurrentes (PROBLEMA 7).
+   */
   async guardarPasoCenso(paso, idEstudio, datos) {
     if (this.isDevelopment) {
       return new Promise(r => setTimeout(() => r({ success: true, id_estudio: idEstudio || Math.floor(Math.random() * 90000000) }), 500));
     }
+
+    // Prevenir envíos concurrentes del mismo paso (PROBLEMA 7)
+    if (this.isSubmitting) {
+      throw new Error('Ya hay un paso de censo en proceso de envío. Por favor espera.');
+    }
+
+    // Prevenir envío mientras se está sincronizando la cola
+    if (this.isSyncing) {
+      throw new Error('El sistema está sincronizando datos offline. Por favor espera un momento.');
+    }
+
+    this.isSubmitting = true;
 
     try {
       const response = await this._fetch(`${this.baseURL}/estudios-demograficos/paso`, {
@@ -892,20 +1068,36 @@ class APIManager {
         body: JSON.stringify({ paso, id_estudio: idEstudio, datos })
       });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || `Error en paso ${paso}`);
+      if (!response.ok) {
+        // El body ya fue leído arriba: lanzar ApiError manualmente sin volver a leer
+        throw new ApiError(
+          data.error || `Error HTTP ${response.status}`,
+          response.status,
+          data.codigo || 'ERROR_SERVIDOR',
+          data.details || null
+        );
+      }
       return data;
     } catch (error) {
-      // Si falla por red, encolamos el paso para sincronizar luego
+      // Si es un ApiError (error del servidor), no encolamos, propagamos
+      if (error instanceof ApiError && error.status !== 0) {
+        throw error;
+      }
+      // Si falla por red (sin conexión), encolar para sincronizar luego
       try {
         this._enqueuePendingPaso(paso, idEstudio, datos);
+        console.info(`[CensoPaso] Sin conexión. Paso ${paso} guardado en cola offline.`);
         return { success: true, id_estudio: idEstudio || Math.floor(Math.random() * 90000000), queued: true };
-      } catch (e) {
+      } catch (queueError) {
         this._enableMockMode(error);
         if (this.isDevelopment) {
           return { success: true, id_estudio: idEstudio || Math.floor(Math.random() * 90000000) };
         }
-        throw error;
+        throw queueError;
       }
+    } finally {
+      // Siempre liberar el mutex, aunque haya error
+      this.isSubmitting = false;
     }
   }
 

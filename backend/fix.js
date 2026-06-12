@@ -1,41 +1,19 @@
+/**
+ * fix.js — Script utilitario de mantenimiento (SICAG backend)
+ * Uso: node fix.js
+ *
+ * Este script era un generador de tests que ya fue ejecutado.
+ * El archivo migration.test.js ya existe en backend/tests/.
+ * Este script no tiene más uso activo — se mantiene como referencia.
+ */
+
 const fs = require('fs');
-const content = const { initSQLite } = require('../config/database');
-const { runMigrations } = require('../migrate');
-const { initModels } = require('../models');
+const path = require('path');
 
-describe('Database Migrations', () => {
-  let sequelize;
+const testPath = path.join(__dirname, 'tests', 'migration.test.js');
 
-  beforeAll(async () => {
-    sequelize = await initSQLite();
-    await initModels(sequelize);
-  });
-
-  afterAll(async () => {
-    await sequelize.close();
-  });
-
-  test('debe ejecutar las migraciones sin errores (idempotente)', async () => {
-    await expect(runMigrations(sequelize)).resolves.not.toThrow();
-    await expect(runMigrations(sequelize)).resolves.not.toThrow();
-  }, 60000);
-
-  test('debe crear todas las 15 tablas esperadas', async () => {
-    const [results] = await sequelize.query(\SELECT name FROM sqlite_master WHERE type='table'\);
-    const tables = results.map(r => r.name);
-    
-    const expectedTables = [
-      'bandeja_validaciones', 'cartelera_digital', 'estudios_demograficos',
-      'habitantes', 'logs_auditoria', 'noticias', 'organizaciones_sociales',
-      'persona_grupo_social', 'produccion_agricola', 'proyectos', 'reportes_7t',
-      'usuarios', 'viviendas', 'votaciones', 'consejos_comunales'
-    ];
-
-    expectedTables.forEach(table => {
-      expect(tables).toContain(table);
-    });
-  });
-});
-;
-fs.writeFileSync('tests/migration.test.js', content);
-
+if (fs.existsSync(testPath)) {
+  console.log('✓ El archivo tests/migration.test.js ya existe. No se requiere ninguna acción.');
+} else {
+  console.warn('⚠ tests/migration.test.js no existe. Ejecuta el generador correspondiente.');
+}

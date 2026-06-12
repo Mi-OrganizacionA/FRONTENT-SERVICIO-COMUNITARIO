@@ -1108,7 +1108,7 @@
     }
   </style>
   <script>
-    if (!localStorage.getItem('token') || !localStorage.getItem('user')) {
+    if (!sessionStorage.getItem('sicag_user')) { // Token en memoria, usuario en sessionStorage
       window.location.replace('login.html');
     }
   </script>
@@ -3235,10 +3235,12 @@
       }
 
       try {
-        const token = localStorage.getItem('token');
+        // Leer token desde memoria (no desde localStorage)
+        const token = window.auth?.getToken();
         const response = await fetch('/api/auth/verify-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          credentials: 'include',
           body: JSON.stringify({ password })
         });
         const result = await response.json();
@@ -3265,10 +3267,12 @@
 
     async function eliminarViviendaReal(id, index) {
       try {
-        const token = localStorage.getItem('token');
+        // Leer token desde memoria (no desde localStorage)
+        const token = window.auth?.getToken();
         const response = await fetch(`/api/viviendas/${id}`, {
           method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { 'Authorization': `Bearer ${token}` },
+          credentials: 'include'
         });
         if (response.ok) {
           viviendas.splice(index, 1);
@@ -3391,7 +3395,7 @@
     document.getElementById('chkFechaAuto').dispatchEvent(new Event('change'));
 
     /* ── Form submit (paso final) ── */
-    document.getElementById('formVivienda').addEventListener('submit', function (e) {
+    document.getElementById('formVivienda').addEventListener('submit', async function (e) {
       e.preventDefault();
       const gv = id => document.getElementById(id)?.value?.trim() || '';
       const v = {
@@ -3570,7 +3574,6 @@
               if (fam1Input.forceSearch) fam1Input.forceSearch();
             });
           }
-        }
         }
       }
 

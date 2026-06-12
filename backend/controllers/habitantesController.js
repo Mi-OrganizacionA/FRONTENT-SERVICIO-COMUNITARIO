@@ -365,6 +365,34 @@ class HabitantesController {
   }
 
   /**
+   * Verificar si una cédula ya está registrada.
+   * Endpoint liviano usado por el frontend para validación en tiempo real (PROBLEMA 4).
+   * No requiere autenticación para poder usarse en el paso inicial del formulario.
+   */
+  static async checkCedula(req, res) {
+    try {
+      const { cedula } = req.params;
+      if (!cedula) return res.status(400).json({ error: 'Cédula requerida' });
+
+      // Limpiar la cédula (solo dígitos)
+      const cedulaLimpia = String(cedula).replace(/\D/g, '');
+      if (cedulaLimpia.length < 7 || cedulaLimpia.length > 8) {
+        return res.status(400).json({ error: 'Formato de cédula inválido (7-8 dígitos)' });
+      }
+
+      const existe = await HabitanteModel.findOne({
+        where: { cedula: cedulaLimpia },
+        attributes: ['id'] // Solo verificar existencia, no retornar datos sensibles
+      });
+
+      res.json({ existe: !!existe });
+    } catch (error) {
+      logger.error('Error verificando cédula:', error);
+      res.status(500).json({ error: 'Error verificando cédula' });
+    }
+  }
+
+  /**
    * Endpoint público para búsqueda de habitantes (información limitada)
    */
   static async getPublico(req, res) {

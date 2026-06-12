@@ -62,9 +62,11 @@ class HabitanteAutocomplete {
       setStatus('loading');
       try {
         const baseURL = window.api?.baseURL || 'https://sicag-api.onrender.com/api';
-        const token = localStorage.getItem('token') || '';
+        // Leer token desde memoria (no desde localStorage)
+        const token = window.auth?.getToken() || '';
         const res = await fetch(`${baseURL}/habitantes/buscar/rapido?q=${encodeURIComponent(cedula)}`, {
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          credentials: 'include'
         });
 
         if (!res.ok) throw new Error('Error al consultar');
