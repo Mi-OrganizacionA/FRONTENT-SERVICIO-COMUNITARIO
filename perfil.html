@@ -218,13 +218,14 @@
           </form>
 
           <!-- Separador -->
-          <hr style="border:none; border-top:1px dashed var(--border); margin: 2rem 0;">
+          <hr id="sepPerdidaCorreo" style="border:none; border-top:1px dashed var(--border); margin: 2rem 0;">
 
           <!-- Pérdida de Correo -->
-          <div class="form-section-header form-section-verde" style="margin-bottom:1.1rem; border:none; padding:0; background:transparent;">
-            <i class="fas fa-envelope"></i> Solicitud de Cambio de Correo
-          </div>
-          <p style="font-size:0.9rem; color:var(--sub); margin-bottom:1rem;">Si perdiste acceso a tu correo electrónico, puedes enviar una solicitud al administrador para que registre uno nuevo.</p>
+          <div id="wrapperPerdidaCorreo">
+            <div class="form-section-header form-section-verde" style="margin-bottom:1.1rem; border:none; padding:0; background:transparent;">
+              <i class="fas fa-envelope"></i> Solicitud de Cambio de Correo
+            </div>
+            <p style="font-size:0.9rem; color:var(--sub); margin-bottom:1rem;">Si perdiste acceso a tu correo electrónico, puedes enviar una solicitud al administrador para que registre uno nuevo.</p>
           
           <form id="formChangeEmailReq">
             <div class="form-group-sicag">
@@ -241,7 +242,7 @@
               </button>
             </div>
           </form>
-
+          </div>
         </div>
       </section>
 
@@ -390,6 +391,12 @@
           // Mostrar sección de Configuración del Portal solo para Admin
           const sectionConfig = document.getElementById('sectionConfigPortal');
           if (sectionConfig) sectionConfig.style.display = 'block';
+          
+          // Ocultar sección de Solicitud de Cambio de Correo
+          const wrapperCorreo = document.getElementById('wrapperPerdidaCorreo');
+          const sepCorreo = document.getElementById('sepPerdidaCorreo');
+          if (wrapperCorreo) wrapperCorreo.style.display = 'none';
+          if (sepCorreo) sepCorreo.style.display = 'none';
         }
       }
 
