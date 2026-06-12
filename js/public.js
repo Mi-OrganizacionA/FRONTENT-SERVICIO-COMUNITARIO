@@ -193,6 +193,27 @@
   let explorerFiltered = [];
 
   /* ── CARGAR DATOS PUBLICOS ── */
+  
+  // ─────────────────────────────────────────
+  // REGISTRO DE PWA Y MODO OFFLINE (PÚBLICO)
+  // ─────────────────────────────────────────
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then(reg => {
+        console.log('[PWA Público] Service Worker registrado:', reg.scope);
+      }).catch(err => {
+        console.warn('[PWA Público] Fallo al registrar:', err);
+      });
+    });
+  }
+  
+  if (!document.querySelector('link[rel="manifest"]')) {
+    const manifestLink = document.createElement('link');
+    manifestLink.rel = 'manifest';
+    manifestLink.href = '/manifest.json';
+    document.head.appendChild(manifestLink);
+  }
+
   async function cargarDatosPublicos() {
     let proyectos = [];
     let noticias = [];

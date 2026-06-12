@@ -1,0 +1,21 @@
+{
+  "name": "Comuna Socialista Simón Rodríguez",
+  "short_name": "SICAG",
+  "description": "Sistema de Información Comunal Agroecológico",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2E7D32",
+  "icons": [
+    {
+      "src": "/assets/img/logo_comuna.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/img/logo_comuna.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

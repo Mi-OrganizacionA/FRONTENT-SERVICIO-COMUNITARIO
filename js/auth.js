@@ -189,7 +189,31 @@ class AuthManager {
   }
 }
 
-window.auth = new AuthManager();
+// Asegurar instancia global
+if (!window.auth) {
+  window.auth = new AuthManager();
+}
+
+// ─────────────────────────────────────────
+// REGISTRO DE PWA Y MODO OFFLINE
+// ─────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      console.log('[PWA] Service Worker registrado correctamente:', reg.scope);
+    }).catch(err => {
+      console.warn('[PWA] Fallo al registrar el Service Worker:', err);
+    });
+  });
+}
+
+// Inyección dinámica del Manifest para "Add to Home Screen"
+if (!document.querySelector('link[rel="manifest"]')) {
+  const manifestLink = document.createElement('link');
+  manifestLink.rel = 'manifest';
+  manifestLink.href = '/manifest.json';
+  document.head.appendChild(manifestLink);
+}
 
 // Middleware de protección visual para las páginas HTML
 function checkAuthMiddleware() {
