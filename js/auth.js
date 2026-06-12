@@ -10,8 +10,8 @@
  */
 class AuthManager {
   constructor() {
-    // El token vive SOLO en memoria: no es accesible desde el DOM ni por XSS
-    this.token = null;
+    // Al usar file:// no podemos depender de cookies, guardamos token en sessionStorage
+    this.token = sessionStorage.getItem('sicag_token') || null;
     // Datos del usuario (sin secretos) se restauran desde sessionStorage al recargar
     this.user = this._parseUser(sessionStorage.getItem('sicag_user'));
     this.observers = [];
@@ -39,8 +39,9 @@ class AuthManager {
 
       const data = await response.json();
 
-      // Guardar token SOLO en memoria (no en localStorage ni sessionStorage)
+      // Guardar token en sessionStorage para que sobreviva la redirección a dashboard.html
       this.token = data.token;
+      sessionStorage.setItem('sicag_token', data.token);
       this.user = data.usuario;
 
       // Los datos del usuario (sin secretos) van a sessionStorage para sobrevivir recargas
@@ -61,6 +62,7 @@ class AuthManager {
   logout(silencioso = false) {
     this.token = null;
     this.user = null;
+    sessionStorage.removeItem('sicag_token');
     sessionStorage.removeItem('sicag_user');
 
     // Señal para que otras pestañas detecten el logout
@@ -97,8 +99,9 @@ class AuthManager {
       }
 
       const data = await response.json();
-      // Guardar nuevo token en memoria solamente
+      // Guardar nuevo token en sessionStorage
       this.token = data.token;
+      sessionStorage.setItem('sicag_token', data.token);
       return data.token;
     } catch (error) {
       console.warn('Error al intentar refresh del token:', error);
@@ -131,8 +134,7 @@ class AuthManager {
   }
 
   getToken() {
-    // El token solo existe en memoria
-    return this.token;
+    return this.token || sessionStorage.getItem('sicag_token');
   }
 
   // ─────────────────────────────────────────
@@ -145,6 +147,7 @@ class AuthManager {
         console.info('[Auth] Sesión cerrada desde otra pestaña, realizando logout local.');
         this.token = null;
         this.user = null;
+        sessionStorage.removeItem('sicag_token');
         sessionStorage.removeItem('sicag_user');
 
         const esPublica = this._esRutaPublica(window.location.pathname);

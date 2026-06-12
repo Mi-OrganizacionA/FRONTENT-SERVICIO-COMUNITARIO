@@ -28,7 +28,7 @@ window.ApiError = ApiError;
 class APIManager {
   constructor() {
     const host = window.location.hostname;
-    this.isLocal = host === 'localhost' || host === '127.0.0.1' || host === '::1';
+    this.isLocal = host === 'localhost' || host === '127.0.0.1' || host === '::1' || window.location.protocol === 'file:';
     this.baseURL = window.API_BASE_URL || (this.isLocal ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api');
     this.mockData = null;
     this.isDevelopment = Boolean(window.API_FORCE_MOCK || false);
