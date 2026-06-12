@@ -129,6 +129,7 @@ async function start() {
       CensoReportesController.setModels(models);
       AuditService.setModel(models.LogAuditoria);
       SystemController.setConfiguracionModel(models.Configuracion);
+      SystemController.setUsuarioModel(models.Usuario);
       SearchController.setModels(models);
 
       await runMigrations(sequelize);

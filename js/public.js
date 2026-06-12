@@ -33,6 +33,26 @@
         }
       });
     });
+
+    // Cargar Configuración del Portal
+    const portalConfig = JSON.parse(localStorage.getItem('sicag_portal_settings') || '{}');
+    if (Object.keys(portalConfig).length > 0) {
+      const setEl = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+      setEl('txtContactDir', portalConfig.direccion);
+      setEl('txtContactTlf', portalConfig.telefono);
+      setEl('txtContactHorario', portalConfig.horario);
+      setEl('txtContactCorreo', portalConfig.correo);
+
+      // Limpiar números para WhatsApp URL
+      const waNumber = (portalConfig.telefono || '').replace(/\D/g, '');
+      const waLink = waNumber ? `https://wa.me/${waNumber}?text=Hola,%20les%20escribo%20desde%20el%20portal%20SICAG` : '#';
+
+      // Actualizar redes (Contacto y Footer)
+      document.querySelectorAll('.pub-btn-whatsapp').forEach(a => a.href = waLink);
+      document.querySelectorAll('.pub-btn-facebook').forEach(a => a.href = portalConfig.facebook || '#');
+      document.querySelectorAll('.pub-btn-instagram').forEach(a => a.href = portalConfig.instagram || '#');
+      document.querySelectorAll('.pub-btn-tiktok').forEach(a => a.href = portalConfig.tiktok || '#');
+    }
   });
 
   /* ── NAV SCROLL ── */
@@ -167,21 +187,41 @@
 
   /* ── CONTACT FORM ── */
   const contactForm = document.getElementById('contactForm');
-  contactForm?.addEventListener('submit', function (e) {
+  contactForm?.addEventListener('submit', async function (e) {
     e.preventDefault();
     const btn = document.getElementById('submitBtn');
+    
+    // Obtener datos
+    const nombre = document.getElementById('cNombre').value;
+    const correo = document.getElementById('cCorreo')?.value || '';
+    const consejoComunal = document.getElementById('cCC').value;
+    const mensaje = document.getElementById('cMensaje').value;
+
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
     btn.disabled = true;
-    setTimeout(() => {
+
+    try {
+      if (window.api && window.api.enviarContacto) {
+        await window.api.enviarContacto({ nombre, correo, consejoComunal, mensaje });
+      } else {
+        // Fallback simulación si API no está cargada
+        await new Promise(r => setTimeout(r, 1500));
+      }
+      
       btn.innerHTML = '<i class="fas fa-check"></i> ¡Mensaje Enviado!';
       btn.style.background = 'var(--vd)';
       contactForm.reset();
+    } catch (err) {
+      console.error(err);
+      btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error al enviar';
+      btn.style.background = 'var(--ru)';
+    } finally {
       setTimeout(() => {
         btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Mensaje';
         btn.style.background = '';
         btn.disabled = false;
       }, 3000);
-    }, 1500);
+    }
   });
 
   /* ── GLOBAL STATE PARA EXPLORADOR ── */

@@ -81,6 +81,40 @@ class EmailService {
       throw new Error('No se pudo enviar el correo.');
     }
   }
+  async sendContactEmail(toEmails, contactData) {
+    if (!this.transporter) {
+      logger.warn('Transporter no disponible, simulando envío en consola.');
+      logger.info(`[SIMULACIÓN CONTACTO] Para: ${toEmails} | De: ${contactData.nombre}`);
+      return;
+    }
+
+    try {
+      const info = await this.transporter.sendMail({
+        from: '"SICAG Portal Público" <no-reply@sicag.com>',
+        to: toEmails.join(', '),
+        subject: `Nuevo Mensaje de Contacto - ${contactData.consejoComunal || 'SICAG'}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+            <h2 style="color: #2E7D32; border-bottom: 2px solid #2E7D32; padding-bottom: 10px;">Nuevo Mensaje Recibido</h2>
+            <p><strong>Nombre:</strong> ${contactData.nombre}</p>
+            <p><strong>Correo:</strong> ${contactData.correo || 'No proporcionado'}</p>
+            <p><strong>Consejo Comunal:</strong> ${contactData.consejoComunal || 'No seleccionado'}</p>
+            <div style="margin-top: 20px; padding: 15px; background-color: #f9f9f9; border-left: 4px solid #4CAF50;">
+              <p style="margin: 0; white-space: pre-wrap;">${contactData.mensaje}</p>
+            </div>
+            <p style="font-size: 12px; color: #777; margin-top: 30px;">
+              Este mensaje fue enviado desde el formulario de contacto del portal público SICAG.
+            </p>
+          </div>
+        `,
+      });
+
+      logger.info(`Correo de contacto enviado. ID: ${info.messageId}`);
+    } catch (error) {
+      logger.error('Error enviando correo de contacto:', error);
+      throw new Error('No se pudo enviar el correo de contacto.');
+    }
+  }
 }
 
 module.exports = new EmailService();

@@ -29,7 +29,7 @@ class AuthManager {
         headers: { 'Content-Type': 'application/json' },
         // credentials: 'include' es necesario para que el navegador envíe/reciba cookies httpOnly
         credentials: 'include',
-        body: JSON.stringify({ email: usuario, password: contraseña })
+        body: JSON.stringify({ identifier: usuario, password: contraseña })
       });
 
       if (!response.ok) {

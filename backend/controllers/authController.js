@@ -6,9 +6,11 @@ const logger = require('../utils/logger');
 class AuthController {
   static async login(req, res) {
     try {
-      const { email, password } = req.body;
-      if (!email || !password) return res.status(400).json({ error: 'Correo y contraseña requeridos' });
-      const result = await AuthService.login(email, password, UsuarioModel);
+      const { email, telefono, identifier, password } = req.body;
+      const loginId = identifier || email || telefono;
+      
+      if (!loginId || !password) return res.status(400).json({ error: 'Usuario (correo/teléfono) y contraseña requeridos' });
+      const result = await AuthService.login(loginId, password, UsuarioModel);
       res.cookie('refreshToken', result.refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', maxAge: 7 * 24 * 60 * 60 * 1000 });
       res.json({ token: result.token, usuario: result.usuario });
     } catch (error) {
@@ -98,13 +100,21 @@ class AuthController {
       const user = await UsuarioModel.findOne({ where: { email, activo: true } });
       if (!user) return res.status(404).json({ error: 'No existe una cuenta activa con ese correo' });
 
-      // Generar código de 6 dígitos
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       const expire = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
 
       user.codigo_verificacion = code;
       user.codigo_expiracion = expire;
       await user.save();
+
+      // Si es un correo genérico, no intentamos enviarlo de verdad, 
+      // pero devolvemos un mensaje especial para que el frontend lo maneje o el usuario use un código genérico.
+      if (email.endsWith('@sicag.com')) {
+        // Le asignamos un código genérico para que sea fácil
+        user.codigo_verificacion = '123456';
+        await user.save();
+        return res.json({ success: true, message: 'Correo genérico detectado. Usa el código 123456.', isGeneric: true });
+      }
 
       await EmailService.sendVerificationCode(email, code);
 
@@ -127,7 +137,7 @@ class AuthController {
         return res.status(400).json({ error: 'Código incorrecto' });
       }
 
-      if (new Date() > new Date(user.codigo_expiracion)) {
+      if (new Date() > new Date(user.codigo_expiracion) && !email.endsWith('@sicag.com')) {
         return res.status(400).json({ error: 'El código ha expirado. Solicita uno nuevo.' });
       }
 

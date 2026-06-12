@@ -15,16 +15,25 @@ class AuthService {
   static hashPassword(password) { return bcrypt.hashSync(password, 10); }
   static validatePassword(password, hash) { return bcrypt.compareSync(password, hash); }
 
-  static async login(email, password, userModel) {
-    const user = await userModel.findOne({ where: { email, activo: true } });
-    if (!user) throw new Error('Correo o contraseña incorrectos');
+  static async login(identifier, password, userModel) {
+    const { Op } = require('sequelize');
+    const user = await userModel.findOne({ 
+      where: { 
+        [Op.or]: [
+          { email: identifier },
+          { telefono: identifier }
+        ],
+        activo: true 
+      } 
+    });
+    if (!user) throw new Error('Credenciales incorrectas');
     const isValid = this.validatePassword(password, user.credenciales);
-    if (!isValid) throw new Error('Correo o contraseña incorrectos');
+    if (!isValid) throw new Error('Credenciales incorrectas');
     const token = this.generateToken(user);
     const refreshToken = this.generateRefreshToken(user);
     await user.update({ ultimo_login: new Date() });
-    logger.info(`✅ Login exitoso: ${email}`);
-    return { token, refreshToken, usuario: { id: user.id, email: user.email, nombre: user.nombre, rol: user.rol, id_comunidad_asignada: user.id_comunidad_asignada } };
+    logger.info(`✅ Login exitoso: ${identifier}`);
+    return { token, refreshToken, usuario: { id: user.id, email: user.email, telefono: user.telefono, nombre: user.nombre, rol: user.rol, id_comunidad_asignada: user.id_comunidad_asignada } };
   }
 
   static async refreshToken(refreshToken, userModel) {

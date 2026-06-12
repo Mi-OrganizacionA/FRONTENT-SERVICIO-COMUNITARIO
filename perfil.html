@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -217,6 +217,92 @@
             </div>
           </form>
 
+          <!-- Separador -->
+          <hr style="border:none; border-top:1px dashed var(--border); margin: 2rem 0;">
+
+          <!-- Pérdida de Correo -->
+          <div class="form-section-header form-section-verde" style="margin-bottom:1.1rem; border:none; padding:0; background:transparent;">
+            <i class="fas fa-envelope"></i> Solicitud de Cambio de Correo
+          </div>
+          <p style="font-size:0.9rem; color:var(--sub); margin-bottom:1rem;">Si perdiste acceso a tu correo electrónico, puedes enviar una solicitud al administrador para que registre uno nuevo.</p>
+          
+          <form id="formChangeEmailReq">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag">Nuevo Correo Electrónico <span style="color:var(--ru);">*</span></label>
+              <input type="email" id="reqNewEmail" class="form-control-sicag" placeholder="tucorreo@ejemplo.com" required>
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag">Motivo de la Solicitud <span style="color:var(--ru);">*</span></label>
+              <textarea id="reqEmailReason" class="form-control-sicag" rows="2" placeholder="Ej. Olvidé la contraseña de mi correo anterior" required></textarea>
+            </div>
+            <div style="text-align:right;">
+              <button class="btn-sicag btn-outline-verde" type="submit" id="btnReqEmail">
+                <i class="fas fa-paper-plane"></i> Enviar Solicitud al Admin
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </section>
+
+      <!-- Configuración del Portal Público (Solo Admin) -->
+      <section class="card-sicag" id="sectionConfigPortal" style="display:none; grid-column: 1 / -1; align-self: start;">
+        <div class="card-header-sicag">
+          <span><i class="fas fa-globe"></i> Configuración del Portal Público</span>
+        </div>
+        <div class="card-body-sicag">
+          <p style="font-size:0.9rem; color:var(--sub); margin-bottom:1.5rem;">Actualiza la información de contacto y enlaces de redes sociales que se muestran a la comunidad en el portal público.</p>
+
+          <form id="formConfigPortal">
+            <!-- Contacto Físico -->
+            <div class="form-section-header form-section-verde" style="margin-bottom:1rem; border:none; padding:0; background:transparent;">
+              <i class="fas fa-map-marker-alt"></i> Información de Contacto
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div class="form-group-sicag" style="grid-column: 1 / -1;">
+                <label class="form-label-sicag">Dirección Física de la Sala de Autogobierno</label>
+                <input type="text" id="cpDireccion" class="form-control-sicag" placeholder="Ej. Sector Las Mercedes, San Felipe">
+              </div>
+              <div class="form-group-sicag">
+                <label class="form-label-sicag">Teléfono / WhatsApp</label>
+                <input type="text" id="cpTelefono" class="form-control-sicag" placeholder="+58 414 000 0000">
+              </div>
+              <div class="form-group-sicag">
+                <label class="form-label-sicag">Horario de Atención</label>
+                <input type="text" id="cpHorario" class="form-control-sicag" placeholder="Lunes a Viernes: 8:00 AM - 4:00 PM">
+              </div>
+              <div class="form-group-sicag" style="grid-column: 1 / -1;">
+                <label class="form-label-sicag">Correo Público</label>
+                <input type="email" id="cpCorreo" class="form-control-sicag" placeholder="contacto@comunasimonrodriguez.gob.ve">
+              </div>
+            </div>
+
+            <!-- Redes Sociales -->
+            <div class="form-section-header form-section-verde" style="margin-top:1.5rem; margin-bottom:1rem; border:none; padding:0; background:transparent;">
+              <i class="fas fa-share-alt"></i> Redes Sociales (Enlaces)
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+              <div class="form-group-sicag">
+                <label class="form-label-sicag"><i class="fab fa-facebook" style="color:#1877F2;"></i> Facebook</label>
+                <input type="url" id="cpFacebook" class="form-control-sicag" placeholder="https://facebook.com/comuna">
+              </div>
+              <div class="form-group-sicag">
+                <label class="form-label-sicag"><i class="fab fa-instagram" style="color:#E4405F;"></i> Instagram</label>
+                <input type="url" id="cpInstagram" class="form-control-sicag" placeholder="https://instagram.com/comuna">
+              </div>
+              <div class="form-group-sicag">
+                <label class="form-label-sicag"><i class="fab fa-tiktok" style="color:#000;"></i> TikTok</label>
+                <input type="url" id="cpTiktok" class="form-control-sicag" placeholder="https://tiktok.com/@comuna">
+              </div>
+            </div>
+
+            <div style="text-align:right; border-top:1px solid var(--border); padding-top:1.5rem;">
+              <button class="btn-sicag btn-primary" type="submit" id="btnSaveConfigPortal">
+                <i class="fas fa-save"></i> Guardar Cambios Públicos
+              </button>
+            </div>
+          </form>
+
         </div>
       </section>
 
@@ -301,6 +387,9 @@
           }
         } else {
           document.getElementById('profileRole').textContent = 'Administrador General';
+          // Mostrar sección de Configuración del Portal solo para Admin
+          const sectionConfig = document.getElementById('sectionConfigPortal');
+          if (sectionConfig) sectionConfig.style.display = 'block';
         }
       }
 
@@ -434,6 +523,84 @@
           btn.disabled = false;
         }
       });
+
+      // Lógica de Solicitud de Cambio de Correo
+      const formEmailReq = document.getElementById('formChangeEmailReq');
+      if (formEmailReq) {
+        formEmailReq.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById('btnReqEmail');
+          const nuevoCorreo = document.getElementById('reqNewEmail').value;
+          const motivo = document.getElementById('reqEmailReason').value;
+
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+          btn.disabled = true;
+
+          try {
+            if (window.api && window.api.crearNotificacion) {
+              await window.api.crearNotificacion({
+                tipo: 'cambio_correo',
+                titulo: `Solicitud de Cambio de Correo: ${user.nombre}`,
+                mensaje: `El usuario solicita cambiar su correo a ${nuevoCorreo}. Motivo: ${motivo}`,
+                status: 'pendiente',
+                vocero: user.nombre,
+                consejoComunal: user.consejoComunal || 'S/C',
+                datosHabitante: { nuevoCorreo, motivo, userId: user.id } // Guardamos info extra
+              });
+            } else {
+              // Fallback
+              await new Promise(r => setTimeout(r, 1000));
+            }
+            Components.showToast('Solicitud enviada al administrador exitosamente.', 'success');
+            formEmailReq.reset();
+          } catch (error) {
+            Components.showToast('Error al enviar la solicitud.', 'error');
+          } finally {
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Solicitud al Admin';
+            btn.disabled = false;
+          }
+        });
+      }
+
+      // Lógica de Configuración del Portal (Admin)
+      const formConfig = document.getElementById('formConfigPortal');
+      if (formConfig) {
+        // Cargar configuración actual
+        const portalConfig = JSON.parse(localStorage.getItem('sicag_portal_settings') || '{}');
+        document.getElementById('cpDireccion').value = portalConfig.direccion || 'Sector Las Mercedes, San Felipe, Yaracuy, Venezuela';
+        document.getElementById('cpTelefono').value = portalConfig.telefono || '+58 424 000 0000';
+        document.getElementById('cpHorario').value = portalConfig.horario || 'Lunes a Viernes: 8:00 AM – 4:00 PM';
+        document.getElementById('cpCorreo').value = portalConfig.correo || 'sicag@comunasimonrodriguez.gob.ve';
+        document.getElementById('cpFacebook').value = portalConfig.facebook || '#';
+        document.getElementById('cpInstagram').value = portalConfig.instagram || '#';
+        document.getElementById('cpTiktok').value = portalConfig.tiktok || '#';
+
+        formConfig.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const btnSaveConfig = document.getElementById('btnSaveConfigPortal');
+          btnSaveConfig.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+          btnSaveConfig.disabled = true;
+
+          const newConfig = {
+            direccion: document.getElementById('cpDireccion').value,
+            telefono: document.getElementById('cpTelefono').value,
+            horario: document.getElementById('cpHorario').value,
+            correo: document.getElementById('cpCorreo').value,
+            facebook: document.getElementById('cpFacebook').value,
+            instagram: document.getElementById('cpInstagram').value,
+            tiktok: document.getElementById('cpTiktok').value
+          };
+
+          // Simular tiempo de guardado en API para UX
+          setTimeout(() => {
+            localStorage.setItem('sicag_portal_settings', JSON.stringify(newConfig));
+            Components.showToast('Configuración pública guardada exitosamente.', 'success');
+            btnSaveConfig.innerHTML = '<i class="fas fa-save"></i> Guardar Cambios Públicos';
+            btnSaveConfig.disabled = false;
+          }, 800);
+        });
+      }
+
     });
   </script>
 </body>

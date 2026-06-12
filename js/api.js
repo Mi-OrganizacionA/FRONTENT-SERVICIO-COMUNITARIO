@@ -1125,6 +1125,24 @@ class APIManager {
     }
     return resultado;
   }
+
+  // --- CONTACTO ---
+  async enviarContacto(datos) {
+    if (this.isDevelopment) {
+      return new Promise(resolve => setTimeout(() => resolve({ success: true }), 1000));
+    }
+    const response = await this._fetch(`${this.baseURL}/system/contacto`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    });
+    
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || 'Error al enviar el mensaje');
+    }
+    return await response.json();
+  }
 }
 
 // Instancia global

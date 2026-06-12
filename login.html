@@ -913,10 +913,10 @@
 
           <!-- Usuario -->
           <div class="lg-group">
-            <label class="lg-label" for="loginUser">Cédula o Usuario</label>
+            <label class="lg-label" for="loginUser">Correo o Teléfono</label>
             <div class="lg-input-wrap">
               <i class="fas fa-id-card icon-l"></i>
-              <input class="lg-input" type="text" id="loginUser" placeholder="Ej: V-12.345.678" autocomplete="username"
+              <input class="lg-input" type="text" id="loginUser" placeholder="Ej: admin@sicag.com / 04120000000" autocomplete="username"
                 aria-required="true" required>
             </div>
           </div>
@@ -958,33 +958,81 @@
 
   </div>
 
-  <!-- Modal Recuperar Contraseña -->
+  <!-- Modal Recuperar Contraseña Inteligente -->
   <div id="recoveryModal" class="modal">
-    <div class="modal-content" style="max-width: 400px;">
+    <div class="modal-content" style="max-width: 450px;">
       <span class="close" id="closeRecovery">&times;</span>
-      <h2>Recuperar Contraseña</h2>
       
+      <!-- Indicador de Progreso -->
+      <div style="display:flex; justify-content:space-between; margin-bottom: 2rem; position:relative;">
+        <div style="position:absolute; top:50%; left:0; right:0; height:2px; background:var(--border); z-index:0; transform:translateY(-50%);"></div>
+        <div class="wiz-step active" id="wiz1">1</div>
+        <div class="wiz-step" id="wiz2">2</div>
+        <div class="wiz-step" id="wiz3">3</div>
+        <div class="wiz-step" id="wiz4">4</div>
+      </div>
+      
+      <style>
+        .wiz-step { width:30px; height:30px; border-radius:50%; background:var(--bg); border:2px solid var(--border); color:var(--sub); display:flex; align-items:center; justify-content:center; font-weight:bold; z-index:1; position:relative; transition:all 0.3s ease; }
+        .wiz-step.active { background:var(--vp); border-color:var(--vp); color:#fff; box-shadow:0 0 10px rgba(46,125,50,0.5); }
+        .pw-strength-bar { height: 5px; border-radius: 5px; background: #eee; margin-top: 5px; overflow: hidden; }
+        .pw-strength-fill { height: 100%; width: 0%; transition: all 0.3s; }
+      </style>
+
+      <h2 id="wizTitle" style="text-align:center; color:var(--vp); margin-bottom:1rem;">Identificación</h2>
+      
+      <!-- Paso 1: Correo -->
       <div id="stepEmail">
-        <p>Ingresa tu correo electrónico para recibir un código de verificación.</p>
+        <p style="text-align:center; color:var(--sub); margin-bottom:1.5rem; font-size:0.9rem;">Ingresa tu correo electrónico asociado a la cuenta.</p>
         <div class="form-group">
           <label>Correo Electrónico</label>
-          <input type="email" id="recoveryEmail" required>
+          <input type="email" id="recoveryEmail" class="lg-input" placeholder="ejemplo@correo.com" required>
         </div>
-        <button class="btn btn-primary" id="btnRequestCode" style="width: 100%;">Enviar Código</button>
+        <button class="btn-sicag btn-primary" id="btnRequestCode" style="width: 100%; margin-top:1rem;">
+          <i class="fas fa-paper-plane"></i> Enviar Código
+        </button>
       </div>
 
+      <!-- Paso 2: Código -->
       <div id="stepCode" style="display: none;">
-        <p>Ingresa el código que enviamos a tu correo y tu nueva contraseña.</p>
+        <p style="text-align:center; color:var(--sub); margin-bottom:1.5rem; font-size:0.9rem;" id="codeDescText">Ingresa el código de 6 dígitos enviado a tu correo.</p>
         <div class="form-group">
-          <label>Código de Verificación (6 dígitos)</label>
-          <input type="text" id="recoveryCode" required maxlength="6" style="text-align: center; letter-spacing: 5px; font-weight: bold; font-size: 1.2rem;">
+          <label>Código de Verificación</label>
+          <input type="text" id="recoveryCode" class="lg-input" required maxlength="6" style="text-align: center; letter-spacing: 10px; font-weight: bold; font-size: 1.5rem;">
         </div>
+        <button class="btn-sicag btn-primary" id="btnVerifyCode" style="width: 100%; margin-top:1rem;">
+          <i class="fas fa-check-circle"></i> Verificar Código
+        </button>
+      </div>
+
+      <!-- Paso 3: Nueva Contraseña -->
+      <div id="stepPassword" style="display: none;">
+        <p style="text-align:center; color:var(--sub); margin-bottom:1.5rem; font-size:0.9rem;">Crea una nueva contraseña segura.</p>
         <div class="form-group">
           <label>Nueva Contraseña</label>
-          <input type="password" id="recoveryNewPassword" required>
+          <input type="password" id="recoveryNewPassword" class="lg-input" placeholder="Mínimo 8 caracteres" required>
+          <div class="pw-strength-bar"><div id="pwFill" class="pw-strength-fill"></div></div>
+          <small id="pwHint" style="font-size:0.75rem; color:var(--sub); display:block; margin-top:5px;">Nivel de seguridad</small>
         </div>
-        <button class="btn btn-primary" id="btnResetPassword" style="width: 100%;">Cambiar Contraseña</button>
+        <div class="form-group" style="margin-top:1rem;">
+          <label>Confirmar Contraseña</label>
+          <input type="password" id="recoveryConfirmPassword" class="lg-input" placeholder="Repite la contraseña" required>
+        </div>
+        <button class="btn-sicag btn-primary" id="btnResetPassword" style="width: 100%; margin-top:1rem;">
+          <i class="fas fa-key"></i> Guardar Nueva Contraseña
+        </button>
       </div>
+
+      <!-- Paso 4: Éxito -->
+      <div id="stepSuccess" style="display: none; text-align:center;">
+        <i class="fas fa-check-circle" style="font-size: 4rem; color: var(--vp); margin-bottom:1rem;"></i>
+        <h3 style="color:var(--txt);">¡Contraseña Recuperada!</h3>
+        <p style="color:var(--sub); margin-top:1rem; font-size:0.9rem;">Tu contraseña ha sido actualizada con éxito. Ya puedes iniciar sesión con tus nuevas credenciales.</p>
+        <button class="btn-sicag btn-primary" id="btnFinishRecovery" style="width: 100%; margin-top:2rem;">
+          Iniciar Sesión
+        </button>
+      </div>
+
     </div>
   </div>
 

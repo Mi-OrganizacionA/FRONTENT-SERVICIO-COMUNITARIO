@@ -13,6 +13,9 @@ class SystemController {
   static setConfiguracionModel(model) {
     ConfiguracionModel = model;
   }
+  static setUsuarioModel(model) {
+    this.UsuarioModel = model;
+  }
 
   static async getConfig(req, res) {
     try {
@@ -94,6 +97,43 @@ class SystemController {
     } catch (error) {
       logger.error('Error downloading backup:', error);
       res.status(500).send('Error interno del servidor al generar el respaldo.');
+    }
+  }
+
+  static async enviarContacto(req, res) {
+    try {
+      const { nombre, correo, consejoComunal, mensaje } = req.body;
+      if (!nombre || !mensaje) {
+        return res.status(400).json({ error: 'Nombre y mensaje son requeridos' });
+      }
+
+      // Buscar todos los administradores y voceros con correos válidos
+      const { Op } = require('sequelize');
+      const usuarios = await SystemController.UsuarioModel.findAll({
+        where: {
+          rol: { [Op.in]: ['admin', 'vocero'] },
+          activo: true
+        },
+        attributes: ['email']
+      });
+
+      // Filtrar correos genéricos o nulos
+      const destinatarios = usuarios
+        .map(u => u.email)
+        .filter(email => email && !email.endsWith('@sicag.com'));
+
+      if (destinatarios.length === 0) {
+        // Fallback al administrador principal si nadie tiene correo
+        destinatarios.push('sala_autogobierno@gmail.com');
+      }
+
+      const EmailService = require('../services/emailService');
+      await EmailService.sendContactEmail(destinatarios, { nombre, correo, consejoComunal, mensaje });
+
+      res.json({ success: true, message: 'Mensaje enviado correctamente' });
+    } catch (error) {
+      logger.error('Error enviando contacto:', error);
+      res.status(500).json({ error: 'Error al enviar el mensaje de contacto' });
     }
   }
 }
