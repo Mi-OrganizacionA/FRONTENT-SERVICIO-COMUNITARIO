@@ -4,7 +4,17 @@
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "backend/**",
+      "**/*.bat",
+      "**/*.sqlite",
+      "database.sqlite",
+      "package.json",
+      "package-lock.json",
+      "check_html_js.js",
+      "temp_doc.txt",
+      "README.md",
+      "GEMINI.md"
     ]
   }
 }
