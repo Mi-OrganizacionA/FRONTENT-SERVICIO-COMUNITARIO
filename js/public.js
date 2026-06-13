@@ -260,41 +260,37 @@
     let stats = null;
 
     try {
-      // Soporte para API inyectada (Electron) o fetch REST backend
-      if (window.api && window.api.getProyectosPublicos) {
-        proyectos = await window.api.getProyectosPublicos().catch(e => {
-            console.warn('Proyectos requiere auth o falló:', e.message);
-            return [];
-        });
-        if (window.api.getNoticias) {
-            noticias = await window.api.getNoticias().catch(e => {
-                console.error('Error fetching noticias:', e.message);
-                return [];
-            });
-        }
-        if (window.api.getDashboardStats) {
-            stats = await window.api.getDashboardStats().catch(e => {
-                console.warn('Stats requiere auth o falló:', e.message);
-                return null;
-            });
-        }
-        if (!stats) {
-            const baseApi = window.api.baseURL || 'https://sicag-api.onrender.com/api';
-            const resS = await fetch(`${baseApi}/system/public-stats`).catch(()=>null);
-            if (resS && resS.ok) stats = await resS.json();
-        }
-      } else {
-        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
-        const baseApi = window.api ? window.api.baseURL : (isLocal ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api');
-        const resP = await fetch(`${baseApi}/proyectos/publico`).catch(()=>null);
-        if (resP && resP.ok) proyectos = await resP.json();
-        
-        const resN = await fetch(`${baseApi}/cartelera/publico/activas`).catch(()=>null);
-        if (resN && resN.ok) noticias = await resN.json();
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
+      const baseApi = window.api ? window.api.baseURL : (isLocal ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api');
 
-        const resS = await fetch(`${baseApi}/system/public-stats`).catch(()=>null);
-        if (resS && resS.ok) stats = await resS.json();
+      // 1. Proyectos públicos
+      try {
+        if (window.api && window.api.getProyectosPublicos) {
+          proyectos = await window.api.getProyectosPublicos();
+        } else {
+          const resP = await fetch(`${baseApi}/proyectos/publico`);
+          if (resP.ok) proyectos = await resP.json();
+        }
+      } catch (e) {
+        console.warn('Error cargando proyectos públicos:', e.message);
       }
+
+      // 2. Noticias públicas (Cartelera)
+      try {
+        const resN = await fetch(`${baseApi}/cartelera/publico/activas`);
+        if (resN.ok) noticias = await resN.json();
+      } catch (e) {
+        console.warn('Error cargando noticias públicas:', e.message);
+      }
+
+      // 3. Stats públicas
+      try {
+        const resS = await fetch(`${baseApi}/system/public-stats`);
+        if (resS.ok) stats = await resS.json();
+      } catch (e) {
+        console.warn('Error cargando stats públicas:', e.message);
+      }
+
       
       todasLasNoticias = noticias;
       todosLosProyectos = proyectos;
