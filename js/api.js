@@ -654,7 +654,9 @@ class APIManager {
 
   async getNotificaciones() {
     if (!this.isDevelopment) {
-      const response = await this._fetch(`${this.baseURL}/validaciones/pendientes`, this._getHeaders());
+      const user = window.auth ? window.auth.getUser() : null;
+      const endpoint = (user && user.rol === 'vocero') ? '/validaciones/mis-solicitudes' : '/validaciones/pendientes';
+      const response = await this._fetch(`${this.baseURL}${endpoint}`, this._getHeaders());
       if (!response.ok) throw new Error('Error al obtener notificaciones');
       return response.json();
     }

@@ -35,6 +35,7 @@
       items: [
         { href: 'ayuda.html', icon: 'circle-question', label: 'Centro de Ayuda' },
         { href: 'index.html', icon: 'globe', label: 'Portal Público', target: '_blank' },
+        { href: 'perfil.html',  icon: 'user-circle',          label: 'Mi Perfil' },
         { href: 'login.html', icon: 'right-from-bracket', label: 'Cerrar Sesión', style: 'color:rgba(255,100,100,.85);' }
       ]
     }
