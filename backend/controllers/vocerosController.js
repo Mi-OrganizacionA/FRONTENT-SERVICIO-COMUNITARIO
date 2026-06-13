@@ -95,6 +95,14 @@ module.exports = {
     try {
       const data = await Usuario.findByPk(req.params.id);
       if (!data || data.rol !== 'vocero') return res.status(404).json({ error: 'Vocero no encontrado' });
+      
+      // Eliminar registros dependientes en bandeja_validaciones y log_auditoria
+      const Bandeja = Usuario.sequelize.models.BandejaValidacion;
+      const Log = Usuario.sequelize.models.LogAuditoria;
+      
+      if (Bandeja) await Bandeja.destroy({ where: { id_vocero: req.params.id } });
+      if (Log) await Log.destroy({ where: { id_usuario: req.params.id } });
+      
       await data.destroy();
       res.json({ success: true });
     } catch (error) { next(error); }
