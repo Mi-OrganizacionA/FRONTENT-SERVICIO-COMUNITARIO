@@ -13,7 +13,7 @@
  */
 
 // ── VERSIONES DE CACHÉ ──────────────────────────────────────────────────────
-const CORE_CACHE   = 'sicag-core-v3';
+const CORE_CACHE   = 'sicag-core-v3.1';
 const CDN_CACHE    = 'sicag-cdn-v3';
 const API_CACHE    = 'sicag-api-v3';
 const TODOS_LOS_CACHES = [CORE_CACHE, CDN_CACHE, API_CACHE];
@@ -90,7 +90,6 @@ const PRECACHE_CORE = [
   '/data/seed.json',
 
   // ── Imágenes (todas) ──
-  '/assets/img/logo_comuna.png',
   '/assets/img/logo_comuna_fondoremovido.png',
   '/assets/img/hero_banner.png',
   '/assets/img/proyecto_cacao.png',

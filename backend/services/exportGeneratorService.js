@@ -65,7 +65,7 @@ class ExportGeneratorService {
         // Agregar el Logo
         const fs = require('fs');
         const path = require('path');
-        const logoPath = path.join(__dirname, '../../assets/img/logo_comuna.png');
+        const logoPath = path.join(__dirname, '../../assets/img/logo_comuna_fondoremovido.png');
         
         if (fs.existsSync(logoPath)) {
           // Posicionar arriba a la izquierda
