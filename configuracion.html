@@ -377,21 +377,49 @@
   <script>
     // Lógica para Switches de Configuración
     document.addEventListener('DOMContentLoaded', () => {
-      // Cargar estado inicial de Aprobación Global
-      const isAutoGlobal = localStorage.getItem('sicag_auto_global') === 'true';
-      const autoGlobalCheckbox = document.getElementById('toggleAutoGlobal');
-      if (autoGlobalCheckbox) {
-        autoGlobalCheckbox.checked = isAutoGlobal;
-      }
+      // Mapeo de IDs de checkbox a claves de localStorage
+      const configs = {
+        'toggleCenso': 'sicag_auto_viviendas', // o sicag_censo_abierto
+        'toggleAutoGlobal': 'sicag_auto_global',
+        'toggleAutoHabitantes': 'sicag_auto_habitantes',
+        'toggleAutoNoticias': 'sicag_auto_noticias',
+        'toggleAutoProyectos': 'sicag_auto_proyectos',
+        'toggleAutoOrganizaciones': 'sicag_auto_organizaciones',
+        'toggleAutoReportes': 'sicag_auto_reportes'
+      };
+
+      // Cargar estados
+      Object.keys(configs).forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox) {
+          const val = localStorage.getItem(configs[id]);
+          // Por defecto false, a menos que sea explicitly 'true'
+          checkbox.checked = val === 'true';
+        }
+      });
     });
 
     function toggleSetting(nombre, activado, esGlobal = false) {
+      // Mapear nombre a la clave
+      const nombreMap = {
+        'Censo': 'sicag_auto_viviendas',
+        'Aprobación Automática Global': 'sicag_auto_global',
+        'Aprobación Automática Habitantes': 'sicag_auto_habitantes',
+        'Aprobación Automática Noticias': 'sicag_auto_noticias',
+        'Aprobación Automática Proyectos': 'sicag_auto_proyectos',
+        'Aprobación Automática Organizaciones': 'sicag_auto_organizaciones',
+        'Aprobación Automática Reportes': 'sicag_auto_reportes'
+      };
+      
+      const clave = nombreMap[nombre];
+      
       if (esGlobal) {
         if (activado) {
           Components.confirmDialog(
             '⚠️ ADVERTENCIA: Estás a punto de activar la Aprobación Automática Global. Todas las peticiones de los voceros se guardarán directamente en la base de datos sin requerir validación. ¿Deseas continuar?',
-            () => {
-              localStorage.setItem('sicag_auto_global', 'true');
+            async () => {
+              localStorage.setItem(clave, 'true');
+              await syncConfigWithBackend(clave, 'true');
               Components.showToast('Aprobación Automática Global ACTIVADA.', 'warning');
             },
             () => {
@@ -400,12 +428,30 @@
             }
           );
         } else {
-          localStorage.setItem('sicag_auto_global', 'false');
+          localStorage.setItem(clave, 'false');
+          syncConfigWithBackend(clave, 'false');
           Components.showToast('Aprobación Automática Global DESACTIVADA.', 'success');
         }
       } else {
         const estado = activado ? 'ACTIVADA' : 'DESACTIVADA';
+        localStorage.setItem(clave, activado ? 'true' : 'false');
+        syncConfigWithBackend(clave, activado ? 'true' : 'false');
         Components.showToast(`Política de ${nombre}: ${estado}`, activado ? 'success' : 'info');
+      }
+    }
+
+    async function syncConfigWithBackend(clave, valor) {
+      if (window.api && !window.api.isDevelopment) {
+        try {
+           const response = await fetch(`${window.api.baseURL}/system/config`, {
+             method: 'POST',
+             ...window.api._getHeaders(),
+             body: JSON.stringify({ clave, valor })
+           });
+           // Ignoramos el error si no existe la ruta en el backend por ahora
+        } catch(e) {
+           console.warn('Backend endpoint no listo', e);
+        }
       }
     }
   </script>

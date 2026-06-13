@@ -21,24 +21,23 @@
    * Formato: V-00.000.000
    */
   function aplicarMascaraCedula(input) {
-    input.setAttribute('maxlength', '12');
+    input.setAttribute('maxlength', '13'); // V-123.456.789 = 13 caracteres max
     input.setAttribute('placeholder', input.placeholder || 'V-12.345.678');
     input.setAttribute('autocomplete', 'off');
     input.setAttribute('inputmode', 'text');
 
     input.addEventListener('input', function () {
       let v = this.value.toUpperCase().replace(/[^VEve0-9]/g, '');
-      // Permitir prefijo V o E
       let prefix = '';
       let nums = '';
       if (v.startsWith('V') || v.startsWith('E')) {
         prefix = v[0] + '-';
-        nums = v.slice(1).replace(/\D/g, '');
+        nums = v.slice(1).replace(/\D/g, '').slice(0, 9); // Max 9 digitos
       } else {
-        // Asumir venezolano si solo escribe números
         prefix = 'V-';
-        nums = v.replace(/\D/g, '');
+        nums = v.replace(/\D/g, '').slice(0, 9);
       }
+      
       // Agregar puntos: 0.000.000
       if (nums.length > 3 && nums.length <= 6) {
         nums = nums.slice(0, nums.length - 3) + '.' + nums.slice(nums.length - 3);
@@ -47,16 +46,36 @@
                nums.slice(nums.length - 6, nums.length - 3) + '.' +
                nums.slice(nums.length - 3);
       }
-      const valorFinal = prefix + nums;
+      
+      const valorFinal = nums.length > 0 ? prefix + nums : prefix;
       if (this.value !== valorFinal) this.value = valorFinal;
     });
 
-    // Bloquear teclas no permitidas (solo letras V/E, números y guión)
     input.addEventListener('keydown', function (e) {
       const permitidos = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
       if (permitidos.includes(e.key)) return;
       if (/^[VvEe0-9]$/.test(e.key)) return;
       e.preventDefault();
+    });
+
+    input.addEventListener('blur', function () {
+      const nums = this.value.replace(/\D/g, '');
+      if (nums.length > 0 && (nums.length < 7 || nums.length > 9)) {
+        this.style.borderColor = 'var(--ru)';
+        if (!this.nextElementSibling || !this.nextElementSibling.classList.contains('error-cedula')) {
+          const err = document.createElement('small');
+          err.className = 'error-cedula';
+          err.style.color = 'var(--ru)';
+          err.style.display = 'block';
+          err.textContent = 'La cédula debe tener entre 7 y 9 dígitos.';
+          this.parentNode.insertBefore(err, this.nextSibling);
+        }
+      } else {
+        this.style.borderColor = '';
+        if (this.nextElementSibling && this.nextElementSibling.classList.contains('error-cedula')) {
+          this.nextElementSibling.remove();
+        }
+      }
     });
   }
 
@@ -66,6 +85,8 @@
    * Bloquea: números, caracteres especiales
    */
   function aplicarMascaraNombres(input) {
+    input.setAttribute('maxlength', '40');
+    
     input.addEventListener('keydown', function (e) {
       const permitidos = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight',
                           'Home', 'End', 'Enter', ' '];
@@ -76,9 +97,17 @@
     });
 
     input.addEventListener('input', function () {
-      // Eliminar cualquier número que se haya pegado
-      const nuevo = this.value.replace(/[0-9]/g, '');
+      // Eliminar cualquier número o símbolo que se haya pegado
+      const nuevo = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚäëïöüÄËÏÖÜñÑüÜ''\-\s]/g, '');
       if (this.value !== nuevo) this.value = nuevo;
+    });
+
+    input.addEventListener('blur', function () {
+      let val = this.value.replace(/\s+/g, ' ').trim();
+      val = val.split(' ').map(palabra => {
+        return palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase();
+      }).join(' ');
+      if (this.value !== val) this.value = val;
     });
   }
 
@@ -88,19 +117,65 @@
    */
   function aplicarMascaraTelefono(input) {
     input.setAttribute('inputmode', 'tel');
-    input.setAttribute('maxlength', '18');
+    input.setAttribute('maxlength', '15'); // (0412) 123-4567 = 15 chars
+    input.setAttribute('placeholder', '(0412) 123-4567');
 
     input.addEventListener('keydown', function (e) {
-      const permitidos = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight',
-                          'Home', 'End'];
+      const permitidos = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
       if (permitidos.includes(e.key)) return;
-      if (/^[0-9\+\-\s\(\)]$/.test(e.key)) return;
+      if (/^[0-9]$/.test(e.key)) return;
       e.preventDefault();
     });
 
     input.addEventListener('input', function () {
-      const nuevo = this.value.replace(/[^0-9\+\-\s\(\)]/g, '');
-      if (this.value !== nuevo) this.value = nuevo;
+      let nums = this.value.replace(/\D/g, '').slice(0, 11);
+      
+      let formatted = '';
+      if (nums.length > 0) {
+        formatted += '(' + nums.substring(0, 4);
+      }
+      if (nums.length >= 5) {
+        formatted += ') ' + nums.substring(4, 7);
+      }
+      if (nums.length >= 8) {
+        formatted += '-' + nums.substring(7, 11);
+      }
+      
+      if (this.value !== formatted) this.value = formatted;
+    });
+
+    input.addEventListener('blur', function () {
+      const nums = this.value.replace(/\D/g, '');
+      if (nums.length > 0 && nums.length < 11) {
+        this.style.borderColor = 'var(--ru)';
+        if (!this.nextElementSibling || !this.nextElementSibling.classList.contains('error-telefono')) {
+          const err = document.createElement('small');
+          err.className = 'error-telefono';
+          err.style.color = 'var(--ru)';
+          err.style.display = 'block';
+          err.textContent = 'El teléfono debe tener 11 dígitos.';
+          this.parentNode.insertBefore(err, this.nextSibling);
+        }
+      } else {
+        const prefijo = nums.substring(0, 4);
+        const validos = ['0412', '0414', '0416', '0422', '0424', '0426'];
+        if (nums.length === 11 && !validos.includes(prefijo) && !prefijo.startsWith('02')) {
+          this.style.borderColor = 'var(--ru)';
+          if (!this.nextElementSibling || !this.nextElementSibling.classList.contains('error-telefono')) {
+            const err = document.createElement('small');
+            err.className = 'error-telefono';
+            err.style.color = 'var(--ru)';
+            err.style.display = 'block';
+            err.textContent = 'Prefijo inválido.';
+            this.parentNode.insertBefore(err, this.nextSibling);
+          }
+        } else {
+          this.style.borderColor = '';
+          if (this.nextElementSibling && this.nextElementSibling.classList.contains('error-telefono')) {
+            this.nextElementSibling.remove();
+          }
+        }
+      }
     });
   }
 

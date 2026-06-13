@@ -171,6 +171,76 @@ class Components {
       gap: 4px;
     "><i class="fas fa-circle" style="font-size: 6px;"></i> ${estado}</span>`;
   }
+
+  // ─────────────────────────────────────────
+  // Alcance por Consejo Comunal (Contexto Visual y Bloqueos)
+  // ─────────────────────────────────────────
+  static applyCommunityScope() {
+    const user = window.auth ? window.auth.getUser() : null;
+    if (!user || !user.rol || user.rol.toLowerCase() !== 'vocero') return;
+    
+    // 1. Mostrar banner de comunidad activa
+    let headerMain = document.querySelector('.page-header') || document.querySelector('.main-content');
+    let banner = document.getElementById('communityScopeBanner');
+    if (!banner && headerMain) {
+      banner = document.createElement('div');
+      banner.id = 'communityScopeBanner';
+      banner.style.cssText = `
+        background-color: var(--primary, #2E7D32);
+        color: white;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 20px;
+        border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      `;
+      banner.innerHTML = `<i class="fas fa-users"></i> Consejo Comunal Activo: <strong>${user.consejoComunal || 'Tu Comunidad'}</strong> (Vista Restringida)`;
+      if (headerMain.firstChild) {
+        headerMain.insertBefore(banner, headerMain.firstChild);
+      } else {
+        headerMain.appendChild(banner);
+      }
+    }
+
+    // 2. Bloquear cualquier selector de consejo comunal
+    const lockSelects = () => {
+      const selectors = document.querySelectorAll('select[id*="consejo"], select[name*="consejo"], select[id*="comunidad"], select[id="comunidadAsignada"]');
+      selectors.forEach(select => {
+        let found = false;
+        Array.from(select.options).forEach(opt => {
+          if (opt.text.trim() === user.consejoComunal || String(opt.value) === String(user.id_comunidad_asignada)) {
+            opt.selected = true;
+            found = true;
+          }
+        });
+        
+        // Si no se encontró pero hay opciones y estamos seguros de que es un select de CC
+        if (!found && select.options.length > 1) {
+           // A veces el texto del option tiene espacios extra
+           Array.from(select.options).forEach(opt => {
+             if (opt.text.toLowerCase().includes(user.consejoComunal?.toLowerCase())) {
+               opt.selected = true;
+               found = true;
+             }
+           });
+        }
+        
+        if (select.options.length > 0) {
+           select.disabled = true;
+           select.title = "Solo puedes gestionar registros de tu propio consejo comunal.";
+        }
+      });
+    };
+    
+    // Ejecutar inmediatamente y también observar cambios en el DOM para modals
+    lockSelects();
+    setTimeout(lockSelects, 500);
+    setTimeout(lockSelects, 2000);
+  }
 }
 
 // ─────────────────────────────────────────

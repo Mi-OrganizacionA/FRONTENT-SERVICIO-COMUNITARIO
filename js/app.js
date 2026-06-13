@@ -13,6 +13,9 @@ window.censoService = censoService;
 authService.onAuthChange(user => {
   if (user) {
     console.log('Firebase authenticated user:', user.uid);
+    if (window.Components && Components.applyCommunityScope) {
+      Components.applyCommunityScope();
+    }
   } else {
     console.log('Firebase session closed.');
   }

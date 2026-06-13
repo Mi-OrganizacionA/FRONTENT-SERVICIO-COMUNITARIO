@@ -543,7 +543,7 @@ class APIManager {
   async getHabitantes(filtros = {}) {
     await this.waitForMockData();
     if (this.isDevelopment) {
-      return this._filterHabitantes(this.mockData.habitantes, filtros);
+      return this._aplicarFiltroCC(this._filterHabitantes(this.mockData.habitantes, filtros));
     }
     const params = new URLSearchParams(filtros);
     try {
@@ -553,10 +553,10 @@ class APIManager {
         throw new Error(err.error || 'Error fetching habitantes');
       }
       const data = await response.json();
-      return data.habitantes || data;
+      return this._aplicarFiltroCC(data.habitantes || data);
     } catch (error) {
       if (this.isDevelopment) {
-        return this._filterHabitantes(this.mockData.habitantes, filtros);
+        return this._aplicarFiltroCC(this._filterHabitantes(this.mockData.habitantes, filtros));
       }
       throw error;
     }
@@ -604,41 +604,26 @@ class APIManager {
   }
 
   async crearHabitante(datos) {
-    await this.waitForMockData();
-    if (this.isDevelopment) {
-      const usuario = window.auth?.getUser();
-      const nuevoId = this.mockData.habitantes.length > 0 ? Math.max(...this.mockData.habitantes.map(h => h.id)) + 1 : 1;
-      const registro = { id: nuevoId, ...datos, fechaRegistro: new Date().toISOString() };
-
-      if (usuario?.rol === 'vocero') {
-        const notificacion = await this.crearNotificacion({
-          tipo: 'registro_habitante',
-          titulo: 'Solicitud de registro de habitante',
-          mensaje: `El vocero ${usuario.nombre} solicitó validación del nuevo habitante.`,
-          status: 'pendiente',
-          vocero: usuario.nombre,
-          consejoComunal: usuario.consejoComunal,
-          fechaSolicitud: new Date().toISOString(),
-          datosHabitante: registro,
-          nota: ''
-        });
-        return notificacion;
+    return await this._interceptarValidacion('habitantes', 'INSERT', datos, async () => {
+      await this.waitForMockData();
+      if (this.isDevelopment) {
+        const usuario = window.auth?.getUser();
+        const nuevoId = this.mockData.habitantes.length > 0 ? Math.max(...this.mockData.habitantes.map(h => h.id)) + 1 : 1;
+        const registro = { id: nuevoId, ...datos, fechaRegistro: new Date().toISOString() };
+        this.mockData.habitantes.push(registro);
+        this.saveMockData();
+        return registro;
       }
-
-      this.mockData.habitantes.push(registro);
-      this.saveMockData();
-      return registro;
-    }
-    
-    // En producción:
-    const response = await this._fetch(`${this.baseURL}/habitantes`, {
-      method: 'POST',
-      ...this._getHeaders(),
-      body: JSON.stringify(datos)
+      
+      const response = await this._fetch(`${this.baseURL}/habitantes`, {
+        method: 'POST',
+        ...this._getHeaders(),
+        body: JSON.stringify(datos)
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Error al crear habitante');
+      return data;
     });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || 'Error al crear habitante');
-    return data;
   }
 
   async registrarHabitante(datos) {
@@ -646,23 +631,25 @@ class APIManager {
   }
 
   async actualizarHabitante(id, cambios) {
-    await this.waitForMockData();
-    if (this.isDevelopment) {
-      const index = this.mockData.habitantes.findIndex(h => h.id === id);
-      if (index !== -1) {
-        this.mockData.habitantes[index] = { ...this.mockData.habitantes[index], ...cambios };
-        this.saveMockData();
-        return this.mockData.habitantes[index];
+    return await this._interceptarValidacion('habitantes', 'UPDATE', { id, ...cambios }, async () => {
+      await this.waitForMockData();
+      if (this.isDevelopment) {
+        const index = this.mockData.habitantes.findIndex(h => h.id === id);
+        if (index !== -1) {
+          this.mockData.habitantes[index] = { ...this.mockData.habitantes[index], ...cambios };
+          this.saveMockData();
+          return this.mockData.habitantes[index];
+        }
+        throw new Error('Habitante no encontrado');
       }
-      throw new Error('Habitante no encontrado');
-    }
-    const response = await fetch(`${this.baseURL}/habitantes/${id}`, {
-      method: 'PUT',
-      ...this._getHeaders(),
-      body: JSON.stringify(cambios)
+      const response = await fetch(`${this.baseURL}/habitantes/${id}`, {
+        method: 'PUT',
+        ...this._getHeaders(),
+        body: JSON.stringify(cambios)
+      });
+      if (!response.ok) throw new Error('Error al actualizar habitante');
+      return response.json();
     });
-    if (!response.ok) throw new Error('Error al actualizar habitante');
-    return response.json();
   }
 
   async getNotificaciones() {
@@ -699,10 +686,13 @@ class APIManager {
   async _interceptarValidacion(tabla, accion, datos, callbackOriginal) {
     const user = window.auth ? window.auth.getUser() : null;
     const isVocero = user && user.rol && user.rol.toLowerCase() === 'vocero';
+    
+    // Leer configuraciones (sincronizadas desde backend por getSystemConfig)
     const autoGlobal = localStorage.getItem('sicag_auto_global') === 'true';
+    const autoModulo = localStorage.getItem(`sicag_auto_${tabla}`) === 'true';
 
     // Si es vocero y la aprobación automática NO está activa, va a la bandeja
-    if (isVocero && !autoGlobal) {
+    if (isVocero && !autoGlobal && !autoModulo) {
       console.log(`[API] Interceptado: Enviando ${accion} de ${tabla} a validaciones.`);
       const res = await this.crearNotificacion({
         tabla_afectada: tabla,
@@ -808,18 +798,20 @@ class APIManager {
   }
 
   async eliminarHabitante(id) {
-    await this.waitForMockData();
-    if (this.isDevelopment) {
-      this.mockData.habitantes = this.mockData.habitantes.filter(h => h.id !== id);
-      this.saveMockData();
-      return { success: true };
-    }
-    const response = await fetch(`${this.baseURL}/habitantes/${id}`, {
-      method: 'DELETE',
-      ...this._getHeaders()
+    return await this._interceptarValidacion('habitantes', 'DELETE', { id }, async () => {
+      await this.waitForMockData();
+      if (this.isDevelopment) {
+        this.mockData.habitantes = this.mockData.habitantes.filter(h => h.id !== id);
+        this.saveMockData();
+        return { success: true };
+      }
+      const response = await fetch(`${this.baseURL}/habitantes/${id}`, {
+        method: 'DELETE',
+        ...this._getHeaders()
+      });
+      if (!response.ok) throw new Error('Error al eliminar habitante');
+      return response.json();
     });
-    if (!response.ok) throw new Error('Error al eliminar habitante');
-    return response.json();
   }
 
   // ─────────────────────────────────────────
@@ -828,16 +820,17 @@ class APIManager {
   async getProyectos(filtros = {}) {
     await this.waitForMockData();
     if (this.isDevelopment) {
-      return this._filterProyectos(this.mockData.proyectos, filtros);
+      return this._aplicarFiltroCC(this._filterProyectos(this.mockData.proyectos, filtros));
     }
     const params = new URLSearchParams(filtros);
     try {
       const response = await this._fetch(`${this.baseURL}/proyectos?${params}`, this._getHeaders());
       if (!response.ok) throw new Error('Error fetching proyectos');
-      return response.json();
+      const data = await response.json();
+      return this._aplicarFiltroCC(data);
     } catch (error) {
       if (this.isDevelopment) {
-        return this._filterProyectos(this.mockData.proyectos, filtros);
+        return this._aplicarFiltroCC(this._filterProyectos(this.mockData.proyectos, filtros));
       }
       throw error;
     }
@@ -929,7 +922,8 @@ class APIManager {
     const params = new URLSearchParams(filtros);
     const response = await this._fetch(`${this.baseURL}/produccion_agricola?${params}`, this._getHeaders());
     if (!response.ok) throw new Error('Error fetching produccion agricola');
-    return response.json();
+    const data = await response.json();
+    return this._aplicarFiltroCC(data);
   }
 
   async crearProduccion(datos) {
@@ -967,7 +961,8 @@ class APIManager {
     const params = new URLSearchParams(filtros);
     const response = await this._fetch(`${this.baseURL}/organizaciones?${params}`, this._getHeaders());
     if (!response.ok) throw new Error('Error fetching organizaciones');
-    return response.json();
+    const data = await response.json();
+    return this._aplicarFiltroCC(data);
   }
 
   async crearOrganizacion(datos) {
@@ -1005,7 +1000,8 @@ class APIManager {
     const params = new URLSearchParams(filtros);
     const response = await this._fetch(`${this.baseURL}/viviendas?${params}`, this._getHeaders());
     if (!response.ok) throw new Error('Error fetching viviendas');
-    return response.json();
+    const data = await response.json();
+    return this._aplicarFiltroCC(data);
   }
 
   async crearVivienda(datos) {
@@ -1043,7 +1039,8 @@ class APIManager {
     const params = new URLSearchParams(filtros);
     const response = await this._fetch(`${this.baseURL}/voceros?${params}`, this._getHeaders());
     if (!response.ok) throw new Error('Error fetching voceros');
-    return response.json();
+    const data = await response.json();
+    return this._aplicarFiltroCC(data);
   }
 
   async crearVocero(datos) {
@@ -1069,18 +1066,19 @@ class APIManager {
   // ─────────────────────────────────────────
   async getNoticias(filtros = {}) {
     await this.waitForMockData();
-    if (this.isDevelopment) return this.mockData?.noticias || [];
+    if (this.isDevelopment) return this._aplicarFiltroCC(this.mockData?.noticias || []);
     const params = new URLSearchParams(filtros);
     try {
       const response = await this._fetch(`${this.baseURL}/cartelera/publico/activas`, this._getHeaders());
       if (!response.ok) throw new Error('Error fetching noticias');
-      return response.json();
+      const data = await response.json();
+      return this._aplicarFiltroCC(data);
     } catch (error) {
       if (this.isDevelopment) {
-        return this.mockData?.noticias || [];
+        return this._aplicarFiltroCC(this.mockData?.noticias || []);
       }
       console.warn('No se pudo cargar noticias desde la API; usando datos locales:', error.message);
-      return this.mockData?.noticias || [];
+      return this._aplicarFiltroCC(this.mockData?.noticias || []);
     }
   }
 
@@ -1394,6 +1392,24 @@ class APIManager {
       default:
         throw new ApiError(cuerpo.error || 'Error interno del servidor', response.status, 'ERROR_SERVIDOR');
     }
+  }
+
+  _aplicarFiltroCC(lista) {
+    if (!Array.isArray(lista)) return lista;
+    const user = window.auth ? window.auth.getUser() : null;
+    if (user && user.rol && user.rol.toLowerCase() === 'vocero') {
+      const ccName = user.consejoComunal;
+      const ccId = user.id_comunidad_asignada;
+      return lista.filter(item => {
+        if (item.consejoComunal && ccName && item.consejoComunal === ccName) return true;
+        if (item.comunidad && ccName && item.comunidad === ccName) return true;
+        if (item.consejo_comunal_id && ccId && String(item.consejo_comunal_id) === String(ccId)) return true;
+        if (item.id_comunidad && ccId && String(item.id_comunidad) === String(ccId)) return true;
+        if (item.nombreConsejo && ccName && item.nombreConsejo === ccName) return true;
+        return false;
+      });
+    }
+    return lista;
   }
 
   _filterHabitantes(habitantes, filtros) {
