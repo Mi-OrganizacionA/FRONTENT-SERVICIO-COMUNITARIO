@@ -31,9 +31,9 @@ class SystemController {
 
   static async getPublicStats(req, res) {
     try {
-      const countHab = this.models && this.models.Habitante ? await this.models.Habitante.count({ where: { activo: true } }) : 0;
-      const countProy = this.models && this.models.Proyecto ? await this.models.Proyecto.count() : 0;
-      const countViv = this.models && this.models.Vivienda ? await this.models.Vivienda.count() : 0;
+      const countHab = SystemController.models && SystemController.models.Habitante ? await SystemController.models.Habitante.count({ where: { activo: true } }) : 0;
+      const countProy = SystemController.models && SystemController.models.Proyecto ? await SystemController.models.Proyecto.count() : 0;
+      const countViv = SystemController.models && SystemController.models.Vivienda ? await SystemController.models.Vivienda.count() : 0;
       // Si el modelo ConsejoComunal existiera, podríamos contar, pero son 9 estáticos
       res.json({
         habitantes: countHab,
