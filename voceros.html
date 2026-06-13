@@ -551,14 +551,15 @@
           if (card) card.classList.add('visible');
           if (habAvatar) habAvatar.textContent = (nombres[0] || '?').toUpperCase();
           if (habNombre) habNombre.textContent = fullName;
-          if (habMeta) habMeta.textContent = `C.I: ${datos.cedula || '—'} · ${datos.consejoComunal || 'Sin comunidad'}`;
+          
+          const nombreComunidad = datos.consejo?.nombre_comunidad || datos.consejoComunal;
+          if (habMeta) habMeta.textContent = `C.I: ${datos.cedula || '—'} · ${nombreComunidad || 'Sin comunidad'}`;
 
           // Pre-llenar correo si viene del habitante
           if (emailInput && datos.email) emailInput.value = datos.email;
           if (telefonoInput && datos.telefono) telefonoInput.value = datos.telefono;
 
           // Autoseleccionar comunidad
-          const nombreComunidad = datos.consejo?.nombre_comunidad || datos.consejoComunal;
           if (nombreComunidad) {
             const sel = document.getElementById('selComunidad');
             if (sel) {
