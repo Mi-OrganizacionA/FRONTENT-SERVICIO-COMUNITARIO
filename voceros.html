@@ -14,10 +14,124 @@
   <link rel="preload" href="css/admin.css" as="style">
   <link href="css/admin.css" rel="stylesheet">
   <script>
-    if (!sessionStorage.getItem('sicag_user')) { // Token en memoria, usuario en sessionStorage
+    if (!sessionStorage.getItem('sicag_user')) {
       window.location.replace('login.html');
     }
   </script>
+  <style>
+    /* ─── Estilos Adicionales para Voceros ─── */
+    .badge-activo {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px; font-size: .72rem; font-weight: 600;
+      background: rgba(46,125,50,.1); color: #2E7D32;
+    }
+    .badge-inactivo {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px; font-size: .72rem; font-weight: 600;
+      background: rgba(198,40,40,.1); color: #C62828;
+    }
+    .badge-activo i, .badge-inactivo i { font-size: 7px; }
+
+    .accion-btns { display: flex; gap: .4rem; flex-wrap: wrap; }
+
+    /* Tarjeta de estadísticas */
+    .voceros-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--surface, #fff);
+      border: 1px solid var(--border, #e0e0e0);
+      border-radius: var(--r-lg, 12px);
+      padding: 1.1rem 1.3rem;
+      display: flex; align-items: center; gap: .9rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    }
+    .stat-card .stat-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.15rem; flex-shrink: 0;
+    }
+    .stat-card .stat-num { font-size: 1.55rem; font-weight: 700; line-height: 1; color: var(--text); }
+    .stat-card .stat-label { font-size: .72rem; color: var(--muted, #888); margin-top: 2px; }
+
+    /* Barra de búsqueda/filtros */
+    .tb-filters {
+      display: flex; gap: .7rem; flex-wrap: wrap; align-items: center;
+      margin-bottom: 1rem;
+    }
+    .tb-filters input, .tb-filters select {
+      padding: .42rem .8rem; border: 1px solid var(--border, #e0e0e0);
+      border-radius: 6px; font-size: .85rem; background: var(--surface, #fff);
+      color: var(--text, #1a1a1a);
+    }
+    .tb-filters input { flex: 1 1 200px; }
+
+    /* Avatar */
+    .vocero-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, #0D3311, #2E7D32);
+      color: white; display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: .8rem; flex-shrink: 0; margin-right: .5rem;
+    }
+    .nombre-cell { display: flex; align-items: center; }
+
+    /* Modal más amplio */
+    #modalAgregar .modal-content-sicag,
+    #modalEditar .modal-content-sicag {
+      max-width: 640px;
+    }
+    .form-grid-2 {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem;
+    }
+    @media (max-width: 560px) { .form-grid-2 { grid-template-columns: 1fr; } }
+
+    .section-divider {
+      font-size: .75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--muted, #888);
+      border-bottom: 1px solid var(--border, #e0e0e0);
+      padding-bottom: .35rem; margin: 1.2rem 0 .8rem;
+    }
+    .input-eye-wrap { position: relative; }
+    .input-eye-wrap input { width: 100%; padding-right: 2.5rem; }
+    .input-eye-wrap .eye-btn {
+      position: absolute; right: .7rem; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer;
+      color: var(--muted, #888); font-size: .9rem;
+    }
+    /* Highlight del habitante encontrado */
+    .habitante-card {
+      background: linear-gradient(135deg, rgba(13,51,17,.05), rgba(46,125,50,.08));
+      border: 1px solid rgba(46,125,50,.3);
+      border-radius: 8px; padding: .7rem 1rem;
+      display: flex; align-items: center; gap: .7rem;
+      margin-top: .5rem; display: none;
+    }
+    .habitante-card.visible { display: flex; }
+    .habitante-card .hab-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, #0D3311, #2E7D32);
+      color: white; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1rem; flex-shrink: 0;
+    }
+    .habitante-card .hab-info { flex: 1; }
+    .habitante-card .hab-nombre { font-weight: 600; font-size: .9rem; color: #1a1a1a; }
+    .habitante-card .hab-meta { font-size: .75rem; color: var(--muted, #888); }
+
+    /* Warning de solo admin */
+    .admin-only-notice {
+      background: rgba(25, 118, 210, .07);
+      border: 1px solid rgba(25, 118, 210, .25);
+      border-radius: 8px;
+      padding: .6rem 1rem;
+      font-size: .8rem;
+      color: #1565C0;
+      display: flex; align-items: center; gap: .5rem;
+      margin-bottom: 1rem;
+    }
+  </style>
 </head>
 <body data-search-placeholder="Buscar voceros...">
   <div class="barra-tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -28,7 +142,7 @@
   <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral"><i class="fas fa-bars"></i></button>
 
   <main class="app-main" role="main">
-    
+
     <!-- ══ PREMIUM HEADER ══ -->
     <div class="ph-wrap fade-in">
       <div class="ph-deco-dots" aria-hidden="true"></div>
@@ -43,38 +157,92 @@
           <div>
             <div class="ph-module"><i class="fas fa-shield-halved"></i> Administración del Sistema</div>
             <h1 class="ph-title">Gestión de Voceros</h1>
-            <p class="ph-sub">Administra los accesos de los voceros comunitarios para el registro y censo de habitantes.</p>
+            <p class="ph-sub">Administra los accesos de los voceros comunitarios. Solo el administrador puede crear, editar o revocar accesos.</p>
           </div>
         </div>
-        <div class="ph-actions" style="display:flex;gap:.6rem;flex-wrap:wrap;">
+        <div class="ph-actions" id="phActions" style="display:none;gap:.6rem;flex-wrap:wrap;">
           <button type="button" class="ph-btn" id="btnAgregarVocero">
-            <i class="fas fa-user-plus"></i> Agregar Vocero
+            <i class="fas fa-user-plus"></i> Nuevo Vocero
           </button>
         </div>
       </div>
     </div>
 
-    <!-- ══ CONTENT SECTION ══ -->
+    <!-- ══ ESTADÍSTICAS ══ -->
+    <div class="voceros-stats fade-in-up">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(46,125,50,.1); color:#2E7D32;"><i class="fas fa-users"></i></div>
+        <div><div class="stat-num" id="statTotal">—</div><div class="stat-label">Voceros Registrados</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(25,118,210,.1); color:#1976D2;"><i class="fas fa-user-check"></i></div>
+        <div><div class="stat-num" id="statActivos">—</div><div class="stat-label">Activos</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(198,40,40,.1); color:#C62828;"><i class="fas fa-user-xmark"></i></div>
+        <div><div class="stat-num" id="statInactivos">—</div><div class="stat-label">Inactivos</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(245,127,23,.1); color:#E65100;"><i class="fas fa-map-location-dot"></i></div>
+        <div><div class="stat-num" id="statComunidades">—</div><div class="stat-label">Comunidades con Vocero</div></div>
+      </div>
+    </div>
+
+    <!-- ══ TABLA DE VOCEROS ══ -->
     <section class="card-sicag fade-in-up">
       <div class="card-header-sicag">
         <span><i class="fas fa-list"></i> Directorio de Voceros Autorizados</span>
       </div>
       <div class="card-body-sicag">
+
+        <!-- Filtros -->
+        <div class="tb-filters">
+          <input type="text" id="filtroNombre" placeholder="🔍 Buscar por nombre o cédula..." oninput="filtrarTabla()">
+          <select id="filtroComunidad" onchange="filtrarTabla()">
+            <option value="">Todas las Comunidades</option>
+            <option>C.C. Jobito I</option>
+            <option>C.C. Jobito II</option>
+            <option>C.C. Brisas del Yurubí</option>
+            <option>C.C. Andrés Eloy Blanco</option>
+            <option>C.C. Las Mercedes I</option>
+            <option>C.C. Las Mercedes II</option>
+            <option>C.C. Santa Cruz de las Mercedes</option>
+            <option>C.C. Fortaleza del Corozo</option>
+            <option>C.C. Vencedores del Corozo</option>
+          </select>
+          <select id="filtroEstado" onchange="filtrarTabla()">
+            <option value="">Todos los Estados</option>
+            <option value="activo">Activos</option>
+            <option value="inactivo">Inactivos</option>
+          </select>
+        </div>
+
         <div class="table-responsive-sicag">
           <table class="table-sicag" id="tablaVoceros">
             <thead>
               <tr>
                 <th><i class="fas fa-id-card"></i> Cédula</th>
-                <th><i class="fas fa-user"></i> Nombre del Vocero</th>
-                <th><i class="fas fa-map-marker-alt"></i> Consejo Comunal / Comunidad</th>
-                <th>Acciones</th>
+                <th><i class="fas fa-user"></i> Vocero</th>
+                <th><i class="fas fa-map-marker-alt"></i> Consejo Comunal</th>
+                <th><i class="fas fa-envelope"></i> Correo</th>
+                <th><i class="fas fa-phone"></i> Teléfono</th>
+                <th><i class="fas fa-circle-dot"></i> Estado</th>
+                <th id="colAcciones" style="display:none;">Acciones</th>
               </tr>
             </thead>
-            <tbody>
-              <!-- Se llena por voceros.js -->
+            <tbody id="tablaVocerosBody">
+              <tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--muted);">
+                <i class="fas fa-spinner fa-spin"></i> Cargando voceros...
+              </td></tr>
             </tbody>
           </table>
         </div>
+
+        <div id="tbEmptyMsg" style="display:none; text-align:center; padding: 3rem 1rem; color: var(--muted);">
+          <i class="fas fa-user-slash" style="font-size:2.5rem; opacity:.3; display:block; margin-bottom:.8rem;"></i>
+          No se encontraron voceros con los filtros aplicados.
+        </div>
+
       </div>
     </section>
 
@@ -83,33 +251,99 @@
   <!-- ════════════════════════════════════════
        MODAL: Agregar Vocero
   ════════════════════════════════════════ -->
-  <div id="modalAgregar" class="modal-overlay" role="dialog" aria-hidden="true">
-    <div class="modal-content-sicag" style="max-width:550px;">
+  <div id="modalAgregar" class="modal-overlay" role="dialog" aria-hidden="true" aria-labelledby="tituloModalAgregar">
+    <div class="modal-content-sicag">
       <div class="modal-header-sicag" style="background:linear-gradient(135deg,#0D3311,#2E7D32);color:#fff;border-bottom:none;">
-        <h3 style="color:#fff;">
+        <h3 id="tituloModalAgregar" style="color:#fff;">
           <i class="fas fa-user-plus" style="color:rgba(165,214,167,.9)"></i>
-          <span>Agregar Nuevo Vocero</span>
+          Registrar Nuevo Vocero
         </h3>
-        <button type="button" class="modal-close" id="closeModal" type="button" style="background:rgba(255,255,255,.15);color:#fff;" aria-label="Cerrar">&times;</button>
+        <button type="button" class="modal-close" id="closeModalAgregar" style="background:rgba(255,255,255,.15);color:#fff;" aria-label="Cerrar">&times;</button>
       </div>
       <div class="modal-body-sicag">
+
+        <div class="admin-only-notice">
+          <i class="fas fa-info-circle"></i>
+          Solo el administrador puede registrar nuevos voceros. Esto creará una cuenta de acceso al sistema.
+        </div>
+
         <form id="formAgregar" novalidate>
-          
-          <div class="form-group-sicag">
-            <label class="form-label-sicag" for="inputCedula">Buscar Habitante (Cédula) *</label>
-            <div style="display:flex;">
-              <input type="text" class="form-control-sicag" id="inputCedula" placeholder="Ej: 12345678" required style="border-top-right-radius:0; border-bottom-right-radius:0;">
-              <button type="button" id="btnValidarVocero" style="background:var(--vp); color:white; border:none; padding:0 1rem; border-top-right-radius:var(--r-sm); border-bottom-right-radius:var(--r-sm); cursor:pointer;"><i class="fas fa-magnifying-glass"></i></button>
-            </div>
-            <div id="buscarResult" style="margin:.5rem 0;color:var(--vp);font-size:.85rem;font-weight:600;"></div>
-            <small style="color:var(--muted);font-size:.75rem;">El habitante debe estar censado previamente en el sistema.</small>
-            <input type="hidden" id="inputNombre">
-          </div>
+
+          <!-- BÚSQUEDA DE HABITANTE -->
+          <div class="section-divider"><i class="fas fa-user-magnifying-glass"></i> Identificar Habitante</div>
 
           <div class="form-group-sicag">
-            <label class="form-label-sicag" for="selComunidad">Comunidad Asignada *</label>
+            <label class="form-label-sicag" for="inputCedula">Buscar por Cédula del Habitante *</label>
+            <div style="display:flex;">
+              <input type="text" class="form-control-sicag" id="inputCedula"
+                placeholder="Ej: V-12.345.678" required
+                style="border-top-right-radius:0; border-bottom-right-radius:0;">
+              <button type="button" id="btnValidarVocero"
+                style="background:var(--vp,#1B5E20); color:white; border:none; padding:0 1rem;
+                       border-top-right-radius:var(--r-sm,6px); border-bottom-right-radius:var(--r-sm,6px); cursor:pointer;"
+                title="Buscar habitante">
+                <i class="fas fa-magnifying-glass"></i>
+              </button>
+            </div>
+            <small style="color:var(--muted);font-size:.75rem;">El habitante debe estar censado previamente en el sistema.</small>
+
+            <!-- Tarjeta del habitante encontrado -->
+            <div class="habitante-card" id="habitanteCard">
+              <div class="hab-avatar" id="habAvatar">?</div>
+              <div class="hab-info">
+                <div class="hab-nombre" id="habNombre">—</div>
+                <div class="hab-meta" id="habMeta">—</div>
+              </div>
+              <i class="fas fa-check-circle" style="color:#2E7D32; font-size:1.2rem;"></i>
+            </div>
+
+            <!-- Campos hidden para datos del habitante -->
+            <input type="hidden" id="inputNombre">
+            <input type="hidden" id="inputHabitanteId">
+          </div>
+
+          <!-- DATOS DE ACCESO -->
+          <div class="section-divider"><i class="fas fa-key"></i> Datos de Acceso al Sistema</div>
+          <div class="form-grid-2">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="inputEmail">Correo Electrónico *</label>
+              <input type="email" class="form-control-sicag" id="inputEmail"
+                placeholder="correo@ejemplo.com" required>
+              <small style="color:var(--muted);font-size:.75rem;">Usado para iniciar sesión y recuperar contraseña.</small>
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="inputTelefono">Teléfono de Contacto</label>
+              <input type="text" class="form-control-sicag" id="inputTelefono"
+                placeholder="(0412) 123-4567">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="inputPassword">Contraseña Inicial *</label>
+              <div class="input-eye-wrap">
+                <input type="password" class="form-control-sicag" id="inputPassword"
+                  placeholder="Mínimo 8 caracteres" required minlength="8">
+                <button type="button" class="eye-btn" onclick="toggleEye('inputPassword', this)"><i class="fas fa-eye"></i></button>
+              </div>
+              <small style="color:var(--muted);font-size:.75rem;">El vocero podrá cambiarla en su perfil.</small>
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="inputPasswordConfirm">Confirmar Contraseña *</label>
+              <div class="input-eye-wrap">
+                <input type="password" class="form-control-sicag" id="inputPasswordConfirm"
+                  placeholder="Repite la contraseña" required>
+                <button type="button" class="eye-btn" onclick="toggleEye('inputPasswordConfirm', this)"><i class="fas fa-eye"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- COMUNIDAD Y ROL -->
+          <div class="section-divider"><i class="fas fa-map-location-dot"></i> Asignación de Comunidad</div>
+          <div class="form-group-sicag">
+            <label class="form-label-sicag" for="selComunidad">Consejo Comunal Asignado *</label>
             <select class="form-control-sicag" id="selComunidad" required>
-              <option value="">Seleccionar comunidad...</option>
+              <option value="">Seleccionar consejo comunal...</option>
               <option value="C.C. Jobito I">C.C. Jobito I</option>
               <option value="C.C. Jobito II">C.C. Jobito II</option>
               <option value="C.C. Brisas del Yurubí">C.C. Brisas del Yurubí</option>
@@ -120,19 +354,122 @@
               <option value="C.C. Fortaleza del Corozo">C.C. Fortaleza del Corozo</option>
               <option value="C.C. Vencedores del Corozo">C.C. Vencedores del Corozo</option>
             </select>
+            <small style="color:var(--muted);font-size:.75rem;">Puedes sobreescribir el consejo sugerido automáticamente.</small>
           </div>
 
+          <!-- CONFIRMACIÓN ADMIN -->
+          <div class="section-divider"><i class="fas fa-lock"></i> Autorización</div>
           <div class="form-group-sicag">
-            <label class="form-label-sicag" for="confirmPass">Autorización de Seguridad (Contraseña Admin) *</label>
-            <input type="password" class="form-control-sicag" id="confirmPass" placeholder="Ingresa tu contraseña de administrador" required>
+            <label class="form-label-sicag" for="confirmPass">Tu Contraseña de Administrador *</label>
+            <div class="input-eye-wrap">
+              <input type="password" class="form-control-sicag" id="confirmPass"
+                placeholder="Ingresa tu contraseña para confirmar" required>
+              <button type="button" class="eye-btn" onclick="toggleEye('confirmPass', this)"><i class="fas fa-eye"></i></button>
+            </div>
           </div>
 
-          <div class="form-group-sicag" style="margin-top:1.5rem;text-align:right;">
-            <button type="button" class="btn-sicag btn-primary" type="submit" style="width:100%;justify-content:center;">
-              <i class="fas fa-check-circle"></i> Asignar Rol de Vocero
+          <div class="form-group-sicag" style="margin-top:1.5rem;">
+            <button type="submit" class="btn-sicag btn-primary" style="width:100%;justify-content:center;" id="btnGuardarVocero">
+              <i class="fas fa-check-circle"></i> Registrar Vocero
             </button>
           </div>
 
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       MODAL: Editar Vocero
+  ════════════════════════════════════════ -->
+  <div id="modalEditar" class="modal-overlay" role="dialog" aria-hidden="true" aria-labelledby="tituloModalEditar">
+    <div class="modal-content-sicag">
+      <div class="modal-header-sicag" style="background:linear-gradient(135deg,#0D2A4F,#1976D2);color:#fff;border-bottom:none;">
+        <h3 id="tituloModalEditar" style="color:#fff;">
+          <i class="fas fa-user-pen" style="color:rgba(144,202,249,.9)"></i>
+          Editar Vocero
+        </h3>
+        <button type="button" class="modal-close" id="closeModalEditar" style="background:rgba(255,255,255,.15);color:#fff;" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body-sicag">
+        <form id="formEditar" novalidate>
+          <input type="hidden" id="editId">
+
+          <div class="section-divider"><i class="fas fa-user"></i> Información del Vocero</div>
+          <div class="form-grid-2">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="editNombre">Nombre Completo</label>
+              <input type="text" class="form-control-sicag" id="editNombre" readonly
+                style="background:#f5f5f5; cursor:not-allowed;">
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="editCedula">Cédula</label>
+              <input type="text" class="form-control-sicag" id="editCedula" readonly
+                style="background:#f5f5f5; cursor:not-allowed;">
+            </div>
+          </div>
+
+          <div class="section-divider"><i class="fas fa-address-card"></i> Datos de Contacto y Acceso</div>
+          <div class="form-grid-2">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="editEmail">Correo Electrónico</label>
+              <input type="email" class="form-control-sicag" id="editEmail" placeholder="correo@ejemplo.com">
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="editTelefono">Teléfono</label>
+              <input type="text" class="form-control-sicag" id="editTelefono" placeholder="(0412) 123-4567">
+            </div>
+          </div>
+
+          <div class="form-group-sicag">
+            <label class="form-label-sicag" for="editNuevaPassword">Nueva Contraseña <small style="color:var(--muted); font-weight:400;">(dejar en blanco para no cambiar)</small></label>
+            <div class="input-eye-wrap">
+              <input type="password" class="form-control-sicag" id="editNuevaPassword" placeholder="Nueva contraseña (opcional)">
+              <button type="button" class="eye-btn" onclick="toggleEye('editNuevaPassword', this)"><i class="fas fa-eye"></i></button>
+            </div>
+          </div>
+
+          <div class="section-divider"><i class="fas fa-map-location-dot"></i> Comunidad y Estado</div>
+          <div class="form-grid-2">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="editComunidad">Consejo Comunal</label>
+              <select class="form-control-sicag" id="editComunidad">
+                <option value="">Sin asignar</option>
+                <option value="C.C. Jobito I">C.C. Jobito I</option>
+                <option value="C.C. Jobito II">C.C. Jobito II</option>
+                <option value="C.C. Brisas del Yurubí">C.C. Brisas del Yurubí</option>
+                <option value="C.C. Andrés Eloy Blanco">C.C. Andrés Eloy Blanco</option>
+                <option value="C.C. Las Mercedes I">C.C. Las Mercedes I</option>
+                <option value="C.C. Las Mercedes II">C.C. Las Mercedes II</option>
+                <option value="C.C. Santa Cruz de las Mercedes">C.C. Santa Cruz de las Mercedes</option>
+                <option value="C.C. Fortaleza del Corozo">C.C. Fortaleza del Corozo</option>
+                <option value="C.C. Vencedores del Corozo">C.C. Vencedores del Corozo</option>
+              </select>
+            </div>
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="editEstado">Estado de la Cuenta</label>
+              <select class="form-control-sicag" id="editEstado">
+                <option value="activo">Activo</option>
+                <option value="inactivo">Inactivo (suspendido)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="section-divider"><i class="fas fa-lock"></i> Autorización</div>
+          <div class="form-group-sicag">
+            <label class="form-label-sicag" for="editConfirmPass">Tu Contraseña de Administrador *</label>
+            <div class="input-eye-wrap">
+              <input type="password" class="form-control-sicag" id="editConfirmPass"
+                placeholder="Ingresa tu contraseña para confirmar" required>
+              <button type="button" class="eye-btn" onclick="toggleEye('editConfirmPass', this)"><i class="fas fa-eye"></i></button>
+            </div>
+          </div>
+
+          <div class="form-group-sicag" style="margin-top:1.5rem;">
+            <button type="submit" class="btn-sicag btn-primary" style="width:100%;justify-content:center; background:linear-gradient(135deg,#0D2A4F,#1976D2);">
+              <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -145,30 +482,93 @@
   <script src="js/components.js"></script>
   <script src="js/layout-menu.js"></script>
   <script src="js/roles.js"></script>
-  <script src="js/voceros.js"></script>
   <script src="js/habitante-autocomplete.js"></script>
+  <script src="js/voceros.js"></script>
   <script>
+    /* ── Utilidades de UI ── */
+    function toggleEye(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      if (!inp) return;
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+      } else {
+        inp.type = 'password';
+        btn.innerHTML = '<i class="fas fa-eye"></i>';
+      }
+    }
+
+    function filtrarTabla() {
+      const q = (document.getElementById('filtroNombre')?.value || '').toLowerCase();
+      const c = (document.getElementById('filtroComunidad')?.value || '').toLowerCase();
+      const e = (document.getElementById('filtroEstado')?.value || '').toLowerCase();
+      let visible = 0;
+
+      document.querySelectorAll('#tablaVocerosBody tr[data-vocero]').forEach(row => {
+        const nombre = (row.dataset.nombre || '').toLowerCase();
+        const cedula = (row.dataset.cedula || '').toLowerCase();
+        const comunidad = (row.dataset.comunidad || '').toLowerCase();
+        const estado = (row.dataset.estado || '').toLowerCase();
+
+        const matchQ = !q || nombre.includes(q) || cedula.includes(q);
+        const matchC = !c || comunidad.includes(c);
+        const matchE = !e || estado === e;
+
+        if (matchQ && matchC && matchE) {
+          row.style.display = '';
+          visible++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+
+      const emptyMsg = document.getElementById('tbEmptyMsg');
+      if (emptyMsg) emptyMsg.style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    /* ── Autocompletar habitante en modal Agregar ── */
     document.addEventListener('DOMContentLoaded', () => {
       if (window.HabitanteAutocomplete) {
         HabitanteAutocomplete.attachTo('inputCedula', (datos) => {
+          const nombres = datos.nombres || '';
+          const apellidos = datos.apellidos || '';
+          const fullName = (nombres + ' ' + apellidos).trim();
+
+          // Actualizar inputs hidden
           const inputNombre = document.getElementById('inputNombre');
-          const buscarResult = document.getElementById('buscarResult');
-          const fullName = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
+          const inputHabId = document.getElementById('inputHabitanteId');
           if (inputNombre) inputNombre.value = fullName;
-          if (buscarResult) buscarResult.textContent = `✅ Habitante encontrado: ${fullName}`;
-          
-          // Autoselect community
+          if (inputHabId) inputHabId.value = datos.id || '';
+
+          // Tarjeta visual del habitante
+          const card = document.getElementById('habitanteCard');
+          const habAvatar = document.getElementById('habAvatar');
+          const habNombre = document.getElementById('habNombre');
+          const habMeta = document.getElementById('habMeta');
+          const emailInput = document.getElementById('inputEmail');
+          const telefonoInput = document.getElementById('inputTelefono');
+
+          if (card) card.classList.add('visible');
+          if (habAvatar) habAvatar.textContent = (nombres[0] || '?').toUpperCase();
+          if (habNombre) habNombre.textContent = fullName;
+          if (habMeta) habMeta.textContent = `C.I: ${datos.cedula || '—'} · ${datos.consejoComunal || 'Sin comunidad'}`;
+
+          // Pre-llenar correo si viene del habitante
+          if (emailInput && datos.email) emailInput.value = datos.email;
+          if (telefonoInput && datos.telefono) telefonoInput.value = datos.telefono;
+
+          // Autoseleccionar comunidad
           const nombreComunidad = datos.consejo?.nombre_comunidad || datos.consejoComunal;
           if (nombreComunidad) {
-             const sel = document.getElementById('selComunidad');
-             if (sel) {
-                for (let i = 0; i < sel.options.length; i++) {
-                   if (sel.options[i].value === nombreComunidad) {
-                       sel.selectedIndex = i;
-                       break;
-                   }
+            const sel = document.getElementById('selComunidad');
+            if (sel) {
+              for (let i = 0; i < sel.options.length; i++) {
+                if (sel.options[i].value === nombreComunidad || sel.options[i].value.includes(nombreComunidad)) {
+                  sel.selectedIndex = i;
+                  break;
                 }
-             }
+              }
+            }
           }
         });
 
@@ -176,14 +576,17 @@
         if (btnLupa) {
           btnLupa.addEventListener('click', () => {
             const input = document.getElementById('inputCedula');
-            if (input.forceSearch) input.forceSearch();
+            if (input && input.forceSearch) input.forceSearch();
           });
         }
       }
+
+      // Máscara teléfono
+      const tel = document.getElementById('inputTelefono');
+      if (tel && window.SICAGMasks) SICAGMasks.aplicarMascaraTelefono(tel);
+      const editTel = document.getElementById('editTelefono');
+      if (editTel && window.SICAGMasks) SICAGMasks.aplicarMascaraTelefono(editTel);
     });
   </script>
 </body>
 </html>
-
-
-
