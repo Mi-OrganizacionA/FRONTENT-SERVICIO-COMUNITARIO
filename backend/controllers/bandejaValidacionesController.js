@@ -46,6 +46,27 @@ class BandejaValidacionesController {
         return res.status(400).json({ error: 'Campos requeridos: tabla_afectada, tipo_accion, datos_temporales' });
       }
 
+      // Validar duplicidad para proteger contra reintentos de la Cola Offline
+      const { Op } = require('sequelize');
+      const hace5Minutos = new Date(Date.now() - 5 * 60 * 1000);
+      const existente = await BandejaModel.findOne({
+        where: {
+          id_vocero: req.user.id,
+          tabla_afectada,
+          tipo_accion,
+          estado_tramite: 'Pendiente',
+          fecha_solicitud: { [Op.gte]: hace5Minutos }
+        }
+      });
+
+      if (existente && JSON.stringify(existente.datos_temporales) === JSON.stringify(datos_temporales)) {
+        logger.info(`Validación duplicada detectada y prevenida para vocero ${req.user.id}`);
+        return res.status(200).json({ 
+          mensaje: 'Solicitud ya estaba registrada (deduplicada exitosamente)',
+          validacion: existente 
+        });
+      }
+
       const validacion = await BandejaModel.create({
         id_vocero: req.user.id,
         tabla_afectada,

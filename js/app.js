@@ -209,6 +209,22 @@ function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString('es-VE', options);
 }
 
+// ---- SYNC NOTIFICATIONS ----
+window.addEventListener('offline:syncCompleted', (e) => {
+  if (e.detail && e.detail.sincronizados > 0) {
+    if (typeof Components !== 'undefined' && Components.showToast) {
+      Components.showToast(`📡 Conexión restaurada: ${e.detail.sincronizados} operaciones sincronizadas con éxito.`, 'success');
+    }
+  }
+});
+window.addEventListener('censo:syncCompleted', (e) => {
+  if (e.detail && e.detail.sincronizados > 0) {
+    if (typeof Components !== 'undefined' && Components.showToast) {
+      Components.showToast(`📡 Censo sincronizado: ${e.detail.sincronizados} encuestas enviadas con éxito.`, 'success');
+    }
+  }
+});
+
 // ---- INIT ON DOM READY ----
 document.addEventListener('DOMContentLoaded', function () {
   initSidebar();
