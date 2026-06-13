@@ -9,6 +9,7 @@
     "migrate": "node migrate.js up",
     "migrate:undo": "node migrate.js down",
     "seed": "node scripts/seed.js",
+    "fix:consejos": "node scripts/fix_consejos.js",
     "test": "jest --coverage",
     "test:watch": "jest --watch"
   },

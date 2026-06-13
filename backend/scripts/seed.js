@@ -9,8 +9,18 @@ async function seed() {
   const { Usuario, Habitante, ConsejoComunal, Configuracion } = models;
 
   try {
-    // 1. Semilla de Consejos Comunales (Idempotente)
-    const consejos = ['Jobito I', 'Jobito II', 'Brisas del Yurubí', 'Cacique Tamanaco', 'La Esperanza'];
+    // Los IDs deben coincidir con los values del frontend (1-9)
+    const consejos = [
+      'Jobito I',                  // id: 1
+      'Jobito II',                 // id: 2
+      'Brisas del Yurubí',        // id: 3
+      'Andrés Eloy Blanco',       // id: 4
+      'Las Mercedes I',            // id: 5
+      'Las Mercedes II',           // id: 6
+      'Santa Cruz de las Mercedes',// id: 7
+      'Fortaleza del Corozo',      // id: 8
+      'Vencedores del Corozo'      // id: 9
+    ];
     console.log('--- Verificando Consejos Comunales ---');
     for (const nombre of consejos) {
       const [cc, created] = await ConsejoComunal.findOrCreate({
@@ -24,6 +34,7 @@ async function seed() {
       });
       if (created) console.log(`[+] Consejo Comunal creado: ${nombre}`);
     }
+
 
     // 2. Semilla de Usuarios Administradores y Voceros
     console.log('\n--- Verificando Usuarios ---');
