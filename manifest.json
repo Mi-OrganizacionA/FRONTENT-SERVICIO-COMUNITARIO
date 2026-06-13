@@ -1,21 +1,50 @@
 {
-  "name": "Comuna Socialista Agroecológica Simón Rodríguez",
+  "name": "SICAG — Comuna Socialista Agroecológica Simón Rodríguez",
   "short_name": "SICAG",
-  "description": "Sistema de Información Comunal Agroecológico",
+  "description": "Sistema de Información Comunal Agroecológica. Gestión digital de habitantes, proyectos y consejos comunales del sector Las Mercedes, San Felipe, Yaracuy, Venezuela.",
   "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "background_color": "#0D1F0D",
   "theme_color": "#2E7D32",
+  "lang": "es-VE",
+  "categories": ["government", "utilities", "productivity"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/assets/img/logo_comuna_fondoremovido.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/assets/img/logo_comuna_fondoremovido.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/img/logo_comuna_fondoremovido.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Censo de Habitantes",
+      "short_name": "Censo",
+      "description": "Registrar habitante nuevo",
+      "url": "/censo.html",
+      "icons": [{ "src": "/assets/img/logo_comuna_fondoremovido.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Ver estadísticas de la comuna",
+      "url": "/dashboard.html",
+      "icons": [{ "src": "/assets/img/logo_comuna_fondoremovido.png", "sizes": "96x96" }]
     }
   ]
 }

@@ -36,10 +36,18 @@ class APIManager {
     this.isSyncing = false;
     this.isSubmitting = false;
     this.initMockData();
-    // Intentar sincronizar pendientes al reconectar
-    window.addEventListener('online', () => this.flushPendingPasos());
-    // Intentar flush inicial de pendientes
+    // Sincronizar AMBAS colas al reconectar (censo + universal)
+    window.addEventListener('online', () => {
+      this._mostrarBannerOnline();
+      this.flushPendingPasos();
+      this.flushColaUniversal();
+    });
+    window.addEventListener('offline', () => this._mostrarBannerOffline());
+    // Flush inicial de pendientes al cargar
     try { this.flushPendingPasos(); } catch(e) { /* ignore */ }
+    try { this.flushColaUniversal(); } catch(e) { /* ignore */ }
+    // Mostrar estado de conexión actual
+    if (!navigator.onLine) this._mostrarBannerOffline();
   }
 
   // Cargar datos de ejemplo
@@ -91,9 +99,9 @@ class APIManager {
     }
   }
 
-  // ─────────────────────────────────────────
-  // COLA OFFLINE ROBUSTA (PROBLEMA 3)
-  // ─────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────
+  // COLA OFFLINE — CENSO DEMOGRÁFICO (pasos de estudio)
+  // ─────────────────────────────────────────────────────────────────────────
 
   /** Límite máximo de ítems en la cola offline para evitar saturar localStorage */
   get MAX_QUEUE_SIZE() { return 100; }
@@ -108,69 +116,56 @@ class APIManager {
   _savePendingQueue(queue) {
     try {
       const serializado = JSON.stringify(queue);
-      // Verificar tamaño aproximado (localStorage limita ~5MB)
       if (serializado.length > 4 * 1024 * 1024) {
-        console.error('[Cola] La cola offline supera 4MB, algunos ítems no se guardarán.');
+        console.error('[Cola Censo] Supera 4MB, algunos ítems no se guardarán.');
         window.dispatchEvent(new CustomEvent('censo:queueOverflow', { detail: { count: queue.length } }));
         return;
       }
       localStorage.setItem('sicag_censo_queue', serializado);
       window.dispatchEvent(new CustomEvent('censo:pendingCount', { detail: { count: queue.length } }));
     } catch (e) {
-      console.error('No se pudo guardar la cola de pasos:', e);
+      console.error('[Cola Censo] No se pudo guardar:', e);
       window.dispatchEvent(new CustomEvent('censo:queueError', { detail: { error: e.message } }));
     }
   }
 
   /**
    * Encola un paso de censo para sincronización futura.
-   * Incluye deduplicación: si ya existe un ítem con el mismo paso + id_estudio,
-   * se reemplaza en vez de agregar un duplicado.
+   * Incluye deduplicación por paso + id_estudio.
    */
   _enqueuePendingPaso(paso, idEstudio, datos) {
     const queue = this._getPendingQueue();
 
     if (queue.length >= this.MAX_QUEUE_SIZE) {
-      console.error('[Cola] Límite de cola offline alcanzado. No se puede encolar más pasos.');
+      console.error('[Cola Censo] Límite alcanzado.');
       throw new Error('La cola de sincronización está llena. Conéctate a internet para sincronizar.');
     }
 
-    // Deduplicación: reemplazar ítem existente si tiene mismo paso + id_estudio
     const indiceExistente = queue.findIndex(
       item => item.paso === paso && String(item.id_estudio) === String(idEstudio)
     );
-
     const nuevoItem = { paso, id_estudio: idEstudio, datos, ts: Date.now(), intentos: 0 };
 
     if (indiceExistente >= 0) {
-      // Actualizar ítem existente (no duplicar)
       queue[indiceExistente] = nuevoItem;
-      console.info(`[Cola] Paso ${paso} actualizado en la cola offline (reemplazó duplicado).`);
+      console.info(`[Cola Censo] Paso ${paso} actualizado (reemplazó duplicado).`);
     } else {
       queue.push(nuevoItem);
-      console.info(`[Cola] Paso ${paso} agregado a la cola offline. Total: ${queue.length}`);
+      console.info(`[Cola Censo] Paso ${paso} encolado. Total: ${queue.length}`);
     }
-
     this._savePendingQueue(queue);
   }
 
   /**
-   * Sincroniza todos los pasos pendientes en la cola offline.
-   * Usa mutex isSyncing para prevenir ejecuciones concurrentes (PROBLEMA 7).
+   * Sincroniza todos los pasos pendientes del censo.
    */
   async flushPendingPasos() {
-    // Prevenir sincronización concurrente (race condition)
-    if (this.isSyncing) {
-      console.info('[Cola] Sincronización ya en progreso, omitiendo llamada concurrente.');
-      return;
-    }
-
+    if (this.isSyncing) return;
     const queue = this._getPendingQueue();
     if (!queue.length) return;
 
     this.isSyncing = true;
-    console.info(`[Cola] Iniciando sincronización de ${queue.length} pasos pendientes...`);
-
+    console.info(`[Cola Censo] Sincronizando ${queue.length} pasos...`);
     const remaining = [];
     let sincronizados = 0;
 
@@ -185,19 +180,222 @@ class APIManager {
           if (!resp.ok) throw new Error('HTTP ' + resp.status);
           sincronizados++;
         } catch (e) {
-          console.warn(`[Cola] No se pudo sincronizar paso ${item.paso}:`, e.message);
-          // Incrementar contador de intentos
+          console.warn(`[Cola Censo] No se pudo sincronizar paso ${item.paso}:`, e.message);
           remaining.push({ ...item, intentos: (item.intentos || 0) + 1 });
         }
       }
     } finally {
       this._savePendingQueue(remaining);
       this.isSyncing = false;
-      console.info(`[Cola] Sincronización completada. Sincronizados: ${sincronizados}, Pendientes: ${remaining.length}`);
+      console.info(`[Cola Censo] Completado. OK: ${sincronizados}, Pendientes: ${remaining.length}`);
       window.dispatchEvent(new CustomEvent('censo:syncCompleted', {
         detail: { sincronizados, pendientes: remaining.length }
       }));
     }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // COLA OFFLINE UNIVERSAL — Todos los módulos (habitantes, proyectos, etc.)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Obtiene la cola offline universal desde localStorage.
+   * Esta cola aplica a TODOS los módulos: habitantes, proyectos, producción,
+   * organizaciones, voceros, noticias y cualquier otro que registre datos.
+   */
+  _getColaUniversal() {
+    try {
+      const raw = localStorage.getItem('sicag_offline_queue');
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  /**
+   * Guarda la cola universal en localStorage.
+   */
+  _guardarColaUniversal(cola) {
+    try {
+      const serializado = JSON.stringify(cola);
+      if (serializado.length > 3 * 1024 * 1024) {
+        console.error('[Cola Universal] Supera 3MB. No se guardarán más ítems.');
+        return;
+      }
+      localStorage.setItem('sicag_offline_queue', serializado);
+      // Notificar conteo total combinado (censo + universal)
+      const totalCenso = this._getPendingQueue().length;
+      const totalUniversal = cola.length;
+      window.dispatchEvent(new CustomEvent('offline:pendingCount', {
+        detail: { total: totalCenso + totalUniversal, universal: totalUniversal, censo: totalCenso }
+      }));
+    } catch (e) {
+      console.error('[Cola Universal] No se pudo guardar:', e);
+    }
+  }
+
+  /**
+   * Encola una operación fallida (cualquier módulo) para sincronización futura.
+   *
+   * @param {string} modulo   - Nombre del módulo ('habitantes', 'proyectos', etc.)
+   * @param {string} accion   - Acción HTTP: 'POST', 'PUT', 'DELETE'
+   * @param {string} endpoint - URL del endpoint relativo al baseURL
+   * @param {object} datos    - Datos de la operación
+   * @param {string|null} id  - ID del recurso (para PUT/DELETE)
+   */
+  _encolarOperacion(modulo, accion, endpoint, datos, id = null) {
+    const cola = this._getColaUniversal();
+
+    if (cola.length >= this.MAX_QUEUE_SIZE) {
+      console.error('[Cola Universal] Límite alcanzado. No se puede encolar más operaciones.');
+      throw new Error('La cola de sincronización está llena. Conéctate a internet para sincronizar.');
+    }
+
+    // Deduplicación: mismo módulo + acción + id → reemplazar
+    const clave = `${modulo}|${accion}|${id || 'nuevo'}`;
+    const indiceExistente = cola.findIndex(item => item.clave === clave);
+
+    const nuevoItem = {
+      clave,
+      modulo,
+      accion,
+      endpoint,
+      datos,
+      id,
+      ts: Date.now(),
+      intentos: 0
+    };
+
+    if (indiceExistente >= 0) {
+      cola[indiceExistente] = nuevoItem;
+      console.info(`[Cola Universal] Operación ${accion} en ${modulo} actualizada (deduplicada).`);
+    } else {
+      cola.push(nuevoItem);
+      console.info(`[Cola Universal] ${accion} en ${modulo} encolada. Total: ${cola.length}`);
+    }
+
+    this._guardarColaUniversal(cola);
+  }
+
+  /**
+   * Sincroniza todas las operaciones pendientes de la cola universal.
+   * Se ejecuta automáticamente cuando el navegador detecta conexión.
+   */
+  async flushColaUniversal() {
+    if (this.isSyncing) {
+      console.info('[Cola Universal] Sincronización ya en progreso.');
+      return;
+    }
+
+    const cola = this._getColaUniversal();
+    if (!cola.length) return;
+
+    this.isSyncing = true;
+    console.info(`[Cola Universal] Sincronizando ${cola.length} operaciones pendientes...`);
+
+    const pendientes = [];
+    let sincronizados = 0;
+
+    try {
+      for (const item of cola) {
+        try {
+          const url = `${this.baseURL}${item.endpoint}`;
+          const opciones = {
+            method: item.accion,
+            ...this._getHeaders()
+          };
+          // Solo adjuntar body si no es DELETE
+          if (item.accion !== 'DELETE' && item.datos) {
+            opciones.body = JSON.stringify(item.datos);
+          }
+
+          const resp = await this._fetch(url, opciones);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          sincronizados++;
+          console.info(`[Cola Universal] ✅ ${item.accion} ${item.modulo} sincronizado.`);
+        } catch (e) {
+          console.warn(`[Cola Universal] ❌ No se pudo sincronizar ${item.accion} ${item.modulo}:`, e.message);
+          pendientes.push({ ...item, intentos: (item.intentos || 0) + 1 });
+        }
+      }
+    } finally {
+      this._guardarColaUniversal(pendientes);
+      this.isSyncing = false;
+      console.info(`[Cola Universal] Completado. OK: ${sincronizados}, Pendientes: ${pendientes.length}`);
+      window.dispatchEvent(new CustomEvent('offline:syncCompleted', {
+        detail: { sincronizados, pendientes: pendientes.length }
+      }));
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // BANNER VISUAL ONLINE / OFFLINE
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Muestra un banner en la parte superior indicando que el dispositivo está offline.
+   */
+  _mostrarBannerOffline() {
+    this._eliminarBannerEstado();
+    const banner = document.createElement('div');
+    banner.id = 'sicag-offline-banner';
+    banner.setAttribute('role', 'alert');
+    banner.setAttribute('aria-live', 'assertive');
+    banner.style.cssText = [
+      'position:fixed', 'top:0', 'left:0', 'right:0', 'z-index:99999',
+      'background:linear-gradient(90deg,#E65100,#F57C00)',
+      'color:#fff', 'font-family:Poppins,sans-serif',
+      'font-size:0.82rem', 'font-weight:600',
+      'padding:0.55rem 1rem',
+      'display:flex', 'align-items:center', 'justify-content:center', 'gap:0.5rem',
+      'box-shadow:0 2px 12px rgba(0,0,0,0.25)',
+      'animation:slideDown 0.3s ease'
+    ].join(';');
+    banner.innerHTML = `
+      <span style="font-size:1rem">📡</span>
+      <span>Sin conexión a internet — Los datos se guardarán localmente y se sincronizarán al reconectar</span>
+    `;
+    // Insertar style de animación si no existe
+    if (!document.getElementById('sicag-banner-style')) {
+      const style = document.createElement('style');
+      style.id = 'sicag-banner-style';
+      style.textContent = '@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}@keyframes slideUp{from{transform:translateY(0)}to{transform:translateY(-100%)}}';
+      document.head.appendChild(style);
+    }
+    document.body.prepend(banner);
+  }
+
+  /**
+   * Muestra un banner verde temporal indicando que se recuperó la conexión.
+   */
+  _mostrarBannerOnline() {
+    this._eliminarBannerEstado();
+    const banner = document.createElement('div');
+    banner.id = 'sicag-offline-banner';
+    banner.setAttribute('role', 'status');
+    banner.style.cssText = [
+      'position:fixed', 'top:0', 'left:0', 'right:0', 'z-index:99999',
+      'background:linear-gradient(90deg,#2E7D32,#43A047)',
+      'color:#fff', 'font-family:Poppins,sans-serif',
+      'font-size:0.82rem', 'font-weight:600',
+      'padding:0.55rem 1rem',
+      'display:flex', 'align-items:center', 'justify-content:center', 'gap:0.5rem',
+      'box-shadow:0 2px 12px rgba(0,0,0,0.25)',
+      'animation:slideDown 0.3s ease'
+    ].join(';');
+    banner.innerHTML = `
+      <span style="font-size:1rem">✅</span>
+      <span>Conexión restaurada — Sincronizando datos pendientes...</span>
+    `;
+    document.body.prepend(banner);
+    // Auto-ocultar después de 4 segundos
+    setTimeout(() => this._eliminarBannerEstado(), 4000);
+  }
+
+  /**
+   * Elimina el banner de estado de red si existe.
+   */
+  _eliminarBannerEstado() {
+    const banner = document.getElementById('sicag-offline-banner');
+    if (banner) banner.remove();
   }
 
   // ─────────────────────────────────────────
@@ -494,6 +692,9 @@ class APIManager {
    * Interceptor de validaciones:
    * Revisa si el usuario actual es un vocero y si debe pasar por la bandeja de validaciones
    * o si la "Aprobación Automática Global" está activa.
+   *
+   * MODO OFFLINE: Si no hay conexión, encola la operación en la cola universal
+   * para sincronizarla automáticamente cuando vuelva internet.
    */
   async _interceptarValidacion(tabla, accion, datos, callbackOriginal) {
     const user = window.auth ? window.auth.getUser() : null;
@@ -528,9 +729,56 @@ class APIManager {
       return res;
     }
 
-    // De lo contrario (es admin, o autoGlobal está activo), ejecuta directo
+    // De lo contrario (es admin, o autoGlobal está activo), ejecutar directo
     console.log(`[API] Ejecución directa permitida para ${accion} en ${tabla}.`);
-    return await callbackOriginal();
+    try {
+      return await callbackOriginal();
+    } catch (errorRed) {
+      // Si el error es de red (sin conexión), encolamos la operación en la cola universal
+      const esErrorDeRed = !navigator.onLine ||
+        errorRed?.message?.toLowerCase().includes('failed to fetch') ||
+        errorRed?.message?.toLowerCase().includes('network') ||
+        errorRed?.code === 0;
+
+      if (esErrorDeRed) {
+        // Mapear tabla → endpoint de la API REST del backend
+        const endpointMap = {
+          'proyectos':           '/proyectos',
+          'habitantes':          '/habitantes',
+          'produccion_agricola': '/produccion_agricola',
+          'organizaciones':      '/organizaciones',
+          'voceros':             '/voceros',
+          'noticias':            '/cartelera',
+          'viviendas':           '/viviendas',
+        };
+        const metodosMap = { INSERT: 'POST', UPDATE: 'PUT', DELETE: 'DELETE' };
+
+        const endpoint      = endpointMap[tabla] || `/${tabla}`;
+        const metodo        = metodosMap[accion] || 'POST';
+        const id            = datos?.id || null;
+        const endpointFinal = (metodo !== 'POST' && id) ? `${endpoint}/${id}` : endpoint;
+
+        try {
+          this._encolarOperacion(tabla, metodo, endpointFinal, datos, id);
+          console.info(`[Cola Universal] ${accion} en ${tabla} guardada offline para sincronizar luego.`);
+
+          // Notificar al usuario que se guardó offline
+          if (window.Components?.showToast) {
+            const accionText = accion === 'INSERT' ? 'Registro' : (accion === 'UPDATE' ? 'Actualización' : 'Eliminación');
+            Components.showToast(
+              `📴 Sin conexión — ${accionText} guardada localmente. Se sincronizará al reconectar.`,
+              'warning'
+            );
+          }
+          return { success: true, offline: true, encolado: true };
+        } catch (colaError) {
+          throw colaError; // Cola llena u otro error crítico
+        }
+      }
+
+      // Si no es error de red, propagar el error original
+      throw errorRed;
+    }
   }
 
   async aprobarNotificacion(id, comentarios) {

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sin Conexión — SICAG</title>
+  <!--
+    IMPORTANTE: Esta página NO usa ningún recurso externo (ni CDN, ni Google Fonts,
+    ni FontAwesome). Todo el CSS está inline para garantizar que funcione 100% offline.
+    Es la página de fallback cuando no hay caché y no hay internet.
+  -->
+  <style>
+    /* ── Tokens de color del SICAG ── */
+    :root {
+      --vp: #2E7D32;
+      --vv: #43A047;
+      --vc: #A5D6A7;
+      --vd: #1B5E20;
+      --vx: #0D1F0D;
+      --au: #F9A825;
+      --az: #1565C0;
+      --ru: #C62828;
+      --bg: #F0F4F0;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, var(--vx) 0%, #1a3a1a 50%, var(--vd) 100%);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Tricolor ── */
+    .tricolor {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      display: flex;
+      z-index: 100;
+    }
+    .tricolor span { flex: 1; }
+    .tricolor span:nth-child(1) { background: var(--au); }
+    .tricolor span:nth-child(2) { background: var(--az); }
+    .tricolor span:nth-child(3) { background: var(--ru); }
+
+    /* ── Partículas de fondo ── */
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(165, 214, 167, 0.12);
+      animation: flotar linear infinite;
+    }
+    .particle:nth-child(1) { width: 8px;  height: 8px;  left: 10%; animation-duration: 14s; animation-delay: 0s;   bottom: -20px; }
+    .particle:nth-child(2) { width: 12px; height: 12px; left: 25%; animation-duration: 19s; animation-delay: 3s;   bottom: -20px; }
+    .particle:nth-child(3) { width: 5px;  height: 5px;  left: 40%; animation-duration: 12s; animation-delay: 1.5s; bottom: -20px; }
+    .particle:nth-child(4) { width: 9px;  height: 9px;  left: 60%; animation-duration: 17s; animation-delay: 4s;   bottom: -20px; }
+    .particle:nth-child(5) { width: 6px;  height: 6px;  left: 75%; animation-duration: 15s; animation-delay: 2s;   bottom: -20px; }
+    .particle:nth-child(6) { width: 14px; height: 14px; left: 88%; animation-duration: 21s; animation-delay: 5s;   bottom: -20px; }
+
+    @keyframes flotar {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.8; }
+      90%  { opacity: 0.4; }
+      100% { transform: translateY(-110vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ── Contenido principal ── */
+    .contenedor {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      gap: 1.5rem;
+    }
+
+    /* ── Logo ── */
+    .logo-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(165, 214, 167, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      /* Intentar cargar imagen del logo desde caché */
+    }
+
+    .logo-img img {
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      object-fit: cover;
+    }
+
+    .logo-nombre {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    .logo-sub {
+      font-size: 0.72rem;
+      color: var(--vc);
+      letter-spacing: 0.3px;
+    }
+
+    /* ── Icono de sin conexión ── */
+    .icono-offline {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(249, 168, 37, 0.15);
+      border: 3px solid rgba(249, 168, 37, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      animation: pulsar 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulsar {
+      0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(249, 168, 37, 0.3); }
+      50%       { transform: scale(1.05); box-shadow: 0 0 0 16px rgba(249, 168, 37, 0); }
+    }
+
+    /* ── Textos principales ── */
+    .titulo {
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      font-weight: 800;
+      line-height: 1.2;
+      color: #fff;
+    }
+
+    .titulo span {
+      color: var(--au);
+    }
+
+    .descripcion {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.7;
+      max-width: 420px;
+    }
+
+    /* ── Badge de pendientes ── */
+    .badge-pendientes {
+      display: none;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(249, 168, 37, 0.15);
+      border: 1px solid rgba(249, 168, 37, 0.4);
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.85rem;
+      color: var(--au);
+      font-weight: 600;
+    }
+
+    .badge-pendientes.visible {
+      display: flex;
+    }
+
+    .badge-pendientes .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--au);
+      animation: parpadear 1.2s ease-in-out infinite;
+    }
+
+    @keyframes parpadear {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    /* ── Información de modo offline ── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .info-item {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(165, 214, 167, 0.15);
+      border-radius: 12px;
+      padding: 0.9rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .info-item .icono {
+      font-size: 1.4rem;
+    }
+
+    .info-item .etiqueta {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.55);
+      font-weight: 500;
+    }
+
+    .info-item .valor {
+      font-size: 0.8rem;
+      color: var(--vc);
+      font-weight: 700;
+    }
+
+    /* ── Botones de acción ── */
+    .acciones {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .btn-reintentar {
+      background: linear-gradient(135deg, var(--vv), var(--vd));
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 0.95rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      box-shadow: 0 8px 24px rgba(46, 125, 50, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-reintentar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(46, 125, 50, 0.5);
+    }
+
+    .btn-reintentar:active {
+      transform: translateY(0);
+    }
+
+    .btn-inicio {
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.85);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 14px;
+      padding: 0.85rem 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .btn-inicio:hover {
+      background: rgba(255,255,255,0.14);
+      border-color: rgba(255,255,255,0.35);
+    }
+
+    /* ── Footer ── */
+    .pie {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .info-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Tricolor venezolana -->
+  <div class="tricolor" role="presentation" aria-hidden="true">
+    <span></span><span></span><span></span>
+  </div>
+
+  <!-- Partículas de fondo -->
+  <div class="particles" aria-hidden="true">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <!-- Contenido principal -->
+  <main class="contenedor" role="main">
+
+    <!-- Logo SICAG -->
+    <div class="logo-wrap">
+      <div class="logo-img">
+        <!-- Imagen del caché del SW -->
+        <img src="/assets/img/logo_comuna_fondoremovido.png"
+             alt="Logo SICAG"
+             onerror="this.parentElement.textContent='🌿'">
+      </div>
+      <div>
+        <div class="logo-nombre">SICAG</div>
+        <div class="logo-sub">Sistema de Información Comunal Agroecológica</div>
+      </div>
+    </div>
+
+    <!-- Icono de sin conexión -->
+    <div class="icono-offline" role="img" aria-label="Sin conexión a internet">
+      📡
+    </div>
+
+    <!-- Título y descripción -->
+    <h1 class="titulo">Sin <span>Conexión</span> a Internet</h1>
+
+    <p class="descripcion">
+      No se detectó conexión a internet. Algunas funciones del sistema están disponibles
+      en modo offline gracias al caché local. Tus operaciones pendientes se sincronizarán
+      automáticamente cuando vuelva la conexión.
+    </p>
+
+    <!-- Badge de operaciones pendientes (se muestra si hay datos en la cola) -->
+    <div class="badge-pendientes" id="badgePendientes" role="status" aria-live="polite">
+      <div class="dot"></div>
+      <span id="textoPendientes">Tienes operaciones pendientes de sincronizar</span>
+    </div>
+
+    <!-- Información del estado offline -->
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="icono">💾</div>
+        <div class="etiqueta">Caché disponible</div>
+        <div class="valor" id="estadoCache">Verificando...</div>
+      </div>
+      <div class="info-item">
+        <div class="icono">🔄</div>
+        <div class="etiqueta">Pendientes de sync</div>
+        <div class="valor" id="totalPendientes">—</div>
+      </div>
+      <div class="info-item">
+        <div class="icono">📍</div>
+        <div class="etiqueta">Ubicación</div>
+        <div class="valor">Las Mercedes, Yaracuy</div>
+      </div>
+      <div class="info-item">
+        <div class="icono">⚡</div>
+        <div class="etiqueta">Modo</div>
+        <div class="valor">Offline Activo</div>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="acciones">
+      <button class="btn-reintentar" id="btnReintentar" onclick="reintentar()">
+        🔄 Reintentar conexión
+      </button>
+      <a href="/index.html" class="btn-inicio">
+        🏠 Ir al inicio
+      </a>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="pie" role="contentinfo">
+    <p>© 2026 — SICAG · Comuna Socialista Agroecológica Simón Rodríguez · Yaracuy, Venezuela</p>
+    <p style="margin-top:0.4rem">Los datos registrados offline se sincronizarán automáticamente al recuperar internet</p>
+  </footer>
+
+  <script>
+    /**
+     * Lógica de la página offline.
+     * IMPORTANTE: No usa fetch() ni dependencias externas.
+     * Solo accede a localStorage para mostrar el estado de la cola.
+     */
+
+    // Contar operaciones pendientes de TODOS los módulos
+    function contarPendientes() {
+      let total = 0;
+      const clavesCola = [
+        'sicag_censo_queue',        // Censo demográfico
+        'sicag_offline_queue',       // Cola universal (nueva)
+      ];
+
+      clavesCola.forEach(clave => {
+        try {
+          const datos = localStorage.getItem(clave);
+          if (datos) {
+            const lista = JSON.parse(datos);
+            if (Array.isArray(lista)) total += lista.length;
+          }
+        } catch (e) { /* ignorar */ }
+      });
+
+      return total;
+    }
+
+    // Verificar estado del caché
+    async function verificarCache() {
+      if ('caches' in window) {
+        try {
+          const nombres = await caches.keys();
+          const tieneSicag = nombres.some(n => n.startsWith('sicag-'));
+          document.getElementById('estadoCache').textContent = tieneSicag ? '✅ Disponible' : '⚠️ Limitado';
+        } catch (e) {
+          document.getElementById('estadoCache').textContent = '⚠️ No verificable';
+        }
+      } else {
+        document.getElementById('estadoCache').textContent = '❌ No soportado';
+      }
+    }
+
+    // Actualizar conteo de pendientes
+    function actualizarPendientes() {
+      const total = contarPendientes();
+      const el = document.getElementById('totalPendientes');
+      const badge = document.getElementById('badgePendientes');
+      const texto = document.getElementById('textoPendientes');
+
+      el.textContent = total > 0 ? `${total} operación${total > 1 ? 'es' : ''}` : 'Ninguna';
+
+      if (total > 0) {
+        badge.classList.add('visible');
+        texto.textContent = `Tienes ${total} operación${total > 1 ? 'es' : ''} pendiente${total > 1 ? 's' : ''} de sincronizar`;
+      }
+    }
+
+    // Reintentar conexión
+    function reintentar() {
+      const btn = document.getElementById('btnReintentar');
+      btn.textContent = '⏳ Verificando...';
+      btn.style.opacity = '0.7';
+      btn.style.pointerEvents = 'none';
+
+      // Intentar navegar a la página principal
+      setTimeout(() => {
+        // Si hay conexión, redirige. Si no, recarga esta misma página.
+        window.location.href = '/index.html';
+      }, 1500);
+    }
+
+    // Escuchar cuando vuelve la conexión
+    window.addEventListener('online', () => {
+      document.querySelector('.titulo').innerHTML = 'Conexión <span style="color:#43A047">Restaurada</span>';
+      document.querySelector('.descripcion').textContent = 'La conexión a internet fue restaurada. Redirigiendo al sistema...';
+      setTimeout(() => { window.location.href = '/index.html'; }, 2000);
+    });
+
+    // Inicializar al cargar la página
+    document.addEventListener('DOMContentLoaded', () => {
+      verificarCache();
+      actualizarPendientes();
+    });
+  </script>
+
+</body>
+</html>
