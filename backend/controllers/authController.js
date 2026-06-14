@@ -11,7 +11,7 @@ class AuthController {
       
       if (!loginId || !password) return res.status(400).json({ error: 'Usuario (correo/teléfono) y contraseña requeridos' });
       const result = await AuthService.login(loginId, password, UsuarioModel);
-      res.cookie('refreshToken', result.refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', maxAge: 7 * 24 * 60 * 60 * 1000 });
+      res.cookie('refreshToken', result.refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' || true, sameSite: 'none', maxAge: 7 * 24 * 60 * 60 * 1000 });
       res.json({ token: result.token, usuario: result.usuario });
     } catch (error) {
       logger.error('Error en login:', error);
@@ -33,7 +33,7 @@ class AuthController {
 
   static async logout(req, res) {
     try {
-      res.clearCookie('refreshToken');
+      res.clearCookie('refreshToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production' || true, sameSite: 'none' });
       res.json({ mensaje: 'Logout exitoso' });
     } catch (error) {
       res.status(500).json({ error: error.message });
