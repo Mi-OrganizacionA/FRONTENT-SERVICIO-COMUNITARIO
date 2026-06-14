@@ -30,10 +30,8 @@ const errorHandler = require('./middleware/errorHandler');
 const { captureClientInfo } = require('./middleware/auditMiddleware');
 
 const app = express();
+app.set('trust proxy', 1);
 app.use(helmet());
-if (env.trust_proxy) {
-  app.set('trust proxy', 1);
-}
 app.use(cors(env.cors));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));

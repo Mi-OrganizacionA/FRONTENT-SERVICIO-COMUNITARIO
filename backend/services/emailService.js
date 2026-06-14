@@ -25,6 +25,11 @@ class EmailService {
           this.apiProvider = 'sendgrid';
           logger.info('Servicio de correos inicializado usando API HTTP (SendGrid). Evitando bloqueo SMTP de Render.');
           return;
+        } else if (this.apiKey && this.apiKey.includes(':')) {
+          this.useHttpApi = true;
+          this.apiProvider = 'mailjet';
+          logger.info('Servicio de correos inicializado usando API HTTP (Mailjet). Evitando bloqueo SMTP de Render.');
+          return;
         } else if (this.apiKey && this.apiKey.startsWith('xkeysib-')) {
           this.useHttpApi = true;
           this.apiProvider = 'brevo';
@@ -89,6 +94,21 @@ class EmailService {
         to: [{ email: toEmail }],
         subject: subject,
         htmlContent: htmlContent
+      };
+    }
+    else if (this.apiProvider === 'mailjet') {
+      url = 'https://api.mailjet.com/v3.1/send';
+      const base64Auth = Buffer.from(this.apiKey).toString('base64');
+      headers = { 'Authorization': `Basic ${base64Auth}`, 'Content-Type': 'application/json' };
+      body = {
+        Messages: [
+          {
+            From: { Email: fromEmail, Name: fromName },
+            To: [{ Email: toEmail }],
+            Subject: subject,
+            HTMLPart: htmlContent
+          }
+        ]
       };
     }
 
