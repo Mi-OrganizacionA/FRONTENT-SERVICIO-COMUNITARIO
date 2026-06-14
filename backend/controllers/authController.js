@@ -132,15 +132,7 @@ class AuthController {
       user.codigo_expiracion = expire;
       await user.save();
 
-      // Si es un correo genérico, no intentamos enviarlo de verdad, 
-      // pero devolvemos un mensaje especial para que el frontend lo maneje o el usuario use un código genérico.
-      if (email.endsWith('@sicag.com')) {
-        // Le asignamos un código genérico para que sea fácil
-        user.codigo_verificacion = '123456';
-        await user.save();
-        return res.json({ success: true, message: 'Correo genérico detectado. Usa el código 123456.', isGeneric: true });
-      }
-
+      // Enviar siempre un correo real
       await EmailService.sendVerificationCode(email, code);
 
       res.json({ success: true, message: 'Código enviado al correo' });

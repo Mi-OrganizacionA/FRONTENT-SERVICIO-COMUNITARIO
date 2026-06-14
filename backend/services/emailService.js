@@ -52,8 +52,9 @@ class EmailService {
     }
 
     try {
+      const fromEmail = this.transporter.options.auth?.user || 'no-reply@sicag.com';
       const info = await this.transporter.sendMail({
-        from: '"SICAG Soporte" <no-reply@sicag.com>',
+        from: `"SICAG Soporte" <${fromEmail}>`,
         to: toEmail,
         subject: "Código de Verificación - SICAG",
         html: `
@@ -75,12 +76,12 @@ class EmailService {
       });
 
       logger.info(`Correo enviado a ${toEmail}. ID: ${info.messageId}`);
-      logger.info(`URL de prueba del correo: ${nodemailer.getTestMessageUrl(info)}`);
     } catch (error) {
       logger.error('Error enviando correo de verificación:', error);
       throw new Error('No se pudo enviar el correo.');
     }
   }
+
   async sendContactEmail(toEmails, contactData) {
     if (!this.transporter) {
       logger.warn('Transporter no disponible, simulando envío en consola.');
@@ -89,8 +90,9 @@ class EmailService {
     }
 
     try {
+      const fromEmail = this.transporter.options.auth?.user || 'no-reply@sicag.com';
       const info = await this.transporter.sendMail({
-        from: '"SICAG Portal Público" <no-reply@sicag.com>',
+        from: `"SICAG Portal Público" <${fromEmail}>`,
         to: toEmails.join(', '),
         subject: `Nuevo Mensaje de Contacto - ${contactData.consejoComunal || 'SICAG'}`,
         html: `
