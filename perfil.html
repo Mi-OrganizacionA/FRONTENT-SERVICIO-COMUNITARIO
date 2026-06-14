@@ -438,7 +438,7 @@
           let habitanteInfo = null;
 
           if (perfilUser.cedula && window.api.getHabitantes) {
-            const result = await window.api.getHabitantes({ nombre: perfilUser.cedula, limit: 5000 });
+            const result = await window.api.getHabitantes({ limit: 5000 });
             if (result && result.length > 0) {
               // Filtrar exacto por cédula ignorando formato (puntos, guiones, mayusculas)
               const normalizar = c => String(c).toUpperCase().replace(/[^A-Z0-9]/g, '');

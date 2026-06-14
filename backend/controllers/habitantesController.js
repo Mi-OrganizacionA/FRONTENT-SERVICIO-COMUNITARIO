@@ -429,6 +429,50 @@ class HabitantesController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  /**
+   * Endpoint de búsqueda rápida para autocompletado
+   */
+  static async buscar(req, res) {
+    try {
+      const { q } = req.query;
+      if (!q || q.length < 2) return res.json([]);
+      
+      const { Op } = require('sequelize');
+      const ConsejoComunal = HabitanteModel.sequelize?.models?.ConsejoComunal;
+      const include = ConsejoComunal ? [{ model: ConsejoComunal, as: 'consejo', attributes: ['id', 'nombre_comunidad'] }] : [];
+      
+      // Permitir flexiblidad en cedula
+      const qNum = q.replace(/\D/g, '');
+
+      let orConditions = [
+        { nombres: { [Op.iLike]: `%${q}%` } },
+        { apellidos: { [Op.iLike]: `%${q}%` } },
+        { cedula: { [Op.iLike]: `%${q}%` } }
+      ];
+
+      if (qNum.length > 0) {
+        orConditions.push({ cedula: { [Op.iLike]: `%${qNum}%` } });
+      }
+
+      const habitantes = await HabitanteModel.findAll({
+        where: { [Op.or]: orConditions, activo: true },
+        include,
+        limit: 10
+      });
+      res.json(habitantes);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  /**
+   * Endpoint público de búsqueda
+   */
+  static async buscarPublico(req, res) {
+    req.query.q = req.query.q || '';
+    return HabitantesController.buscar(req, res);
+  }
 }
 
 module.exports = HabitantesController;

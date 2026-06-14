@@ -86,8 +86,24 @@ class HabitanteAutocomplete {
           setStatus('error', 'No registrado');
         }
       } catch (err) {
-        console.error('Error autocompletado:', err);
-        setStatus('error', 'Error de conexión');
+        console.warn('Error autocompletado (posible 404 del backend), usando fallback local:', err);
+        try {
+          // FALLBACK LOCAL: Si el endpoint de buscar no existe aún en producción, descargar todos y buscar
+          if (window.api && window.api.getHabitantes) {
+            const allHabitantes = await window.api.getHabitantes({ limit: 5000 });
+            const cedNorm = cedula.replace(/[.\s-]/g, '').replace(/^[VE]/i, '');
+            const habitante = allHabitantes.find(h => String(h.cedula).replace(/[.\s-]/g,'') === cedNorm);
+            if (habitante) {
+              setStatus('success', habitante.nombres);
+              if (onFill) onFill(habitante);
+              return;
+            }
+          }
+          setStatus('error', 'No registrado');
+        } catch (fbErr) {
+          console.error('Error en fallback:', fbErr);
+          setStatus('error', 'Error de conexión');
+        }
       }
     };
 

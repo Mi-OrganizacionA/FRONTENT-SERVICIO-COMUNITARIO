@@ -215,6 +215,8 @@ class CensoController {
     setVal('habEmail', h.email);
     setVal('habDireccion', h.direccion);
     setVal('habCC', h.consejo_comunal_id);
+    setVal('habOcupacion', h.ocupacion);
+    setVal('habNivelEducativo', h.nivel_educativo);
     setVal('condicionSalud', h.condicion_salud || 'saludable');
     this.calcularDatosNacimiento(h.fecha_nacimiento ? h.fecha_nacimiento.split('T')[0] : '');
   }
