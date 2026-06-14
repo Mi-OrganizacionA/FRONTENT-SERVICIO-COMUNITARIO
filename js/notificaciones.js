@@ -177,12 +177,13 @@ class NotificacionesController {
 
     tbody.innerHTML = lista.map((n, idx) => {
       const isSelected = this.selected.has(n.id);
-      const estado = (n.estado || 'pendiente').toLowerCase();
+      const estadoRaw = n.estado || n.estado_tramite || 'pendiente';
+      const estado = estadoRaw.toLowerCase();
       const desc = this.getDescripcion(n);
       const tipoBadge = this.getTipoBadge(n.tabla_afectada);
       const estadoPill = this.getEstadoPill(estado);
       const fecha = this.formatDate(n.fecha_solicitud);
-      const solicitante = n.nombre_vocero || `Vocero #${n.id_vocero}`;
+      const solicitante = n.nombre_vocero || `Vocero #${n.id_vocero || 'Desconocido'}`;
 
       return `
         <tr class="${isSelected ? 'selected' : ''}" data-id="${n.id}" role="row">

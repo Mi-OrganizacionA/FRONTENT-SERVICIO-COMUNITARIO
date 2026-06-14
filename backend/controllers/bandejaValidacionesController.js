@@ -125,6 +125,17 @@ class BandejaValidacionesController {
       // Inserción en la tabla real según corresponda
       if (tabla === 'habitantes') {
         nuevoRegistro = await models.Habitante.create(datos);
+        
+        // Vincular la cédula y teléfono al usuario que envió la solicitud para que "perfil.html" pueda enlazarlo
+        if (validacion.id_vocero) {
+          const usuarioSolicitante = await models.Usuario.findByPk(validacion.id_vocero);
+          if (usuarioSolicitante && !usuarioSolicitante.cedula) {
+            await usuarioSolicitante.update({ 
+              cedula: datos.cedula, 
+              telefono: datos.telefono || usuarioSolicitante.telefono 
+            });
+          }
+        }
       } else if (tabla === 'noticias') {
         nuevoRegistro = await models.Noticia.create(datos);
       } else if (tabla === 'proyectos') {
