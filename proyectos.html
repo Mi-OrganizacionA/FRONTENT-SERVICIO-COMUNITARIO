@@ -414,15 +414,16 @@
               <label class="form-label-sicag" for="projConsejo">Consejo Comunal *</label>
               <select class="form-control-sicag" id="projConsejo" required>
                 <option value="">Seleccionar...</option>
-                <option value="El Progreso">El Progreso</option>
-                <option value="Vencedores">Vencedores</option>
-                <option value="Patria Nueva">Patria Nueva</option>
-                <option value="Zamora Vive">Zamora Vive</option>
-                <option value="Sierra Verde">Sierra Verde</option>
-                <option value="La Esperanza">La Esperanza</option>
-                <option value="Pueblo Nuevo">Pueblo Nuevo</option>
-                <option value="Los Próceres">Los Próceres</option>
-                <option value="Bicentenario">Bicentenario</option>
+                <option value="10" style="font-weight: 600; color: var(--vp);">(Para toda la Comuna)</option>
+                <option value="1">C.C. Jobito I</option>
+                <option value="2">C.C. Jobito II</option>
+                <option value="3">C.C. Brisas del Yurubí</option>
+                <option value="4">C.C. Andrés Eloy Blanco</option>
+                <option value="5">C.C. Las Mercedes I</option>
+                <option value="6">C.C. Las Mercedes II</option>
+                <option value="7">C.C. Santa Cruz de las Mercedes</option>
+                <option value="8">C.C. Fortaleza del Corozo</option>
+                <option value="9">C.C. Vencedores del Corozo</option>
               </select>
             </div>
             <div class="form-group-sicag">
@@ -635,7 +636,7 @@
           titulo: p.nombre_proyecto || p.titulo || '',
           descripcion: p.descripcion || '',
           estado: (p.estado || 'propuesto').toLowerCase(),
-          consejo: p.consejo_comunal || p.consejo || '',
+          consejo: p.id_comunidad == 10 ? 'Para toda la Comuna' : (p.consejo_comunal || p.consejo || ''),
           consejo_id: p.id_comunidad || null,
           presupuesto: p.presupuesto_estimado || p.presupuesto || 0,
           avance: p.avance || 0,

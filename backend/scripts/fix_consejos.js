@@ -27,6 +27,7 @@ async function fixConsejos() {
     { id: 7, nombre_correcto: 'Santa Cruz de las Mercedes' },
     { id: 8, nombre_correcto: 'Fortaleza del Corozo' },
     { id: 9, nombre_correcto: 'Vencedores del Corozo' },
+    { id: 10, nombre_correcto: 'Toda la Comuna' },
   ];
 
   // Crear los que no existen y corregir los que están mal
