@@ -340,27 +340,33 @@ class APIManager {
     banner.setAttribute('role', 'alert');
     banner.setAttribute('aria-live', 'assertive');
     banner.style.cssText = [
-      'position:fixed', 'top:0', 'left:0', 'right:0', 'z-index:99999',
+      'position:fixed', 'bottom:0', 'left:0', 'right:0', 'z-index:99999',
       'background:linear-gradient(90deg,#E65100,#F57C00)',
       'color:#fff', 'font-family:Poppins,sans-serif',
       'font-size:0.82rem', 'font-weight:600',
       'padding:0.55rem 1rem',
       'display:flex', 'align-items:center', 'justify-content:center', 'gap:0.5rem',
-      'box-shadow:0 2px 12px rgba(0,0,0,0.25)',
-      'animation:slideDown 0.3s ease'
+      'box-shadow:0 -2px 12px rgba(0,0,0,0.25)',
+      'animation:slideUpBanner 0.3s ease'
     ].join(';');
     banner.innerHTML = `
       <span style="font-size:1rem">📡</span>
-      <span>Sin conexión a internet — Los datos se guardarán localmente y se sincronizarán al reconectar</span>
+      <span>Sin conexión a internet — Guardando localmente</span>
     `;
     // Insertar style de animación si no existe
     if (!document.getElementById('sicag-banner-style')) {
       const style = document.createElement('style');
       style.id = 'sicag-banner-style';
-      style.textContent = '@keyframes slideDown{from{transform:translateY(-100%)}to{transform:translateY(0)}}@keyframes slideUp{from{transform:translateY(0)}to{transform:translateY(-100%)}}';
+      style.textContent = '@keyframes slideUpBanner{from{transform:translateY(100%)}to{transform:translateY(0)}}';
       document.head.appendChild(style);
     }
-    document.body.prepend(banner);
+    document.body.appendChild(banner);
+
+    // Auto-ocultar después de 2 segundos
+    setTimeout(() => {
+      banner.style.animation = 'slideUpBanner 0.3s ease reverse forwards';
+      setTimeout(() => this._eliminarBannerEstado(), 300);
+    }, 2000);
   }
 
   /**
@@ -372,20 +378,20 @@ class APIManager {
     banner.id = 'sicag-offline-banner';
     banner.setAttribute('role', 'status');
     banner.style.cssText = [
-      'position:fixed', 'top:0', 'left:0', 'right:0', 'z-index:99999',
+      'position:fixed', 'bottom:0', 'left:0', 'right:0', 'z-index:99999',
       'background:linear-gradient(90deg,#2E7D32,#43A047)',
       'color:#fff', 'font-family:Poppins,sans-serif',
       'font-size:0.82rem', 'font-weight:600',
       'padding:0.55rem 1rem',
       'display:flex', 'align-items:center', 'justify-content:center', 'gap:0.5rem',
-      'box-shadow:0 2px 12px rgba(0,0,0,0.25)',
-      'animation:slideDown 0.3s ease'
+      'box-shadow:0 -2px 12px rgba(0,0,0,0.25)',
+      'animation:slideUpBanner 0.3s ease'
     ].join(';');
     banner.innerHTML = `
       <span style="font-size:1rem">✅</span>
-      <span>Conexión restaurada — Sincronizando datos pendientes...</span>
+      <span>Conexión restaurada — Sincronizando...</span>
     `;
-    document.body.prepend(banner);
+    document.body.appendChild(banner);
     // Auto-ocultar después de 4 segundos
     setTimeout(() => this._eliminarBannerEstado(), 4000);
   }

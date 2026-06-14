@@ -1,7 +1,7 @@
 /**
  * SICAG — Service Worker v3.0
  * Sistema de Información Comunal Agroecológica
- * Comuna Socialista Simón Rodríguez — Venezuela
+ * Comuna Socialista Agroecológica Simón Rodríguez — Venezuela
  *
  * Estrategia de caché en 3 capas:
  *  - CAPA 1 (sicag-core-v3):   Todo el frontend propio (HTML, CSS, JS, imágenes)

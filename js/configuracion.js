@@ -6,7 +6,7 @@
   const STORAGE_KEY_PORTAL = 'sicag_portal_settings';
 
   const defaultPortalSettings = {
-    nombre: 'Comuna Socialista Simón Rodríguez',
+    nombre: 'Comuna Socialista Agroecológica Simón Rodríguez',
     lema: 'Ecosocialismo y Tecnología',
     descripcion: 'Plataforma comunal diseñada para el control demográfico, cartelera informativa digital y gestión de proyectos agroecológicos administrada por la Sala de Autogobierno.',
     telefono: '0412-5554321',

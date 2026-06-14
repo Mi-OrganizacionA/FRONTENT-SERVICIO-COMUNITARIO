@@ -25,7 +25,7 @@ authService.onAuthChange(user => {
  * ============================================================
  * SICAG — Sistema de Información Comunal Agroecológica
  * Utilidades JavaScript Compartidas
- * Comuna Socialista Simón Rodríguez — Venezuela
+ * Comuna Socialista Agroecológica Simón Rodríguez — Venezuela
  * ============================================================
  */
 
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
     'color: #4CAF50; font-size: 14px; font-weight: bold;'
   );
   console.log(
-    '%cComuna Socialista Simón Rodríguez — Venezuela',
+    '%cComuna Socialista Agroecológica Simón Rodríguez — Venezuela',
     'color: #228B22; font-size: 11px;'
   );
 });
