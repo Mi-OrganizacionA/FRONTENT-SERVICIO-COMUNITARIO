@@ -15,6 +15,17 @@ module.exports = {
 
   create: async (req, res, next) => {
     try {
+      // Validar unicidad del jefe de familia: un habitante solo puede ser jefe en UNA vivienda
+      if (req.body.id_jefe_familia) {
+        const existente = await Vivienda.findOne({
+          where: { id_jefe_familia: req.body.id_jefe_familia }
+        });
+        if (existente) {
+          return res.status(409).json({
+            error: 'Este habitante ya tiene una vivienda registrada como jefe de familia. Una cédula solo puede ser jefe de una vivienda.'
+          });
+        }
+      }
       const data = await Vivienda.create(req.body);
       res.status(201).json(data);
     } catch (error) { next(error); }

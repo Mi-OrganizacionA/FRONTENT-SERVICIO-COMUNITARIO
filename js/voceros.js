@@ -179,7 +179,11 @@
     vocerosData.forEach(vocero => {
       const nombre = vocero.nombre || `${vocero.nombres || ''} ${vocero.apellidos || ''}`.trim() || 'Sin nombre';
       const cedula = vocero.cedula || vocero.nombre_usuario || '—';
-      const comunidad = vocero.consejoComunal || vocero.comunidad || '—';
+      // Leer la comunidad desde la asociación Sequelize (consejo.nombre_comunidad) o campos directos
+      const comunidad = vocero.consejo?.nombre_comunidad
+        || vocero.consejoComunal
+        || vocero.comunidad
+        || '—';
       const email = vocero.email || '—';
       const telefono = vocero.telefono || '—';
       const activo = vocero.activo !== false && vocero.estado !== 'inactivo';
@@ -273,7 +277,11 @@
     if (!el.modalEditar || !vocero) return;
 
     const nombre = vocero.nombre || `${vocero.nombres || ''} ${vocero.apellidos || ''}`.trim();
-    const comunidad = vocero.consejoComunal || vocero.comunidad || '';
+    // Leer la comunidad desde la asociación Sequelize o campos directos
+    const comunidad = vocero.consejo?.nombre_comunidad
+      || vocero.consejoComunal
+      || vocero.comunidad
+      || '';
     const activo = vocero.activo !== false && vocero.estado !== 'inactivo';
 
     if (el.editId) el.editId.value = vocero.id;

@@ -19,6 +19,11 @@
     }
   </script>
   <style>
+    /* ─── Fuente global forzada (fix móvil) ─── */
+    body, input, select, textarea, button, label, th, td, p, h1, h2, h3, h4, h5, span, div {
+      font-family: 'Poppins', 'Inter', sans-serif;
+    }
+
     /* ─── Estilos Adicionales para Voceros ─── */
     .badge-activo {
       display: inline-flex; align-items: center; gap: 5px;
@@ -203,15 +208,15 @@
           <input type="text" id="filtroNombre" placeholder="🔍 Buscar por nombre o cédula..." oninput="filtrarTabla()">
           <select id="filtroComunidad" onchange="filtrarTabla()">
             <option value="">Todas las Comunidades</option>
-            <option>C.C. Jobito I</option>
-            <option>C.C. Jobito II</option>
-            <option>C.C. Brisas del Yurubí</option>
-            <option>C.C. Andrés Eloy Blanco</option>
-            <option>C.C. Las Mercedes I</option>
-            <option>C.C. Las Mercedes II</option>
-            <option>C.C. Santa Cruz de las Mercedes</option>
-            <option>C.C. Fortaleza del Corozo</option>
-            <option>C.C. Vencedores del Corozo</option>
+            <option value="Jobito I">C.C. Jobito I</option>
+            <option value="Jobito II">C.C. Jobito II</option>
+            <option value="Brisas del Yurubí">C.C. Brisas del Yurubí</option>
+            <option value="Andrés Eloy Blanco">C.C. Andrés Eloy Blanco</option>
+            <option value="Las Mercedes I">C.C. Las Mercedes I</option>
+            <option value="Las Mercedes II">C.C. Las Mercedes II</option>
+            <option value="Santa Cruz de las Mercedes">C.C. Santa Cruz de las Mercedes</option>
+            <option value="Fortaleza del Corozo">C.C. Fortaleza del Corozo</option>
+            <option value="Vencedores del Corozo">C.C. Vencedores del Corozo</option>
           </select>
           <select id="filtroEstado" onchange="filtrarTabla()">
             <option value="">Todos los Estados</option>
@@ -562,12 +567,14 @@
           if (emailInput && datos.email) emailInput.value = datos.email;
           if (telefonoInput && datos.telefono) telefonoInput.value = datos.telefono;
 
-          // Autoseleccionar comunidad
+          // Autoseleccionar comunidad (búsqueda flexible por coincidencia parcial)
           if (nombreComunidad) {
             const sel = document.getElementById('selComunidad');
             if (sel) {
+              const normComun = nombreComunidad.toLowerCase().trim();
               for (let i = 0; i < sel.options.length; i++) {
-                if (sel.options[i].value === nombreComunidad || sel.options[i].value.includes(nombreComunidad)) {
+                const normVal = sel.options[i].value.toLowerCase().trim();
+                if (normVal && (normVal === normComun || normComun.includes(normVal) || normVal.includes(normComun))) {
                   sel.selectedIndex = i;
                   break;
                 }
