@@ -13,7 +13,7 @@
  */
 
 // ── VERSIONES DE CACHÉ ──────────────────────────────────────────────────────
-const CORE_CACHE   = 'sicag-core-v3.2';
+const CORE_CACHE   = 'sicag-core-v3.3';
 const CDN_CACHE    = 'sicag-cdn-v3';
 const API_CACHE    = 'sicag-api-v3';
 const TODOS_LOS_CACHES = [CORE_CACHE, CDN_CACHE, API_CACHE];
@@ -173,7 +173,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
 
   // ── Ignorar siempre ──────────────────────────────────────────────────────
-  // Extensiones de Chrome, WebSockets, y peticiones que no son GET de escritura
+  // Extensiones de Chrome, WebSockets, peticiones no GET, y peticiones con credenciales
   if (
     request.url.startsWith('chrome-extension') ||
     request.url.includes('extension') ||
@@ -182,8 +182,18 @@ self.addEventListener('fetch', (event) => {
     return; // Dejar que el navegador maneje directamente
   }
 
+  // ── CRÍTICO: No interceptar peticiones con Authorization o credenciales ───
+  // Esto evita que el SW interfiera con el flujo de token/refresh JWT.
+  // Las peticiones autenticadas deben ir siempre directo a la red.
+  if (
+    request.headers.get('Authorization') ||
+    request.credentials === 'include'
+  ) {
+    return; // El navegador maneja directamente sin pasar por el SW
+  }
+
   // ── ESTRATEGIA 1: API propia — Network-First con caché de respaldo ────────
-  if (url.pathname.startsWith('/api/')) {
+  if (url.pathname.startsWith('/api/') || url.hostname === 'sicag-api.onrender.com') {
     // Verificar si es una ruta API pública que podemos cachear
     const esCacheable = API_CACHE_PATTERNS.some(p => url.pathname.includes(p));
 
