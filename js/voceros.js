@@ -330,8 +330,8 @@
     const adminPass = el.confirmPass?.value;
 
     // Validaciones
-    if (!cedula) {
-      Components.showToast('Debes buscar y seleccionar un habitante mediante su cédula.', 'error');
+    if (!cedula || !habitanteId) {
+      Components.showToast('Debes buscar y seleccionar un habitante válido mediante el botón de la lupa.', 'error');
       return el.inputCedula?.focus();
     }
     if (!nombre) {

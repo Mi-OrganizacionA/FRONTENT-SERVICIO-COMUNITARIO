@@ -1,4 +1,4 @@
-﻿const logger = require('../utils/logger');
+const logger = require('../utils/logger');
 
 class HabitantesService {
   
@@ -45,14 +45,31 @@ class HabitantesService {
   }
 
   /**
-   * Crear habitante
+   * Crear o Reactivar habitante
    */
   static async crear(habitanteModel, data) {
     try {
+      // Buscar si ya existe la cédula (incluso si está inactivo)
+      if (data.cedula) {
+        const existente = await habitanteModel.findOne({ where: { cedula: data.cedula } });
+        if (existente) {
+          if (existente.activo) {
+            const error = new Error('Cédula ya registrada');
+            error.name = 'SequelizeUniqueConstraintError';
+            throw error;
+          } else {
+            // Reactivar el habitante eliminado con los nuevos datos
+            const { id, cedula, fecha_creacion, ...datosNuevos } = data;
+            await existente.update({ ...datosNuevos, activo: true });
+            return this.enriquecerHabitante(existente);
+          }
+        }
+      }
+
       const habitante = await habitanteModel.create(data);
       return this.enriquecerHabitante(habitante);
     } catch (error) {
-      logger.error('Error creating habitante:', error);
+      logger.error('Error creating/reactivating habitante:', error);
       throw error;
     }
   }

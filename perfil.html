@@ -440,8 +440,8 @@
           if (perfilUser.cedula && window.api.getHabitantes) {
             const result = await window.api.getHabitantes({ limit: 5000 });
             if (result && result.length > 0) {
-              // Filtrar exacto por cédula ignorando formato (puntos, guiones, mayusculas)
-              const normalizar = c => String(c).toUpperCase().replace(/[^A-Z0-9]/g, '');
+              // Extraer unicamente los numeros para comparar (evita errores con la V, E, puntos, etc)
+              const normalizar = c => String(c).replace(/\D/g, '');
               const cedulaUserNorm = normalizar(perfilUser.cedula);
               habitanteInfo = result.find(h => normalizar(h.cedula) === cedulaUserNorm);
               if (habitanteInfo) esHabitante = true;

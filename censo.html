@@ -517,8 +517,17 @@
         field.style.borderColor = '';
       }
     });
+    if (step === 1) {
+      const cedulaInput = document.getElementById('habCedula');
+      if (cedulaInput && cedulaInput.dataset.invalidCedula === 'true') {
+        valid = false;
+        cedulaInput.style.borderColor = '#C62828';
+        errors.push('Cédula ya registrada');
+      }
+    }
+
     if (!valid && window.Components) {
-      Components.showToast('Complete los campos obligatorios: ' + errors.slice(0,3).join(', '), 'warning');
+      Components.showToast('Verifique los campos con error: ' + errors.slice(0,3).join(', '), 'warning');
     }
     return valid;
   }
@@ -592,6 +601,12 @@
     if (!valido) {
       if (window.Components) Components.showToast('Complete todos los campos obligatorios (*).', 'error');
       else alert('Complete todos los campos obligatorios (*).');
+      return;
+    }
+
+    const cedulaInput = document.getElementById('habCedula');
+    if (cedulaInput && cedulaInput.dataset.invalidCedula === 'true' && !window.censoCtrl?.editingId) {
+      if (window.Components) Components.showToast('Corrige los errores de la cédula antes de guardar.', 'error');
       return;
     }
     
@@ -820,6 +835,7 @@
           window.verificarCedulaUnica(cedulaVal).then(function(resultado) {
             if (!resultado.unica) {
               cedulaInput.style.borderColor = '#C62828';
+              cedulaInput.dataset.invalidCedula = 'true';
               var hint = cedulaInput.parentElement.querySelector('.cv-form-hint');
               if (hint) {
                 hint.textContent = resultado.error;
@@ -828,6 +844,7 @@
               if (window.Components) Components.showToast(resultado.error, 'warning');
             } else {
               cedulaInput.style.borderColor = '';
+              cedulaInput.dataset.invalidCedula = 'false';
               var hint2 = cedulaInput.parentElement.querySelector('.cv-form-hint');
               if (hint2) {
                 hint2.textContent = 'Llave unica para consultas.';

@@ -163,7 +163,7 @@ class HabitantesController {
       
       // Verificar que cédula sea única
       const existe = await HabitanteModel.findOne({ where: { cedula } });
-      if (existe) return res.status(409).json({ error: 'Cédula ya registrada' });
+      if (existe && existe.activo) return res.status(409).json({ error: 'Cédula ya registrada' });
 
       // Lógica de Aprobación Automática
       const Configuracion = HabitanteModel.sequelize.models.Configuracion;
@@ -382,7 +382,7 @@ class HabitantesController {
       }
 
       const existe = await HabitanteModel.findOne({
-        where: { cedula: cedulaLimpia },
+        where: { cedula: cedulaLimpia, activo: true },
         attributes: ['id'] // Solo verificar existencia, no retornar datos sensibles
       });
 
