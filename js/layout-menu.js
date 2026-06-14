@@ -72,6 +72,7 @@
       title: 'Sesión',
       items: [
         { href: 'perfil.html', icon: 'user-circle', label: 'Mi Perfil' },
+        { href: 'index.html', icon: 'globe', label: 'Portal Público', target: '_blank' },
         { href: 'login.html', icon: 'right-from-bracket', label: 'Cerrar Sesión', style: 'color:rgba(255,130,100,.9);' }
       ]
     }
