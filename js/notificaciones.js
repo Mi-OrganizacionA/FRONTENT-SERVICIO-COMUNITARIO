@@ -60,8 +60,25 @@ class NotificacionesController {
   /* ─── Carga de datos ──────────────────────────────────────── */
   async cargarDatos() {
     try {
-      const data = await window.api.getNotificaciones();
-      this.todas = Array.isArray(data) ? data : (data.pendientes || []);
+      const isVocero = this.userRole === 'vocero';
+      let data;
+      
+      if (isVocero && this.userId) {
+        const response = await window.api._fetch(`${window.api.baseURL}/validaciones/mis-solicitudes?userId=${this.userId}`, window.api._getHeaders());
+        data = await response.json().catch(() => []);
+      } else {
+        data = await window.api.getNotificaciones();
+      }
+      
+      const arrayData = Array.isArray(data) ? data : (data.pendientes || []);
+      
+      // Normalizar estado_tramite a estado ('pendiente', 'aceptado', 'rechazado')
+      this.todas = arrayData.map(n => {
+        let raw = (n.estado_tramite || n.estado || 'pendiente').toLowerCase();
+        if (raw === 'aprobado') raw = 'aceptado';
+        return { ...n, estado: raw };
+      });
+      
       this.aplicarFiltros();
     } catch (e) {
       console.error('Error cargando notificaciones:', e);
@@ -177,8 +194,7 @@ class NotificacionesController {
 
     tbody.innerHTML = lista.map((n, idx) => {
       const isSelected = this.selected.has(n.id);
-      const estadoRaw = n.estado || n.estado_tramite || 'pendiente';
-      const estado = estadoRaw.toLowerCase();
+      const estado = (n.estado || 'pendiente').toLowerCase();
       const desc = this.getDescripcion(n);
       const tipoBadge = this.getTipoBadge(n.tabla_afectada);
       const estadoPill = this.getEstadoPill(estado);
@@ -191,7 +207,6 @@ class NotificacionesController {
             <input type="checkbox" class="v-checkbox row-check" data-id="${n.id}"
               ${isSelected ? 'checked' : ''} title="Seleccionar" aria-label="Seleccionar solicitud ${n.id}">
           </td>
-          <td style="color:var(--muted); font-size:.78rem;">${n.id}</td>
           <td>${tipoBadge} <span style="font-size:.75rem;color:var(--muted);display:block;margin-top:2px;">${this.escapeHtml(n.tipo_accion || 'INSERT')}</span></td>
           <td>
             <div class="v-solicitante">${this.escapeHtml(solicitante)}</div>

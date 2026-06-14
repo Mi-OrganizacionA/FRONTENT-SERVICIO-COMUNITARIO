@@ -135,7 +135,6 @@ class CensoController {
 
     tbody.innerHTML = this.habitantes.map((h, idx) => `
       <tr data-hab-id="${h.id}" class="${highlightId && String(h.id) === String(highlightId) ? 'row-highlight' : ''}">
-        <td>${idx + 1}</td>
         <td><span class="cv-cedula">V-${h.cedula}</span></td>
         <td>
           <div style="display:flex;align-items:center;gap:10px;">

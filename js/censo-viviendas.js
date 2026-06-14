@@ -63,7 +63,6 @@ function renderTable() {
   tableBody.innerHTML = viviendas.map((v, index) => {
     return `
       <tr>
-        <th scope="row">${index + 1}</th>
         <td>${v.cedula_jefe_familia}</td>
         <td>${v.sector_comunidad}</td>
         <td>${v.cantidad_habitantes}</td>
