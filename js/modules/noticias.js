@@ -98,10 +98,10 @@ class NoticiasController {
     }
     container.style.display = 'block';
     container.innerHTML = `
-      <div class="feat-pub-banner">
+      <div class="feat-banner-strip">
         <i class="fas fa-star"></i>
         <strong>Destacadas:</strong>
-        ${destacadas.map(n => `<span class="feat-pub">${n.titulo}</span>`).join('')}
+        ${destacadas.map(n => `<span class="feat-item-tag">${n.titulo}</span>`).join('')}
       </div>`;
   }
 
@@ -261,12 +261,10 @@ class NoticiasController {
       titulo: titulo,
       tipo_publicacion: tipo,
       contenido: desc,
-      autor: document.getElementById('notAutor')?.value.trim() || 'Sala de Autogobierno',
       fecha_publicacion: document.getElementById('notFecha')?.value || new Date().toISOString(),
-      // Incluir enlace de encuesta si aplica (campo 'extra' del formulario)
-      enlace_encuesta: tipo === 'encuesta' ? (extra || '') : undefined,
-      // Incluir lugar/horario si es convocatoria
-      lugar_horario: tipo === 'convocatoria' ? (extra || '') : undefined
+      enlace_extra: extra || null,
+      fecha_cierre: document.getElementById('notCierre')?.value || null,
+      destacada: document.getElementById('notDestacada')?.checked ? true : false
     };
 
     try {

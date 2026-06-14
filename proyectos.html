@@ -19,6 +19,9 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
 
   <style>
+    body, input, select, textarea, button, label, th, td, p, h1, h2, h3, h4, h5, span {
+      font-family: 'Poppins', 'Inter', sans-serif;
+    }
     /* ══════════════════════════════════════════════
        PROYECTOS AGROECOLÓGICOS — Premium Styles
     ══════════════════════════════════════════════ */
@@ -318,6 +321,49 @@
   </main>
 
   <!-- ════════════════════════════════════════
+       MODAL: Ver Proyecto
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modalVerProyecto" role="dialog" aria-modal="true">
+    <div class="modal-content-sicag" style="max-width: 600px;">
+      <div class="modal-header-sicag">
+        <h3 id="verProjTitle"><i class="fas fa-eye" style="color:var(--vv)"></i> Detalle del Proyecto</h3>
+        <button type="button" class="modal-close" onclick="cerrarModalVerProyecto()" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body-sicag">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+          <div style="grid-column: 1 / -1; margin-bottom: 0.5rem;">
+            <label style="font-weight:700; color:var(--vp);">Título del Proyecto:</label>
+            <div id="verProjTitulo" style="font-weight:600; font-size: 1.1rem;"></div>
+          </div>
+          <div style="grid-column: 1 / -1; margin-bottom: 0.5rem;">
+            <label style="font-weight:700; color:var(--vp);">Descripción:</label>
+            <div id="verProjDesc" style="color:var(--muted); line-height: 1.5;"></div>
+          </div>
+          <div><label style="font-weight:700; color:var(--vp);">Estado:</label> <span id="verProjEstado"></span></div>
+          <div><label style="font-weight:700; color:var(--vp);">Consejo Comunal:</label> <span id="verProjConsejo"></span></div>
+          <div><label style="font-weight:700; color:var(--vp);">Presupuesto:</label> <span id="verProjPresupuesto"></span></div>
+          <div><label style="font-weight:700; color:var(--vp);">Fecha Inicio:</label> <span id="verProjInicio"></span></div>
+          <div><label style="font-weight:700; color:var(--vp);">Fecha Fin:</label> <span id="verProjFin"></span></div>
+          <div style="grid-column: 1 / -1; margin-top: 0.5rem;">
+            <label style="font-weight:700; color:var(--vp);">Avance:</label>
+            <div class="proj-progress" style="margin-top: 0.2rem;">
+              <div class="proj-progress-label">
+                <span id="verProjAvanceText">0%</span>
+              </div>
+              <div class="proj-progress-bar">
+                <div id="verProjAvanceBar" class="proj-progress-fill" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer-sicag">
+        <button type="button" class="btn-sicag btn-outline-verde" onclick="cerrarModalVerProyecto()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
        MODAL: Nuevo / Editar Proyecto
   ════════════════════════════════════════ -->
   <div class="modal-overlay" id="modalProyecto" role="dialog" aria-modal="true" aria-labelledby="modalProjTitle">
@@ -590,6 +636,7 @@
           descripcion: p.descripcion || '',
           estado: (p.estado || 'propuesto').toLowerCase(),
           consejo: p.consejo_comunal || p.consejo || '',
+          consejo_id: p.id_comunidad || null,
           presupuesto: p.presupuesto_estimado || p.presupuesto || 0,
           avance: p.avance || 0,
           tipo: p.tipo_proyecto || p.tipo || '',
@@ -629,7 +676,7 @@
       document.getElementById('projTitulo').value      = p.titulo;
       document.getElementById('projDescripcion').value = p.descripcion;
       document.getElementById('projEstado').value      = p.estado;
-      document.getElementById('projConsejo').value     = p.consejo || '';
+      document.getElementById('projConsejo').value     = p.consejo_id || '';
       document.getElementById('projPresupuesto').value = p.presupuesto || '';
       document.getElementById('projAvance').value      = p.avance || 0;
       document.getElementById('projTipo').value        = p.tipo || '';
@@ -676,16 +723,16 @@
 
     const id  = document.getElementById('projId').value;
     const data = {
-      nombre_proyecto: titulo,
+      titulo: titulo,
       descripcion: desc,
-      estado,
-      consejo_comunal: consejo,
-      presupuesto_estimado: parseFloat(document.getElementById('projPresupuesto').value) || 0,
+      estado: estado,
+      id_comunidad: parseInt(consejo, 10),
+      presupuesto: parseFloat(document.getElementById('projPresupuesto').value) || 0,
       avance: parseInt(document.getElementById('projAvance').value) || 0,
       tipo_proyecto: document.getElementById('projTipo').value,
       responsable: document.getElementById('projResponsable').value.trim(),
-      fecha_inicio: document.getElementById('projFechaInicio').value,
-      fecha_fin: document.getElementById('projFechaFin').value,
+      fecha_inicio: document.getElementById('projFechaInicio').value || null,
+      fecha_fin: document.getElementById('projFechaFin').value || null,
       observaciones: document.getElementById('projObservaciones').value.trim()
     };
 
@@ -737,9 +784,25 @@
   function verProyecto(id) {
     const p = proyectos.find(x => x.id === id);
     if (!p) return;
-    if (window.Components) {
-      Components.showToast(`Detalle: ${p.titulo} — ${p.estado}`, 'info');
-    }
+    
+    document.getElementById('verProjTitulo').textContent = p.titulo;
+    document.getElementById('verProjDesc').textContent = p.descripcion || 'Sin descripción.';
+    document.getElementById('verProjEstado').innerHTML = `<span class="proj-badge badge-${p.estado}">${p.estado.toUpperCase()}</span>`;
+    document.getElementById('verProjConsejo').textContent = p.consejo || 'No especificado';
+    document.getElementById('verProjPresupuesto').textContent = p.presupuesto ? `Bs. ${Number(p.presupuesto).toLocaleString('es-VE')}` : '0.00';
+    document.getElementById('verProjInicio').textContent = formatDate(p.fechaInicio) || 'No definida';
+    document.getElementById('verProjFin').textContent = formatDate(p.fechaFin) || 'No definida';
+    
+    document.getElementById('verProjAvanceText').textContent = `${p.avance || 0}%`;
+    document.getElementById('verProjAvanceBar').style.width = `${p.avance || 0}%`;
+
+    const modal = document.getElementById('modalVerProyecto');
+    if (modal) modal.classList.add('show');
+  }
+
+  function cerrarModalVerProyecto() {
+    const modal = document.getElementById('modalVerProyecto');
+    if (modal) modal.classList.remove('show');
   }
 
   // ── EXPORTAR ──

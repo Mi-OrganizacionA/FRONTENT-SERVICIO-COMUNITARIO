@@ -13,11 +13,13 @@
   <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
   <link href="css/admin.css" rel="stylesheet">
-
   <style>
     /* ══════════════════════════════════════════════
        CARTELERA DIGITAL — Premium Styles
     ══════════════════════════════════════════════ */
+    body, input, select, textarea, button, label, th, td, p, h1, h2, h3, h4, h5, span {
+      font-family: 'Poppins', 'Inter', sans-serif;
+    }
 
     /* ── Toolbar ── */
     .pub-toolbar {
@@ -94,85 +96,31 @@
     .chip[data-filter="encuesta"].active    { background: #6A1B9A; color: #fff; border-color: #6A1B9A; }
     .chip[data-filter="aviso"].active       { background: #EF6C00; color: #fff; border-color: #EF6C00; }
 
-    /* ── Featured Publication Banner ── */
-    .feat-pub {
+    /* ── Featured Banner Strip ── */
+    .feat-banner-strip {
       background: linear-gradient(135deg, #0D2E14 0%, #1B5E20 50%, #2E7D32 100%);
-      border-radius: var(--r-lg);
-      padding: 1.75rem 2rem;
+      border-radius: var(--r-md);
+      padding: 1.2rem 1.5rem;
       color: #fff;
       display: flex;
       align-items: center;
-      gap: 2rem;
+      gap: 1rem;
       margin-bottom: 1.5rem;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(27,94,32,.25);
+      box-shadow: 0 4px 15px rgba(27,94,32,.2);
+      flex-wrap: wrap;
     }
-    .feat-pub::before {
-      content: '';
-      position: absolute;
-      top: -40px; right: -40px;
-      width: 200px; height: 200px;
-      background: rgba(255,255,255,.05);
-      border-radius: 50%;
-      pointer-events: none;
+    .feat-banner-strip i.fa-star {
+      color: var(--au);
+      font-size: 1.2rem;
     }
-    .feat-pub::after {
-      content: '';
-      position: absolute;
-      bottom: -60px; left: 40%;
-      width: 240px; height: 240px;
-      background: rgba(255,255,255,.04);
-      border-radius: 50%;
-      pointer-events: none;
-    }
-    .feat-icon {
-      width: 72px; height: 72px;
-      background: rgba(255,255,255,.12);
-      border: 2px solid rgba(255,255,255,.2);
-      border-radius: var(--r-lg);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.8rem; flex-shrink: 0;
-      position: relative; z-index: 1;
-    }
-    .feat-content { flex: 1; position: relative; z-index: 1; min-width: 0; }
-    .feat-badge {
-      display: inline-flex; align-items: center; gap: .35rem;
-      background: rgba(255,255,255,.15); color: rgba(255,255,255,.92);
-      font-size: .67rem; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
-      padding: .22rem .75rem; border-radius: 20px;
+    .feat-item-tag {
+      background: rgba(255,255,255,.15);
       border: 1px solid rgba(255,255,255,.2);
-      margin-bottom: .6rem;
+      padding: .3rem .8rem;
+      border-radius: 20px;
+      font-size: .8rem;
+      font-weight: 600;
     }
-    .feat-title {
-      font-size: 1.15rem; font-weight: 800; color: #fff;
-      line-height: 1.35; margin-bottom: .55rem;
-    }
-    .feat-meta {
-      font-size: .77rem; color: rgba(255,255,255,.65);
-      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
-    }
-    .feat-meta span { display: flex; align-items: center; gap: .35rem; }
-    .feat-meta i { color: rgba(255,255,255,.45); }
-    .feat-actions {
-      display: flex; flex-direction: column; gap: .5rem;
-      flex-shrink: 0; position: relative; z-index: 1;
-    }
-    .feat-btn {
-      display: inline-flex; align-items: center; gap: .45rem;
-      padding: .6rem 1.2rem;
-      border-radius: var(--r-sm);
-      font-size: .8rem; font-weight: 700; font-family: inherit;
-      cursor: pointer; border: none; transition: all .22s;
-      white-space: nowrap;
-    }
-    .feat-btn.primary { background: #fff; color: var(--vd); }
-    .feat-btn.primary:hover { background: var(--au); transform: translateY(-1px); }
-    .feat-btn.outline {
-      background: rgba(255,255,255,.12); color: #fff;
-      border: 1.5px solid rgba(255,255,255,.25);
-    }
-    .feat-btn.outline:hover { background: rgba(255,255,255,.2); }
 
     /* ── Section Row ── */
     .section-row {
@@ -295,9 +243,6 @@
 
     /* ── Responsive ── */
     @media (max-width: 640px) {
-      .feat-pub { flex-direction: column; }
-      .feat-actions { flex-direction: row; flex-wrap: wrap; }
-      .feat-icon { width: 52px; height: 52px; font-size: 1.3rem; }
       .pub-grid { grid-template-columns: 1fr; }
       .mfg-2, .mfg-3 { grid-template-columns: 1fr; }
       .pub-toolbar { flex-direction: column; align-items: stretch; }
@@ -531,32 +476,7 @@
     </div>
   </div>
 
-  <!-- ════════════════════════════════════════
-       MODAL: Confirmar Eliminación
-  ════════════════════════════════════════ -->
-  <div class="modal-overlay" id="modalElimNot" role="dialog" aria-modal="true">
-    <div class="modal-content-sicag" style="max-width:420px;">
-      <div class="modal-header-sicag">
-        <h3 style="color:var(--ru)"><i class="fas fa-exclamation-triangle"></i> Eliminar Publicación</h3>
-        <button type="button" class="modal-close" onclick="cerrarModalElimNot()" aria-label="Cerrar">&times;</button>
-      </div>
-      <div class="modal-body-sicag" style="text-align:center">
-        <div style="width:72px;height:72px;border-radius:50%;background:rgba(198,40,40,.08);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:2rem;color:var(--ru)">
-          <i class="fas fa-newspaper"></i>
-        </div>
-        <p style="font-size:1rem;font-weight:600;margin-bottom:.5rem">¿Eliminar esta publicación?</p>
-        <p style="font-size:.875rem;color:var(--muted)">Ya no será visible para la comunidad.<br>Esta acción no se puede deshacer.</p>
-      </div>
-      <div class="modal-footer-sicag" style="justify-content:center">
-        <button type="button" class="btn-sicag btn-outline-verde" onclick="cerrarModalElimNot()">
-          <i class="fas fa-times"></i> Cancelar
-        </button>
-        <button type="button" class="btn-sicag btn-danger" onclick="eliminarNoticia()">
-          <i class="fas fa-trash-alt"></i> Sí, Eliminar
-        </button>
-      </div>
-    </div>
-  </div>
+
 
   <!-- SICAG v5.0 Core Scripts -->
   <script src="js/masks.js"></script>

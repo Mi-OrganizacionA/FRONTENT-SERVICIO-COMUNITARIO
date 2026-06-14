@@ -33,4 +33,4 @@ Sistema de Información Comunal Agroecológica (SICAG) - Módulo Frontend Refact
 - [ ] Implementar seguridad JWT real
 
 ---
-*Desarrollado para la Comuna Socialista Simón Rodríguez.*
+*Desarrollado para la Comuna Socialista Agroecológica Simón Rodríguez.*
