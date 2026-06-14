@@ -30,7 +30,8 @@ class HabitantesController {
         where[Op.or] = [
           { nombres: { [Op.iLike]: `%${nombre}%` } },
           { apellidos: { [Op.iLike]: `%${nombre}%` } },
-          { cedula: nombre }
+          { cedula: { [Op.iLike]: `%${nombre.replace(/\D/g, '')}%` } },
+          { cedula: { [Op.iLike]: `%${nombre}%` } }
         ];
       }
 
