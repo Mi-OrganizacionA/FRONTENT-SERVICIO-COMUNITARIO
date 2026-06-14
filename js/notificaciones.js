@@ -340,6 +340,12 @@ class NotificacionesController {
       <!-- Datos proporcionados -->
       <div class="det-data-group">
         <h4><i class="fas fa-database"></i> Datos de la Solicitud</h4>
+        ${n.tabla_afectada === 'recuperacion_clave' ? `
+          <div style="background: rgba(46, 125, 50, 0.1); border: 2px dashed #2E7D32; border-radius: 12px; padding: 1.5rem; text-align: center; margin-bottom: 1rem;">
+            <p style="margin: 0; font-size: 0.9rem; color: #1B5E20; font-weight: 600;">CÓDIGO DE VERIFICACIÓN GENERADO</p>
+            <h2 style="margin: 0.5rem 0 0 0; font-size: 2.5rem; color: #2E7D32; letter-spacing: 5px;">${registro.codigo}</h2>
+          </div>
+        ` : ''}
         <div class="det-data-grid">
           ${datosHtml || '<span style="color:var(--muted); font-size:.85rem;">Sin datos adicionales.</span>'}
         </div>
@@ -537,6 +543,8 @@ class NotificacionesController {
   /* ─── Helpers ─────────────────────────────────────────────── */
   getDescripcion(n) {
     const d = n.datos_temporales || {};
+    if (n.tabla_afectada === 'recuperacion_clave') return `Recuperación de clave: ${d.correo_usuario}`;
+    if (n.tabla_afectada === 'contacto') return `Contacto de: ${d.nombre}`;
     if (d.nombres) return `Habitante: ${d.nombres} ${d.apellidos || ''}`.trim();
     if (d.titulo) return `Noticia: ${d.titulo}`;
     if (d.nombre_proyecto) return `Proyecto: ${d.nombre_proyecto}`;
@@ -553,7 +561,9 @@ class NotificacionesController {
       'noticias': ['noticia', 'newspaper'],
       'proyectos': ['proyecto', 'seedling'],
       'organizaciones': ['organización', 'hands-holding-circle'],
-      'produccion_agricola': ['producción', 'tractor']
+      'produccion_agricola': ['producción', 'tractor'],
+      'recuperacion_clave': ['recuperación', 'key'],
+      'contacto': ['contacto', 'envelope']
     };
     const t = (tabla || '').toLowerCase();
     for (const [key, [label, icon]] of Object.entries(map)) {

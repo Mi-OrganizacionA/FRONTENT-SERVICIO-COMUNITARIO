@@ -110,6 +110,7 @@ async function start() {
       const SearchController = require('./controllers/searchController');
 
       AuthController.setUsuarioModel(models.Usuario);
+      AuthController.setBandejaModel(models.BandejaValidaciones);
       HabitantesController.setModel(models.Habitante);
       VotacionesController.setModel(models.Votacion);
       ProyectosController.setModel(models.Proyecto);
@@ -129,6 +130,7 @@ async function start() {
       SystemController.setConfiguracionModel(models.Configuracion);
       SystemController.setUsuarioModel(models.Usuario);
       SystemController.setModels(models);
+      SystemController.setBandejaModel(models.BandejaValidaciones);
       SearchController.setModels(models);
 
       await runMigrations(sequelize);

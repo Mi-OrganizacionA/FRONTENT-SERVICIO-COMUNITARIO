@@ -544,6 +544,46 @@ class APIManager {
   }
 
   // ─────────────────────────────────────────
+  // NOTIFICACIONES INTERNAS
+  // ─────────────────────────────────────────
+
+  async getNotificaciones() {
+    if (this.isDevelopment) return [];
+    try {
+      const response = await this._fetch(`${this.baseURL}/notificaciones`, this._getHeaders());
+      const data = await response.json().catch(() => []);
+      return Array.isArray(data) ? data : (data.pendientes || []);
+    } catch (error) {
+      if (this.isDevelopment) return [];
+      throw error;
+    }
+  }
+
+  async aprobarNotificacion(id, comentario = '') {
+    if (this.isDevelopment) return { success: true };
+    const response = await this._fetch(`${this.baseURL}/notificaciones/${id}`, {
+      method: 'PUT',
+      ...this._getHeaders(),
+      body: JSON.stringify({ status: 'aceptado', nota: comentario })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'Error al aprobar la notificación');
+    return data;
+  }
+
+  async rechazarNotificacion(id, motivo = '') {
+    if (this.isDevelopment) return { success: true };
+    const response = await this._fetch(`${this.baseURL}/notificaciones/${id}`, {
+      method: 'PUT',
+      ...this._getHeaders(),
+      body: JSON.stringify({ status: 'rechazado', nota: motivo })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'Error al rechazar la notificación');
+    return data;
+  }
+
+  // ─────────────────────────────────────────
   // HABITANTES
   // ─────────────────────────────────────────
   async getHabitantes(filtros = {}) {
@@ -1528,6 +1568,24 @@ class APIManager {
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
       throw new Error(data.error || 'Error al enviar el mensaje');
+    }
+    return await response.json();
+  }
+
+  // --- CAMBIO DE CONTRASEÑA ---
+  async changePassword(passwordActual, nuevaPassword) {
+    if (this.isDevelopment) {
+      return new Promise(resolve => setTimeout(() => resolve({ success: true, message: 'Contraseña actualizada (Mock)' }), 1000));
+    }
+    const response = await this._fetch(`${this.baseURL}/auth/password`, {
+      method: 'PUT',
+      ...this._getHeaders(),
+      body: JSON.stringify({ passwordActual, nuevaPassword })
+    });
+    
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.error || 'Error al cambiar la contraseña');
     }
     return await response.json();
   }

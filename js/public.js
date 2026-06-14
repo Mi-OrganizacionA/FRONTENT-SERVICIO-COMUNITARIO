@@ -208,7 +208,7 @@
         await new Promise(r => setTimeout(r, 1500));
       }
       
-      btn.innerHTML = '<i class="fas fa-check"></i> ¡Mensaje Enviado!';
+      btn.innerHTML = '<i class="fas fa-check"></i> ¡Mensaje enviado! Nuestros administradores lo revisarán en breve.';
       btn.style.background = 'var(--vd)';
       contactForm.reset();
     } catch (err) {

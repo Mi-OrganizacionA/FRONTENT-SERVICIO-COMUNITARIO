@@ -107,34 +107,44 @@ class SystemController {
         return res.status(400).json({ error: 'Nombre y mensaje son requeridos' });
       }
 
-      // Buscar todos los administradores y voceros con correos válidos
-      const { Op } = require('sequelize');
-      const usuarios = await SystemController.UsuarioModel.findAll({
-        where: {
-          rol: { [Op.in]: ['admin', 'vocero'] },
-          activo: true
-        },
-        attributes: ['email']
-      });
-
-      // Filtrar correos genéricos o nulos
-      const destinatarios = usuarios
-        .map(u => u.email)
-        .filter(email => email && !email.endsWith('@sicag.com'));
-
-      if (destinatarios.length === 0) {
-        // Fallback al administrador principal si nadie tiene correo
-        destinatarios.push('sala_autogobierno@gmail.com');
+      if (!SystemController.BandejaModel) {
+        logger.warn('BandejaModel no disponible para guardar el mensaje de contacto.');
+        return res.status(500).json({ error: 'Sistema de notificaciones no disponible' });
       }
 
-      const EmailService = require('../services/emailService');
-      await EmailService.sendContactEmail(destinatarios, { nombre, correo, consejoComunal, mensaje });
+      // Buscar el primer administrador disponible para asignarle la notificación
+      const admin = await SystemController.UsuarioModel.findOne({ where: { rol: 'admin', activo: true } });
+      if (!admin) {
+        return res.status(500).json({ error: 'No hay administradores disponibles para recibir el mensaje' });
+      }
 
-      res.json({ success: true, message: 'Mensaje enviado correctamente' });
+      // Guardar el mensaje como notificación interna en la bandeja
+      await SystemController.BandejaModel.create({
+        id_vocero: admin.id,
+        tabla_afectada: 'contacto',
+        registro_id: null,
+        tipo_accion: 'CREATE',
+        datos_temporales: {
+          nombre,
+          correo: correo || 'No proporcionado',
+          consejo_comunal: consejoComunal || 'No especificado',
+          mensaje,
+          tipo_notificacion: 'contacto'
+        },
+        estado_tramite: 'Pendiente',
+        fecha_solicitud: new Date()
+      });
+
+      logger.info(`Mensaje de contacto de "${nombre}" guardado en bandeja de notificaciones.`);
+      res.json({ success: true, message: 'Mensaje enviado correctamente a los administradores.' });
     } catch (error) {
-      logger.error('Error enviando contacto:', error);
+      logger.error('Error guardando mensaje de contacto:', error);
       res.status(500).json({ error: 'Error al enviar el mensaje de contacto' });
     }
+  }
+
+  static setBandejaModel(model) {
+    SystemController.BandejaModel = model;
   }
 }
 

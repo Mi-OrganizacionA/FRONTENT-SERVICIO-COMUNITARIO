@@ -15,7 +15,25 @@ class BandejaValidacionesController {
         order: [['fecha_solicitud', 'ASC']],
         limit: 100
       });
-      res.json(validaciones);
+      
+      // Mapear al formato esperado por el frontend en notificaciones.html
+      const formatData = validaciones.map(v => {
+        const temp = v.datos_temporales || {};
+        return {
+          id: v.id,
+          tabla_afectada: v.tabla_afectada || 'desconocida',
+          tipo_accion: v.tipo_accion,
+          datos_temporales: temp,
+          estado: 'pendiente', // Siempre 'pendiente' en esta ruta
+          id_vocero: v.id_vocero,
+          nombre_vocero: temp.nombre_usuario || temp.nombre || temp.vocero || `Vocero #${v.id_vocero}`,
+          consejo_comunal: temp.consejo_comunal || temp.consejoComunal || '',
+          fecha_solicitud: v.fecha_solicitud || new Date().toISOString(),
+          comentarios: v.comentarios_validador || ''
+        };
+      });
+
+      res.json(formatData);
     } catch (error) {
       logger.error('Error obteniendo validaciones pendientes:', error);
       res.status(500).json({ error: error.message });
@@ -124,20 +142,23 @@ class BandejaValidacionesController {
         if (!nuevoCorreo) throw new Error('No se especificó un nuevo correo en la solicitud');
         
         await nuevoRegistro.update({ email: nuevoCorreo });
+      } else if (tabla === 'recuperacion_clave' || tabla === 'contacto') {
+        // Estas notificaciones no requieren inserción en tablas maestras, solo se archivan.
+        nuevoRegistro = { id: validacion.registro_id };
       } else {
         throw new Error(`Tabla afectada o tipo de acción desconocida: ${tabla} - ${validacion.tipo_accion}`);
       }
 
       await validacion.update({
         estado_tramite: 'Aprobado',
-        id_validador: req.user.id,
+        id_validador: req.user ? req.user.id : null,
         comentarios_validador: comentarios,
         fecha_validacion: new Date(),
-        registro_id: nuevoRegistro.id // Actualizamos con el ID real insertado
+        registro_id: nuevoRegistro && nuevoRegistro.id ? nuevoRegistro.id : validacion.registro_id
       });
 
-      await AuditService.log(req.user.id, 'VALIDACION_APROBADA', 'bandeja_validaciones', id, 
-        { estado: 'Pendiente' }, { estado: 'Aprobado', nuevoRegistroId: nuevoRegistro.id });
+      await AuditService.log(req.user ? req.user.id : 0, 'VALIDACION_APROBADA', 'bandeja_validaciones', id, 
+        { estado: 'Pendiente' }, { estado: 'Aprobado', nuevoRegistroId: nuevoRegistro ? nuevoRegistro.id : null });
 
       res.json({ 
         mensaje: 'Solicitud aprobada e insertada en el sistema',

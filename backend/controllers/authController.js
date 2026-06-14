@@ -1,6 +1,7 @@
 const AuthService = require('../services/authService');
-const EmailService = require('../services/emailService');
+// EmailService eliminado: el sistema ahora usa notificaciones internas
 let UsuarioModel = null;
+let BandejaModel = null;
 const logger = require('../utils/logger');
 
 class AuthController {
@@ -42,7 +43,7 @@ class AuthController {
 
   static async getPerfil(req, res) {
     try {
-      const user = await UsuarioModel.findByPk(req.user.id, { attributes: { exclude: ['contraseña'] } });
+      const user = await UsuarioModel.findByPk(req.user.id, { attributes: { exclude: ['credenciales'] } });
       res.json(user);
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -115,7 +116,7 @@ class AuthController {
     }
   }
 
-  // --- Recuperación de Contraseña por Correo ---
+  // --- Recuperación de Contraseña por Notificación Interna ---
 
   static async requestCode(req, res) {
     try {
@@ -125,26 +126,72 @@ class AuthController {
       const user = await UsuarioModel.findOne({ where: { email, activo: true } });
       if (!user) return res.status(404).json({ error: 'No existe una cuenta activa con ese correo' });
 
+      // Generar código de 6 dígitos y fecha de expiración (15 minutos)
       const code = Math.floor(100000 + Math.random() * 900000).toString();
-      const expire = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
+      const expire = new Date(Date.now() + 15 * 60 * 1000);
 
       user.codigo_verificacion = code;
       user.codigo_expiracion = expire;
       await user.save();
 
-      // Enviar siempre un correo real
-      await EmailService.sendVerificationCode(email, code);
+      // Buscar el primer administrador disponible para crear la notificación interna
+      let adminId = null;
+      if (BandejaModel) {
+        const admin = await UsuarioModel.findOne({ where: { rol: 'admin', activo: true } });
+        adminId = admin ? admin.id : user.id; // Fallback al mismo usuario si no hay admin
 
-      res.json({ success: true, message: 'Código enviado al correo' });
+        // Crear la notificación en la bandeja para que el administrador vea el código
+        try {
+          await BandejaModel.create({
+            id_vocero: adminId,
+            tabla_afectada: 'recuperacion_clave',
+            registro_id: user.id,
+            tipo_accion: 'CREATE',
+            datos_temporales: {
+              correo_usuario: email,
+              nombre_usuario: user.nombre,
+              codigo: code,
+              expira: expire.toISOString(),
+              tipo_notificacion: 'recuperacion_clave'
+            },
+            estado_tramite: 'Pendiente',
+            fecha_solicitud: new Date()
+          });
+          logger.info(`Notificación de recuperación de clave creada para usuario: ${email}`);
+        } catch (bandejaError) {
+          // Si falla la creación en bandeja por índice único, actualizar la existente
+          logger.warn('Notificación de recuperación ya existente, buscando para actualizar:', bandejaError.message);
+          const existente = await BandejaModel.findOne({
+            where: {
+              tabla_afectada: 'recuperacion_clave',
+              registro_id: user.id,
+              estado_tramite: 'Pendiente'
+            }
+          });
+          if (existente) {
+            await existente.update({
+              datos_temporales: {
+                correo_usuario: email,
+                nombre_usuario: user.nombre,
+                codigo: code,
+                expira: expire.toISOString(),
+                tipo_notificacion: 'recuperacion_clave'
+              },
+              fecha_solicitud: new Date()
+            });
+          }
+        }
+      }
+
+      res.json({ success: true, message: 'Solicitud enviada. Un administrador te proporcionará el código.' });
     } catch (error) {
       logger.error('Error solicitando código:', error);
-      res.status(500).json({ error: 'Error enviando código de verificación' });
+      res.status(500).json({ error: 'Error procesando la solicitud de recuperación' });
     }
   }
 
   /**
    * Verificar código de recuperación sin cambiar la contraseña.
-   * Usado por el frontend en el Paso 2 del wizard antes de pedir la nueva contraseña.
    */
   static async verifyCode(req, res) {
     try {
@@ -158,9 +205,7 @@ class AuthController {
         return res.status(400).json({ error: 'Código incorrecto' });
       }
 
-      // Permitir siempre si es correo genérico @sicag.com (código fijo 123456)
-      const esGenerico = email.endsWith('@sicag.com');
-      if (!esGenerico && new Date() > new Date(user.codigo_expiracion)) {
+      if (new Date() > new Date(user.codigo_expiracion)) {
         return res.status(400).json({ error: 'El código ha expirado. Solicita uno nuevo.' });
       }
 
@@ -183,15 +228,33 @@ class AuthController {
         return res.status(400).json({ error: 'Código incorrecto' });
       }
 
-      if (new Date() > new Date(user.codigo_expiracion) && !email.endsWith('@sicag.com')) {
+      if (new Date() > new Date(user.codigo_expiracion)) {
         return res.status(400).json({ error: 'El código ha expirado. Solicita uno nuevo.' });
       }
 
-      // Actualizar contraseña
+      // Actualizar contraseña y limpiar código
       user.credenciales = AuthService.hashPassword(newPassword);
       user.codigo_verificacion = null;
       user.codigo_expiracion = null;
       await user.save();
+
+      // Marcar la notificación de bandeja como resuelta si existe
+      if (BandejaModel) {
+        try {
+          const notif = await BandejaModel.findOne({
+            where: { tabla_afectada: 'recuperacion_clave', registro_id: user.id, estado_tramite: 'Pendiente' }
+          });
+          if (notif) {
+            await notif.update({
+              estado_tramite: 'Aprobado',
+              comentarios_validador: 'Contraseña restablecida exitosamente por el usuario.',
+              fecha_validacion: new Date()
+            });
+          }
+        } catch (e) {
+          logger.warn('No se pudo actualizar el estado de la notificación en bandeja:', e.message);
+        }
+      }
 
       res.json({ success: true, message: 'Contraseña actualizada correctamente' });
     } catch (error) {
@@ -202,6 +265,11 @@ class AuthController {
 
   static setUsuarioModel(model) {
     UsuarioModel = model;
+  }
+
+  // Nuevo: recibe el modelo de la Bandeja de Validaciones para crear notificaciones internas
+  static setBandejaModel(model) {
+    BandejaModel = model;
   }
 }
 
