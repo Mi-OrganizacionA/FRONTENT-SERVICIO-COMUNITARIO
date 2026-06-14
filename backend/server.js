@@ -97,7 +97,6 @@ async function start() {
       const ProduccionAgricolaController = require('./controllers/produccionAgricolaController');
       const OrganizacionesController = require('./controllers/organizacionesController');
       const ViviendasController = require('./controllers/viviendasController');
-      const ValidacionesController = require('./controllers/validacionesController');
       const VocerosController = require('./controllers/vocerosController');
       const BandejaValidacionesController = require('./controllers/bandejaValidacionesController');
       const CarteleraDigitalController = require('./controllers/carteleraDigitalController');
@@ -119,7 +118,6 @@ async function start() {
       ProduccionAgricolaController.setModel(models.ProduccionAgricola);
       OrganizacionesController.setModel(models.OrganizacionSocial);
       ViviendasController.setModel(models.Vivienda);
-      ValidacionesController.setModel(models.BandejaValidaciones);
       VocerosController.setModel(models.Usuario);
       BandejaValidacionesController.setModel(models.BandejaValidaciones);
       CarteleraDigitalController.setModel(models.CarteleraDigital);
