@@ -164,10 +164,6 @@
               <span class="detail-label">Correo Electrónico</span>
               <span class="detail-value" id="detCorreo">usuario@sicag.gob.ve</span>
             </div>
-            <div class="detail-item" style="grid-column: 1 / -1;">
-              <span class="detail-label">Dirección de Domicilio</span>
-              <span class="detail-value" id="detDireccion">No registrada</span>
-            </div>
           </div>
 
           <!-- Alerta / Botón para completar datos (Solo se usa una vez) -->
@@ -303,10 +299,6 @@
           <div class="form-group-sicag">
             <label class="form-label-sicag">Teléfono <span style="color:var(--ru);">*</span></label>
             <input type="text" id="cdTelefono" class="form-control-sicag" placeholder="Ej. 0414-1234567" required>
-          </div>
-          <div class="form-group-sicag">
-            <label class="form-label-sicag">Dirección de Domicilio <span style="color:var(--ru);">*</span></label>
-            <textarea id="cdDireccion" class="form-control-sicag" rows="2" placeholder="Detalla tu dirección exacta dentro de la comunidad" required></textarea>
           </div>
           <div class="modal-footer-sicag" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.5rem; margin-bottom: -1rem; margin-left: -1.5rem; margin-right: -1.5rem; padding-bottom: 0; padding-left: 1.5rem; padding-right: 1.5rem;">
             <button type="button" class="btn-sicag btn-outline-verde" onclick="document.getElementById('modalCompletarDatos').classList.remove('show')">Cancelar</button>
@@ -457,7 +449,6 @@
           if (esHabitante) {
             document.getElementById('detCedula').textContent = habitanteInfo.cedula || perfilUser.cedula;
             document.getElementById('detTelefono').textContent = habitanteInfo.telefono || perfilUser.telefono;
-            document.getElementById('detDireccion').textContent = habitanteInfo.direccion || 'No registrada';
             
             // Si ya es habitante, cambiar el banner a "Actualizar Datos"
             bannerCompletar.querySelector('h4').textContent = 'Datos Registrados';
@@ -472,7 +463,6 @@
             if (habitanteInfo.fecha_nacimiento) document.getElementById('cdFechaNac').value = habitanteInfo.fecha_nacimiento.split('T')[0];
             document.getElementById('cdGenero').value = habitanteInfo.genero || '';
             document.getElementById('cdTelefono').value = habitanteInfo.telefono || '';
-            document.getElementById('cdDireccion').value = habitanteInfo.direccion || '';
             
           } else {
             // Pre-llenar con lo que haya del usuario
@@ -495,7 +485,6 @@
             const fechaNac = document.getElementById('cdFechaNac').value;
             const genero = document.getElementById('cdGenero').value;
             const telefono = document.getElementById('cdTelefono').value;
-            const direccion = document.getElementById('cdDireccion').value;
             
             const nombresArr = (user.nombre || 'Usuario').split(' ');
             const nombres = nombresArr[0];
@@ -507,8 +496,7 @@
               apellidos,
               fecha_nacimiento: fechaNac,
               genero,
-              telefono, 
-              direccion,
+              telefono,
               consejo_comunal_id: perfilUser.id_comunidad_asignada || 1,
               clasificacion: 'adulto',
               elector: true
