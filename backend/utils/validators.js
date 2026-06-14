@@ -19,9 +19,11 @@ const habitanteCreateSchema = Joi.object({
   direccion: Joi.string().max(300).allow('', null),
   clasificacion: Joi.string().valid('adulto', 'niño', 'adulto_mayor', 'discapacitado', 'encamado').allow('', null),
   elector: Joi.boolean(),
-  centro_electoral: Joi.string().max(100).when('elector', { is: true, then: Joi.required(), otherwise: Joi.allow('', null) }),
+  // centro_electoral es opcional: el formulario actual no captura este campo
+  centro_electoral: Joi.string().max(100).allow('', null),
   pensionado: Joi.boolean(),
-  pensionado_institucion: Joi.string().max(150).when('pensionado', { is: true, then: Joi.required(), otherwise: Joi.allow('', null) }),
+  // pensionado_institucion es opcional: el formulario actual no captura este campo
+  pensionado_institucion: Joi.string().max(150).allow('', null),
   condicion_salud: Joi.string().valid('saludable', 'enfermedad_cronica', 'discapacidad', 'encamado').allow('', null)
 }).unknown(true);
 
@@ -37,9 +39,11 @@ const habitanteUpdateSchema = Joi.object({
   direccion: Joi.string().max(300).allow('', null),
   clasificacion: Joi.string().valid('adulto', 'niño', 'adulto_mayor', 'discapacitado', 'encamado').allow('', null),
   elector: Joi.boolean(),
-  centro_electoral: Joi.string().max(100).when('elector', { is: true, then: Joi.required(), otherwise: Joi.allow('', null) }),
+  // centro_electoral es opcional: el formulario actual no captura este campo
+  centro_electoral: Joi.string().max(100).allow('', null),
   pensionado: Joi.boolean(),
-  pensionado_institucion: Joi.string().max(150).when('pensionado', { is: true, then: Joi.required(), otherwise: Joi.allow('', null) }),
+  // pensionado_institucion es opcional: el formulario actual no captura este campo
+  pensionado_institucion: Joi.string().max(150).allow('', null),
   condicion_salud: Joi.string().valid('saludable', 'enfermedad_cronica', 'discapacidad', 'encamado').allow('', null)
 }).unknown(true);
 

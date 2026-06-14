@@ -135,6 +135,100 @@ class Components {
   }
 
   // ─────────────────────────────────────────
+  // Modal de acción dinámica (Botones Personalizados)
+  // ─────────────────────────────────────────
+  static actionDialog({ titulo, mensaje, icono = 'fa-question-circle', colorIcono = '#1565C0', btnPrimaryText, btnPrimaryIcon, btnPrimaryColor = '#2E7D32', btnSecondaryText, btnSecondaryIcon, onPrimary, onSecondary }) {
+    const modalId = 'modal-action-' + Date.now();
+    const modal = document.createElement('div');
+    modal.id = modalId;
+    
+    window[`primary_${modalId}`] = () => {
+      document.getElementById(modalId).remove();
+      delete window[`primary_${modalId}`];
+      delete window[`secondary_${modalId}`];
+      if (typeof onPrimary === 'function') onPrimary();
+    };
+
+    window[`secondary_${modalId}`] = () => {
+      document.getElementById(modalId).remove();
+      delete window[`primary_${modalId}`];
+      delete window[`secondary_${modalId}`];
+      if (typeof onSecondary === 'function') onSecondary();
+    };
+
+    modal.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        animation: fadeIn 0.2s ease-out;
+      ">
+        <div style="
+          background: white;
+          border-radius: 12px;
+          padding: 24px;
+          width: 90%;
+          max-width: 450px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+          text-align: center;
+          animation: slideUp 0.3s ease-out;
+        ">
+          <div style="font-size: 48px; color: ${colorIcono}; margin-bottom: 16px;">
+            <i class="fas ${icono}"></i>
+          </div>
+          <h3 style="margin-bottom: 12px; color: #1A1A1A; font-family: 'Poppins', sans-serif;">${titulo}</h3>
+          <p style="color: #666; margin-bottom: 24px; font-size: 15px; line-height: 1.5;">${mensaje}</p>
+          <div style="display: flex; gap: 12px; justify-content: center;">
+            <button onclick="window['secondary_${modalId}']()" style="
+              padding: 10px 20px;
+              border: 1px solid #ddd;
+              background: #f8f9fa;
+              color: #333;
+              border-radius: 6px;
+              cursor: pointer;
+              font-weight: 500;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            " onmouseover="this.style.background='#e2e6ea'; this.style.borderColor='#dae0e5'" onmouseout="this.style.background='#f8f9fa'; this.style.borderColor='#ddd'">
+              ${btnSecondaryIcon ? `<i class="fas ${btnSecondaryIcon}"></i>` : ''} ${btnSecondaryText}
+            </button>
+            
+            <button onclick="window['primary_${modalId}']()" style="
+              padding: 10px 20px;
+              background: ${btnPrimaryColor};
+              color: white;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+              font-weight: 500;
+              transition: all 0.2s;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            " onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.1)'">
+              ${btnPrimaryIcon ? `<i class="fas ${btnPrimaryIcon}"></i>` : ''} ${btnPrimaryText}
+            </button>
+          </div>
+        </div>
+      </div>
+      <style>
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+      </style>
+    `;
+
+    document.body.appendChild(modal);
+  }
+
+  // ─────────────────────────────────────────
   // Spinner de carga
   // ─────────────────────────────────────────
   static createLoadingSpinner() {

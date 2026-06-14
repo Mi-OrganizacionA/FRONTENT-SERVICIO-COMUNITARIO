@@ -28,10 +28,10 @@ class HabitantesController {
       if (nombre) {
         const { Op } = require('sequelize');
         where[Op.or] = [
-          { nombres: { [Op.iLike]: `%${nombre}%` } },
-          { apellidos: { [Op.iLike]: `%${nombre}%` } },
-          { cedula: { [Op.iLike]: `%${nombre.replace(/\D/g, '')}%` } },
-          { cedula: { [Op.iLike]: `%${nombre}%` } }
+          { nombres: { [Op.like]: `%${nombre}%` } },
+          { apellidos: { [Op.like]: `%${nombre}%` } },
+          { cedula: { [Op.like]: `%${nombre.replace(/\D/g, '')}%` } },
+          { cedula: { [Op.like]: `%${nombre}%` } }
         ];
       }
 
@@ -165,10 +165,16 @@ class HabitantesController {
       const existe = await HabitanteModel.findOne({ where: { cedula } });
       if (existe && existe.activo) return res.status(409).json({ error: 'Cédula ya registrada' });
 
-      // Lógica de Aprobación Automática
+      // Validar si el Censo está abierto
       const Configuracion = HabitanteModel.sequelize.models.Configuracion;
       const BandejaValidaciones = HabitanteModel.sequelize.models.BandejaValidaciones;
       
+      const censoConfig = await Configuracion.findOne({ where: { clave: 'Censo' } });
+      if (req.user?.rol !== 'admin' && censoConfig && censoConfig.valor === 'false') {
+        return res.status(403).json({ error: 'El Censo Comunitario está actualmente cerrado por la administración. No se permiten nuevos registros.' });
+      }
+
+      // Lógica de Aprobación Automática
       const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Habitantes' } });
       const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
       
@@ -407,8 +413,8 @@ class HabitantesController {
       if (nombre) {
         const { Op } = require('sequelize');
         where[Op.or] = [
-          { nombres: { [Op.iLike]: `%${nombre}%` } },
-          { apellidos: { [Op.iLike]: `%${nombre}%` } }
+          { nombres: { [Op.like]: `%${nombre}%` } },
+          { apellidos: { [Op.like]: `%${nombre}%` } }
         ];
       }
 
@@ -446,13 +452,13 @@ class HabitantesController {
       const qNum = q.replace(/\D/g, '');
 
       let orConditions = [
-        { nombres: { [Op.iLike]: `%${q}%` } },
-        { apellidos: { [Op.iLike]: `%${q}%` } },
-        { cedula: { [Op.iLike]: `%${q}%` } }
+        { nombres: { [Op.like]: `%${q}%` } },
+        { apellidos: { [Op.like]: `%${q}%` } },
+        { cedula: { [Op.like]: `%${q}%` } }
       ];
 
       if (qNum.length > 0) {
-        orConditions.push({ cedula: { [Op.iLike]: `%${qNum}%` } });
+        orConditions.push({ cedula: { [Op.like]: `%${qNum}%` } });
       }
 
       const habitantes = await HabitanteModel.findAll({

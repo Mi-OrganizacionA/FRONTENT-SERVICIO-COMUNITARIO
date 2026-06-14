@@ -107,20 +107,32 @@ class CensoReportesController {
       // Obtener datos estructurados del servicio
       const { title, headers, rows } = await CensoReportesService.getReporteData(CensoReportesController.dbModels, tipo, filtros);
 
+      const action = req.query.action || 'download';
+      const isView = action === 'view';
+
       // Generar archivo según formato
       if (format.toLowerCase() === 'pdf') {
         const pdfBuffer = await ExportGeneratorService.generatePDF(title, headers, rows, filtrosText);
         
+        const disposition = isView ? 'inline' : 'attachment';
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=reporte_${tipo}_${Date.now()}.pdf`);
+        res.setHeader('Content-Disposition', `${disposition}; filename=reporte_${tipo}_${Date.now()}.pdf`);
         return res.send(pdfBuffer);
       } 
       else if (format.toLowerCase() === 'excel') {
-        const excelBuffer = await ExportGeneratorService.generateExcel(headers, rows, title, filtrosText);
-        
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', `attachment; filename=reporte_${tipo}_${Date.now()}.xlsx`);
-        return res.send(excelBuffer);
+        if (isView) {
+          // El usuario solicitó VER el reporte Excel en el navegador
+          // Retornaremos una tabla HTML renderizada
+          const htmlContent = ExportGeneratorService.generateExcelHTML(headers, rows, title, filtrosText);
+          res.setHeader('Content-Type', 'text/html; charset=utf-8');
+          return res.send(htmlContent);
+        } else {
+          // El usuario solicitó DESCARGAR el Excel (.xlsx)
+          const excelBuffer = await ExportGeneratorService.generateExcel(headers, rows, title, filtrosText);
+          res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+          res.setHeader('Content-Disposition', `attachment; filename=reporte_${tipo}_${Date.now()}.xlsx`);
+          return res.send(excelBuffer);
+        }
       } 
       else {
         return res.status(400).json({ error: 'Formato no soportado. Use "pdf" o "excel".' });

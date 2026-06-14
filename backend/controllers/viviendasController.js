@@ -26,6 +26,34 @@ module.exports = {
           });
         }
       }
+
+      const db = require('../models');
+      
+      // Validar si el Censo está abierto
+      const censoConfig = await db.Configuracion.findOne({ where: { clave: 'Censo' } });
+      if (req.user?.rol !== 'admin' && censoConfig && censoConfig.valor === 'false') {
+        return res.status(403).json({ error: 'El Censo Comunitario está cerrado. No se permiten registrar nuevas viviendas.' });
+      }
+
+      // Lógica de Aprobación Automática
+      const config = await db.Configuracion.findOne({ where: { clave: 'Aprobación Automática Habitantes' } });
+      const globalConfig = await db.Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+      
+      const autoApprove = (globalConfig && globalConfig.valor === 'true') || 
+                          (config && config.valor === 'true') || 
+                          req.user?.rol === 'admin';
+
+      if (!autoApprove) {
+        await db.BandejaValidaciones.create({
+          id_vocero: req.user.id,
+          tabla_afectada: 'viviendas',
+          tipo_accion: 'CREATE',
+          datos_temporales: req.body,
+          estado_tramite: 'Pendiente'
+        });
+        return res.status(202).json({ mensaje: 'Solicitud de registro enviada a la bandeja de validaciones.' });
+      }
+
       const data = await Vivienda.create(req.body);
       res.status(201).json(data);
     } catch (error) { next(error); }

@@ -33,13 +33,10 @@ module.exports = (sequelize) => {
     fecha_validacion: DataTypes.DATE
   }, { 
     tableName: 'bandeja_validaciones', 
-    timestamps: false,
-    indexes: [
-      {
-        unique: true,
-        fields: ['id_vocero', 'tabla_afectada', 'registro_id', 'tipo_accion']
-      }
-    ]
+    timestamps: false
+    // NOTA: No usar índice unique compuesto aquí porque registro_id puede ser NULL
+    // (operaciones CREATE) y SQLite tiene comportamiento especial con NULLs en índices únicos.
+    // La deduplicación se maneja por código en bandejaValidacionesController.crear()
   });
 
   return BandejaValidaciones;

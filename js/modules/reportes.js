@@ -294,6 +294,33 @@ class ReportesController {
 
   iniciarExportacion(tipo, formato, btn) {
     const orig = btn.innerHTML;
+
+    if (window.Components && typeof Components.actionDialog === 'function') {
+      Components.actionDialog({
+        titulo: 'Opciones de Documento',
+        mensaje: '¿Deseas abrir el reporte aquí mismo en el navegador o descargarlo directamente a tu equipo?',
+        icono: 'fa-file-pdf',
+        colorIcono: '#1565C0',
+        btnPrimaryText: 'Descargar Archivo',
+        btnPrimaryIcon: 'fa-download',
+        btnPrimaryColor: '#1565C0',
+        btnSecondaryText: 'Solo Ver',
+        btnSecondaryIcon: 'fa-eye',
+        onPrimary: () => {
+          this._ejecutarRequestExportacion(tipo, formato, btn, orig, 'download');
+        },
+        onSecondary: () => {
+          this._ejecutarRequestExportacion(tipo, formato, btn, orig, 'view');
+        }
+      });
+    } else {
+      // Fallback si no está cargado el componente
+      const accion = confirm('Pulsa Aceptar para VER el reporte, o Cancelar para DESCARGARLO.') ? 'view' : 'download';
+      this._ejecutarRequestExportacion(tipo, formato, btn, orig, accion);
+    }
+  }
+
+  _ejecutarRequestExportacion(tipo, formato, btn, orig, action) {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
     btn.disabled = true;
 
@@ -301,19 +328,18 @@ class ReportesController {
     const urlParams = this.getFiltrosUrl();
     const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
     
-    // El navegador manejará la descarga del archivo automáticamente al usar window.open
-    const downloadUrl = `${baseUrl}/censo-reportes/exportar?tipo=${tipo}&format=${formato}&${urlParams}`;
+    const downloadUrl = `${baseUrl}/censo-reportes/exportar?tipo=${tipo}&format=${formato}&action=${action}&${urlParams}`;
     
     window.open(downloadUrl, '_blank');
 
     setTimeout(() => {
       btn.innerHTML = '<i class="fas fa-check"></i> ¡Listo!';
-      if (window.Components) Components.showToast('Archivo generado. Verifica tus descargas.', 'success');
+      if (window.Components) Components.showToast('Reporte generado exitosamente.', 'success');
       setTimeout(() => { 
         btn.innerHTML = orig; 
         btn.disabled = false; 
       }, 2000);
-    }, 1500); // Simulamos el retraso visual mientras se inicia la descarga
+    }, 1500);
   }
 
   renderGraficos(kpis) {

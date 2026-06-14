@@ -102,6 +102,60 @@ class ExportGeneratorService {
       }
     });
   }
+
+  /**
+   * Genera un string HTML con una tabla estilizada para visualizar en el navegador
+   * @param {Array} headers - Nombres de columnas
+   * @param {Array} data - Filas de datos
+   * @param {String} title - Título del reporte
+   * @param {String} filtrosText - Texto descriptivo de los filtros
+   * @returns {String} HTML completo
+   */
+  static generateExcelHTML(headers, data, title = 'Reporte', filtrosText = '') {
+    const thead = headers.map(h => `<th>${h}</th>`).join('');
+    const tbody = data.map(row => {
+      const tds = row.map(cell => `<td>${cell !== null && cell !== undefined ? cell : ''}</td>`).join('');
+      return `<tr>${tds}</tr>`;
+    }).join('');
+
+    return `
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <title>${title} - Vista Previa SICAG</title>
+        <style>
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
+          .container { max-width: 100%; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow-x: auto; }
+          .header-box { margin-bottom: 20px; border-bottom: 2px solid #2E7D32; padding-bottom: 10px; }
+          h1 { color: #2E7D32; margin: 0 0 5px 0; font-size: 24px; }
+          p.filtros { color: #666; font-size: 14px; margin: 0; font-style: italic; }
+          table { width: 100%; border-collapse: collapse; font-size: 14px; }
+          th, td { padding: 12px 15px; border: 1px solid #ddd; text-align: left; }
+          th { background-color: #2E7D32; color: white; position: sticky; top: 0; z-index: 10; font-weight: 500; }
+          tr:nth-child(even) { background-color: #f9f9f9; }
+          tr:hover { background-color: #f1f8e9; }
+          .btn-print { margin-bottom: 20px; padding: 10px 20px; background: #1565C0; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+          .btn-print:hover { background: #0D47A1; }
+          @media print { .btn-print { display: none; } body { padding: 0; background: white; } .container { box-shadow: none; } }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+          <div class="header-box">
+            <h1>${title}</h1>
+            ${filtrosText ? `<p class="filtros">${filtrosText}</p>` : ''}
+          </div>
+          <table>
+            <thead><tr>${thead}</tr></thead>
+            <tbody>${tbody}</tbody>
+          </table>
+        </div>
+      </body>
+      </html>
+    `;
+  }
 }
 
 module.exports = ExportGeneratorService;

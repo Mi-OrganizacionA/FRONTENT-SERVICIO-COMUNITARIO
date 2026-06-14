@@ -1,18 +1,21 @@
 const { Sequelize } = require('sequelize');
+const path = require('path');
+
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './database.sqlite',
+  storage: path.join(__dirname, 'database.sqlite'),
   logging: false
 });
 
 async function run() {
   try {
-    const [results] = await sequelize.query("PRAGMA table_info('usuarios')");
-    console.log(JSON.stringify(results, null, 2));
-  } catch(e) {
-    console.error(e);
+    const [result] = await sequelize.query("SELECT sql FROM sqlite_master WHERE name='bandeja_validaciones';");
+    console.log(result[0].sql);
+  } catch (error) {
+    console.error('Error:', error);
   } finally {
     await sequelize.close();
   }
 }
+
 run();

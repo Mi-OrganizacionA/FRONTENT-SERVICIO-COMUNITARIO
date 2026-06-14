@@ -14,13 +14,25 @@ echo 2. Esperando 5 segundos para que el backend despierte...
 timeout /t 5 /nobreak > NUL
 
 echo.
-echo 3. Abriendo la aplicacion web en tu navegador...
-start login.html
+echo 3. Iniciando servidor HTTP para el frontend en puerto 5500...
+echo    (IMPORTANTE: No abrir login.html directamente, usar el servidor HTTP)
+start "Servidor Frontend SICAG" cmd /k "npx -y http-server . -p 5500 -c-1 --cors"
+
+echo.
+echo 4. Esperando 3 segundos para que el frontend arranque...
+timeout /t 3 /nobreak > NUL
+
+echo.
+echo 5. Abriendo la aplicacion en el navegador...
+start http://localhost:5500/login.html
 
 echo.
 echo ========================================================
 echo LISTO! Ya puedes ingresar con:
 echo Correo: admin@sicag.com
 echo Clave: alvaro.09
+echo.
+echo Frontend: http://localhost:5500/login.html
+echo Backend:  http://localhost:3000/api
 echo ========================================================
 pause

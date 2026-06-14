@@ -320,14 +320,15 @@
   const handleCrear = async (e) => {
     e.preventDefault();
 
-    const cedula    = el.inputCedula?.value.trim();
-    const nombre    = el.inputNombre?.value.trim();
-    const email     = el.inputEmail?.value.trim();
-    const telefono  = el.inputTelefono?.value.trim();
-    const password  = el.inputPassword?.value;
-    const passConf  = el.inputPassConfirm?.value;
-    const comunidad = el.selComunidad?.value;
-    const adminPass = el.confirmPass?.value;
+    const cedula      = el.inputCedula?.value.trim();
+    const nombre      = el.inputNombre?.value.trim();
+    const habitanteId = el.inputHabId?.value.trim(); // ID del habitante seleccionado (campo hidden)
+    const email       = el.inputEmail?.value.trim();
+    const telefono    = el.inputTelefono?.value.trim();
+    const password    = el.inputPassword?.value;
+    const passConf    = el.inputPassConfirm?.value;
+    const comunidad   = el.selComunidad?.value;
+    const adminPass   = el.confirmPass?.value;
 
     // Validaciones
     if (!cedula || !habitanteId) {

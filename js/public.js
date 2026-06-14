@@ -698,14 +698,19 @@
          // Usar el endpoint público del backend (no requiere token).
          // El parámetro que acepta el backend es '?q=' (ver buscarPublico en habitantesController.js).
          try {
-           const baseUrl = (window.api && window.api.baseURL) || 'https://sicag-api.onrender.com/api';
+           const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
+           const baseUrl = (window.api && window.api.baseURL) || (isLocal ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api');
            const res = await fetch(`${baseUrl}/habitantes/publico/buscar?q=${encodeURIComponent(soloNumeros)}`);
+           
            if (res.ok) {
              const data = await res.json();
              // La respuesta puede ser un array o un objeto con el habitante
              habs = Array.isArray(data) ? data : (data.habitante ? [data.habitante] : (data.id ? [data] : []));
              // Filtrar para que la cédula coincida exactamente (el backend hace búsqueda parcial con LIKE)
              habs = habs.filter(h => h.cedula && h.cedula.toString().replace(/[^0-9]/g, '') === soloNumeros);
+           } else if (res.status === 429) {
+             mostrarModalHab({ error: 'Demasiadas consultas. Por favor, espera un minuto y vuelve a intentar.' });
+             return;
            }
          } catch (_) {
            // Error de red — el resultado quedará vacío, se mostrará "no encontrado"
@@ -713,7 +718,6 @@
 
          // NOTA: No hacemos fallback a window.api.getHabitantes() ni a /api/habitantes
          // porque ambos endpoints requieren autenticación y causarían un error 401 + cierre de sesión.
-
 
          if (habs.length > 0) {
            mostrarModalHab({ habitante: habs[0] });

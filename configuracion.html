@@ -396,7 +396,7 @@
             '⚠️ ADVERTENCIA: Estás a punto de activar la Aprobación Automática Global. Todas las peticiones de los voceros se guardarán directamente en la base de datos sin requerir validación. ¿Deseas continuar?',
             async () => {
               localStorage.setItem(clave, 'true');
-              await syncConfigWithBackend(clave, 'true');
+              await syncConfigWithBackend(nombre, 'true');
               Components.showToast('Aprobación Automática Global ACTIVADA.', 'warning');
             },
             () => {
@@ -406,24 +406,24 @@
           );
         } else {
           localStorage.setItem(clave, 'false');
-          syncConfigWithBackend(clave, 'false');
+          syncConfigWithBackend(nombre, 'false');
           Components.showToast('Aprobación Automática Global DESACTIVADA.', 'success');
         }
       } else {
         const estado = activado ? 'ACTIVADA' : 'DESACTIVADA';
         localStorage.setItem(clave, activado ? 'true' : 'false');
-        syncConfigWithBackend(clave, activado ? 'true' : 'false');
+        syncConfigWithBackend(nombre, activado ? 'true' : 'false');
         Components.showToast(`Política de ${nombre}: ${estado}`, activado ? 'success' : 'info');
       }
     }
 
-    async function syncConfigWithBackend(clave, valor) {
+    async function syncConfigWithBackend(nombreClaveOriginal, valor) {
       if (window.api && !window.api.isDevelopment) {
         try {
            const response = await fetch(`${window.api.baseURL}/system/config`, {
              method: 'POST',
              ...window.api._getHeaders(),
-             body: JSON.stringify({ clave, valor })
+             body: JSON.stringify({ nombre: nombreClaveOriginal, estado: valor === 'true' })
            });
            // Ignoramos el error si no existe la ruta en el backend por ahora
         } catch(e) {

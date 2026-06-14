@@ -576,8 +576,9 @@
         var ccSelect = document.getElementById('habCC');
         if (ccSelect) {
           ccSelect.value = user.id_comunidad_asignada || user.consejo_comunal_id || user.consejoComunal || '';
-          ccSelect.style.pointerEvents = 'none';
+          ccSelect.disabled = true; // Bloquea totalmente la edición, incluyendo teclado
           ccSelect.style.background = 'var(--gray2)';
+          ccSelect.style.cursor = 'not-allowed';
         }
       }
     }
