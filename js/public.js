@@ -695,40 +695,25 @@
        try {
          let habs = [];
 
-         // Intentar API pública del backend primero (no requiere token)
+         // Usar el endpoint público del backend (no requiere token).
+         // El parámetro que acepta el backend es '?q=' (ver buscarPublico en habitantesController.js).
          try {
            const baseUrl = (window.api && window.api.baseURL) || 'https://sicag-api.onrender.com/api';
-           const res = await fetch(`${baseUrl}/habitantes/publico/buscar?cedula=${encodeURIComponent(soloNumeros)}`);
+           const res = await fetch(`${baseUrl}/habitantes/publico/buscar?q=${encodeURIComponent(soloNumeros)}`);
            if (res.ok) {
              const data = await res.json();
-             // La respuesta puede ser el habitante directamente o un array
+             // La respuesta puede ser un array o un objeto con el habitante
              habs = Array.isArray(data) ? data : (data.habitante ? [data.habitante] : (data.id ? [data] : []));
+             // Filtrar para que la cédula coincida exactamente (el backend hace búsqueda parcial con LIKE)
+             habs = habs.filter(h => h.cedula && h.cedula.toString().replace(/[^0-9]/g, '') === soloNumeros);
            }
          } catch (_) {
-           // Si no hay endpoint público específico, fallback al endpoint general
+           // Error de red — el resultado quedará vacío, se mostrará "no encontrado"
          }
 
-         // Fallback: usar window.api.getHabitantes si el anterior no dio resultado
-         if (habs.length === 0 && window.api && window.api.getHabitantes) {
-           try {
-             const todos = await window.api.getHabitantes();
-             habs = todos.filter(h =>
-               h.cedula && h.cedula.toString().replace(/[^0-9]/g, '') === soloNumeros
-             );
-           } catch (_) {}
-         }
+         // NOTA: No hacemos fallback a window.api.getHabitantes() ni a /api/habitantes
+         // porque ambos endpoints requieren autenticación y causarían un error 401 + cierre de sesión.
 
-         if (habs.length === 0) {
-           // Segundo intento: fetch al backend sin autenticación
-           try {
-             const baseUrl2 = (window.api && window.api.baseURL) || 'https://sicag-api.onrender.com/api';
-             const r2 = await fetch(`${baseUrl2}/habitantes?cedula=${soloNumeros}`);
-             if (r2.ok) {
-               const d2 = await r2.json();
-               habs = Array.isArray(d2) ? d2 : (d2.habitantes || []);
-             }
-           } catch (_) {}
-         }
 
          if (habs.length > 0) {
            mostrarModalHab({ habitante: habs[0] });
