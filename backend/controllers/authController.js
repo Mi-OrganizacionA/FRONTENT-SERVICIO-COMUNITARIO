@@ -150,6 +150,35 @@ class AuthController {
     }
   }
 
+  /**
+   * Verificar código de recuperación sin cambiar la contraseña.
+   * Usado por el frontend en el Paso 2 del wizard antes de pedir la nueva contraseña.
+   */
+  static async verifyCode(req, res) {
+    try {
+      const { email, code } = req.body;
+      if (!email || !code) return res.status(400).json({ error: 'Correo y código son requeridos' });
+
+      const user = await UsuarioModel.findOne({ where: { email, activo: true } });
+      if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+      if (user.codigo_verificacion !== code) {
+        return res.status(400).json({ error: 'Código incorrecto' });
+      }
+
+      // Permitir siempre si es correo genérico @sicag.com (código fijo 123456)
+      const esGenerico = email.endsWith('@sicag.com');
+      if (!esGenerico && new Date() > new Date(user.codigo_expiracion)) {
+        return res.status(400).json({ error: 'El código ha expirado. Solicita uno nuevo.' });
+      }
+
+      res.json({ success: true, message: 'Código verificado correctamente' });
+    } catch (error) {
+      logger.error('Error verificando código:', error);
+      res.status(500).json({ error: 'Error del servidor al verificar código' });
+    }
+  }
+
   static async resetPasswordWithCode(req, res) {
     try {
       const { email, code, newPassword } = req.body;

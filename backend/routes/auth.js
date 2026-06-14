@@ -14,6 +14,7 @@ router.put('/password', verifyToken, authController.changePassword);
 router.put('/email', verifyToken, authController.changeEmail);
 
 router.post('/request-code', authController.requestCode);
+router.post('/verify-code', authController.verifyCode);
 router.post('/reset-password', authController.resetPasswordWithCode);
 
 module.exports = router;
