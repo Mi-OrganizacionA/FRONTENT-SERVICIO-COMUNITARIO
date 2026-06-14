@@ -407,17 +407,41 @@ class APIManager {
   // ─────────────────────────────────────────
   // AUTHENTICATION & SECURITY
   // ─────────────────────────────────────────
-  async cambiarPassword(passwordActual, nuevaPassword) {
+  async changePassword(passwordActual, nuevaPassword) {
     if (this.isDevelopment) {
       return new Promise(r => setTimeout(() => r({ success: true, message: 'Simulado' }), 500));
     }
-    const response = await fetch(`${this.baseURL}/auth/password`, {
+    const response = await this._fetch(`${this.baseURL}/auth/password`, {
       method: 'PUT',
       ...this._getHeaders(),
       body: JSON.stringify({ passwordActual, nuevaPassword })
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Error al cambiar la contraseña');
+    return data;
+  }
+
+  async changeEmail(nuevoEmail, passwordActual) {
+    if (this.isDevelopment) {
+      return new Promise(r => setTimeout(() => r({ success: true, message: 'Simulado' }), 500));
+    }
+    const response = await this._fetch(`${this.baseURL}/auth/email`, {
+      method: 'PUT',
+      ...this._getHeaders(),
+      body: JSON.stringify({ email: nuevoEmail, passwordActual })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Error al cambiar el correo');
+    return data;
+  }
+
+  async getPerfil() {
+    if (this.isDevelopment) {
+      return { success: true, message: 'Simulado' };
+    }
+    const response = await this._fetch(`${this.baseURL}/auth/perfil`, this._getHeaders());
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Error al obtener el perfil');
     return data;
   }
 

@@ -93,23 +93,27 @@ class AuthController {
 
   static async changeEmail(req, res) {
     try {
-      const { nuevoCorreo } = req.body;
-      if (!nuevoCorreo) return res.status(400).json({ error: 'El nuevo correo es requerido' });
+      const { email, passwordActual } = req.body;
+      if (!email || !passwordActual) return res.status(400).json({ error: 'El nuevo correo y la contraseña actual son requeridos' });
 
       const userId = req.user.id;
       const user = await UsuarioModel.findByPk(userId);
       if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
 
+      // Validar contraseña
+      const isValid = AuthService.validatePassword(passwordActual, user.credenciales);
+      if (!isValid) return res.status(401).json({ error: 'La contraseña actual es incorrecta' });
+
       // Verificar si el correo ya está en uso
-      const existingUser = await UsuarioModel.findOne({ where: { email: nuevoCorreo } });
+      const existingUser = await UsuarioModel.findOne({ where: { email } });
       if (existingUser && existingUser.id !== userId) {
         return res.status(400).json({ error: 'El correo ya está en uso por otro usuario' });
       }
 
-      user.email = nuevoCorreo;
+      user.email = email;
       await user.save();
 
-      res.json({ success: true, message: 'Correo actualizado exitosamente', nuevoCorreo });
+      res.json({ success: true, message: 'Correo actualizado exitosamente', nuevoCorreo: email });
     } catch (error) {
       logger.error('Error cambiando correo:', error);
       res.status(500).json({ error: 'Error del servidor al cambiar correo' });
