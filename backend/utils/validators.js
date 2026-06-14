@@ -74,7 +74,7 @@ const votacionParamSchema = Joi.object({
 
 const paginationSchema = Joi.object({
   page: Joi.number().integer().min(1).default(1),
-  limit: Joi.number().integer().min(1).max(100).default(20),
+  limit: Joi.number().integer().min(1).max(10000).default(20),
   search: Joi.string().max(200).allow('', null)
 });
 
