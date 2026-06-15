@@ -610,34 +610,37 @@
     explorerPage = 1;
     const searchInput = document.getElementById('fsSearch');
     const filterStatus = document.getElementById('fsFilterStatus');
+    const filterCC = document.getElementById('fsFilterCC');
     
     if(searchInput) searchInput.value = '';
-    if(document.getElementById('fsFilterCC')) document.getElementById('fsFilterCC').value = '';
+    if(filterCC) filterCC.value = '';
     
     if (tipo === 'proyectos') {
       document.getElementById('fsTitle').textContent = 'Explorador de Proyectos';
       document.getElementById('fsSub').textContent = 'Proyectos agroecológicos y de infraestructura de los consejos comunales.';
       document.getElementById('fsIcon').innerHTML = '<i class="fas fa-seedling"></i>';
+      if(filterCC) filterCC.style.display = 'inline-block';
       if(filterStatus) {
-        filterStatus.style.display = 'block';
+        filterStatus.style.display = 'inline-block';
         filterStatus.innerHTML = `
           <option value="">Todos los Estados</option>
-          <option value="activo">Activo</option>
-          <option value="desarrollo">En Desarrollo</option>
           <option value="propuesto">Propuesto</option>
-          <option value="pendiente">Pendiente</option>
-          <option value="completado">Completado</option>
+          <option value="aprobado">Aprobado</option>
+          <option value="en_ejecucion">En Ejecución</option>
+          <option value="finalizado">Finalizado</option>
+          <option value="rechazado">Rechazado</option>
         `;
       }
     } else {
       document.getElementById('fsTitle').textContent = 'Explorador de Noticias';
       document.getElementById('fsSub').textContent = 'Avisos, convocatorias y actualizaciones de la comuna.';
       document.getElementById('fsIcon').innerHTML = '<i class="fas fa-newspaper"></i>';
+      if(filterCC) filterCC.style.display = 'none';
       if(filterStatus) {
-        filterStatus.style.display = 'block';
+        filterStatus.style.display = 'inline-block';
         filterStatus.innerHTML = `
           <option value="">Todos los Tipos</option>
-          <option value="noticia">Noticia</option>
+          <option value="noticia">Noticia general</option>
           <option value="convocatoria">Convocatoria</option>
           <option value="encuesta">Encuesta</option>
           <option value="aviso">Aviso</option>
@@ -653,30 +656,31 @@
 
   function filtrarExplorador() {
     const q = document.getElementById('fsSearch').value.toLowerCase().trim();
-    const cc = document.getElementById('fsFilterCC').value;
-    const status = document.getElementById('fsFilterStatus').value.toLowerCase();
+    const cc = document.getElementById('fsFilterCC') ? document.getElementById('fsFilterCC').value : '';
+    const status = document.getElementById('fsFilterStatus') ? document.getElementById('fsFilterStatus').value.toLowerCase() : '';
     
     let base = explorerType === 'proyectos' ? todosLosProyectos : todasLasNoticias;
     
     explorerFiltered = base.filter(item => {
       // Búsqueda por texto
       const textMatch = explorerType === 'proyectos' ? 
-        ((item.nombre_proyecto||'').toLowerCase().includes(q) || (item.descripcion||'').toLowerCase().includes(q)) :
+        ((item.titulo||item.nombre_proyecto||'').toLowerCase().includes(q) || (item.descripcion||'').toLowerCase().includes(q)) :
         ((item.titulo||'').toLowerCase().includes(q) || (item.contenido||'').toLowerCase().includes(q));
         
       if (!textMatch) return false;
       
       // Búsqueda por CC
-      if (cc) {
-        if (explorerType === 'proyectos') {
-           const cName = (item.consejo_comunal || '').toLowerCase();
-           const keywordMap = {
-              'jobito1': 'jobito i', 'jobito2': 'jobito ii', 'brisas': 'brisas',
-              'aeb': 'andrés eloy', 'mercedes1': 'mercedes', 'santacruz': 'santa cruz', 'corozo': 'corozo'
-           };
-           const kw = keywordMap[cc] || cc;
-           if (!cName.includes(kw)) return false;
-        }
+      if (cc && explorerType === 'proyectos') {
+         const nombresConsejo = {
+           1: 'C.C. Jobito I', 2: 'C.C. Jobito II', 3: 'C.C. Jobito III', 10: 'Para toda la Comuna'
+         };
+         const cName = (nombresConsejo[item.id_comunidad] || item.consejo_comunal || item.consejo || '').toLowerCase();
+         const keywordMap = {
+            'jobito1': 'jobito i', 'jobito2': 'jobito ii', 'brisas': 'brisas',
+            'aeb': 'andrés eloy', 'mercedes1': 'mercedes', 'santacruz': 'santa cruz', 'corozo': 'corozo'
+         };
+         const kw = keywordMap[cc] || cc;
+         if (!cName.includes(kw)) return false;
       }
       
       // Búsqueda por estado/tipo
