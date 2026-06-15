@@ -370,7 +370,7 @@
               <span style="font-size: 0.8rem; font-weight: 700; color: var(--gray5);"><i class="fas fa-tag" style="color:var(--gray4);"></i> ${p.tipo_proyecto || 'General'}</span>
             </div>
             
-            <div style="font-size: 1.1rem; font-weight: 800; color: var(--dark); line-height: 1.35;">${p.nombre_proyecto || ''}</div>
+            <div style="font-size: 1.1rem; font-weight: 800; color: var(--dark); line-height: 1.35;">${p.titulo || p.nombre_proyecto || ''}</div>
             
             <div style="font-size: 0.85rem; color: var(--gray4); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.descripcion || ''}</div>
             
@@ -525,7 +525,7 @@
     if (tipo === 'proyecto') {
       item = todosLosProyectos.find(p => String(p.id) === String(id));
       if (!item) return;
-      titleEl.textContent = item.nombre_proyecto;
+      titleEl.textContent = item.titulo || item.nombre_proyecto || 'Proyecto sin título';
       
       const nombresConsejo = {
         1: 'C.C. Jobito I',
