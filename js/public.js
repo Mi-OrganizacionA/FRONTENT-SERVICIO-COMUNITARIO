@@ -520,38 +520,40 @@
       else if(estado === 'finalizado') { badgeColor = 'rgba(27,94,32,.12)'; textColor = '#1B5E20'; }
 
       infoEl.innerHTML = `
-        <div style="background:#F9FAFB;border:1px solid #EAEEF2;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
-           <div>
-              <div style="font-size:.7rem;color:var(--gray4);font-weight:700;text-transform:uppercase;margin-bottom:.3rem;letter-spacing:0.5px;"><i class="fas fa-map-marker-alt" style="color:var(--vv);"></i> Consejo Comunal</div>
-              <div style="font-size:.85rem;font-weight:700;color:var(--dark);">${item.consejo_comunal || 'Sector General'}</div>
-           </div>
-           <div>
-              <div style="font-size:.7rem;color:var(--gray4);font-weight:700;text-transform:uppercase;margin-bottom:.3rem;letter-spacing:0.5px;"><i class="fas fa-user-tie" style="color:var(--vv);"></i> Responsable</div>
-              <div style="font-size:.85rem;font-weight:700;color:var(--dark);">${item.responsable || 'Comunidad'}</div>
-           </div>
-           <div>
-              <div style="font-size:.7rem;color:var(--gray4);font-weight:700;text-transform:uppercase;margin-bottom:.3rem;letter-spacing:0.5px;"><i class="fas fa-calendar-alt" style="color:var(--vv);"></i> Inicio / Registro</div>
-              <div style="font-size:.85rem;font-weight:700;color:var(--dark);">${item.fecha_inicio ? new Date(item.fecha_inicio).toLocaleDateString() : 'Por definir'}</div>
-           </div>
-           <div>
-              <div style="font-size:.7rem;color:var(--gray4);font-weight:700;text-transform:uppercase;margin-bottom:.3rem;letter-spacing:0.5px;"><i class="fas fa-calendar-check" style="color:var(--vv);"></i> Culminación</div>
-              <div style="font-size:.85rem;font-weight:700;color:var(--dark);">${item.fecha_fin ? new Date(item.fecha_fin).toLocaleDateString() : 'Por definir'}</div>
-           </div>
-        </div>
+        <div style="grid-column: 1 / -1; display: flex; flex-direction: column; width: 100%;">
+          <div style="background:#F9FAFB;border:1px solid #EAEEF2;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+             <div>
+                <div style="font-size:.7rem;color:var(--gray4);font-weight:700;text-transform:uppercase;margin-bottom:.3rem;letter-spacing:0.5px;"><i class="fas fa-map-marker-alt" style="color:var(--vv);"></i> Consejo Comunal</div>
+                <div style="font-size:.85rem;font-weight:700;color:var(--dark);">${item.consejo_comunal || 'Sector General'}</div>
+             </div>
+             <div>
+                <div style="font-size:.7rem;color:var(--gray4);font-weight:700;text-transform:uppercase;margin-bottom:.3rem;letter-spacing:0.5px;"><i class="fas fa-user-tie" style="color:var(--vv);"></i> Responsable</div>
+                <div style="font-size:.85rem;font-weight:700;color:var(--dark);">${item.responsable || 'Comunidad'}</div>
+             </div>
+             <div>
+                <div style="font-size:.7rem;color:var(--gray4);font-weight:700;text-transform:uppercase;margin-bottom:.3rem;letter-spacing:0.5px;"><i class="fas fa-calendar-alt" style="color:var(--vv);"></i> Inicio / Registro</div>
+                <div style="font-size:.85rem;font-weight:700;color:var(--dark);">${item.fecha_inicio ? new Date(item.fecha_inicio).toLocaleDateString() : 'Por definir'}</div>
+             </div>
+             <div>
+                <div style="font-size:.7rem;color:var(--gray4);font-weight:700;text-transform:uppercase;margin-bottom:.3rem;letter-spacing:0.5px;"><i class="fas fa-calendar-check" style="color:var(--vv);"></i> Culminación</div>
+                <div style="font-size:.85rem;font-weight:700;color:var(--dark);">${item.fecha_fin ? new Date(item.fecha_fin).toLocaleDateString() : 'Por definir'}</div>
+             </div>
+          </div>
 
-        <div style="margin-bottom:1.5rem;">
-           <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:.5rem;">
-              <span style="font-size:.8rem;font-weight:700;color:var(--muted);"><i class="fas fa-list-check"></i> Avance del Proyecto</span>
-              <span style="color:${textColor};font-size:1.25rem;font-weight:800;">${item.avance || 0}%</span>
-           </div>
-           <div style="height:8px;background:#F0F0F0;border-radius:4px;overflow:hidden;">
-              <div style="height:100%;width:${item.avance || 0}%;background:${textColor};border-radius:4px;"></div>
-           </div>
-        </div>
-        
-        <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;">
-           <div style="background:${badgeColor};color:${textColor};padding:.4rem 1rem;border-radius:20px;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;"><i class="fas fa-circle" style="font-size:0.5rem;vertical-align:middle;margin-bottom:1px;margin-right:2px;"></i> ${estado}</div>
-           <div style="background:#FFF3E0;color:#E65100;padding:.4rem 1rem;border-radius:20px;font-size:.75rem;font-weight:800;"><i class="fas fa-coins"></i> ${item.presupuesto_estimado && item.presupuesto_estimado > 0 ? Number(item.presupuesto_estimado).toLocaleString('es-VE',{style:'currency',currency:'VES'}) : 'Sin presupuesto'}</div>
+          <div style="margin-bottom:1.5rem;">
+             <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:.5rem;">
+                <span style="font-size:.8rem;font-weight:700;color:var(--muted);"><i class="fas fa-tasks"></i> Avance del Proyecto</span>
+                <span style="color:${textColor};font-size:1.25rem;font-weight:800;">${item.avance || 0}%</span>
+             </div>
+             <div style="height:8px;background:#E0E0E0;border-radius:4px;overflow:hidden;">
+                <div style="height:100%;width:${item.avance || 0}%;background:${textColor};border-radius:4px;"></div>
+             </div>
+          </div>
+          
+          <div style="display:flex;gap:1rem;margin-bottom:0.5rem;flex-wrap:wrap;">
+             <div style="background:${badgeColor};color:${textColor};padding:.4rem 1rem;border-radius:20px;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;"><i class="fas fa-circle" style="font-size:0.5rem;vertical-align:middle;margin-bottom:1px;margin-right:2px;"></i> ${estado}</div>
+             <div style="background:#FFF3E0;color:#E65100;padding:.4rem 1rem;border-radius:20px;font-size:.75rem;font-weight:800;"><i class="fas fa-coins"></i> ${item.presupuesto_estimado && item.presupuesto_estimado > 0 ? Number(item.presupuesto_estimado).toLocaleString('es-VE',{style:'currency',currency:'VES'}) : 'Sin presupuesto'}</div>
+          </div>
         </div>
       `;
       descEl.innerHTML = `<div style="padding-top:1rem;border-top:1px dashed #E0E0E0;"><p style="font-size:0.95rem;color:var(--sub);line-height:1.6;">${item.descripcion || 'Sin descripción detallada.'}</p></div>`;
