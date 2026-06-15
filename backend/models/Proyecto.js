@@ -1,4 +1,4 @@
-﻿const { DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
   const Proyecto = sequelize.define('Proyecto', {
@@ -15,6 +15,10 @@ module.exports = (sequelize) => {
       defaultValue: 'propuesto' 
     },
     presupuesto: DataTypes.DECIMAL(12, 2),
+    avance: { type: DataTypes.INTEGER, defaultValue: 0 },
+    tipo_proyecto: { type: DataTypes.STRING(50) },
+    responsable: { type: DataTypes.STRING(150) },
+    observaciones: DataTypes.TEXT,
     fecha_creacion: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     fecha_inicio: DataTypes.DATE,
     fecha_fin: DataTypes.DATE,

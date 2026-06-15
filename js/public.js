@@ -354,31 +354,37 @@
      else if(estado === 'finalizado') { badgeColor = 'rgba(27,94,32,.12)'; textColor = '#1B5E20'; }
 
      return `
-       <div class="pub-card" style="background:#fff;border:1px solid var(--gray3);border-radius:16px;padding:1.5rem;display:flex;flex-direction:column;box-shadow:0 4px 15px rgba(0,0,0,.03);transition:transform 0.3s, box-shadow 0.3s;cursor:pointer;position:relative;" onclick="abrirModalDetalle(${p.id}, 'proyecto')" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 25px rgba(0,0,0,.08)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 15px rgba(0,0,0,.03)';">
-          ${esDestacado ? `<div style="font-size:.65rem;font-weight:800;color:#E65100;background:#FFF8E1;border:1px solid #FFCC80;border-radius:20px;padding:.18rem .6rem;display:inline-flex;align-items:center;gap:.3rem;align-self:flex-start;margin-bottom:.8rem;text-transform:uppercase;letter-spacing:.05em;"><i class="fas fa-star"></i> Destacado</div>` : ''}
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-             <span style="background:${badgeColor};color:${textColor};padding:.35rem .85rem;border-radius:20px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;"><i class="fas fa-circle" style="font-size:0.5rem;vertical-align:middle;margin-bottom:1px;margin-right:2px;"></i> ${estado}</span>
-             <span style="color:var(--gray4);font-size:.75rem;font-weight:600;"><i class="fas fa-tag"></i> ${p.tipo_proyecto || 'General'}</span>
-          </div>
-          <h4 style="font-size:1.1rem;font-weight:800;color:var(--dark);margin-bottom:.5rem;line-height:1.35;">${p.nombre_proyecto || ''}</h4>
-          <p style="font-size:.85rem;color:var(--gray4);flex:1;margin-bottom:1.25rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${p.descripcion || ''}</p>
-          
-          <div style="margin-bottom:1.25rem;">
-             <div style="display:flex;justify-content:space-between;font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:.4rem;">
-                <span><i class="fas fa-list-check"></i> Avance</span>
+        <div class="proj-card fade-in-up" data-id="${p.id}" onclick="abrirModalDetalle(${p.id}, 'proyecto')" style="background:#fff; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05); overflow:hidden; position:relative; display:flex; flex-direction:column; cursor:pointer; transition:transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 25px rgba(0,0,0,.1)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 15px rgba(0,0,0,0.05)';">
+          <div style="height:4px; width:100%; background:${textColor};"></div>
+          <div style="padding: 1.5rem; display: flex; flex-direction: column; flex: 1; gap: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="background: ${badgeColor}; color: ${textColor}; padding: 0.35rem 0.85rem; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-circle" style="font-size:0.5rem;margin-right:4px;vertical-align:middle;margin-bottom:1px;"></i> ${estado}</span>
+              <span style="font-size: 0.8rem; font-weight: 700; color: var(--gray5);"><i class="fas fa-tag" style="color:var(--gray4);"></i> ${p.tipo_proyecto || 'General'}</span>
+            </div>
+            
+            <div style="font-size: 1.1rem; font-weight: 800; color: var(--dark); line-height: 1.35;">${p.nombre_proyecto || ''}</div>
+            
+            <div style="font-size: 0.85rem; color: var(--gray4); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.descripcion || ''}</div>
+            
+            <div style="margin-top: auto; padding-top: 0.5rem;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; color: var(--muted); margin-bottom: 0.4rem;">
+                <span>Avance del Proyecto</span>
                 <span style="color:${textColor};">${avance}%</span>
-             </div>
-             <div style="height:6px;background:#F0F0F0;border-radius:4px;overflow:hidden;">
-                <div style="height:100%;width:${avance}%;background:${textColor};border-radius:4px;transition:width 0.5s ease;"></div>
-             </div>
+              </div>
+              <div style="height: 6px; background: #F0F0F0; border-radius: 4px; overflow: hidden;">
+                <div style="height: 100%; width: ${avance}%; background: ${textColor}; border-radius: 4px; transition:width 0.5s ease;"></div>
+              </div>
+            </div>
+            
+            <div style="margin-top: 0.5rem; border-top: 1px dashed #E0E0E0; padding-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-size: 0.8rem; font-weight: 700; color: var(--gray5);">
+                <i class="fas fa-map-marker-alt" style="color:var(--vv);margin-right:4px;"></i>${p.consejo_comunal || 'Sector General'}
+              </div>
+              <div style="color:var(--vp); font-size: 0.8rem; font-weight: 700;"><i class="fas fa-arrow-right"></i> Ver Detalles</div>
+            </div>
           </div>
-          
-          <div style="border-top:1px dashed #E0E0E0;padding-top:1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;font-weight:700;">
-             <span style="color:var(--gray5);"><i class="fas fa-map-marker-alt" style="color:var(--vv);"></i> ${p.consejo_comunal || 'Sector General'}</span>
-             <span style="color:var(--vp);"><i class="fas fa-arrow-right"></i> Ver detalles</span>
-          </div>
-       </div>
-     `;
+        </div>
+      `;
   }
 
   function renderProyectos(proyectos) {
