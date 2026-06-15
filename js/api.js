@@ -445,6 +445,20 @@ class APIManager {
     return data;
   }
 
+  async updateProfile(datos) {
+    if (this.isDevelopment) {
+      return { success: true, message: 'Simulado' };
+    }
+    const response = await this._fetch(`${this.baseURL}/auth/perfil`, {
+      method: 'PUT',
+      ...this._getHeaders(),
+      body: JSON.stringify(datos)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Error al actualizar el perfil');
+    return data;
+  }
+
   async requestCode(email) {
     if (this.isDevelopment) {
       console.log('Simulando envío de correo a:', email);
@@ -651,6 +665,30 @@ class APIManager {
         const h = this.mockData.habitantes.find(x => String(x.id) === String(id));
         if (!h) throw new Error('Habitante no encontrado');
         return h;
+      }
+      throw error;
+    }
+  }
+
+  async buscarHabitanteRapido(query) {
+    if (!query || query.trim().length < 2) return [];
+    try {
+      await this.waitForMockData();
+      if (this.isDevelopment) {
+        const qNum = query.replace(/\D/g, '');
+        return (this.mockData.habitantes || [])
+          .filter(h => String(h.cedula).includes(qNum) || String(h.cedula).includes(query))
+          .slice(0, 10);
+      }
+      const response = await this._fetch(`${this.baseURL}/habitantes/buscar/rapido?q=${encodeURIComponent(query.trim())}`, this._getHeaders());
+      if (!response.ok) return [];
+      return response.json();
+    } catch (error) {
+      if (this.isDevelopment) {
+        const qNum = query.replace(/\D/g, '');
+        return (this.mockData.habitantes || [])
+          .filter(h => String(h.cedula).includes(qNum) || String(h.cedula).includes(query))
+          .slice(0, 10);
       }
       throw error;
     }
@@ -1420,7 +1458,7 @@ class APIManager {
             window.auth.user = null;
             sessionStorage.removeItem('sicag_user');
 
-            const esPublica = /index\.html$|consulta_habitantes\.html$|login\.html$/.test(window.location.pathname) ||
+            const esPublica = /index\.html$|consulta_habitantes\.html$|login\.html$|censo_viviendas\.html$/.test(window.location.pathname) ||
               window.location.pathname.endsWith('/');
             if (!esPublica) {
               alert(errData.error || 'Su sesión ha expirado. Por favor inicie sesión nuevamente.');

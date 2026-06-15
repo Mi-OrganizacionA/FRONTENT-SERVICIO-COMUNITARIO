@@ -33,7 +33,7 @@ class AuthService {
     const refreshToken = this.generateRefreshToken(user);
     await user.update({ ultimo_login: new Date() });
     logger.info(`✅ Login exitoso: ${identifier}`);
-    return { token, refreshToken, usuario: { id: user.id, email: user.email, telefono: user.telefono, nombre: user.nombre, rol: user.rol, id_comunidad_asignada: user.id_comunidad_asignada } };
+    return { token, refreshToken, usuario: { id: user.id, email: user.email, telefono: user.telefono, cedula: user.cedula, nombre: user.nombre, rol: user.rol, id_comunidad_asignada: user.id_comunidad_asignada } };
   }
 
   static async refreshToken(refreshToken, userModel) {

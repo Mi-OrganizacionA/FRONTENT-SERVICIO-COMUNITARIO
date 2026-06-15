@@ -511,6 +511,19 @@
                 await window.api.crearHabitante(datosHabitante);
               }
 
+              // Actualizar los datos localmente para que se reflejen de inmediato sin necesidad de recargar de BD
+              if (user) {
+                user.cedula = cedula;
+                user.telefono = telefono;
+                sessionStorage.setItem('sicag_user', JSON.stringify(user));
+              }
+              perfilUser.cedula = cedula;
+              perfilUser.telefono = telefono;
+              // Sincronizar tambien en el perfil del usuario de la sesión para el login
+              if (window.api.updateProfile) {
+                await window.api.updateProfile({ cedula, telefono });
+              }
+
               if(window.Components) Components.showToast('Datos de habitante guardados con éxito', 'success');
               document.getElementById('modalCompletarDatos').classList.remove('show');
               
@@ -518,7 +531,29 @@
               cargarDatosPerfil();
             } catch (error) {
               console.error('Error guardando habitante:', error);
-              if(window.Components) Components.showToast('Error al guardar: ' + error.message, 'error');
+              
+              // Si la cédula ya existe (porque el usuario la registró antes y se desvinculó de la sesión)
+              if (error.message && (error.message.includes('Cédula ya registrada') || error.status === 409)) {
+                // Forzar la vinculación local
+                if (user) {
+                  user.cedula = cedula;
+                  user.telefono = telefono;
+                  sessionStorage.setItem('sicag_user', JSON.stringify(user));
+                }
+                perfilUser.cedula = cedula;
+                perfilUser.telefono = telefono;
+                
+                // Sincronizar en DB
+                if (window.api.updateProfile) {
+                  await window.api.updateProfile({ cedula, telefono });
+                }
+
+                if(window.Components) Components.showToast('Cuenta vinculada a tu registro comunal con éxito', 'success');
+                document.getElementById('modalCompletarDatos').classList.remove('show');
+                cargarDatosPerfil();
+              } else {
+                if(window.Components) Components.showToast('Error al guardar: ' + error.message, 'error');
+              }
             } finally {
               btnSubmit.disabled = false;
               btnSubmit.innerHTML = '<i class="fas fa-save"></i> Guardar Datos';

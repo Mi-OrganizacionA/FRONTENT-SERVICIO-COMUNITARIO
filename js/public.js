@@ -776,15 +776,35 @@
       const consejo  = (h.consejo && h.consejo.nombre_comunidad) ||
                        h.consejo_comunal || h.nombre_comunidad || 'Registrado';
       const initials = nombre.split(' ').slice(0,2).map(p => p[0]||'').join('').toUpperCase();
+      
+      const edadStr = h.edad ? `${h.edad} años` : 'N/D';
+      const generoStr = h.genero === 'M' ? 'Masculino' : (h.genero === 'F' ? 'Femenino' : (h.genero || 'N/D'));
+      const electorStr = h.elector ? 'Habilitado(a)' : 'No Elector';
 
       body.innerHTML = `
         <div class="mhab-avatar">${initials}</div>
         <div class="mhab-name">${nombre}</div>
         <div class="mhab-cedula">${cedula}</div>
-        <div class="mhab-tags">
+        <div class="mhab-tags" style="margin-bottom:1rem;">
           <span class="mhab-tag"><i class="fas fa-house-chimney"></i> ${consejo}</span>
           <span class="mhab-tag ok"><i class="fas fa-circle-check"></i> Censado(a) ✓</span>
         </div>
+        
+        <div style="background:rgba(0,0,0,0.03); border-radius:12px; padding:1rem; margin-bottom:1.5rem; text-align:left; display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; font-size:0.9rem;">
+          <div>
+            <div style="color:var(--gray5); font-weight:600; font-size:0.75rem; text-transform:uppercase;">Edad</div>
+            <div style="color:var(--vp); font-weight:700;"><i class="fas fa-user-clock" style="opacity:0.6;"></i> ${edadStr}</div>
+          </div>
+          <div>
+            <div style="color:var(--gray5); font-weight:600; font-size:0.75rem; text-transform:uppercase;">Género</div>
+            <div style="color:var(--vp); font-weight:700;"><i class="fas fa-venus-mars" style="opacity:0.6;"></i> ${generoStr}</div>
+          </div>
+          <div style="grid-column: span 2;">
+            <div style="color:var(--gray5); font-weight:600; font-size:0.75rem; text-transform:uppercase;">Estatus Electoral</div>
+            <div style="color:var(--vp); font-weight:700;"><i class="fas fa-vote-yea" style="opacity:0.6;"></i> ${electorStr}</div>
+          </div>
+        </div>
+        
         <p class="mhab-disclaimer">Los datos mostrados corresponden al registro público del padrón comunal.<br>Para más información, contacta a tu Consejo Comunal.</p>
       `;
     }

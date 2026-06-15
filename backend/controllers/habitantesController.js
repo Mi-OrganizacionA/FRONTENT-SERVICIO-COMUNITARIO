@@ -471,14 +471,6 @@ class HabitantesController {
       res.status(500).json({ error: error.message });
     }
   }
-
-  /**
-   * Endpoint público de búsqueda
-   */
-  static async buscarPublico(req, res) {
-    req.query.q = req.query.q || '';
-    return HabitantesController.buscar(req, res);
-  }
 }
 
 module.exports = HabitantesController;

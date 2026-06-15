@@ -1409,7 +1409,8 @@
        MODAL — WIZARD REGISTRO VIVIENDA
   ══════════════════════════════════════════ -->
   <div class="modal fade cv-modal" id="modalVivienda" tabindex="-1"
-       aria-labelledby="modalViviendaLabel" aria-hidden="true">
+       aria-labelledby="modalViviendaLabel" aria-hidden="true"
+       data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
 
@@ -1497,11 +1498,11 @@
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="encuestadorNombre">Nombre del Encuestador <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="encuestadorNombre" placeholder="Nombre completo" required>
+                  <input type="text" class="cv-form-control" id="encuestadorNombre" placeholder="Nombre completo" required readonly style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
                 </div>
                 <div class="cv-form-group">
                   <label for="encuestadorCedula">Cédula del Encuestador <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="encuestadorCedula" data-mask="cedula" placeholder="Ej. V-12.345.678" required>
+                  <input type="text" class="cv-form-control" id="encuestadorCedula" data-mask="cedula" placeholder="Ej. V-12.345.678" required readonly style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
                 </div>
               </div>
 
@@ -1513,57 +1514,56 @@
               </div>
               <div class="cv-form-row cv-grid-2">
                 <div class="cv-form-group">
-                  <label for="encuestadoNombre">Nombre del Encuestado <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="encuestadoNombre" placeholder="Nombre completo" required>
+                  <label for="encuestadoCedula">Cédula del Encuestado <span class="req">*</span></label>
+                  <div class="cv-input-group">
+                    <input type="text" class="cv-form-control" id="encuestadoCedula" data-mask="cedula" placeholder="Ej. V-12.345.678" required>
+                    <button type="button" class="cv-btn-validate" id="btnValidarEncuestado"><i class="fas fa-magnifying-glass"></i></button>
+                  </div>
                 </div>
                 <div class="cv-form-group">
-                  <label for="encuestadoCedula">Cédula del Encuestado <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="encuestadoCedula" placeholder="Ej. V-12.345.678" required>
+                  <label for="encuestadoNombre">Nombre del Encuestado <span class="req">*</span></label>
+                  <input type="text" class="cv-form-control" id="encuestadoNombre" placeholder="Nombre completo" required readonly style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
                 </div>
               </div>
-            </div>
+            </div><!-- /panel1 -->
 
             <!-- ═══════════════════════════════════════
-                 PANEL 2: Ubicación Geográfica
+                 PANEL 2: Dirección de la Vivienda
             ═══════════════════════════════════════ -->
-            <div class="cv-panel" id="panel2" data-required="estado,municipio,parroquia,sector,nombreComunidad,direccionExacta">
+            <div class="cv-panel" id="panel2">
               <div class="cv-panel-title">
                 <i class="fas fa-map-location-dot"></i>
-                Sección II — Ubicación Geográfica de la Comunidad
+                Sección II — Dirección Exacta de la Vivienda
               </div>
 
-              <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
-                <div class="cv-form-group">
-                  <label for="estado">Estado <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="estado" placeholder="Ej. Yaracuy" required>
-                </div>
-                <div class="cv-form-group">
-                  <label for="municipio">Municipio <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="municipio" placeholder="Ej. San Felipe" required>
-                </div>
-                <div class="cv-form-group">
-                  <label for="parroquia">Parroquia <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="parroquia" placeholder="Ej. San Felipe" required>
+              <!-- Resumen del CC seleccionado en Sección I -->
+              <div id="p2InfoCC" style="background:var(--gray1);border:1.5px dashed var(--vp);border-radius:10px;padding:.85rem 1.1rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.7rem;">
+                <i class="fas fa-map-pin" style="color:var(--vp);font-size:1.1rem;"></i>
+                <div>
+                  <div style="font-size:.78rem;color:var(--gray5);font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Consejo Comunal (Sección I)</div>
+                  <div id="p2CCNombre" style="font-size:1rem;font-weight:700;color:var(--vd);">—</div>
                 </div>
               </div>
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="sector">Sector <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="sector" placeholder="Ej. Jobito" required>
+                  <label for="calleAvenida">Calle / Avenida <span class="req">*</span></label>
+                  <input type="text" class="cv-form-control" id="calleAvenida" placeholder="Ej. Calle El Progreso, Av. Principal..." required>
                 </div>
                 <div class="cv-form-group">
-                  <label for="nombreComunidad">Nombre de la Comunidad <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="nombreComunidad" placeholder="Ej. Andrés Eloy Blanco" required>
+                  <label for="numeroCasa">N° de Casa / Apartamento <span class="req">*</span></label>
+                  <input type="text" class="cv-form-control" id="numeroCasa" placeholder="Ej. Casa #12, Apto 3-B..." required>
                 </div>
               </div>
 
               <div class="cv-form-group">
-                <label for="direccionExacta">Dirección Exacta <span class="req">*</span></label>
+                <label for="direccionExacta">Referencia de Ubicación <span style="color:var(--gray4);font-weight:400;">(opcional)</span></label>
                 <textarea class="cv-form-control" id="direccionExacta" rows="2"
-                  placeholder="Calle, Nº de casa, sector, referencia de ubicación..." required></textarea>
+                  placeholder="Puntos de referencia, color de la casa, entre calles..."></textarea>
               </div>
             </div>
+
+
 
             <!-- ═══════════════════════════════════════
                  PANEL 3: Datos del Jefe de Familia
@@ -2631,14 +2631,16 @@
                   showToast('Paso guardado localmente y encolado para sincronizar cuando haya conexión.', 'warning');
                 }
               }
-              
+            } catch (err) {
+              // El error NO bloquea la navegación: solo advertencia, siempre se avanza
+              console.warn('[CensoWizard] Error al guardar paso (se avanza de todas formas):', err.message);
+              showToast('Avanzando al siguiente paso (datos guardados localmente).', 'warning');
+            } finally {
+              // SIEMPRE avanzar al siguiente paso, independientemente del resultado del guardado
               if (btnSiguiente) btnSiguiente.innerHTML = originalText;
               currentStep = n;
               goToStep(currentStep);
               saveDraft();
-            } catch (err) {
-              if (btnSiguiente) btnSiguiente.innerHTML = originalText;
-              showToast('Error guardando el paso: ' + err.message, 'error');
             }
           } else {
             showToast('Debe completar los pasos anteriores antes de avanzar a este paso.', 'error');
@@ -2811,9 +2813,12 @@
       updateStepperArrows();
       const draftStr = localStorage.getItem('borradorCensoVivienda');
       if (draftStr) {
-        if (confirm('Se ha detectado un censo sin terminar. ¿Deseas recuperar los datos y continuar donde lo dejaste?')) {
+        // Auto-restaurar el borrador sin bloquear con confirm() nativo
+        // (el confirm() nativo hace que Bootstrap cierre el modal al quitarle el foco)
+        try {
           loadDraft();
-        } else {
+          showToast('📋 Borrador restaurado. Continúa donde lo dejaste.', 'success');
+        } catch(e) {
           clearDraft();
         }
       }
@@ -2852,12 +2857,14 @@
       } catch(e){}
     })();
 
-    document.getElementById('btnNext').addEventListener('click', () => {
+    document.getElementById('btnNext').addEventListener('click', (e) => {
+      e.preventDefault();
       if (!validateCurrentPanel()) return;
       if (currentStep < totalSteps) navigateToStep(currentStep + 1);
     });
 
-    document.getElementById('btnPrev').addEventListener('click', () => {
+    document.getElementById('btnPrev').addEventListener('click', (e) => {
+      e.preventDefault();
       if (currentStep > 1) goToStep(currentStep - 1);
     });
 
@@ -3034,26 +3041,24 @@
       `;
       list.appendChild(row);
 
-      // Conectar autocompletado para el nuevo familiar
-      if (window.HabitanteAutocomplete) {
+      // Conectar autocompletado completo para el nuevo familiar (con aviso si no está registrado)
+      if (typeof window.adjuntarAutocompletadoFamiliar === 'function') {
+        window.adjuntarAutocompletadoFamiliar(row);
+      } else if (window.HabitanteAutocomplete) {
+        // Fallback si la función aún no está definida
         const newCedulaInput = row.querySelector('.fam-cedula');
         HabitanteAutocomplete.attachTo(newCedulaInput, (datos) => {
-          row.querySelector('.fam-nombres').value = (datos.nombres + ' ' + (datos.apellidos||'')).trim();
-          
-          if (datos.genero) {
-            const selectSexo = row.querySelector('.fam-sexo');
-            if (selectSexo) {
-               selectSexo.value = datos.genero === 'Masculino' ? 'M' : (datos.genero === 'Femenino' ? 'F' : '');
-            }
+          const nombreInput = row.querySelector('.fam-nombres');
+          if (nombreInput) nombreInput.value = (datos.nombres + ' ' + (datos.apellidos||'')).trim();
+          const sexoSel = row.querySelector('.fam-sexo');
+          if (datos.genero && sexoSel) {
+            sexoSel.value = datos.genero === 'Masculino' ? 'M' : (datos.genero === 'Femenino' ? 'F' : '');
           }
-        }, { debounce: 600 });
-
+        }, { debounce: 600, onNotFound: () => {
+          showToast('⚠️ Esta cédula no está registrada como habitante. Debe registrarlo primero.', 'error');
+        }});
         const btnLupa = row.querySelector('.btn-validar-fam');
-        if (btnLupa) {
-          btnLupa.addEventListener('click', () => {
-            if (newCedulaInput.forceSearch) newCedulaInput.forceSearch();
-          });
-        }
+        if (btnLupa) btnLupa.addEventListener('click', () => { if (newCedulaInput.forceSearch) newCedulaInput.forceSearch(); });
       }
     });
 
@@ -3399,6 +3404,13 @@
     /* ── Form submit (paso final) ── */
     document.getElementById('formVivienda').addEventListener('submit', async function (e) {
       e.preventDefault();
+      
+      if (currentStep < totalSteps) {
+        // Si presionan Enter en un input antes del último paso, avanzar al siguiente en vez de guardar todo
+        document.getElementById('btnNext').click();
+        return;
+      }
+
       const gv = id => document.getElementById(id)?.value?.trim() || '';
       const v = {
         // Cabecera
@@ -3517,94 +3529,183 @@
     loadViviendasData();
   </script>
 
-  <script src="js/habitante-autocomplete.js" defer></script>
+  <script src="js/habitante-autocomplete.js"></script>
   <script>
-    // Configurar Autocompletado una vez cargado el DOM
+    // ============================================================
+    // AUTOCOMPLETADO Y LÓGICA AVANZADA DEL WIZARD
+    // ============================================================
     document.addEventListener('DOMContentLoaded', () => {
-      // Configurar para Jefe de Familia
-      if (window.HabitanteAutocomplete) {
-        HabitanteAutocomplete.attachTo('cedulaJefe', (datos) => {
-          document.getElementById('jefNombres').value = datos.nombres || '';
-          document.getElementById('jefApellidos').value = datos.apellidos || '';
-          
-          if (datos.fecha_nacimiento) {
-             const d = new Date(datos.fecha_nacimiento);
-             document.getElementById('jefFechaNac').value = d.toISOString().split('T')[0];
-          }
-          
-          if (datos.genero) {
-            const sexoMap = { 'Masculino': 'Masculino', 'Femenino': 'Femenino' };
-            const s = sexoMap[datos.genero];
-            if (s) document.getElementById('jefSexo').value = s;
-          }
-          
-          if (datos.nivel_educativo) {
-            document.getElementById('jefNivelInstruccion').value = datos.nivel_educativo;
-          }
-          
-          if (datos.ocupacion) {
-            document.getElementById('jefProfesion').value = datos.ocupacion;
-          }
-        });
-        
-        // Vincular el botón de lupa manualmente
-        document.getElementById('btnValidarCedula').addEventListener('click', () => {
-           const input = document.getElementById('cedulaJefe');
-           if (input.forceSearch) input.forceSearch();
-        });
 
-        // Configurar Autocompletado para el Integrante #1
-        const fam1Input = document.querySelector('#familiarList .fam-cedula');
-        if (fam1Input) {
-          HabitanteAutocomplete.attachTo(fam1Input, (datos) => {
-            const row = fam1Input.closest('.familiar-row');
-            if (row) {
-              row.querySelector('.fam-nombres').value = (datos.nombres + ' ' + (datos.apellidos||'')).trim();
-              if (datos.genero) {
-                const selectSexo = row.querySelector('.fam-sexo');
-                if (selectSexo) {
-                   selectSexo.value = datos.genero === 'Masculino' ? 'M' : (datos.genero === 'Femenino' ? 'F' : '');
-                }
-              }
-            }
-          }, { debounce: 600 });
-          
-          const btnLupa1 = document.querySelector('#familiarList .btn-validar-fam');
-          if (btnLupa1) {
-            btnLupa1.addEventListener('click', () => {
-              if (fam1Input.forceSearch) fam1Input.forceSearch();
-            });
-          }
-        }
+      // ── 1. Sincronizar nombre del Consejo Comunal al Paso 2 ──
+      const selCC = document.getElementById('consejoComunalCab');
+      const p2CCNombre = document.getElementById('p2CCNombre');
+      if (selCC && p2CCNombre) {
+        const syncCC = () => {
+          p2CCNombre.textContent = selCC.value ? `C.C. ${selCC.value}` : '— (seleccione en Sección I)';
+        };
+        selCC.addEventListener('change', syncCC);
+        syncCC();
       }
 
-      // Redirección Automática y Resaltado desde Búsqueda Global
+      // ── 2. Auto-fill del Encuestador (siempre desde sesión) ──
+      const fillEncuestador = () => {
+        const u = window.auth?.getUser?.() || window.auth?.user || JSON.parse(sessionStorage.getItem('sicag_user') || '{}');
+        const nom = document.getElementById('encuestadorNombre');
+        const ced = document.getElementById('encuestadorCedula');
+        if (nom) nom.value = u.nombres ? (u.nombres + ' ' + (u.apellidos || '')).trim() : (u.nombre || 'Administrador');
+        if (ced) ced.value = u.cedula || u.documento || '';
+      };
+      fillEncuestador();
+      document.getElementById('modalVivienda')?.addEventListener('show.bs.modal', fillEncuestador);
+
+      // ── 3. Autocompletado: Encuestado ──
+      if (window.HabitanteAutocomplete) {
+        HabitanteAutocomplete.attachTo('encuestadoCedula', (datos) => {
+          const el = document.getElementById('encuestadoNombre');
+          if (el) el.value = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
+        }, { onNotFound: () => {
+          showToast('La cédula del encuestado no está registrada como habitante.', 'error');
+        }});
+        document.getElementById('btnValidarEncuestado')?.addEventListener('click', () => {
+          const input = document.getElementById('encuestadoCedula');
+          if (input?.forceSearch) input.forceSearch();
+        });
+
+        // ── 4. Autocompletado: Jefe de Familia (Sección III) ──
+        // Campos del jefe son solo-lectura; se llenan con la cédula
+        const camposJefe = ['jefNombres','jefApellidos','jefFechaNac','jefSexo','jefEstadoCivil','jefNivelInstruccion','jefProfesion'];
+        camposJefe.forEach(id => {
+          const el = document.getElementById(id);
+          if (el && el.tagName !== 'SELECT') {
+            el.setAttribute('readonly', 'readonly');
+            el.style.backgroundColor = 'var(--gray1)';
+            el.style.color = 'var(--dark)';
+            el.style.fontStyle = 'italic';
+          }
+        });
+
+        HabitanteAutocomplete.attachTo('cedulaJefe', (datos) => {
+          // Limpiar estilo y rellenar
+          camposJefe.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.style.borderColor = ''; el.style.boxShadow = ''; }
+          });
+          document.getElementById('jefNombres').value      = datos.nombres    || '';
+          document.getElementById('jefApellidos').value    = datos.apellidos  || '';
+          document.getElementById('jefProfesion').value    = datos.ocupacion  || '';
+
+          if (datos.fecha_nacimiento) {
+            try {
+              const d = new Date(datos.fecha_nacimiento);
+              document.getElementById('jefFechaNac').value = d.toISOString().split('T')[0];
+            } catch(_) {}
+          }
+          if (datos.genero) {
+            const s = datos.genero; // 'Masculino' o 'Femenino'
+            const sel = document.getElementById('jefSexo');
+            if (sel) sel.value = s;
+          }
+          if (datos.nivel_educativo) {
+            const sel = document.getElementById('jefNivelInstruccion');
+            if (sel) sel.value = datos.nivel_educativo;
+          }
+          if (datos.estado_civil) {
+            const sel = document.getElementById('jefEstadoCivil');
+            if (sel) sel.value = datos.estado_civil;
+          }
+
+          // También sincronizar encuestado si el checkbox está marcado
+          const chk = document.getElementById('chkEncuestadoEsJefe');
+          if (chk?.checked) {
+            document.getElementById('encuestadoNombre').value = (datos.nombres + ' ' + (datos.apellidos||'')).trim();
+            document.getElementById('encuestadoCedula').value = document.getElementById('cedulaJefe').value;
+          }
+
+          showToast(`✅ Jefe de familia cargado: ${datos.nombres} ${datos.apellidos||''}`, 'success');
+        }, { onNotFound: () => {
+          // Limpiar campos y mostrar advertencia
+          camposJefe.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.value = ''; el.style.borderColor = '#EF5350'; }
+          });
+          showToast('⚠️ Esta cédula no está registrada como habitante. Por favor regístrelo primero en "Habitantes".', 'error');
+        }});
+
+        document.getElementById('btnValidarCedula')?.addEventListener('click', () => {
+          const input = document.getElementById('cedulaJefe');
+          if (input?.forceSearch) input.forceSearch();
+        });
+
+        // ── 5. Autocompletado: Integrantes (Sección IV) ──
+        // Función para adjuntar autocomplete a una fila de familiar
+        window.adjuntarAutocompletadoFamiliar = function(row) {
+          const cedulaInput = row.querySelector('.fam-cedula');
+          if (!cedulaInput) return;
+
+          HabitanteAutocomplete.attachTo(cedulaInput, (datos) => {
+            const nombreInput = row.querySelector('.fam-nombres');
+            const sexoSel    = row.querySelector('.fam-sexo');
+            const instrSel   = row.querySelector('.fam-instruccion');
+            const fechaInput = row.querySelector('.fam-fechanac');
+
+            if (nombreInput) nombreInput.value = (datos.nombres + ' ' + (datos.apellidos||'')).trim();
+            if (datos.genero && sexoSel) {
+              sexoSel.value = datos.genero === 'Masculino' ? 'M' : (datos.genero === 'Femenino' ? 'F' : '');
+            }
+            if (datos.nivel_educativo && instrSel) {
+              instrSel.value = datos.nivel_educativo;
+            }
+            if (datos.fecha_nacimiento && fechaInput) {
+              try {
+                const d = new Date(datos.fecha_nacimiento);
+                fechaInput.value = d.toISOString().split('T')[0];
+              } catch(_) {}
+            }
+          }, { onNotFound: () => {
+            showToast('⚠️ Esta cédula no está registrada como habitante en el sistema. Debe registrarlo primero.', 'error');
+            const nombreInput = row.querySelector('.fam-nombres');
+            if (nombreInput) { nombreInput.value = ''; nombreInput.style.borderColor = '#EF5350'; }
+          }, debounce: 600 });
+
+          const btnLupa = row.querySelector('.btn-validar-fam');
+          if (btnLupa) {
+            btnLupa.addEventListener('click', () => {
+              if (cedulaInput.forceSearch) cedulaInput.forceSearch();
+            });
+          }
+        };
+
+        // Adjuntar al primer familiar ya existente
+        const fam1Row = document.querySelector('#familiarList .familiar-row');
+        if (fam1Row) window.adjuntarAutocompletadoFamiliar(fam1Row);
+      }
+
+      // ── 6. Redirección desde Búsqueda Global ──
       const urlParams = new URLSearchParams(window.location.search);
       const viewViviendaId = urlParams.get('viewVivienda');
       const highlightFamiliar = urlParams.get('highlightFamiliar');
-      
       if (viewViviendaId) {
         setTimeout(() => {
           if (typeof window.editarVivienda === 'function') {
-             window.editarVivienda(Number(viewViviendaId));
-             if (highlightFamiliar && typeof goToStep === 'function') {
-                setTimeout(() => {
-                  goToStep(4);
-                  // Resaltado visual sutil del panel
-                  const panel = document.getElementById('panel4');
-                  if(panel) {
-                    panel.style.transition = 'box-shadow 0.3s ease';
-                    panel.style.boxShadow = '0 0 15px rgba(255, 193, 7, 0.6)';
-                    setTimeout(() => panel.style.boxShadow = '', 3000);
-                  }
-                }, 500);
-             }
+            window.editarVivienda(Number(viewViviendaId));
+            if (highlightFamiliar && typeof goToStep === 'function') {
+              setTimeout(() => {
+                goToStep(4);
+                const panel = document.getElementById('panel4');
+                if (panel) {
+                  panel.style.transition = 'box-shadow 0.3s ease';
+                  panel.style.boxShadow = '0 0 15px rgba(255, 193, 7, 0.6)';
+                  setTimeout(() => panel.style.boxShadow = '', 3000);
+                }
+              }, 500);
+            }
           }
-        }, 800); // Dar tiempo a que carguen las viviendas
+        }, 800);
       }
 
     });
   </script>
+
 </body>
 </html>
 

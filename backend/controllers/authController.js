@@ -52,6 +52,24 @@ class AuthController {
     }
   }
 
+  static async updateProfile(req, res) {
+    try {
+      const { cedula, telefono } = req.body;
+      const user = await UsuarioModel.findByPk(req.user.id);
+      if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+      
+      if (cedula !== undefined) user.cedula = cedula;
+      if (telefono !== undefined) user.telefono = telefono;
+      
+      await user.save();
+      
+      res.json({ success: true, message: 'Perfil actualizado', usuario: user });
+    } catch (error) {
+      logger.error('Error actualizando perfil:', error);
+      res.status(500).json({ error: 'Error del servidor al actualizar perfil' });
+    }
+  }
+
   static async verifyPassword(req, res) {
     try {
       const { password } = req.body;

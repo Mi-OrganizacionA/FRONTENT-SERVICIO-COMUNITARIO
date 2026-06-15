@@ -13,7 +13,7 @@
  */
 
 // ── VERSIONES DE CACHÉ ──────────────────────────────────────────────────────
-const CORE_CACHE   = 'sicag-core-v3.3';
+const CORE_CACHE   = 'sicag-core-v3.4';
 const CDN_CACHE    = 'sicag-cdn-v3';
 const API_CACHE    = 'sicag-api-v3';
 const TODOS_LOS_CACHES = [CORE_CACHE, CDN_CACHE, API_CACHE];
@@ -149,16 +149,16 @@ self.addEventListener('install', (event) => {
 
 // ── ACTIVATE: Limpiar caches antiguos ───────────────────────────────────────
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activando SICAG SW v3.0 — limpiando caches antiguos...');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames
-          .filter((name) => !TODOS_LOS_CACHES.includes(name))
-          .map((name) => {
-            console.log('[SW] Eliminando caché obsoleto:', name);
-            return caches.delete(name);
-          })
+        cacheNames.map((cacheName) => {
+          // Eliminar CUALQUIER cache viejo incondicionalmente si no está en la lista actual
+          if (!TODOS_LOS_CACHES.includes(cacheName)) {
+            console.log('[SW] Eliminando caché antiguo:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
       );
     }).then(() => {
       console.log('[SW] SW v3.0 activo y controlando todas las páginas.');

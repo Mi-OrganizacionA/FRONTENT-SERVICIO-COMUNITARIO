@@ -86,6 +86,7 @@ class CensoController {
             if (today.getMonth() < fnac.getMonth() || (today.getMonth() === fnac.getMonth() && today.getDate() < fnac.getDate())) age--;
          }
          return {
+            ...h, // Conservar todos los campos del backend (direccion, ocupacion, etc)
             id: h.id,
             nombre: h.nombres,
             apellido: h.apellidos,
@@ -128,12 +129,63 @@ class CensoController {
     const tbody = document.getElementById('censoBody');
     if (!tbody) return;
 
-    if (this.habitantes.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;">No hay habitantes registrados</td></tr>`;
+    // Obtener valores de los filtros
+    const ccVal = document.getElementById('filterCC')?.value || '';
+    const clasifVal = document.getElementById('filterClasif')?.value || '';
+    const genVal = document.getElementById('filterGenero')?.value || '';
+    const elecVal = document.getElementById('filterElector')?.value || '';
+    const buscarVal = (document.getElementById('filterBuscar')?.value || '').toLowerCase();
+    
+    // Obtener el texto del CC para compararlo sin acentos
+    let ccText = '';
+    const selectCC = document.getElementById('filterCC');
+    if (selectCC && selectCC.selectedIndex > 0) {
+       ccText = selectCC.options[selectCC.selectedIndex].text.replace('C.C. ', '').toLowerCase();
+    }
+
+    const removeAccents = (str) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
+
+    const filtrados = this.habitantes.filter(h => {
+      // Filtro Consejo Comunal
+      if (ccText) {
+         if (!removeAccents(h.consejoComunal).includes(removeAccents(ccText))) return false;
+      }
+      // Filtro Clasificacion
+      if (clasifVal) {
+        if (clasifVal === 'nino' && h.clasificacion !== 'niño') return false;
+        if (clasifVal !== 'nino' && h.clasificacion !== clasifVal) return false;
+      }
+      // Filtro Genero
+      if (genVal) {
+        if (h.genero !== genVal) return false;
+      }
+      // Filtro Elector
+      if (elecVal) {
+        const isElec = h.elector ? 'si' : 'no';
+        if (isElec !== elecVal) return false;
+      }
+      // Filtro Búsqueda (Cedula o nombre)
+      if (buscarVal) {
+        const term = removeAccents(buscarVal);
+        const name = removeAccents(`${h.nombre} ${h.apellido}`);
+        const ci = String(h.cedula);
+        if (!name.includes(term) && !ci.includes(term)) return false;
+      }
+      return true;
+    });
+
+    // Actualizar conteo visible
+    const resultCount = document.getElementById('resultCount');
+    if (resultCount) {
+      resultCount.innerHTML = `Mostrando <strong>${filtrados.length}</strong> de <strong>${this.habitantes.length}</strong> habitantes`;
+    }
+
+    if (filtrados.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2rem;">No se encontraron habitantes que coincidan con los filtros</td></tr>`;
       return;
     }
 
-    tbody.innerHTML = this.habitantes.map((h, idx) => `
+    tbody.innerHTML = filtrados.map((h, idx) => `
       <tr data-hab-id="${h.id}" class="${highlightId && String(h.id) === String(highlightId) ? 'row-highlight' : ''}">
         <td><span class="cv-cedula">V-${h.cedula}</span></td>
         <td>
@@ -186,20 +238,141 @@ class CensoController {
     const h = this.habitantes.find(x => String(x.id) === String(id));
     if (!h) return;
     this.renderTabla(id);
-    const info = [
-      `Nombre: ${h.nombre} ${h.apellido || ''}`,
-      `Cédula: V-${h.cedula}`,
-      `Edad: ${h.edad} años`,
-      `Género: ${h.genero}`,
-      `Consejo Comunal: ${h.consejoComunal}`,
-      `Teléfono: ${h.telefono || 'No registrado'}`,
-      `Clasificación: ${this._formatClasificacion(h.clasificacion)}`,
-      `Elector: ${h.elector ? 'Sí' : 'No'}`
-    ].join('\n');
-    if (window.Components) {
-      Components.showToast('Expediente resaltado en la tabla', 'info');
-    }
-    alert('EXPEDIENTE DEL HABITANTE\n\n' + info);
+    
+    const existingModal = document.getElementById('modalExpedienteVisual');
+    if (existingModal) existingModal.remove();
+
+    const formatDate = (dateStr) => {
+      if (!dateStr) return 'No registrado';
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('es-VE');
+    };
+
+    const getVal = (val) => val ? val : '<span style="color:#aaa;font-style:italic;">No registrado</span>';
+    const getBool = (val) => val ? 'Sí' : 'No';
+
+    const modalHtml = `
+      <div class="modal fade" id="modalExpedienteVisual" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content" style="border: none; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.25);">
+            
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-color, #1B5E20), var(--primary-dark, #0d3612)); color: white; border-bottom: none; padding: 24px;">
+              <h5 class="modal-title" style="font-weight: 700; margin: 0; display: flex; align-items: center; gap: 12px; font-size: 1.25rem;">
+                <i class="fas fa-folder-open"></i> Expediente Integral del Habitante
+              </h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body" style="padding: 0; background: #f8f9fa;">
+              <!-- Header Profile -->
+              <div style="padding: 24px; background: white; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 20px;">
+                <div style="width: 70px; height: 70px; background: var(--secondary-color, #1565C0); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                  ${(h.nombre||'?').charAt(0).toUpperCase()}${(h.apellido||'').charAt(0).toUpperCase()}
+                </div>
+                <div style="flex: 1;">
+                  <h3 style="margin: 0; color: var(--text-dark, #333); font-weight: 800;">${h.nombre} ${h.apellido || ''}</h3>
+                  <div style="display: flex; gap: 15px; margin-top: 5px;">
+                    <span style="color: var(--text-muted, #666); font-weight: 600; font-size: 15px;"><i class="fas fa-id-card" style="color:var(--primary-color)"></i> ${h.nacionalidad||'V'}-${h.cedula}</span>
+                    <span style="color: var(--text-muted, #666); font-weight: 600; font-size: 15px;"><i class="fas fa-map-marker-alt" style="color:var(--primary-color)"></i> ${h.consejoComunal}</span>
+                  </div>
+                </div>
+                <div>
+                  <span class="badge ${this._getColorClasificacion(h.clasificacion)}" style="font-size: 14px; padding: 8px 12px;">${this._formatClasificacion(h.clasificacion)}</span>
+                </div>
+              </div>
+
+              <!-- Content Grid -->
+              <div style="padding: 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+                
+                <!-- Datos Personales y Contacto -->
+                <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eaeaea;">
+                  <h6 style="color: var(--primary-color, #1B5E20); font-weight: 700; border-bottom: 2px solid #eee; padding-bottom: 8px; margin-bottom: 16px;"><i class="fas fa-user-circle"></i> Datos Personales y Contacto</h6>
+                  
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Edad</label><div style="font-weight: 600; color: #333;">${h.edad} años</div></div>
+                    <div><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Género</label><div style="font-weight: 600; color: #333;">${h.genero === 'M' ? 'Masculino' : h.genero === 'F' ? 'Femenino' : h.genero}</div></div>
+                    <div><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Nacimiento</label><div style="font-weight: 600; color: #333;">${formatDate(h.fecha_nacimiento)}</div></div>
+                    <div><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Estado Civil</label><div style="font-weight: 600; color: #333;">${getVal(h.estado_civil)}</div></div>
+                    <div style="grid-column: 1 / -1;"><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Teléfono</label><div style="font-weight: 600; color: #333;">${getVal(h.telefono)}</div></div>
+                    <div style="grid-column: 1 / -1;"><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Correo Electrónico</label><div style="font-weight: 600; color: #333;">${getVal(h.email)}</div></div>
+                    <div style="grid-column: 1 / -1;"><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Dirección</label><div style="font-weight: 600; color: #333;">${getVal(h.direccion)}</div></div>
+                    <div style="grid-column: 1 / -1;"><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Tiempo en la Comunidad</label><div style="font-weight: 600; color: #333;">${getVal(h.tiempo_comunidad)}</div></div>
+                  </div>
+                </div>
+
+                <!-- Perfil Socioeconómico -->
+                <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eaeaea;">
+                  <h6 style="color: var(--primary-color, #1B5E20); font-weight: 700; border-bottom: 2px solid #eee; padding-bottom: 8px; margin-bottom: 16px;"><i class="fas fa-briefcase"></i> Perfil Socioeconómico</h6>
+                  
+                  <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                    <div><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Nivel Educativo</label><div style="font-weight: 600; color: #333;">${getVal(h.nivel_educativo)}</div></div>
+                    <div><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Ocupación</label><div style="font-weight: 600; color: #333;">${getVal(h.ocupacion)}</div></div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px;">
+                      <div><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Trabaja Actualmente</label><div style="font-weight: 600; color: #333;">${getBool(h.trabaja_actualmente)}</div></div>
+                      <div><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Ingreso Familiar</label><div style="font-weight: 600; color: #333;">${getVal(h.clasificacion_ingreso_familiar)}</div></div>
+                    </div>
+                    <div><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Ingreso Mensual (Bs)</label><div style="font-weight: 600; color: #333;">${getVal(h.ingreso_mensual_bs)}</div></div>
+                  </div>
+                </div>
+
+                <!-- Salud y Estatus -->
+                <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eaeaea;">
+                  <h6 style="color: var(--primary-color, #1B5E20); font-weight: 700; border-bottom: 2px solid #eee; padding-bottom: 8px; margin-bottom: 16px;"><i class="fas fa-notes-medical"></i> Salud y Asistencia Social</h6>
+                  
+                  <div style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+                    <div><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Condición de Salud</label><div style="font-weight: 600; color: ${h.condicion_salud && h.condicion_salud.toLowerCase() !== 'saludable' ? '#C62828' : '#2E7D32'};">${getVal(h.condicion_salud)}</div></div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px;">
+                      <div><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Incapacitado</label><div style="font-weight: 600; color: #333;">${getBool(h.incapacitado)}</div></div>
+                      <div><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Tipo Incapacidad</label><div style="font-weight: 600; color: #333;">${getVal(h.incapacitado_tipo)}</div></div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px;">
+                      <div><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Pensionado</label><div style="font-weight: 600; color: #333;">${getBool(h.pensionado)}</div></div>
+                      <div><label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0;">Institución</label><div style="font-weight: 600; color: #333;">${getVal(h.pensionado_institucion)}</div></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Electoral -->
+                <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eaeaea;">
+                  <h6 style="color: var(--primary-color, #1B5E20); font-weight: 700; border-bottom: 2px solid #eee; padding-bottom: 8px; margin-bottom: 16px;"><i class="fas fa-vote-yea"></i> Estatus Electoral</h6>
+                  
+                  <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div>
+                      <label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0; display:block; margin-bottom:6px;">Registro Electoral (CNE)</label>
+                      ${h.inscrito_cne ? '<span class="status-indicator active" style="font-size:14px; padding:6px 12px;"><i class="fas fa-check-circle"></i> Inscrito en el CNE</span>' : '<span class="status-indicator inactive" style="font-size:14px; padding:6px 12px;"><i class="fas fa-times-circle"></i> No Inscrito</span>'}
+                    </div>
+                    <div>
+                      <label style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700; margin:0; display:block; margin-bottom:6px;">Elector Comunal / Universal</label>
+                      ${h.elector ? '<span class="status-indicator active" style="font-size:14px; padding:6px 12px;"><i class="fas fa-check-circle"></i> Habilitado</span>' : '<span class="status-indicator inactive" style="font-size:14px; padding:6px 12px;"><i class="fas fa-times-circle"></i> No Habilitado</span>'}
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="modal-footer" style="background: white; border-top: 1px solid #eee; padding: 16px 24px; display:flex; justify-content: flex-end;">
+              <button type="button" class="btn-sicag btn-outline-gris" data-bs-dismiss="modal" style="border: 2px solid #ddd; background: white; color: #444; padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: all 0.2s;">
+                <i class="fas fa-times"></i> Cerrar Expediente
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modalEl = document.getElementById('modalExpedienteVisual');
+    const bsModal = new bootstrap.Modal(modalEl);
+    bsModal.show();
+    
+    // Limpiar el DOM cuando se cierre el modal
+    modalEl.addEventListener('hidden.bs.modal', function () {
+      modalEl.remove();
+    });
   }
 
   _llenarFormulario(h) {
@@ -207,17 +380,35 @@ class CensoController {
       const el = document.getElementById(id);
       if (el) el.value = val ?? '';
     };
+    
     setVal('habCedula', h.cedula);
     setVal('habNombre', `${h.nombres || ''} ${h.apellidos || ''}`.trim());
     setVal('habFechaNac', h.fecha_nacimiento ? h.fecha_nacimiento.split('T')[0] : '');
     setVal('habGenero', h.genero);
+    setVal('habEstadoCivil', h.estado_civil);
     setVal('habTelefono', h.telefono);
     setVal('habEmail', h.email);
     setVal('habDireccion', h.direccion);
+    setVal('habTiempoComunidad', h.tiempo_comunidad);
     setVal('habCC', h.consejo_comunal_id);
-    setVal('habOcupacion', h.ocupacion);
     setVal('habNivelEducativo', h.nivel_educativo);
+    setVal('habOcupacion', h.ocupacion);
+    setVal('habTrabaja', h.trabaja_actualmente !== null && h.trabaja_actualmente !== undefined ? String(h.trabaja_actualmente) : '');
+    setVal('habIngresoMensual', h.ingreso_mensual_bs);
+    setVal('habClasificacionIngreso', h.clasificacion_ingreso_familiar);
+    
     setVal('condicionSalud', h.condicion_salud || 'saludable');
+    
+    setVal('habIncapacitado', h.incapacitado !== null && h.incapacitado !== undefined ? String(h.incapacitado) : 'false');
+    setVal('habIncapTipo', h.incapacitado_tipo);
+    if (document.getElementById('habIncapacitado')) document.getElementById('habIncapacitado').dispatchEvent(new Event('change'));
+    
+    setVal('habPensionado', h.pensionado !== null && h.pensionado !== undefined ? String(h.pensionado) : 'false');
+    setVal('habPensInst', h.pensionado_institucion);
+    if (document.getElementById('habPensionado')) document.getElementById('habPensionado').dispatchEvent(new Event('change'));
+    
+    setVal('habInscritoCNE', h.inscrito_cne !== null && h.inscrito_cne !== undefined ? String(h.inscrito_cne) : 'false');
+
     this.calcularDatosNacimiento(h.fecha_nacimiento ? h.fecha_nacimiento.split('T')[0] : '');
   }
 

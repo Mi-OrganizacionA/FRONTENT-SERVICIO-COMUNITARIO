@@ -289,6 +289,7 @@
             <div class="cv-step active" id="hab-step-1" onclick="navigateToHabStep(1)"><div class="cv-step-num">1</div></div>
             <div class="cv-step" id="hab-step-2" onclick="navigateToHabStep(2)"><div class="cv-step-num">2</div></div>
             <div class="cv-step" id="hab-step-3" onclick="navigateToHabStep(3)"><div class="cv-step-num">3</div></div>
+            <div class="cv-step" id="hab-step-4" onclick="navigateToHabStep(4)"><div class="cv-step-num">4</div></div>
           </div>
           <button type="button" class="cv-stepper-btn cv-stepper-right" id="habStepperRight"><i class="fas fa-chevron-right"></i></button>
         </div>
@@ -299,9 +300,9 @@
               <div class="cv-panel-title"><i class="fas fa-id-card"></i> Paso 1 &ndash; Datos Personales</div>
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="habCedula">Cedula de Identidad <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="habCedula" data-mask="cedula" name="cedula_identidad" placeholder="V-12.345.678" required>
-                  <span class="cv-form-hint">Llave unica para consultas.</span>
+                  <label for="habCedula">Cédula de Identidad <span class="req">*</span></label>
+                  <input type="text" class="cv-form-control" id="habCedula" data-mask="cedula" name="cedula" placeholder="12345678" required>
+                  <span class="cv-form-hint">Llave única para consultas.</span>
                 </div>
                 <div class="cv-form-group">
                   <label for="habNombre">Nombres y Apellidos <span class="req">*</span></label>
@@ -316,10 +317,10 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="habEdad">Edad (calculada)</label>
-                  <input type="number" class="cv-form-control" id="habEdad" name="edad" readonly placeholder="Automatico" tabindex="-1" style="background:var(--gray1);font-weight:700;color:var(--vp);border-style:dashed;">
+                  <input type="number" class="cv-form-control" id="habEdad" name="edad" readonly placeholder="Automático" tabindex="-1" style="background:var(--gray1);font-weight:700;color:var(--vp);border-style:dashed;">
                 </div>
                 <div class="cv-form-group">
-                  <label for="habGenero">Genero <span class="req">*</span></label>
+                  <label for="habGenero">Género <span class="req">*</span></label>
                   <select class="cv-form-control" id="habGenero" name="genero" required>
                     <option value="">Seleccionar...</option>
                     <option value="M">Masculino</option>
@@ -328,88 +329,168 @@
                   </select>
                 </div>
               </div>
-              <div class="cv-form-row cv-grid-3">
-                <div class="cv-form-group">
-                  <label for="habTelefono">Telefono</label>
-                  <input type="tel" class="cv-form-control" id="habTelefono" data-mask="telefono" name="telefono" placeholder="0412-1234567">
-                </div>
-                <div class="cv-form-group">
-                  <label for="habEmail">Correo Electronico</label>
-                  <input type="email" class="cv-form-control" id="habEmail" name="email" placeholder="ejemplo@correo.com">
-                </div>
-                <div class="cv-form-group">
-                  <label for="habOcupacion">Ocupacion</label>
-                  <input type="text" class="cv-form-control" id="habOcupacion" name="ocupacion" placeholder="Estudiante, Albanil...">
-                </div>
+              <div class="cv-form-group">
+                <label for="habEstadoCivil">Estado Civil</label>
+                <select class="cv-form-control" id="habEstadoCivil" name="estado_civil" style="width:32%">
+                  <option value="">Seleccionar...</option>
+                  <option value="Soltero/a">Soltero/a</option>
+                  <option value="Casado/a">Casado/a</option>
+                  <option value="Viudo/a">Viudo/a</option>
+                  <option value="Divorciado/a">Divorciado/a</option>
+                  <option value="Concubino/a">Concubino/a</option>
+                </select>
               </div>
             </div>
             <!-- PANEL 2 -->
             <div class="cv-panel" id="hab-panel2">
-              <div class="cv-panel-title"><i class="fas fa-map-location-dot"></i> Paso 2 &ndash; Ubicacion y Nivel Educativo</div>
+              <div class="cv-panel-title"><i class="fas fa-map-location-dot"></i> Paso 2 &ndash; Contacto y Ubicación</div>
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="habCC">Consejo Comunal <span class="req">*</span></label>
-                  <select class="cv-form-control" id="habCC" name="id_comunidad" required>
-                    <option value="">Seleccionar...</option>
-                    <option value="1">C.C. Jobito I</option>
-                    <option value="2">C.C. Jobito II</option>
-                    <option value="3">C.C. Brisas del Yurubi</option>
-                    <option value="4">C.C. Andrés Eloy Blanco</option>
-                    <option value="5">C.C. Las Mercedes I</option>
-                    <option value="6">C.C. Las Mercedes II</option>
-                    <option value="7">C.C. Santa Cruz de las Mercedes</option>
-                    <option value="8">C.C. Fortaleza del Corozo</option>
-                    <option value="9">C.C. Vencedores del Corozo</option>
-                  </select>
-                  <span class="cv-form-hint">FK obligatoria para control territorial.</span>
+                  <label for="habTelefono">Teléfono</label>
+                  <input type="tel" class="cv-form-control" id="habTelefono" data-mask="telefono" name="telefono" placeholder="0412-1234567">
                 </div>
+                <div class="cv-form-group">
+                  <label for="habEmail">Correo Electrónico</label>
+                  <input type="email" class="cv-form-control" id="habEmail" name="email" placeholder="ejemplo@correo.com">
+                </div>
+              </div>
+              <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
+                <div class="cv-form-group">
+                  <label for="habDireccion">Dirección de Residencia <span class="req">*</span></label>
+                  <textarea class="cv-form-control" id="habDireccion" name="direccion" rows="1" placeholder="Sector, calle, casa..." required></textarea>
+                </div>
+                <div class="cv-form-group">
+                  <label for="habTiempoComunidad">Tiempo en la Comunidad</label>
+                  <input type="text" class="cv-form-control" id="habTiempoComunidad" name="tiempo_comunidad" placeholder="Ej: 5 años, Toda la vida...">
+                </div>
+              </div>
+              <div class="cv-form-group">
+                <label for="habCC">Consejo Comunal <span class="req">*</span></label>
+                <select class="cv-form-control" id="habCC" name="id_comunidad" required>
+                  <option value="">Seleccionar...</option>
+                  <option value="1">C.C. Jobito I</option>
+                  <option value="2">C.C. Jobito II</option>
+                  <option value="3">C.C. Brisas del Yurubí</option>
+                  <option value="4">C.C. Andrés Eloy Blanco</option>
+                  <option value="5">C.C. Las Mercedes I</option>
+                  <option value="6">C.C. Las Mercedes II</option>
+                  <option value="7">C.C. Santa Cruz de las Mercedes</option>
+                  <option value="8">C.C. Fortaleza del Corozo</option>
+                  <option value="9">C.C. Vencedores del Corozo</option>
+                </select>
+                <span class="cv-form-hint">FK obligatoria para control territorial.</span>
+              </div>
+            </div>
+            <!-- PANEL 3 -->
+            <div class="cv-panel" id="hab-panel3">
+              <div class="cv-panel-title"><i class="fas fa-briefcase"></i> Paso 3 &ndash; Perfil Socioeconómico</div>
+              <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="habNivelEducativo">Nivel Educativo</label>
                   <select class="cv-form-control" id="habNivelEducativo" name="nivel_educativo">
                     <option value="">Seleccionar...</option>
                     <option value="Primaria">Primaria</option>
                     <option value="Bachiller">Bachiller</option>
-                    <option value="Tecnico Medio">Tecnico Medio</option>
-                    <option value="Tecnico Superior">Tecnico Superior (TSU)</option>
+                    <option value="Tecnico Medio">Técnico Medio</option>
+                    <option value="Tecnico Superior">Técnico Superior (TSU)</option>
                     <option value="Universitario">Universitario</option>
-                    <option value="Postgrado">Postgrado / Maestria</option>
+                    <option value="Postgrado">Postgrado / Maestría</option>
                     <option value="Ninguno">Ninguno</option>
                   </select>
                 </div>
+                <div class="cv-form-group">
+                  <label for="habOcupacion">Ocupación</label>
+                  <input type="text" class="cv-form-control" id="habOcupacion" name="ocupacion" placeholder="Estudiante, Albañil...">
+                </div>
               </div>
-              <div class="cv-form-group">
-                <label for="habDireccion">Direccion de Residencia</label>
-                <textarea class="cv-form-control" id="habDireccion" name="direccion" rows="2" placeholder="Sector, calle, numero de casa..."></textarea>
-              </div>
-            </div>
-            <!-- PANEL 3 -->
-            <div class="cv-panel" id="hab-panel3">
-              <div class="cv-panel-title"><i class="fas fa-clipboard-list"></i> Paso 3 &ndash; Salud, Estatus Electoral y Documentos</div>
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="condicionSalud">Condicion de Salud <span class="req">*</span></label>
+                  <label for="habTrabaja">Trabaja Actualmente</label>
+                  <select class="cv-form-control" id="habTrabaja" name="trabaja_actualmente">
+                    <option value="">Seleccionar...</option>
+                    <option value="true">Sí</option>
+                    <option value="false">No</option>
+                  </select>
+                </div>
+                <div class="cv-form-group">
+                  <label for="habIngresoMensual">Ingreso Mensual (Bs)</label>
+                  <input type="number" step="0.01" class="cv-form-control" id="habIngresoMensual" name="ingreso_mensual_bs" placeholder="0.00">
+                </div>
+                <div class="cv-form-group">
+                  <label for="habClasificacionIngreso">Ingreso Familiar</label>
+                  <select class="cv-form-control" id="habClasificacionIngreso" name="clasificacion_ingreso_familiar">
+                    <option value="">Seleccionar...</option>
+                    <option value="Menor a salario mínimo">Menor a salario mínimo</option>
+                    <option value="Salario mínimo">Salario mínimo</option>
+                    <option value="1 a 2 salarios mínimos">1 a 2 salarios mínimos</option>
+                    <option value="Más de 2 salarios mínimos">Más de 2 salarios mínimos</option>
+                    <option value="No percibe ingresos">No percibe ingresos</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <!-- PANEL 4 -->
+            <div class="cv-panel" id="hab-panel4">
+              <div class="cv-panel-title"><i class="fas fa-heartbeat"></i> Paso 4 &ndash; Salud y Estatus Electoral</div>
+              <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
+                <div class="cv-form-group">
+                  <label for="condicionSalud">Condición de Salud <span class="req">*</span></label>
                   <select class="cv-form-control" id="condicionSalud" name="condicion_salud" required>
                     <option value="saludable">Saludable</option>
-                    <option value="enfermedad_cronica">Enfermedad Cronica</option>
+                    <option value="enfermedad_cronica">Enfermedad Crónica</option>
                     <option value="discapacidad">Discapacidad</option>
                     <option value="encamado">Encamado</option>
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="t4Status">Clasificacion T4</label>
-                  <input type="text" class="cv-form-control" id="t4Status" name="clasificacion_t4" readonly placeholder="Por fecha de nacimiento" style="background:var(--gray1);font-weight:700;color:var(--vp);border-style:dashed;" tabindex="-1">
+                  <label for="habIncapacitado">Incapacitado</label>
+                  <select class="cv-form-control" id="habIncapacitado" name="incapacitado" onchange="document.getElementById('habIncapTipoGrp').style.display = this.value === 'true' ? 'block' : 'none'">
+                    <option value="false">No</option>
+                    <option value="true">Sí</option>
+                  </select>
+                </div>
+                <div class="cv-form-group" id="habIncapTipoGrp" style="display:none;">
+                  <label for="habIncapTipo">Tipo de Incapacidad</label>
+                  <input type="text" class="cv-form-control" id="habIncapTipo" name="incapacitado_tipo" placeholder="Ej: Motora, Visual...">
+                </div>
+              </div>
+              
+              <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
+                <div class="cv-form-group">
+                  <label for="habPensionado">Pensionado</label>
+                  <select class="cv-form-control" id="habPensionado" name="pensionado" onchange="document.getElementById('habPensInstGrp').style.display = this.value === 'true' ? 'block' : 'none'">
+                    <option value="false">No</option>
+                    <option value="true">Sí</option>
+                  </select>
+                </div>
+                <div class="cv-form-group" id="habPensInstGrp" style="display:none;">
+                  <label for="habPensInst">Institución</label>
+                  <input type="text" class="cv-form-control" id="habPensInst" name="pensionado_institucion" placeholder="Ej: IVSS, Amor Mayor...">
+                </div>
+                <div class="cv-form-group">
+                  <label for="habInscritoCNE">Inscrito en el CNE</label>
+                  <select class="cv-form-control" id="habInscritoCNE" name="inscrito_cne">
+                    <option value="false">No</option>
+                    <option value="true">Sí</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="cv-form-row cv-grid-2" style="margin-top:1rem; border-top: 1px dashed var(--gray3); padding-top: 1rem;">
+                <div class="cv-form-group">
+                  <label for="t4Status">Clasificación T4</label>
+                  <input type="text" class="cv-form-control" id="t4Status" readonly placeholder="Calculado auto" style="background:var(--gray1);font-weight:700;color:var(--vp);border-style:dashed;" tabindex="-1">
                 </div>
                 <div class="cv-form-group">
                   <label for="electoralStatus">Estado Electoral</label>
-                  <input type="text" class="cv-form-control" id="electoralStatus" name="estado_electoral" readonly placeholder="Por fecha de nacimiento" style="background:var(--gray1);font-weight:700;color:var(--az);border-style:dashed;" tabindex="-1">
+                  <input type="text" class="cv-form-control" id="electoralStatus" readonly placeholder="Calculado auto" style="background:var(--gray1);font-weight:700;color:var(--az);border-style:dashed;" tabindex="-1">
                 </div>
               </div>
-                <!-- Imagen y Cedula Ampliada eliminadas -->
             </div>
           </div>
           <div class="cv-modal-footer">
             <div class="cv-footer-left">
-              <span id="habStepCounter" style="font-size:.82rem;color:var(--gray4);font-weight:600;">Paso 1 de 3</span>
+              <span id="habStepCounter" style="font-size:.82rem;color:var(--gray4);font-weight:600;">Paso 1 de 4</span>
             </div>
             <div class="cv-footer-right">
               <button type="button" class="cv-btn cv-btn-ghost" id="habBtnCancel" data-bs-dismiss="modal">
@@ -477,7 +558,7 @@
 
 <script>
 (function () {
-  var TOTAL = 3;
+  var TOTAL = 4;
   var current = 1;
 
   function goTo(step) {
@@ -642,11 +723,21 @@
       genero: document.getElementById('habGenero').value,
       telefono: document.getElementById('habTelefono').value.trim(),
       email: document.getElementById('habEmail').value.trim(),
-      consejo_comunal_id: parseInt(document.getElementById('habCC').value),
+      estado_civil: document.getElementById('habEstadoCivil') ? document.getElementById('habEstadoCivil').value : '',
       direccion: document.getElementById('habDireccion').value.trim(),
-      ocupacion: document.getElementById('habOcupacion').value.trim(),
+      tiempo_comunidad: document.getElementById('habTiempoComunidad') ? document.getElementById('habTiempoComunidad').value.trim() : '',
+      consejo_comunal_id: parseInt(document.getElementById('habCC').value),
       nivel_educativo: document.getElementById('habNivelEducativo').value,
+      ocupacion: document.getElementById('habOcupacion').value.trim(),
+      trabaja_actualmente: document.getElementById('habTrabaja') && document.getElementById('habTrabaja').value === 'true',
+      ingreso_mensual_bs: document.getElementById('habIngresoMensual') && document.getElementById('habIngresoMensual').value ? parseFloat(document.getElementById('habIngresoMensual').value) : null,
+      clasificacion_ingreso_familiar: document.getElementById('habClasificacionIngreso') ? document.getElementById('habClasificacionIngreso').value : '',
       condicion_salud: condicionSalud || 'saludable',
+      incapacitado: document.getElementById('habIncapacitado') && document.getElementById('habIncapacitado').value === 'true',
+      incapacitado_tipo: document.getElementById('habIncapTipo') ? document.getElementById('habIncapTipo').value.trim() : '',
+      pensionado: document.getElementById('habPensionado') && document.getElementById('habPensionado').value === 'true',
+      pensionado_institucion: document.getElementById('habPensInst') ? document.getElementById('habPensInst').value.trim() : '',
+      inscrito_cne: document.getElementById('habInscritoCNE') && document.getElementById('habInscritoCNE').value === 'true',
       clasificacion: clasificacion
     };
 
@@ -722,7 +813,12 @@
     if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
   };
 
-  window.filtrarCenso = function(e) { if (e) e.preventDefault(); };
+  window.filtrarCenso = function(e) { 
+    if (e) e.preventDefault(); 
+    if (window.censoCtrl) {
+      window.censoCtrl.renderTabla();
+    }
+  };
   window.exportarExcelCenso = function() { alert('Exportar Excel - proximamente.'); };
 
   // ─────────────────────────────────────────
