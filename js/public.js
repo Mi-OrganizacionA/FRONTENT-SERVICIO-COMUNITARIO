@@ -347,6 +347,14 @@
      const esDestacado = p.destacado === true || p.destacado === 1 ||
                          p.is_featured === true || p.is_featured === 1;
 
+     const nombresConsejo = {
+       1: 'C.C. Jobito I',
+       2: 'C.C. Jobito II',
+       3: 'C.C. Jobito III',
+       10: 'Para toda la Comuna'
+     };
+     const nombreConsejo = nombresConsejo[p.id_comunidad] || p.consejo_comunal || p.consejo || 'Sector General';
+
      let badgeColor = 'rgba(21,101,192,.1)';
      let textColor = '#1565C0';
      if(estado === 'aprobado') { badgeColor = 'rgba(106,27,154,.1)'; textColor = '#6A1B9A'; }
@@ -378,7 +386,7 @@
             
             <div style="margin-top: 0.5rem; border-top: 1px dashed #E0E0E0; padding-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
               <div style="font-size: 0.8rem; font-weight: 700; color: var(--gray5);">
-                <i class="fas fa-map-marker-alt" style="color:var(--vv);margin-right:4px;"></i>${p.consejo_comunal || 'Sector General'}
+                <i class="fas fa-map-marker-alt" style="color:var(--vv);margin-right:4px;"></i>${nombreConsejo}
               </div>
               <div style="color:var(--vp); font-size: 0.8rem; font-weight: 700;"><i class="fas fa-arrow-right"></i> Ver Detalles</div>
             </div>
@@ -519,6 +527,14 @@
       if (!item) return;
       titleEl.textContent = item.nombre_proyecto;
       
+      const nombresConsejo = {
+        1: 'C.C. Jobito I',
+        2: 'C.C. Jobito II',
+        3: 'C.C. Jobito III',
+        10: 'Para toda la Comuna'
+      };
+      const nombreConsejo = nombresConsejo[item.id_comunidad] || item.consejo_comunal || item.consejo || 'Sector General';
+
       const estado = (item.estado || 'propuesto').toLowerCase();
       let badgeColor = 'rgba(21,101,192,.1)'; let textColor = '#1565C0';
       if(estado === 'aprobado') { badgeColor = 'rgba(106,27,154,.1)'; textColor = '#6A1B9A'; }
@@ -530,7 +546,7 @@
           <div style="background:#F9FAFB;border:1px solid #EAEEF2;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
              <div>
                 <div style="font-size:.7rem;color:var(--gray4);font-weight:700;text-transform:uppercase;margin-bottom:.3rem;letter-spacing:0.5px;"><i class="fas fa-map-marker-alt" style="color:var(--vv);"></i> Consejo Comunal</div>
-                <div style="font-size:.85rem;font-weight:700;color:var(--dark);">${item.consejo_comunal || 'Sector General'}</div>
+                <div style="font-size:.85rem;font-weight:700;color:var(--dark);">${nombreConsejo}</div>
              </div>
              <div>
                 <div style="font-size:.7rem;color:var(--gray4);font-weight:700;text-transform:uppercase;margin-bottom:.3rem;letter-spacing:0.5px;"><i class="fas fa-user-tie" style="color:var(--vv);"></i> Responsable</div>
