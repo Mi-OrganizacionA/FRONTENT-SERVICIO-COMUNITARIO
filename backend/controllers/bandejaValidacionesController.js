@@ -122,40 +122,54 @@ class BandejaValidacionesController {
       const datos = validacion.datos_temporales;
       let nuevoRegistro;
 
-      // Inserción en la tabla real según corresponda
-      if (tabla === 'habitantes') {
-        nuevoRegistro = await models.Habitante.create(datos);
-        
-        // Vincular la cédula y teléfono al usuario que envió la solicitud para que "perfil.html" pueda enlazarlo
-        if (validacion.id_vocero) {
-          const usuarioSolicitante = await models.Usuario.findByPk(validacion.id_vocero);
-          if (usuarioSolicitante && !usuarioSolicitante.cedula) {
-            await usuarioSolicitante.update({ 
-              cedula: datos.cedula, 
-              telefono: datos.telefono || usuarioSolicitante.telefono 
-            });
-          }
-        }
-      } else if (tabla === 'noticias') {
-        nuevoRegistro = await models.Noticia.create(datos);
-      } else if (tabla === 'proyectos') {
-        nuevoRegistro = await models.Proyecto.create(datos);
-      } else if (tabla === 'organizaciones_sociales') {
-        nuevoRegistro = await models.OrganizacionSocial.create(datos);
-      } else if (tabla === 'reportes_7t') {
-        nuevoRegistro = await models.Reporte7T.create(datos);
-      } else if (tabla === 'usuarios' && validacion.tipo_accion === 'UPDATE') {
+      // Mapeo de nombre de tabla a Modelo Sequelize
+      const tablaAModelo = {
+        'habitantes': models.Habitante,
+        'noticias': models.Noticia,
+        'proyectos': models.Proyecto,
+        'organizaciones_sociales': models.OrganizacionSocial,
+        'organizaciones': models.OrganizacionSocial,
+        'reportes_7t': models.Reporte7T,
+        'viviendas': models.Vivienda,
+        'voceros': models.Usuario,
+        'produccion_agricola': models.ProduccionAgricola
+      };
+
+      const Modelo = tablaAModelo[tabla];
+
+      if (tabla === 'usuarios' && validacion.tipo_accion === 'UPDATE') {
         nuevoRegistro = await models.Usuario.findByPk(validacion.registro_id);
         if (!nuevoRegistro) throw new Error('El usuario a actualizar no existe');
-        
-        // El nuevo correo puede venir como "nuevo_correo" o "email" según el frontend
         const nuevoCorreo = datos.nuevo_correo || datos.email;
         if (!nuevoCorreo) throw new Error('No se especificó un nuevo correo en la solicitud');
-        
         await nuevoRegistro.update({ email: nuevoCorreo });
       } else if (tabla === 'recuperacion_clave' || tabla === 'contacto') {
-        // Estas notificaciones no requieren inserción en tablas maestras, solo se archivan.
         nuevoRegistro = { id: validacion.registro_id };
+      } else if (Modelo) {
+        if (validacion.tipo_accion === 'CREATE' || validacion.tipo_accion === 'INSERT') {
+          nuevoRegistro = await Modelo.create(datos);
+          
+          if (tabla === 'habitantes' && validacion.id_vocero) {
+            const usuarioSolicitante = await models.Usuario.findByPk(validacion.id_vocero);
+            if (usuarioSolicitante && !usuarioSolicitante.cedula) {
+              await usuarioSolicitante.update({ 
+                cedula: datos.cedula, 
+                telefono: datos.telefono || usuarioSolicitante.telefono 
+              });
+            }
+          }
+        } else if (validacion.tipo_accion === 'UPDATE') {
+          nuevoRegistro = await Modelo.findByPk(validacion.registro_id || datos.id);
+          if (!nuevoRegistro) throw new Error(`El registro a actualizar no existe en ${tabla}`);
+          await nuevoRegistro.update(datos);
+        } else if (validacion.tipo_accion === 'DELETE') {
+          const registro = await Modelo.findByPk(validacion.registro_id || datos.id);
+          if (!registro) throw new Error(`El registro a eliminar no existe en ${tabla}`);
+          await registro.destroy();
+          nuevoRegistro = { id: validacion.registro_id || datos.id };
+        } else {
+          throw new Error(`Acción no soportada para la tabla ${tabla}: ${validacion.tipo_accion}`);
+        }
       } else {
         throw new Error(`Tabla afectada o tipo de acción desconocida: ${tabla} - ${validacion.tipo_accion}`);
       }
