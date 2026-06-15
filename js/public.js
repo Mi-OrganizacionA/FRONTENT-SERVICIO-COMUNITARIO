@@ -151,8 +151,7 @@
   const dots = document.querySelectorAll('.pub-dot');
   let currentSlide = 0;
   let slideInterval;
-  const visibleCards = () => window.innerWidth < 768 ? 1 : window.innerWidth < 1024 ? 2 : 3;
-
+  
   function getCardWidth() {
     const cards = track ? track.querySelectorAll('.pub-news-card') : [];
     if (!cards[0]) return 0;
@@ -161,24 +160,48 @@
   }
 
   function goToSlide(n) {
-    const cards = track ? track.querySelectorAll('.pub-news-card') : [];
-    const max = Math.max(0, cards.length - visibleCards());
+    if(!track) return;
+    const cards = track.querySelectorAll('.pub-news-card');
+    const wrap = track.parentElement; // pub-carousel-wrap
+    const visibleCards = Math.floor(wrap.offsetWidth / getCardWidth()) || 1;
+    const max = Math.max(0, cards.length - visibleCards);
     currentSlide = Math.max(0, Math.min(n, max));
-    if (track) track.style.transform = `translateX(-${currentSlide * getCardWidth()}px)`;
+    
+    wrap.scrollTo({
+      left: currentSlide * getCardWidth(),
+      behavior: 'smooth'
+    });
     dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
   }
+  
   function nextSlide() {
-    const cards = track ? track.querySelectorAll('.pub-news-card') : [];
-    const max = Math.max(0, cards.length - visibleCards());
+    if(!track) return;
+    const cards = track.querySelectorAll('.pub-news-card');
+    const wrap = track.parentElement;
+    const visibleCards = Math.floor(wrap.offsetWidth / getCardWidth()) || 1;
+    const max = Math.max(0, cards.length - visibleCards);
     goToSlide(currentSlide >= max ? 0 : currentSlide + 1);
   }
+  
   document.getElementById('carouselPrev')?.addEventListener('click', () => { goToSlide(currentSlide - 1); resetInterval(); });
   document.getElementById('carouselNext')?.addEventListener('click', () => { nextSlide(); resetInterval(); });
   dots.forEach((d, i) => d.addEventListener('click', () => { goToSlide(i); resetInterval(); }));
   function resetInterval() { clearInterval(slideInterval); slideInterval = setInterval(nextSlide, 4500); }
   slideInterval = setInterval(nextSlide, 4500);
 
-  // Reset carousel on resize (e.g. phone rotation)
+  // Sincronizar dots con el scroll manual
+  if(track) {
+    track.parentElement.addEventListener('scroll', () => {
+      const scrollLeft = track.parentElement.scrollLeft;
+      const index = Math.round(scrollLeft / getCardWidth());
+      if(index !== currentSlide) {
+        currentSlide = index;
+        dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+      }
+    }, { passive: true });
+  }
+
+  // Reset carousel on resize
   let resizeTimer;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);

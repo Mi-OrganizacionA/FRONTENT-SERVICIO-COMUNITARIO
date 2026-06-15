@@ -618,9 +618,21 @@ ul {
 }
 
 .pub-grid-scrollable {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  display: flex !important;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
   gap: 1.5rem;
+  padding-bottom: 1.5rem;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+}
+.pub-grid-scrollable > div {
+  flex: 0 0 350px;
+  max-width: 350px;
+  scroll-snap-align: start;
 }
 
 .pub-hab-card {
@@ -1045,17 +1057,25 @@ ul {
 /* ── CAROUSEL (CARTELERA) ── */
 .pub-carousel-wrap {
   position: relative;
-  overflow: hidden
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  padding-bottom: 1.5rem;
+  scrollbar-width: thin;
 }
 
 .pub-carousel-track {
   display: flex;
   gap: 1.5rem;
-  transition: transform .5s cubic-bezier(.4, 0, .2, 1)
+  width: max-content;
 }
 
 .pub-news-card {
-  flex: 0 0 calc(33.333% - 1rem);
+  flex: 0 0 350px;
+  max-width: 350px;
+  scroll-snap-align: start;
   background: #fff;
   border-radius: var(--r-lg);
   overflow: hidden;
