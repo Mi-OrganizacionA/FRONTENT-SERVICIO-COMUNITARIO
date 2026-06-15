@@ -134,7 +134,7 @@
         </div>
       </div>
       <div class="ph-actions" style="display:flex;gap:.6rem;flex-wrap:wrap;">
-        <button type="button" class="ph-btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)" id="btnExportCenso" onclick="exportarExcelCenso()">
+        <button type="button" class="ph-btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)" id="btnExportCenso" onclick="abrirModalExportarCenso()">
           <i class="fas fa-file-pdf"></i> Exportar
         </button>
         <button type="button" class="ph-btn" id="btnAbrirRegistro" onclick="abrirModalCenso()">
@@ -234,8 +234,8 @@
   <div class="result-info-row fade-in-up">
     <span id="resultCount">Cargando habitantes...</span>
     <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
-      <button type="button" class="btn-sicag btn-sm btn-outline-verde" onclick="exportarExcelCenso()">
-        <i class="fas fa-file-excel"></i> Excel
+      <button type="button" class="btn-sicag btn-sm btn-outline-verde" onclick="abrirModalExportarCenso()">
+          <i class="fas fa-file-excel"></i> Excel
       </button>
     </div>
   </div>
@@ -982,8 +982,7 @@
   // ─────────────────────────────────────────
   // Redirección Automática desde Spotlight
   // ─────────────────────────────────────────
-  const urlParams = new URLSearchParams(window.location.search);
-  const viewHabitanteId = urlParams.get('viewHabitante');
+    const viewHabitanteId = urlParams.get('viewHabitante');
   if (viewHabitanteId) {
     setTimeout(() => {
       if (window.censoCtrl) {
@@ -996,6 +995,161 @@
   }
 })();
 </script>
+
+  <!-- Modal Filtros Avanzados (Copiado de reportes para Censo) -->
+  <div class="modal-overlay" id="modalFiltrosAvanzados" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); z-index:9999; display:none; align-items:center; justify-content:center; backdrop-filter:blur(8px); padding:1rem;">
+    <div class="modal-content" style="background:#ffffff; border-radius:16px; padding:0; max-width:800px; width:100%; max-height:95vh; box-shadow:0 25px 50px rgba(0,0,0,0.3); overflow:hidden; display:flex; flex-direction:column; animation: fadeUp 0.3s ease-out;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%); padding:1.5rem 2.5rem; display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center;">
+          <div style="background:rgba(255,255,255,0.2); width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-right:1rem; backdrop-filter:blur(4px);">
+            <i class="fas fa-filter" style="color:#ffffff; font-size:1.4rem;"></i>
+          </div>
+          <div>
+            <h2 style="font-size:1.4rem; color:#ffffff; margin:0; font-weight:800; letter-spacing:-0.5px;">Filtros de Exportación</h2>
+            <p style="color:rgba(255,255,255,0.8); margin:0; font-size:0.85rem; margin-top:0.2rem;">Configura los datos exactos que deseas generar en PDF o Excel.</p>
+          </div>
+        </div>
+        <button class="modal-close" id="btnCloseFilters" style="background:rgba(255,255,255,0.15); border:none; width:36px; height:36px; border-radius:50%; color:#ffffff; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; transition:background 0.2s;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="padding:1.5rem; flex:1; overflow-y:auto;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;">
+          
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Fecha Desde</label>
+            <input type="date" id="filtroDesde" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; transition:border 0.2s;">
+          </div>
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Fecha Hasta</label>
+            <input type="date" id="filtroHasta" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; transition:border 0.2s;">
+          </div>
+          <div class="form-group-sicag" style="grid-column:1/-1;">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Consejo Comunal</label>
+            <select id="filtroConsejoExport" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; transition:border 0.2s; background:#fff;">
+              <option value="">Todos los Consejos Comunales</option>
+              <option value="1">Jobito I</option>
+              <option value="2">Jobito II</option>
+              <option value="3">Brisas del Yurubí</option>
+              <option value="4">Andrés Eloy Blanco</option>
+              <option value="5">Las Mercedes I</option>
+              <option value="6">Las Mercedes II</option>
+              <option value="7">Santa Cruz de las Mercedes</option>
+              <option value="8">Fortaleza del Corozo</option>
+              <option value="9">Vencedores del Corozo</option>
+            </select>
+          </div>
+          <div class="form-group-sicag" style="grid-column:1/-1; background:#f0fdf4; border:1px solid #bbf7d0; padding:1rem; border-radius:8px; display:flex; align-items:center; gap:0.5rem; margin-top:0.5rem;">
+            <input type="checkbox" id="chkNacimiento" style="width:1.2rem; height:1.2rem; cursor:pointer;">
+            <label for="chkNacimiento" style="font-weight:700; color:#166534; cursor:pointer; margin:0;">Usar Rango de Fechas de Nacimiento (desactiva Edad)</label>
+          </div>
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;" id="lblNacMin">F. Nacimiento Desde</label>
+            <input type="date" id="filtroNacMin" class="input-sicag" disabled style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#f3f4f6; cursor:not-allowed;">
+          </div>
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;" id="lblNacMax">F. Nacimiento Hasta</label>
+            <input type="date" id="filtroNacMax" class="input-sicag" disabled style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#f3f4f6; cursor:not-allowed;">
+          </div>
+          
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Mínima</label>
+            <input type="number" id="filtroEdadMin" class="input-sicag" placeholder="Ej: 18" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none;">
+          </div>
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Máxima</label>
+            <input type="number" id="filtroEdadMax" class="input-sicag" placeholder="Ej: 60" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none;">
+          </div>
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Género</label>
+            <select id="filtroGeneroExport" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
+              <option value="">Cualquiera</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+            </select>
+          </div>
+
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Condición de Salud</label>
+            <select id="filtroSalud" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
+              <option value="">Todas</option>
+              <option value="saludable">Saludable</option>
+              <option value="enfermedad_cronica">Enfermedad Crónica</option>
+              <option value="discapacidad">Con Discapacidad</option>
+              <option value="encamado">Encamado</option>
+            </select>
+          </div>
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Elector / Inscrito CNE</label>
+            <select id="filtroCne" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
+              <option value="">Ambos</option>
+              <option value="1">Sí (Inscritos)</option>
+              <option value="0">No Inscritos</option>
+            </select>
+          </div>
+          <div class="form-group-sicag">
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Situación Laboral</label>
+            <select id="filtroTrabajo" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
+              <option value="">Cualquiera</option>
+              <option value="1">Trabaja Actualmente</option>
+              <option value="0">No Trabaja / Desempleado</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- COLUMNAS ADICIONALES -->
+        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed #e5e7eb;">
+          <label style="font-weight:700; color:#111; font-size:1rem; margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem;">
+            <i class="fas fa-columns" style="color:var(--vp);"></i> ¿Deseas incluir columnas adicionales en el reporte?
+          </label>
+          <div style="display:flex; flex-wrap:wrap; gap:1.5rem; background:#f8fafc; padding:1rem; border-radius:8px; border:1px solid #e2e8f0;">
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
+              <input type="checkbox" class="chk-extra" value="telefono"> Teléfono
+            </label>
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
+              <input type="checkbox" class="chk-extra" value="nivel_academico"> Nivel Académico
+            </label>
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
+              <input type="checkbox" class="chk-extra" value="trabajo"> Situación Laboral
+            </label>
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
+              <input type="checkbox" class="chk-extra" value="salud"> Condición de Salud
+            </label>
+          </div>
+        </div>
+
+        <!-- SELECCIÓN DEL REPORTE -->
+        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed #e5e7eb;">
+          <label style="font-weight:700; color:#111; font-size:1rem; margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem;">
+            <i class="fas fa-file-export" style="color:var(--vp);"></i> ¿Qué reporte deseas generar con estos filtros?
+          </label>
+          <select id="customReportType" class="input-sicag" style="width:100%; padding:0.85rem 1rem; border:2px solid #e5e7eb; border-radius:10px; font-size:1rem; color:#222; outline:none; background:#fff; font-weight:500; cursor:pointer;">
+            <option value="total-personas">Padrón Completo de Personas</option>
+            <option value="electores">Registro Electoral (Mayores de 18)</option>
+            <option value="ninos">Padrón de Niños y Adolescentes</option>
+            <option value="adultos-mayores">Padrón de Adultos Mayores (60+)</option>
+            <option value="discapacidad">Personas con Discapacidad</option>
+            <option value="encamados">Personas Encamadas</option>
+            <option value="embarazadas">Mujeres (Censo Demográfico Femenino)</option>
+            <option value="viviendas">Censo de Viviendas</option>
+          </select>
+        </div>
+
+      </div>
+      <div class="modal-footer" style="padding:1.5rem; background:#f9fafb; border-top:1px solid #e5e7eb; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <button class="btn-sicag" id="btnLimpiarFiltros" style="background:#ffffff; border:1px solid #d1d5db; color:#4b5563; padding:0.7rem 1.5rem; border-radius:8px; font-weight:600; cursor:pointer; transition:0.2s; box-shadow:0 1px 2px rgba(0,0,0,0.05);">Limpiar Filtros</button>
+        
+        <div style="display:flex; gap:0.75rem;">
+          <button class="btn-sicag" id="btnCustomExcel" style="background:#107c41; color:white; border:none; padding:0.7rem 1.5rem; border-radius:8px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(16,124,65,0.3); display:flex; align-items:center; gap:0.5rem; transition:0.2s;">
+            <i class="fas fa-file-excel"></i> Exportar Excel
+          </button>
+          <button class="btn-sicag" id="btnCustomPDF" style="background:linear-gradient(135deg, #e53935 0%, #c62828 100%); color:white; border:none; padding:0.7rem 1.5rem; border-radius:8px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(229,57,53,0.3); display:flex; align-items:center; gap:0.5rem; transition:0.2s;">
+            <i class="fas fa-file-pdf"></i> Exportar PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
 

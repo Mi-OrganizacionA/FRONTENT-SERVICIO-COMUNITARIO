@@ -145,6 +145,11 @@ class NoticiasController {
       card.dataset.id = n.id || n.id_publicacion;
       card.dataset.type = tipo;
 
+      const user = window.auth?.getUser() || {};
+      const isAdmin = user.rol === 'admin' || user.rol === 'admin_principal';
+      const isAuthor = n.id_autor == user.id;
+      const puedeEditar = isAdmin || isAuthor;
+
       const star = n.destacada ? '<i class="fas fa-star pub-star" title="Destacada"></i>' : '';
       card.innerHTML = `
         <div class="pub-card-bar bar-${tipo === 'aviso' ? 'aviso' : tipo}"></div>
@@ -164,10 +169,12 @@ class NoticiasController {
               <span class="pub-meta-row"><i class="fas fa-calendar"></i> ${fecha}</span>
               ${n.autor ? `<span class="pub-meta-row"><i class="fas fa-user"></i> ${n.autor}</span>` : ''}
             </div>
+            ${puedeEditar ? `
             <div class="pub-card-btns">
               <button class="btn-sicag btn-sm" style="padding:4px 8px;font-size:0.75rem;background:transparent;color:var(--au)" onclick="abrirModalNoticia(${card.dataset.id}, '${tipo}')" title="Editar"><i class="fas fa-edit"></i></button>
               <button class="btn-sicag btn-sm" style="padding:4px 8px;font-size:0.75rem;background:transparent;color:var(--ru)" onclick="confirmarEliminarNot(${card.dataset.id})" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
             </div>
+            ` : ''}
           </div>
         </div>
       `;

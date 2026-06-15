@@ -116,6 +116,11 @@ class CarteleraDigitalController {
       const publicacion = await CarteleraModel.findByPk(id);
       if (!publicacion) return res.status(404).json({ error: 'Publicación no encontrada' });
 
+      const isAdmin = req.user?.rol === 'admin' || req.user?.rol === 'admin_principal';
+      if (!isAdmin && publicacion.id_autor !== req.user?.id) {
+        return res.status(403).json({ error: 'No tienes permiso para modificar esta publicación.' });
+      }
+
       const datosAntiguos = publicacion.toJSON();
       await publicacion.update({
         titulo: titulo ?? publicacion.titulo,
@@ -145,6 +150,11 @@ class CarteleraDigitalController {
 
       const publicacion = await CarteleraModel.findByPk(id);
       if (!publicacion) return res.status(404).json({ error: 'Publicación no encontrada' });
+
+      const isAdmin = req.user?.rol === 'admin' || req.user?.rol === 'admin_principal';
+      if (!isAdmin && publicacion.id_autor !== req.user?.id) {
+        return res.status(403).json({ error: 'No tienes permiso para eliminar esta publicación.' });
+      }
 
       await publicacion.update({ activo: false });
       await AuditService.log(req.user.id, 'DELETE', 'cartelera_digital', id, publicacion.toJSON(), null);

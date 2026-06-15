@@ -27,35 +27,40 @@ class OrganizacionesController {
     } catch (error) { next(error); }
   }
 
-  static async create(req, res) {
+  static async create(req, res, next) {
     try {
-      const Configuracion = OrganizacionSocial.sequelize.models.Configuracion;
-      const BandejaValidaciones = OrganizacionSocial.sequelize.models.BandejaValidaciones;
-      
-      const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Organizaciones' } });
-      const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
-      
-      const autoApprove = (globalConfig && globalConfig.valor === 'true') || 
-                          (config && config.valor === 'true') || 
-                          req.user?.rol === 'admin';
+      // Los administradores siempre guardan directo, sin pasar por la bandeja
+      const esAdmin = req.user?.rol === 'admin';
 
-      if (!autoApprove) {
-        await BandejaValidaciones.create({
-          id_vocero: req.user.id,
-          tabla_afectada: 'organizaciones_sociales',
-          tipo_accion: 'CREATE',
-          datos_temporales: req.body,
-          estado_tramite: 'Pendiente'
-        });
-        return res.status(202).json({ mensaje: 'Solicitud enviada a la bandeja de validaciones.' });
+      if (!esAdmin) {
+        // Solo para voceros: verificar configuración de aprobación
+        const Configuracion = OrganizacionSocial.sequelize.models.Configuracion;
+        const BandejaValidaciones = OrganizacionSocial.sequelize.models.BandejaValidaciones;
+
+        const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Organizaciones' } }).catch(() => null);
+        const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } }).catch(() => null);
+
+        const autoApprove = (globalConfig && globalConfig.valor === 'true') ||
+                            (config && config.valor === 'true');
+
+        if (!autoApprove) {
+          await BandejaValidaciones.create({
+            id_vocero: req.user.id,
+            tabla_afectada: 'organizaciones_sociales',
+            tipo_accion: 'CREATE',
+            datos_temporales: req.body,
+            estado_tramite: 'Pendiente'
+          });
+          return res.status(202).json({ mensaje: 'Solicitud enviada a la bandeja de validaciones.' });
+        }
       }
 
-      const organizacion = await OrganizacionesService.create(OrganizacionSocial, req.body);
-      await AuditService.log(req.user.id, 'CREATE', 'organizaciones', organizacion.id, null, organizacion);
+      const organizacion = await OrganizacionSocial.create(req.body);
+      await AuditService.log(req.user?.id, 'CREATE', 'organizaciones', organizacion.id, null, organizacion);
       res.status(201).json(organizacion);
     } catch (error) {
       logger.error('Error creando organización:', error);
-      res.status(400).json({ error: error.message });
+      next(error);
     }
   }
 

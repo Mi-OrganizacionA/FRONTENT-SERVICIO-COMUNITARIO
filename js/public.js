@@ -300,8 +300,12 @@
 
       // 2. Noticias públicas (Cartelera)
       try {
-        const resN = await fetch(`${baseApi}/cartelera/publico/activas`);
-        if (resN.ok) noticias = await resN.json();
+        if (window.api && window.api.getNoticias) {
+          noticias = await window.api.getNoticias();
+        } else {
+          const resN = await fetch(`${baseApi}/cartelera/publico/activas`);
+          if (resN.ok) noticias = await resN.json();
+        }
       } catch (e) {
         console.warn('Error cargando noticias públicas:', e.message);
       }

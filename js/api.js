@@ -802,7 +802,8 @@ class APIManager {
     const autoModulo = localStorage.getItem(`sicag_auto_${tabla}`) === 'true';
 
     // Si es vocero y la aprobación automática NO está activa, va a la bandeja
-    if (isVocero && !autoGlobal && !autoModulo) {
+    // EXCEPCIÓN: Cartelera/Noticias siempre va directo para que todos lo vean de inmediato
+    if (isVocero && !autoGlobal && !autoModulo && tabla !== 'noticias') {
       console.log(`[API] Interceptado: Enviando ${accion} de ${tabla} a validaciones.`);
       const res = await this.crearNotificacion({
         tabla_afectada: tabla,
@@ -1079,7 +1080,10 @@ class APIManager {
     return await this._interceptarValidacion('organizaciones', 'INSERT', datos, async () => {
       if (this.isDevelopment) return datos;
       const response = await fetch(`${this.baseURL}/organizaciones`, { method: 'POST', ...this._getHeaders(), body: JSON.stringify(datos) });
-      if (!response.ok) throw new Error('Error creando organizacion');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Error creando organizacion');
+      }
       return response.json();
     });
   }
@@ -1176,19 +1180,19 @@ class APIManager {
   // ─────────────────────────────────────────
   async getNoticias(filtros = {}) {
     await this.waitForMockData();
-    if (this.isDevelopment) return this._aplicarFiltroCC(this.mockData?.noticias || []);
+    if (this.isDevelopment) return this.mockData?.noticias || [];
     const params = new URLSearchParams(filtros);
     try {
       const response = await this._fetch(`${this.baseURL}/cartelera/publico/activas`, this._getHeaders());
       if (!response.ok) throw new Error('Error fetching noticias');
       const data = await response.json();
-      return this._aplicarFiltroCC(data);
+      return data;
     } catch (error) {
       if (this.isDevelopment) {
-        return this._aplicarFiltroCC(this.mockData?.noticias || []);
+        return this.mockData?.noticias || [];
       }
       console.warn('No se pudo cargar noticias desde la API; usando datos locales:', error.message);
-      return this._aplicarFiltroCC(this.mockData?.noticias || []);
+      return this.mockData?.noticias || [];
     }
   }
 

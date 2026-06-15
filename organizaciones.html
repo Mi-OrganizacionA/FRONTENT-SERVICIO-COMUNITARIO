@@ -423,7 +423,7 @@
       cerrarModalOrganizacion();
       await init();
     } catch(err) {
-      if(window.Components) Components.showToast('Error al guardar.', 'error');
+      if(window.Components) Components.showToast(err.message || 'Error al guardar.', 'error');
     }
   }
 

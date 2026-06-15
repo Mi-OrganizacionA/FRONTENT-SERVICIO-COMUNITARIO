@@ -481,3 +481,137 @@ document.addEventListener('spa-navigated', () => {
     window.censoCtrl = new CensoController();
   }
 });
+
+window.abrirModalExportarCenso = function() {
+  const modal = document.getElementById('modalFiltrosAvanzados');
+  if (modal) modal.style.display = 'flex';
+};
+
+document.addEventListener('DOMContentLoaded', _initModalCensoExport);
+document.addEventListener('spa-navigated', () => {
+  if (window.location.pathname.includes('censo.html')) {
+    _initModalCensoExport();
+  }
+});
+
+function _initModalCensoExport() {
+  const modal = document.getElementById('modalFiltrosAvanzados');
+  const btnClose = document.getElementById('btnCloseFilters');
+  const btnExcel = document.getElementById('btnCustomExcel');
+  const btnPDF = document.getElementById('btnCustomPDF');
+  const btnLimpiar = document.getElementById('btnLimpiarFiltros');
+  const chkNac = document.getElementById('chkNacimiento');
+
+  if (!modal) return;
+
+  if (btnClose) btnClose.onclick = () => modal.style.display = 'none';
+  window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+  if (chkNac) {
+    chkNac.onchange = (e) => {
+      const active = e.target.checked;
+      document.getElementById('filtroNacMin').disabled = !active;
+      document.getElementById('filtroNacMax').disabled = !active;
+      document.getElementById('filtroEdadMin').disabled = active;
+      document.getElementById('filtroEdadMax').disabled = active;
+    };
+  }
+
+  if (btnLimpiar) {
+    btnLimpiar.onclick = () => {
+      ['filtroDesde','filtroHasta','filtroConsejoExport','filtroNacMin','filtroNacMax','filtroEdadMin','filtroEdadMax','filtroGeneroExport','filtroSalud','filtroCne','filtroTrabajo'].forEach(id => {
+        if(document.getElementById(id)) document.getElementById(id).value = '';
+      });
+      if(chkNac) { chkNac.checked = false; chkNac.dispatchEvent(new Event('change')); }
+      document.querySelectorAll('.chk-extra').forEach(c => c.checked = false);
+      if(document.getElementById('customReportType')) document.getElementById('customReportType').value = 'total-personas';
+    };
+  }
+
+  if (btnExcel) btnExcel.onclick = () => _generarReporteAvanzadoCenso('excel', btnExcel);
+  if (btnPDF) btnPDF.onclick = () => _generarReporteAvanzadoCenso('pdf', btnPDF);
+}
+
+function _generarReporteAvanzadoCenso(formato, btn) {
+  const orig = btn.innerHTML;
+
+  if (window.Components && typeof Components.actionDialog === 'function') {
+    Components.actionDialog({
+      titulo: 'Opciones de Documento',
+      mensaje: '¿Deseas abrir el reporte aquí mismo en el navegador o descargarlo directamente a tu equipo?',
+      icono: formato === 'excel' ? 'fa-file-excel' : 'fa-file-pdf',
+      colorIcono: formato === 'excel' ? '#107c41' : '#1565C0',
+      btnPrimaryText: 'Descargar Archivo',
+      btnPrimaryIcon: 'fa-download',
+      btnPrimaryColor: formato === 'excel' ? '#107c41' : '#1565C0',
+      btnSecondaryText: 'Solo Ver',
+      btnSecondaryIcon: 'fa-eye',
+      onPrimary: () => { _ejecutarRequestExportacionAvanzada(formato, btn, orig, 'download'); },
+      onSecondary: () => { _ejecutarRequestExportacionAvanzada(formato, btn, orig, 'view'); }
+    });
+  } else {
+    const accion = confirm('Pulsa Aceptar para VER el reporte, o Cancelar para DESCARGARLO.') ? 'view' : 'download';
+    _ejecutarRequestExportacionAvanzada(formato, btn, orig, accion);
+  }
+}
+
+function _ejecutarRequestExportacionAvanzada(formato, btn, orig, action) {
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+  btn.disabled = true;
+
+  let params = new URLSearchParams();
+
+  const getVal = (id) => { const el = document.getElementById(id); return el && !el.disabled ? el.value : ''; };
+
+  const desde = getVal('filtroDesde');
+  const hasta = getVal('filtroHasta');
+  if (desde) params.append('fecha_desde', desde);
+  if (hasta) params.append('fecha_hasta', hasta);
+
+  const cc = getVal('filtroConsejoExport');
+  if (cc) params.append('consejo_id', cc);
+
+  const usarNac = document.getElementById('chkNacimiento')?.checked;
+  if (usarNac) {
+    const fnMin = getVal('filtroNacMin');
+    const fnMax = getVal('filtroNacMax');
+    if (fnMin) params.append('fecha_nac_min', fnMin);
+    if (fnMax) params.append('fecha_nac_max', fnMax);
+  } else {
+    const edMin = getVal('filtroEdadMin');
+    const edMax = getVal('filtroEdadMax');
+    if (edMin) params.append('edad_min', edMin);
+    if (edMax) params.append('edad_max', edMax);
+  }
+
+  const gen = getVal('filtroGeneroExport');
+  if (gen) params.append('genero', gen);
+
+  const salud = getVal('filtroSalud');
+  if (salud) params.append('salud', salud);
+
+  const cne = getVal('filtroCne');
+  if (cne) params.append('inscrito_cne', cne);
+
+  const trabajo = getVal('filtroTrabajo');
+  if (trabajo) params.append('trabaja', trabajo);
+
+  const extras = Array.from(document.querySelectorAll('.chk-extra:checked')).map(c => c.value);
+  if (extras.length > 0) params.append('extras', extras.join(','));
+
+  const tipo = document.getElementById('customReportType')?.value || 'total-personas';
+
+  const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
+  const downloadUrl = `${baseUrl}/censo-reportes/exportar?tipo=${tipo}&format=${formato}&action=${action}&${params.toString()}`;
+  
+  window.open(downloadUrl, '_blank');
+
+  setTimeout(() => {
+    btn.innerHTML = '<i class="fas fa-check"></i> ¡Listo!';
+    if (window.Components) Components.showToast('Reporte generado exitosamente.', 'success');
+    setTimeout(() => { 
+      btn.innerHTML = orig; 
+      btn.disabled = false; 
+    }, 2000);
+  }, 1500);
+}
