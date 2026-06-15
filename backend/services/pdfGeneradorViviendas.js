@@ -100,12 +100,31 @@ class PdfGeneradorViviendas {
           const pagesNeeded = Math.ceil(allFamily.length / 10) || 1;
 
           for(let p = 1; p < pagesNeeded; p++) {
-             // Clona
-             const cln = originalPage1.cloneNode(true);
+             const cln = document.createElement('div');
+             cln.className = 'page';
              cln.style.pageBreakBefore = 'always';
-             // Limpia el tbody clonado
-             cln.querySelector('.familia-table tbody').innerHTML = '';
-             // Inserta el clon ANTES de la pagina 2 (la cual ya inyecté por replace abajo)
+             cln.style.marginTop = '20px';
+             
+             // Extraer solo el título y la tabla de familia (Sección III)
+             const titleBox = originalPage1.querySelector('.title-box');
+             const section3 = originalPage1.querySelector('.section3-wrapper');
+             
+             let htmlContent = '';
+             if (titleBox) {
+                const titleClone = titleBox.cloneNode(true);
+                titleClone.innerHTML = 'ESTUDIO DEMOGRÁFICO Y SOCIOECONÓMICO — CONT. (Pág. ' + (p + 1) + ')';
+                htmlContent += titleClone.outerHTML;
+             }
+             if (section3) {
+                const section3Clone = section3.cloneNode(true);
+                const header = section3Clone.querySelector('.section-header');
+                if (header) header.innerHTML = 'III. CARACTERÍSTICAS DEL GRUPO FAMILIAR (CONTINUACIÓN)';
+                section3Clone.querySelector('.familia-table tbody').innerHTML = '';
+                htmlContent += section3Clone.outerHTML;
+             }
+             
+             cln.innerHTML = htmlContent;
+             // Inserta el clon ANTES de la pagina 2
              pageContainer.insertBefore(cln, pageContainer.lastElementChild);
           }
 

@@ -1651,6 +1651,89 @@ class APIManager {
     }
     return await response.json();
   }
+
+  // ─────────────────────────────────────────
+  // VIVIENDAS (Censo T2 — Infraestructura)
+  // ─────────────────────────────────────────
+
+  /**
+   * Obtiene todas las viviendas censadas del backend.
+   * Si la API falla, retorna un array vacío para no romper la UI.
+   * @param {Object} filtros - Parámetros de filtrado opcionales (ej. consejo_comunal_id)
+   * @returns {Promise<Array>}
+   */
+  async getViviendas(filtros = {}) {
+    try {
+      const params = new URLSearchParams(filtros);
+      const response = await this._fetch(`${this.baseURL}/viviendas?${params}`, this._getHeaders());
+      if (!response.ok) throw new Error('Error cargando viviendas: ' + response.status);
+      const data = await response.json();
+      // El backend puede devolver array directo o { viviendas: [...] }
+      return Array.isArray(data) ? data : (data.viviendas || []);
+    } catch (error) {
+      console.warn('[API] getViviendas falló, retornando array vacío:', error.message);
+      return [];
+    }
+  }
+
+  /**
+   * Crea una nueva vivienda en el backend.
+   * @param {Object} datos - Datos del formulario de vivienda
+   * @returns {Promise<Object>} - La vivienda creada
+   */
+  async crearVivienda(datos) {
+    const response = await this._fetch(`${this.baseURL}/viviendas`, {
+      method: 'POST',
+      ...this._getHeaders(),
+      body: JSON.stringify(datos)
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'Error al crear la vivienda');
+    return data;
+  }
+
+  /**
+   * Actualiza los datos de una vivienda existente.
+   * @param {number} id - ID de la vivienda a actualizar
+   * @param {Object} cambios - Campos a modificar
+   * @returns {Promise<Object>} - La vivienda actualizada
+   */
+  async actualizarVivienda(id, cambios) {
+    const response = await this._fetch(`${this.baseURL}/viviendas/${id}`, {
+      method: 'PUT',
+      ...this._getHeaders(),
+      body: JSON.stringify(cambios)
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'Error al actualizar la vivienda');
+    return data;
+  }
+
+  /**
+   * Elimina una vivienda del sistema.
+   * @param {number} id - ID de la vivienda a eliminar
+   * @returns {Promise<Object>} - Confirmación del servidor
+   */
+  async eliminarVivienda(id) {
+    const response = await this._fetch(`${this.baseURL}/viviendas/${id}`, {
+      method: 'DELETE',
+      ...this._getHeaders()
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'Error al eliminar la vivienda');
+    return data;
+  }
+
+  /**
+   * Abre el PDF de la planilla de censo de una vivienda en una nueva pestaña.
+   * Usa la ruta GET /api/viviendas/:id/exportar-pdf del backend (Puppeteer).
+   * @param {number} id - ID de la vivienda
+   */
+  exportarPdfVivienda(id) {
+    const token = window.auth?.getToken() || '';
+    const url = `${this.baseURL}/viviendas/${id}/exportar-pdf?token=${token}`;
+    window.open(url, '_blank');
+  }
 }
 
 // Instancia global

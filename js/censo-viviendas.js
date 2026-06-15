@@ -70,7 +70,8 @@ function renderTable() {
         <td>${createGasBadge(v.gas_domestico)}</td>
         <td>
           <button type="button" class="btn btn-sm btn-outline-primary me-2" onclick="editarVivienda(${v.id})"><i class="fas fa-edit"></i> Editar</button>
-          <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarVivienda(${v.id})"><i class="fas fa-trash-alt"></i> Eliminar</button>
+          <button type="button" class="btn btn-sm btn-outline-danger me-2" onclick="eliminarVivienda(${v.id})"><i class="fas fa-trash-alt"></i> Eliminar</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.api.exportarPdfVivienda(${v.id})" title="Imprimir Planilla de Censo"><i class="fas fa-file-pdf"></i> Planilla</button>
         </td>
       </tr>`;
   }).join('');

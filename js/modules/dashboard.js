@@ -34,11 +34,13 @@ class DashboardController {
       const pHabitantes = window.api.getHabitantes().catch(() => []);
       const pNoticias = window.api.getNoticias().catch(() => []);
       const pResumen = window.api.getDashboardResumen().catch(() => []);
+      const pViviendas = window.api.getViviendas().catch(() => []);
       
       this.stats = await pStats;
       this.habitantes = await pHabitantes;
       this.noticias = await pNoticias;
       this.resumen = await pResumen;
+      this.viviendas = await pViviendas;
       this.habitantesTotales = await window.api.getHabitantes({ limit: 5000 }).catch(() => this.habitantes);
     } catch (err) {
       console.error(err);
@@ -257,6 +259,68 @@ class DashboardController {
           scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' }, ticks: { callback: v => v+' hab.' } }, x: { grid: { display: false } } }
         }
       });
+    }
+
+    // --- Donut condición de viviendas ---
+    if (this.viviendas && this.viviendas.length > 0) {
+      const condicionMap = { 'Buena': 0, 'Regular': 0, 'Mala': 0, 'Alto Riesgo': 0 };
+      this.viviendas.forEach(v => {
+        const cond = v.condicion_general || 'Regular';
+        if (condicionMap[cond] !== undefined) condicionMap[cond]++;
+        else condicionMap['Regular']++;
+      });
+
+      const ctxCond = document.getElementById('chartCondicionViviendas');
+      if (ctxCond) {
+        new Chart(ctxCond.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Buena', 'Regular', 'Mala', 'Alto Riesgo'],
+            datasets: [{
+              data: [condicionMap['Buena'], condicionMap['Regular'], condicionMap['Mala'], condicionMap['Alto Riesgo']],
+              backgroundColor: ['#43A047', '#FFA726', '#EF5350', '#C62828'],
+              borderWidth: 3, borderColor: '#fff', hoverOffset: 8
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false, cutout: '52%',
+            plugins: {
+              legend: { position: 'bottom', labels: { padding: 10, font: { family: 'Poppins', size: 10 }, usePointStyle: true } },
+              tooltip: { backgroundColor: '#1A2E1A', padding: 12, cornerRadius: 8 }
+            }
+          }
+        });
+      }
+
+      // --- Barras tipo de gas ---
+      const gasMap = {};
+      this.viviendas.forEach(v => {
+        const gas = v.gas_domestico || 'No posee';
+        gasMap[gas] = (gasMap[gas] || 0) + 1;
+      });
+      const gasLabels = Object.keys(gasMap);
+      const gasData = gasLabels.map(k => gasMap[k]);
+
+      const ctxGas = document.getElementById('chartGasViviendas');
+      if (ctxGas) {
+        new Chart(ctxGas.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: gasLabels,
+            datasets: [{
+              label: 'Viviendas',
+              data: gasData,
+              backgroundColor: ['rgba(46,125,50,.85)', 'rgba(21,101,192,.85)', 'rgba(198,40,40,.85)', 'rgba(249,168,37,.85)'],
+              borderRadius: 6, borderSkipped: false
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1A2E1A', padding: 12, cornerRadius: 8 } },
+            scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' } }, x: { grid: { display: false } } }
+          }
+        });
+      }
     }
   }
 }
