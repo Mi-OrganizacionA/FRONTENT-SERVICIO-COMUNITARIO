@@ -3365,13 +3365,16 @@
     document.getElementById('chkEncuestadoEsJefe')?.addEventListener('change', function() {
       const nomEnc = document.getElementById('encuestadoNombre');
       const cedEnc = document.getElementById('encuestadoCedula');
+      const btnValidar = document.getElementById('btnValidarEncuestado');
       if (this.checked) {
         syncEncuestadoDesdeJefe();
-        if (nomEnc) nomEnc.readOnly = true;
-        if (cedEnc) cedEnc.readOnly = true;
+        if (nomEnc) { nomEnc.readOnly = true; nomEnc.removeAttribute('required'); nomEnc.style.borderColor = ''; nomEnc.style.boxShadow = ''; }
+        if (cedEnc) { cedEnc.readOnly = true; cedEnc.removeAttribute('required'); cedEnc.style.borderColor = ''; cedEnc.style.boxShadow = ''; }
+        if (btnValidar) btnValidar.disabled = true;
       } else {
-        if (nomEnc) { nomEnc.readOnly = false; nomEnc.value = ''; }
-        if (cedEnc) { cedEnc.readOnly = false; cedEnc.value = ''; }
+        if (nomEnc) { nomEnc.readOnly = false; nomEnc.setAttribute('required', 'true'); nomEnc.value = ''; }
+        if (cedEnc) { cedEnc.readOnly = false; cedEnc.setAttribute('required', 'true'); cedEnc.value = ''; }
+        if (btnValidar) btnValidar.disabled = false;
       }
     });
 
@@ -3539,7 +3542,36 @@
       // ── 1. Sincronizar nombre del Consejo Comunal al Paso 2 ──
       const selCC = document.getElementById('consejoComunalCab');
       const p2CCNombre = document.getElementById('p2CCNombre');
+      const u = window.auth?.getUser?.() || window.auth?.user || JSON.parse(sessionStorage.getItem('sicag_user') || '{}');
+
       if (selCC && p2CCNombre) {
+        // Auto-asignar comunidad si es vocero
+        if (u.rol === 'vocero' && u.id_comunidad) {
+          const mapCC = {
+            1: 'Jobito I',
+            2: 'Jobito II',
+            3: 'Jobito III',
+            4: 'Brisas del Yurubí',
+            5: 'Andrés Eloy Blanco',
+            6: 'Cacique Tamanaco',
+            7: 'La Esperanza',
+            8: 'Tierra Viva'
+          };
+          const val = mapCC[u.id_comunidad] || u.consejo_comunal;
+          if (val) {
+            for (let option of selCC.options) {
+              if (option.value === val || option.text.includes(val)) {
+                selCC.value = option.value;
+                break;
+              }
+            }
+          }
+          selCC.setAttribute('disabled', 'true');
+          selCC.style.backgroundColor = 'var(--gray1)';
+          selCC.style.fontWeight = '700';
+          selCC.style.color = 'var(--vp)';
+        }
+
         const syncCC = () => {
           p2CCNombre.textContent = selCC.value ? `C.C. ${selCC.value}` : '— (seleccione en Sección I)';
         };
@@ -3549,7 +3581,6 @@
 
       // ── 2. Auto-fill del Encuestador (siempre desde sesión) ──
       const fillEncuestador = () => {
-        const u = window.auth?.getUser?.() || window.auth?.user || JSON.parse(sessionStorage.getItem('sicag_user') || '{}');
         const nom = document.getElementById('encuestadorNombre');
         const ced = document.getElementById('encuestadorCedula');
         if (nom) nom.value = u.nombres ? (u.nombres + ' ' + (u.apellidos || '')).trim() : (u.nombre || 'Administrador');
