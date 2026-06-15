@@ -1485,12 +1485,12 @@
                     <option value="Jobito I">C.C. Jobito I</option>
                     <option value="Jobito II">C.C. Jobito II</option>
                     <option value="Brisas del Yurubí">C.C. Brisas del Yurubí</option>
-                    <option value="Cacique Tamanaco">C.C. Cacique Tamanaco</option>
-                    <option value="La Esperanza">C.C. La Esperanza</option>
-                    <option value="Tierra Viva">C.C. Tierra Viva</option>
-                    <option value="Nueva Raíz">C.C. Nueva Raíz</option>
-                    <option value="Arcoíris">C.C. Arcoíris</option>
-                    <option value="Unidos en Madera">C.C. Unidos en Madera</option>
+                    <option value="Andrés Eloy Blanco">C.C. Andrés Eloy Blanco</option>
+                    <option value="Las Mercedes I">C.C. Las Mercedes I</option>
+                    <option value="Las Mercedes II">C.C. Las Mercedes II</option>
+                    <option value="Santa Cruz de las Mercedes">C.C. Santa Cruz de las Mercedes</option>
+                    <option value="Fortaleza del Corozo">C.C. Fortaleza del Corozo</option>
+                    <option value="Vencedores del Corozo">C.C. Vencedores del Corozo</option>
                   </select>
                 </div>
               </div>
@@ -3546,30 +3546,39 @@
 
       if (selCC && p2CCNombre) {
         // Auto-asignar comunidad si es vocero
-        if (u.rol === 'vocero' && u.id_comunidad) {
+        if (u.rol === 'vocero') {
           const mapCC = {
             1: 'Jobito I',
             2: 'Jobito II',
-            3: 'Jobito III',
-            4: 'Brisas del Yurubí',
-            5: 'Andrés Eloy Blanco',
-            6: 'Cacique Tamanaco',
-            7: 'La Esperanza',
-            8: 'Tierra Viva'
+            3: 'Brisas del Yurubí',
+            4: 'Andrés Eloy Blanco',
+            5: 'Las Mercedes I',
+            6: 'Las Mercedes II',
+            7: 'Santa Cruz de las Mercedes',
+            8: 'Fortaleza del Corozo',
+            9: 'Vencedores del Corozo'
           };
-          const val = mapCC[u.id_comunidad] || u.consejo_comunal;
+          const cid = u.id_comunidad_asignada || u.id_comunidad;
+          const val = mapCC[cid] || u.consejo_comunal;
+          let matched = false;
           if (val) {
             for (let option of selCC.options) {
               if (option.value === val || option.text.includes(val)) {
                 selCC.value = option.value;
+                matched = true;
                 break;
               }
             }
           }
-          selCC.setAttribute('disabled', 'true');
-          selCC.style.backgroundColor = 'var(--gray1)';
-          selCC.style.fontWeight = '700';
-          selCC.style.color = 'var(--vp)';
+          
+          if (matched) {
+            selCC.setAttribute('disabled', 'true');
+            selCC.style.backgroundColor = 'var(--gray1)';
+            selCC.style.fontWeight = '700';
+            selCC.style.color = 'var(--vp)';
+            // Remover el 'required' para que no haya problemas de validación si el JS decide ignorar los disabled
+            selCC.removeAttribute('required'); 
+          }
         }
 
         const syncCC = () => {

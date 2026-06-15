@@ -44,36 +44,37 @@
   /* ─── MENÚ VOCERO (sólo sus páginas) ────────────────────── */
   const MENU_VOCERO = [
     {
-      title: 'Mi Trabajo',
+      title: 'Gestión Principal',
       items: [
-        { href: 'censo_viviendas.html', icon: 'house-chimney-crack', label: 'Censo de Viviendas' },
-        { href: 'censo.html', icon: 'users', label: 'Consultar Habitantes' },
-        { href: 'noticias.html', icon: 'newspaper', label: 'Cartelera Digital' },
+        { href: 'dashboard.html', icon: 'gauge-high', label: 'Dashboard' },
+        { href: 'censo.html', icon: 'users', label: 'Censo Comunitario', badge: '347' },
+        { href: 'censo_viviendas.html', icon: 'house-chimney-crack', label: 'Censo Viviendas' },
+        { href: 'noticias.html', icon: 'newspaper', label: 'Cartelera Digital', badge: '12' },
         { href: 'proyectos.html', icon: 'seedling', label: 'Proyectos Agroecológicos' },
         { href: 'produccion_agricola.html', icon: 'tractor', label: 'Producción Agrícola' },
         { href: 'organizaciones.html', icon: 'hands-holding-circle', label: 'Organizaciones Sociales' }
       ]
     },
     {
-      title: 'Mis Solicitudes',
+      title: 'Análisis y Reportes',
       items: [
-        { href: 'notificaciones.html', icon: 'paper-plane', label: 'Mis Solicitudes' }
+        { href: 'reportes.html', icon: 'chart-column', label: 'Reportes' },
+        { href: 'cartografia.html', icon: 'map-location-dot', label: 'Cartografía Social' }
       ]
     },
     {
-      title: 'Recursos',
+      title: 'Administración',
       items: [
-        { href: 'cartografia.html', icon: 'map-location-dot', label: 'Mapa Comunal' },
+        { href: 'notificaciones.html', icon: 'paper-plane', label: 'Mis Solicitudes' },
+      ]
+    },
+    {
+      title: 'Acceso Rápido',
+      items: [
         { href: 'ayuda.html', icon: 'circle-question', label: 'Centro de Ayuda' },
-        { href: 'index.html', icon: 'globe', label: 'Portal Público', target: '_blank' }
-      ]
-    },
-    {
-      title: 'Sesión',
-      items: [
-        { href: 'perfil.html', icon: 'user-circle', label: 'Mi Perfil' },
         { href: 'index.html', icon: 'globe', label: 'Portal Público', target: '_blank' },
-        { href: 'login.html', icon: 'right-from-bracket', label: 'Cerrar Sesión', style: 'color:rgba(255,130,100,.9);' }
+        { href: 'perfil.html', icon: 'user-circle', label: 'Mi Perfil' },
+        { href: 'login.html', icon: 'right-from-bracket', label: 'Cerrar Sesión', style: 'color:rgba(255,100,100,.85);' }
       ]
     }
   ];
