@@ -347,17 +347,35 @@
      const esDestacado = p.destacado === true || p.destacado === 1 ||
                          p.is_featured === true || p.is_featured === 1;
 
+     let badgeColor = 'rgba(21,101,192,.1)';
+     let textColor = '#1565C0';
+     if(estado === 'aprobado') { badgeColor = 'rgba(106,27,154,.1)'; textColor = '#6A1B9A'; }
+     else if(estado === 'en_ejecucion') { badgeColor = 'rgba(230,81,0,.1)'; textColor = '#E65100'; }
+     else if(estado === 'finalizado') { badgeColor = 'rgba(27,94,32,.12)'; textColor = '#1B5E20'; }
+
      return `
-       <div class="pub-card" style="background:#fff;border:1px solid var(--gray3);border-radius:var(--r-lg);padding:1.5rem;display:flex;flex-direction:column;box-shadow:var(--sh-sm);transition:var(--tr);cursor:pointer;" onclick="abrirModalDetalle(${p.id}, 'proyecto')">
-          ${esDestacado ? `<div style="font-size:.65rem;font-weight:800;color:#E65100;background:#FFF8E1;border:1px solid #FFCC80;border-radius:20px;padding:.18rem .6rem;display:inline-flex;align-items:center;gap:.3rem;align-self:flex-start;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.05em;"><i class="fas fa-star"></i> Destacado</div>` : ''}
-          <div style="font-size:0.75rem;font-weight:700;color:var(--vp);text-transform:uppercase;margin-bottom:0.5rem;display:flex;justify-content:space-between;">
-             <span><i class="fas fa-hammer"></i> ${estado}</span>
-             <span>${avance}%</span>
+       <div class="pub-card" style="background:#fff;border:1px solid var(--gray3);border-radius:16px;padding:1.5rem;display:flex;flex-direction:column;box-shadow:0 4px 15px rgba(0,0,0,.03);transition:transform 0.3s, box-shadow 0.3s;cursor:pointer;position:relative;" onclick="abrirModalDetalle(${p.id}, 'proyecto')" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 25px rgba(0,0,0,.08)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 15px rgba(0,0,0,.03)';">
+          ${esDestacado ? `<div style="font-size:.65rem;font-weight:800;color:#E65100;background:#FFF8E1;border:1px solid #FFCC80;border-radius:20px;padding:.18rem .6rem;display:inline-flex;align-items:center;gap:.3rem;align-self:flex-start;margin-bottom:.8rem;text-transform:uppercase;letter-spacing:.05em;"><i class="fas fa-star"></i> Destacado</div>` : ''}
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+             <span style="background:${badgeColor};color:${textColor};padding:.35rem .85rem;border-radius:20px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;"><i class="fas fa-circle" style="font-size:0.5rem;vertical-align:middle;margin-bottom:1px;margin-right:2px;"></i> ${estado}</span>
+             <span style="color:var(--gray4);font-size:.75rem;font-weight:600;"><i class="fas fa-tag"></i> ${p.tipo_proyecto || 'General'}</span>
           </div>
-          <h4 style="font-size:1rem;font-weight:700;margin-bottom:0.5rem;color:var(--dark)">${p.nombre_proyecto || ''}</h4>
-          <p style="font-size:0.8rem;color:var(--gray4);flex:1;margin-bottom:1rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${p.descripcion || ''}</p>
-          <div style="font-size:0.75rem;color:var(--gray4);border-top:1px solid var(--gray3);padding-top:0.75rem;">
-             <i class="fas fa-map-marker-alt" style="color:var(--vv)"></i> ${p.consejo_comunal || 'Sector General'}
+          <h4 style="font-size:1.1rem;font-weight:800;color:var(--dark);margin-bottom:.5rem;line-height:1.35;">${p.nombre_proyecto || ''}</h4>
+          <p style="font-size:.85rem;color:var(--gray4);flex:1;margin-bottom:1.25rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${p.descripcion || ''}</p>
+          
+          <div style="margin-bottom:1.25rem;">
+             <div style="display:flex;justify-content:space-between;font-size:.75rem;font-weight:700;color:var(--muted);margin-bottom:.4rem;">
+                <span><i class="fas fa-list-check"></i> Avance</span>
+                <span style="color:${textColor};">${avance}%</span>
+             </div>
+             <div style="height:6px;background:#F0F0F0;border-radius:4px;overflow:hidden;">
+                <div style="height:100%;width:${avance}%;background:${textColor};border-radius:4px;transition:width 0.5s ease;"></div>
+             </div>
+          </div>
+          
+          <div style="border-top:1px dashed #E0E0E0;padding-top:1rem;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;font-weight:700;">
+             <span style="color:var(--gray5);"><i class="fas fa-map-marker-alt" style="color:var(--vv);"></i> ${p.consejo_comunal || 'Sector General'}</span>
+             <span style="color:var(--vp);"><i class="fas fa-arrow-right"></i> Ver detalles</span>
           </div>
        </div>
      `;
@@ -494,13 +512,49 @@
       item = todosLosProyectos.find(p => String(p.id) === String(id));
       if (!item) return;
       titleEl.textContent = item.nombre_proyecto;
+      
+      const estado = (item.estado || 'propuesto').toLowerCase();
+      let badgeColor = 'rgba(21,101,192,.1)'; let textColor = '#1565C0';
+      if(estado === 'aprobado') { badgeColor = 'rgba(106,27,154,.1)'; textColor = '#6A1B9A'; }
+      else if(estado === 'en_ejecucion') { badgeColor = 'rgba(230,81,0,.1)'; textColor = '#E65100'; }
+      else if(estado === 'finalizado') { badgeColor = 'rgba(27,94,32,.12)'; textColor = '#1B5E20'; }
+
       infoEl.innerHTML = `
-        <div class="pub-modal-info-item"><label>Estado</label><span>${item.estado || 'Propuesto'}</span></div>
-        <div class="pub-modal-info-item"><label>Avance</label><span>${item.avance || 0}%</span></div>
-        <div class="pub-modal-info-item"><label>Consejo Comunal</label><span>${item.consejo_comunal || 'N/A'}</span></div>
-        <div class="pub-modal-info-item"><label>Presupuesto Estimado</label><span>${item.presupuesto_estimado ? Number(item.presupuesto_estimado).toLocaleString('es-VE',{style:'currency',currency:'VES'}) : 'No definido'}</span></div>
+        <div style="background:#F9FAFB;border:1px solid #EAEEF2;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+           <div>
+              <div style="font-size:.7rem;color:var(--gray4);font-weight:700;text-transform:uppercase;margin-bottom:.3rem;letter-spacing:0.5px;"><i class="fas fa-map-marker-alt" style="color:var(--vv);"></i> Consejo Comunal</div>
+              <div style="font-size:.85rem;font-weight:700;color:var(--dark);">${item.consejo_comunal || 'Sector General'}</div>
+           </div>
+           <div>
+              <div style="font-size:.7rem;color:var(--gray4);font-weight:700;text-transform:uppercase;margin-bottom:.3rem;letter-spacing:0.5px;"><i class="fas fa-user-tie" style="color:var(--vv);"></i> Responsable</div>
+              <div style="font-size:.85rem;font-weight:700;color:var(--dark);">${item.responsable || 'Comunidad'}</div>
+           </div>
+           <div>
+              <div style="font-size:.7rem;color:var(--gray4);font-weight:700;text-transform:uppercase;margin-bottom:.3rem;letter-spacing:0.5px;"><i class="fas fa-calendar-alt" style="color:var(--vv);"></i> Inicio / Registro</div>
+              <div style="font-size:.85rem;font-weight:700;color:var(--dark);">${item.fecha_inicio ? new Date(item.fecha_inicio).toLocaleDateString() : 'Por definir'}</div>
+           </div>
+           <div>
+              <div style="font-size:.7rem;color:var(--gray4);font-weight:700;text-transform:uppercase;margin-bottom:.3rem;letter-spacing:0.5px;"><i class="fas fa-calendar-check" style="color:var(--vv);"></i> Culminación</div>
+              <div style="font-size:.85rem;font-weight:700;color:var(--dark);">${item.fecha_fin ? new Date(item.fecha_fin).toLocaleDateString() : 'Por definir'}</div>
+           </div>
+        </div>
+
+        <div style="margin-bottom:1.5rem;">
+           <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:.5rem;">
+              <span style="font-size:.8rem;font-weight:700;color:var(--muted);"><i class="fas fa-list-check"></i> Avance del Proyecto</span>
+              <span style="color:${textColor};font-size:1.25rem;font-weight:800;">${item.avance || 0}%</span>
+           </div>
+           <div style="height:8px;background:#F0F0F0;border-radius:4px;overflow:hidden;">
+              <div style="height:100%;width:${item.avance || 0}%;background:${textColor};border-radius:4px;"></div>
+           </div>
+        </div>
+        
+        <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+           <div style="background:${badgeColor};color:${textColor};padding:.4rem 1rem;border-radius:20px;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;"><i class="fas fa-circle" style="font-size:0.5rem;vertical-align:middle;margin-bottom:1px;margin-right:2px;"></i> ${estado}</div>
+           <div style="background:#FFF3E0;color:#E65100;padding:.4rem 1rem;border-radius:20px;font-size:.75rem;font-weight:800;"><i class="fas fa-coins"></i> ${item.presupuesto_estimado && item.presupuesto_estimado > 0 ? Number(item.presupuesto_estimado).toLocaleString('es-VE',{style:'currency',currency:'VES'}) : 'Sin presupuesto'}</div>
+        </div>
       `;
-      descEl.textContent = item.descripcion || 'Sin descripción detallada.';
+      descEl.innerHTML = `<div style="padding-top:1rem;border-top:1px dashed #E0E0E0;"><p style="font-size:0.95rem;color:var(--sub);line-height:1.6;">${item.descripcion || 'Sin descripción detallada.'}</p></div>`;
     } else if (tipo === 'noticia') {
       item = todasLasNoticias.find(n => String(n.id) === String(id));
       if (!item) return;
