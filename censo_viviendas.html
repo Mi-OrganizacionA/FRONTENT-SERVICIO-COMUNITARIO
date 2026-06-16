@@ -3570,7 +3570,7 @@
           const cid = u.id_comunidad_asignada || u.id_comunidad;
           const val = mapCC[cid] || u.consejo_comunal;
           let matched = false;
-          if (val) {
+          if (val && val.trim() !== '') {
             for (let option of selCC.options) {
               if (option.value === val || option.text.includes(val)) {
                 selCC.value = option.value;
@@ -3585,7 +3585,7 @@
             selCC.style.backgroundColor = 'var(--gray1)';
             selCC.style.fontWeight = '700';
             selCC.style.color = 'var(--vp)';
-            // Remover el 'required' para que no haya problemas de validación si el JS decide ignorar los disabled
+            // Remover el 'required' para que no haya problemas de validación
             selCC.removeAttribute('required'); 
           }
         }
