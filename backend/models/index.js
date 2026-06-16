@@ -44,6 +44,9 @@ async function initModels(sequelize) {
   ProduccionAgricola.belongsTo(Habitante, { foreignKey: 'habitante_id', as: 'productor' });
   Habitante.hasMany(ProduccionAgricola, { foreignKey: 'habitante_id', as: 'producciones' });
 
+  Vivienda.belongsTo(Habitante, { foreignKey: 'id_jefe_familia', as: 'jefe' });
+  Habitante.hasOne(Vivienda, { foreignKey: 'id_jefe_familia', as: 'vivienda_liderada' });
+
   OrganizacionSocial.belongsTo(Habitante, { foreignKey: 'id_habitante_responsable', as: 'responsable' });
   OrganizacionSocial.hasMany(PersonaGrupoSocial, { foreignKey: 'id_organizacion', as: 'miembros' });
   PersonaGrupoSocial.belongsTo(OrganizacionSocial, { foreignKey: 'id_organizacion', as: 'organizacion' });

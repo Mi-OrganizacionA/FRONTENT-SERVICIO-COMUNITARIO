@@ -10,8 +10,32 @@ module.exports = {
       const { consejo_comunal_id } = req.query;
       const where = {};
       if (consejo_comunal_id) where.consejo_comunal_id = consejo_comunal_id;
-      const data = await Vivienda.findAll({ where });
-      res.json(data);
+      
+      const db = models;
+      const data = await Vivienda.findAll({ 
+        where,
+        include: [
+          { model: db.Habitante, as: 'jefe', attributes: ['cedula', 'nombres', 'apellidos'] },
+          { model: db.ConsejoComunal, as: 'consejo', attributes: ['nombre'] }
+        ]
+      });
+
+      // Mapear al formato esperado por el frontend
+      const mappedData = data.map(v => {
+        const raw = v.toJSON();
+        return {
+          ...raw,
+          cedula: raw.jefe ? raw.jefe.cedula : null,
+          sector: raw.consejo ? raw.consejo.nombre : null,
+          habitantes: raw.cantidad_habitaciones || 0, // Placeholder, idealmente contar desde Habitantes
+          tipo: raw.tipo_vivienda,
+          condicion: raw.condiciones_salubridad,
+          gas: raw.enseres_vivienda?.gas || 'No posee', // Usar campo enseres
+          agua: raw.enseres_vivienda?.agua || 'No tiene'
+        };
+      });
+
+      res.json(mappedData);
     } catch (error) { next(error); }
   },
 
