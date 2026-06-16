@@ -3568,11 +3568,14 @@
             9: 'Vencedores del Corozo'
           };
           const cid = u.id_comunidad_asignada || u.id_comunidad;
-          const val = mapCC[cid] || u.consejo_comunal;
+          const val = mapCC[cid] || u.consejo_comunal || u.consejoComunal;
           let matched = false;
-          if (val && val.trim() !== '') {
+          if (val && val.toString().trim() !== '') {
+            const valLower = val.toString().toLowerCase().trim();
             for (let option of selCC.options) {
-              if (option.value === val || option.text.includes(val)) {
+              const optValLower = option.value.toLowerCase().trim();
+              const optTextLower = option.text.toLowerCase().trim();
+              if (optValLower === valLower || optTextLower.includes(valLower)) {
                 selCC.value = option.value;
                 matched = true;
                 break;
