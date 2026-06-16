@@ -3,7 +3,7 @@ const env = require('../config/environment');
 const logger = require('../utils/logger');
 
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
+  const token = req.headers.authorization?.split(' ')[1] || req.query.token;
   if (!token) return res.status(401).json({ error: 'Token no proporcionado', code: 'NO_TOKEN' });
   
   // Soporte para tokens simulados del frontend en desarrollo

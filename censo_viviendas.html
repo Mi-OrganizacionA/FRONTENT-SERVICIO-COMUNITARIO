@@ -1603,6 +1603,7 @@
           <table class="cv-table" id="tablaViviendas">
             <thead>
               <tr>
+                <th style="width: 40px;">#</th>
                 <th><i class="fas fa-id-card" style="margin-right:.3rem;color:var(--vv)"></i>Cédula Jefe</th>
                 <th><i class="fas fa-map-pin" style="margin-right:.3rem;color:var(--vv)"></i>Consejo Comunal</th>
                 <th><i class="fas fa-users" style="margin-right:.3rem;color:var(--vv)"></i>Habitantes</th>
@@ -3684,7 +3685,9 @@
         showToast('Esta vivienda no tiene ID (modo offline).', 'error');
         return;
       }
-      window.open(`/api/viviendas/${id}/exportar-pdf`, '_blank');
+      const token = window.auth?.getToken() || '';
+      const baseURL = window.api?.baseURL || 'https://sicag-api.onrender.com/api';
+      window.open(`${baseURL}/viviendas/${id}/exportar-pdf?token=${token}`, '_blank');
     }
 
     function intentarEditar(id, index) {
