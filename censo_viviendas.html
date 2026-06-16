@@ -3574,6 +3574,8 @@
           const cid = u.id_comunidad_asignada || u.id_comunidad;
           const val = mapCC[cid] || u.consejo_comunal || u.consejoComunal;
           let matched = false;
+          let matchedValue = '';
+
           if (val && val.toString().trim() !== '') {
             const valLower = val.toString().toLowerCase().trim();
             for (let option of selCC.options) {
@@ -3581,6 +3583,7 @@
               const optTextLower = option.text.toLowerCase().trim();
               if (optValLower === valLower || optTextLower.includes(valLower)) {
                 selCC.value = option.value;
+                matchedValue = option.value;
                 matched = true;
                 break;
               }
@@ -3594,6 +3597,19 @@
             selCC.style.color = 'var(--vp)';
             // Remover el 'required' para que no haya problemas de validación
             selCC.removeAttribute('required'); 
+
+            // Si el formulario se resetea (al cerrar el modal o cancelar), 
+            // HTML restaura los selects a su primer valor ("Seleccione...").
+            // Necesitamos restaurar la auto-asignación inmediatamente después.
+            const formWizard = document.getElementById('formWizard') || document.getElementById('formVivienda');
+            if (formWizard) {
+              formWizard.addEventListener('reset', () => {
+                setTimeout(() => {
+                  selCC.value = matchedValue;
+                  p2CCNombre.textContent = `C.C. ${matchedValue}`;
+                }, 0);
+              });
+            }
           }
         }
 
@@ -3602,31 +3618,6 @@
         };
         selCC.addEventListener('change', syncCC);
         syncCC();
-
-        // Si el formulario se resetea (al cerrar el modal o cancelar), 
-        // HTML restaura los selects a su primer valor ("Seleccione...").
-        // Necesitamos restaurar la auto-asignación inmediatamente después.
-        const formWizard = document.getElementById('formWizard') || document.getElementById('formVivienda');
-        if (formWizard) {
-          formWizard.addEventListener('reset', () => {
-            setTimeout(() => {
-              if (matched) {
-                selCC.value = mapCC[cid] || u.consejo_comunal || u.consejoComunal; // o la variable que coincida
-                // Buscar la opción exacta para restaurar su valor real
-                const valLower = selCC.value.toString().toLowerCase().trim();
-                for (let option of selCC.options) {
-                  const optValLower = option.value.toLowerCase().trim();
-                  const optTextLower = option.text.toLowerCase().trim();
-                  if (optValLower === valLower || optTextLower.includes(valLower)) {
-                    selCC.value = option.value;
-                    break;
-                  }
-                }
-                syncCC();
-              }
-            }, 0);
-          });
-        }
       }
 
       // ── 2. Auto-fill del Encuestador (siempre desde sesión) ──
