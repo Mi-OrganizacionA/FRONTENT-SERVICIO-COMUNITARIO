@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,11 +10,18 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
-  <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"></noscript>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style"
+    onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  </noscript>
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style"
+    onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  </noscript>
   <link href="css/admin.css" rel="stylesheet">
 
   <style>
@@ -21,35 +29,41 @@
        TOKENS
     ══════════════════════════════════════════ */
     :root {
-      --vd:  #1B5E20;
-      --vp:  #2E7D32;
-      --vv:  #43A047;
-      --vc:  #A5D6A7;
+      --vd: #1B5E20;
+      --vp: #2E7D32;
+      --vv: #43A047;
+      --vc: #A5D6A7;
       --vbg: #F1F8E9;
-      --au:  #F9A825;
-      --ru:  #C62828;
-      --az:  #1565C0;
+      --au: #F9A825;
+      --ru: #C62828;
+      --az: #1565C0;
       --gray1: #F8FAF8;
       --gray2: #EEF3EE;
       --gray3: #DDE8DD;
       --gray4: #8A9A8A;
       --gray5: #2E3B2E;
-      --txt:  #263026;
-      --dark:  #0D1F0D;
+      --txt: #263026;
+      --dark: #0D1F0D;
       --border: #DDE8DD;
       --font: 'Poppins', sans-serif;
       --r-sm: 10px;
       --r-md: 16px;
       --r-lg: 22px;
-      --sh-sm: 0 2px 12px rgba(0,0,0,.05), 0 1px 3px rgba(0,0,0,.04);
-      --sh-md: 0 8px 32px rgba(0,0,0,.09), 0 2px 8px rgba(0,0,0,.05);
-      --sh-v:  0 12px 40px rgba(46,125,50,.22);
-      --tr: .25s cubic-bezier(.4,0,.2,1);
+      --sh-sm: 0 2px 12px rgba(0, 0, 0, .05), 0 1px 3px rgba(0, 0, 0, .04);
+      --sh-md: 0 8px 32px rgba(0, 0, 0, .09), 0 2px 8px rgba(0, 0, 0, .05);
+      --sh-v: 0 12px 40px rgba(46, 125, 50, .22);
+      --tr: .25s cubic-bezier(.4, 0, .2, 1);
     }
 
-    *, *::before, *::after { box-sizing: border-box; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
 
-    html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
       font-family: var(--font);
@@ -59,7 +73,9 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    .app-main { min-height: calc(100vh - 70px); }
+    .app-main {
+      min-height: calc(100vh - 70px);
+    }
 
     /* ── PAGE HEADER ── */
     .cv-page-header {
@@ -73,27 +89,33 @@
     .cv-page-header::before {
       content: '';
       position: absolute;
-      top: -80px; right: -80px;
-      width: 320px; height: 320px;
-      background: radial-gradient(circle, rgba(255,255,255,.07) 0%, transparent 70%);
+      top: -80px;
+      right: -80px;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(255, 255, 255, .07) 0%, transparent 70%);
       border-radius: 50%;
     }
 
     .cv-page-header::after {
       content: '';
       position: absolute;
-      bottom: -100px; left: 25%;
-      width: 380px; height: 380px;
-      background: radial-gradient(circle, rgba(255,255,255,.04) 0%, transparent 70%);
+      bottom: -100px;
+      left: 25%;
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, rgba(255, 255, 255, .04) 0%, transparent 70%);
       border-radius: 50%;
     }
 
     /* Detalles decorativos extra */
     .cv-page-header .deco-dots {
       position: absolute;
-      top: 1.5rem; left: 50%;
-      width: 200px; height: 60px;
-      background-image: radial-gradient(circle, rgba(255,255,255,.08) 1.5px, transparent 1.5px);
+      top: 1.5rem;
+      left: 50%;
+      width: 200px;
+      height: 60px;
+      background-image: radial-gradient(circle, rgba(255, 255, 255, .08) 1.5px, transparent 1.5px);
       background-size: 16px 16px;
       pointer-events: none;
     }
@@ -103,16 +125,29 @@
       align-items: center;
       gap: .4rem;
       font-size: .78rem;
-      color: rgba(255,255,255,.65);
+      color: rgba(255, 255, 255, .65);
       margin-bottom: 1rem;
       position: relative;
       z-index: 1;
     }
 
-    .cv-breadcrumb a { color: rgba(255,255,255,.65); transition: color var(--tr); }
-    .cv-breadcrumb a:hover { color: #fff; }
-    .cv-breadcrumb .sep { opacity: .4; }
-    .cv-breadcrumb .current { color: rgba(255,255,255,.9); font-weight: 600; }
+    .cv-breadcrumb a {
+      color: rgba(255, 255, 255, .65);
+      transition: color var(--tr);
+    }
+
+    .cv-breadcrumb a:hover {
+      color: #fff;
+    }
+
+    .cv-breadcrumb .sep {
+      opacity: .4;
+    }
+
+    .cv-breadcrumb .current {
+      color: rgba(255, 255, 255, .9);
+      font-weight: 600;
+    }
 
     .cv-header-body {
       display: flex;
@@ -125,9 +160,10 @@
     }
 
     .cv-header-icon {
-      width: 60px; height: 60px;
-      background: rgba(255,255,255,.12);
-      border: 1.5px solid rgba(255,255,255,.22);
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, .12);
+      border: 1.5px solid rgba(255, 255, 255, .22);
       border-radius: var(--r-md);
       display: flex;
       align-items: center;
@@ -136,10 +172,13 @@
       color: #fff;
       flex-shrink: 0;
       backdrop-filter: blur(12px);
-      box-shadow: 0 4px 16px rgba(0,0,0,.12);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
     }
 
-    .cv-header-text { flex: 1; }
+    .cv-header-text {
+      flex: 1;
+    }
+
     .cv-header-module {
       font-size: .72rem;
       font-weight: 700;
@@ -160,7 +199,7 @@
 
     .cv-header-sub {
       font-size: .85rem;
-      color: rgba(255,255,255,.72);
+      color: rgba(255, 255, 255, .72);
       margin: 0;
     }
 
@@ -168,7 +207,7 @@
       display: inline-flex;
       align-items: center;
       gap: .6rem;
-      background: rgba(255,255,255,.95);
+      background: rgba(255, 255, 255, .95);
       color: var(--vp);
       font-weight: 700;
       font-size: .88rem;
@@ -177,7 +216,7 @@
       border: none;
       cursor: pointer;
       transition: all var(--tr);
-      box-shadow: 0 4px 20px rgba(0,0,0,.18);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .18);
       white-space: nowrap;
       align-self: center;
       letter-spacing: .2px;
@@ -187,7 +226,7 @@
       background: var(--au);
       color: var(--vd);
       transform: translateY(-3px);
-      box-shadow: 0 10px 28px rgba(0,0,0,.22);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, .22);
     }
 
     /* ── KPI CARDS ── */
@@ -218,32 +257,74 @@
     .cv-kpi::before {
       content: '';
       position: absolute;
-      top: -20px; right: -20px;
-      width: 100px; height: 100px;
+      top: -20px;
+      right: -20px;
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
       opacity: .06;
     }
 
-    .cv-kpi:hover { transform: translateY(-5px); box-shadow: var(--sh-v); }
+    .cv-kpi:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--sh-v);
+    }
 
-    .cv-kpi.green  { border-left-color: var(--vv); }
-    .cv-kpi.green  .cv-kpi-icon { background: var(--vbg); color: var(--vp); }
-    .cv-kpi.green::before  { background: var(--vv); }
+    .cv-kpi.green {
+      border-left-color: var(--vv);
+    }
 
-    .cv-kpi.red    { border-left-color: #EF5350; }
-    .cv-kpi.red    .cv-kpi-icon { background: #FFEBEE; color: #C62828; }
-    .cv-kpi.red::before    { background: #EF5350; }
+    .cv-kpi.green .cv-kpi-icon {
+      background: var(--vbg);
+      color: var(--vp);
+    }
 
-    .cv-kpi.yellow { border-left-color: #FFA726; }
-    .cv-kpi.yellow .cv-kpi-icon { background: #FFF8E1; color: #E65100; }
-    .cv-kpi.yellow::before { background: #FFA726; }
+    .cv-kpi.green::before {
+      background: var(--vv);
+    }
 
-    .cv-kpi.blue   { border-left-color: #42A5F5; }
-    .cv-kpi.blue   .cv-kpi-icon { background: #E3F2FD; color: #1565C0; }
-    .cv-kpi.blue::before   { background: #42A5F5; }
+    .cv-kpi.red {
+      border-left-color: #EF5350;
+    }
+
+    .cv-kpi.red .cv-kpi-icon {
+      background: #FFEBEE;
+      color: #C62828;
+    }
+
+    .cv-kpi.red::before {
+      background: #EF5350;
+    }
+
+    .cv-kpi.yellow {
+      border-left-color: #FFA726;
+    }
+
+    .cv-kpi.yellow .cv-kpi-icon {
+      background: #FFF8E1;
+      color: #E65100;
+    }
+
+    .cv-kpi.yellow::before {
+      background: #FFA726;
+    }
+
+    .cv-kpi.blue {
+      border-left-color: #42A5F5;
+    }
+
+    .cv-kpi.blue .cv-kpi-icon {
+      background: #E3F2FD;
+      color: #1565C0;
+    }
+
+    .cv-kpi.blue::before {
+      background: #42A5F5;
+    }
 
     .cv-kpi-icon {
-      width: 50px; height: 50px;
+      width: 50px;
+      height: 50px;
       border-radius: var(--r-sm);
       display: flex;
       align-items: center;
@@ -323,7 +404,7 @@
 
     .cv-search-input:focus {
       border-color: var(--vv);
-      box-shadow: 0 0 0 3px rgba(67,160,71,.12);
+      box-shadow: 0 0 0 3px rgba(67, 160, 71, .12);
     }
 
     .cv-filter-group {
@@ -346,7 +427,9 @@
       transition: border-color var(--tr);
     }
 
-    .cv-filter-select:focus { border-color: var(--vv); }
+    .cv-filter-select:focus {
+      border-color: var(--vv);
+    }
 
     .cv-toolbar-actions {
       display: flex;
@@ -355,7 +438,8 @@
     }
 
     .cv-icon-btn {
-      width: 38px; height: 38px;
+      width: 38px;
+      height: 38px;
       border-radius: var(--r-sm);
       border: 1.5px solid var(--gray3);
       background: #fff;
@@ -403,7 +487,9 @@
       gap: .5rem;
     }
 
-    .cv-table-head h2 i { color: var(--vv); }
+    .cv-table-head h2 i {
+      color: var(--vv);
+    }
 
     .cv-count-badge {
       display: inline-flex;
@@ -414,11 +500,13 @@
       font-weight: 700;
       padding: .2rem .65rem;
       border-radius: 50px;
-      border: 1px solid rgba(67,160,71,.2);
+      border: 1px solid rgba(67, 160, 71, .2);
     }
 
     /* Table */
-    .cv-table-wrap { overflow-x: auto; }
+    .cv-table-wrap {
+      overflow-x: auto;
+    }
 
     .cv-table {
       width: 100%;
@@ -446,9 +534,13 @@
       transition: background var(--tr);
     }
 
-    .cv-table tbody tr:last-child { border-bottom: none; }
+    .cv-table tbody tr:last-child {
+      border-bottom: none;
+    }
 
-    .cv-table tbody tr:hover { background: var(--vbg); }
+    .cv-table tbody tr:hover {
+      background: var(--vbg);
+    }
 
     .cv-table td {
       padding: .9rem 1rem;
@@ -456,7 +548,11 @@
       color: var(--gray5);
     }
 
-    .cv-table td:first-child { font-weight: 600; color: var(--gray4); font-size: .78rem; }
+    .cv-table td:first-child {
+      font-weight: 600;
+      color: var(--gray4);
+      font-size: .78rem;
+    }
 
     /* Cedula cell */
     .cv-cedula {
@@ -491,16 +587,40 @@
       white-space: nowrap;
     }
 
-    .cv-badge.buena       { background: #E8F5E9; color: #1B5E20; }
-    .cv-badge.regular     { background: #FFF8E1; color: #E65100; }
-    .cv-badge.mala        { background: #FFEBEE; color: #B71C1C; }
-    .cv-badge.alto-riesgo { background: #C62828; color: #fff; }
-    .cv-badge.gas-si      { background: #E8F5E9; color: #1B5E20; }
-    .cv-badge.gas-no      { background: #FFEBEE; color: #B71C1C; }
+    .cv-badge.buena {
+      background: #E8F5E9;
+      color: #1B5E20;
+    }
+
+    .cv-badge.regular {
+      background: #FFF8E1;
+      color: #E65100;
+    }
+
+    .cv-badge.mala {
+      background: #FFEBEE;
+      color: #B71C1C;
+    }
+
+    .cv-badge.alto-riesgo {
+      background: #C62828;
+      color: #fff;
+    }
+
+    .cv-badge.gas-si {
+      background: #E8F5E9;
+      color: #1B5E20;
+    }
+
+    .cv-badge.gas-no {
+      background: #FFEBEE;
+      color: #B71C1C;
+    }
 
     /* Action buttons */
     .cv-act-btn {
-      width: 32px; height: 32px;
+      width: 32px;
+      height: 32px;
       border-radius: var(--r-sm);
       border: none;
       display: inline-flex;
@@ -511,11 +631,26 @@
       transition: all var(--tr);
     }
 
-    .cv-act-btn.view  { background: #E3F2FD; color: #1565C0; }
-    .cv-act-btn.edit  { background: var(--vbg); color: var(--vp); }
-    .cv-act-btn.del   { background: #FFEBEE; color: #C62828; }
+    .cv-act-btn.view {
+      background: #E3F2FD;
+      color: #1565C0;
+    }
 
-    .cv-act-btn:hover { opacity: .85; transform: scale(1.12); box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+    .cv-act-btn.edit {
+      background: var(--vbg);
+      color: var(--vp);
+    }
+
+    .cv-act-btn.del {
+      background: #FFEBEE;
+      color: #C62828;
+    }
+
+    .cv-act-btn:hover {
+      opacity: .85;
+      transform: scale(1.12);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
+    }
 
     /* Empty state */
     .cv-empty {
@@ -524,8 +659,17 @@
       color: var(--gray4);
     }
 
-    .cv-empty i { font-size: 3rem; opacity: .3; display: block; margin-bottom: 1rem; }
-    .cv-empty p { font-size: .9rem; margin: 0; }
+    .cv-empty i {
+      font-size: 3rem;
+      opacity: .3;
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .cv-empty p {
+      font-size: .9rem;
+      margin: 0;
+    }
 
     /* ── PAGINATION ── */
     .cv-pagination {
@@ -540,10 +684,14 @@
       gap: .5rem;
     }
 
-    .cv-pag-btns { display: flex; gap: .3rem; }
+    .cv-pag-btns {
+      display: flex;
+      gap: .3rem;
+    }
 
     .cv-pag-btn {
-      width: 34px; height: 34px;
+      width: 34px;
+      height: 34px;
       border-radius: var(--r-sm);
       border: 1.5px solid var(--gray3);
       background: #fff;
@@ -557,7 +705,8 @@
       transition: all var(--tr);
     }
 
-    .cv-pag-btn:hover, .cv-pag-btn.active {
+    .cv-pag-btn:hover,
+    .cv-pag-btn.active {
       background: var(--vp);
       border-color: var(--vp);
       color: #fff;
@@ -566,7 +715,9 @@
     /* ══════════════════════════════════════════
        MODAL — WIZARD CON PESTAÑAS
     ══════════════════════════════════════════ */
-    .cv-modal .modal-dialog { max-width: 860px; }
+    .cv-modal .modal-dialog {
+      max-width: 860px;
+    }
 
     /* Scroll fix para el modal */
     #modalVivienda .modal-content {
@@ -594,7 +745,7 @@
       border-radius: var(--r-lg);
       border: none;
       overflow: hidden;
-      box-shadow: 0 24px 64px rgba(0,0,0,.18);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, .18);
     }
 
     .cv-modal-header {
@@ -612,8 +763,9 @@
     }
 
     .cv-modal-header-icon {
-      width: 46px; height: 46px;
-      background: rgba(255,255,255,.15);
+      width: 46px;
+      height: 46px;
+      background: rgba(255, 255, 255, .15);
       border-radius: var(--r-sm);
       display: flex;
       align-items: center;
@@ -631,15 +783,16 @@
 
     .cv-modal-sub {
       font-size: .75rem;
-      color: rgba(255,255,255,.7);
+      color: rgba(255, 255, 255, .7);
       margin: .1rem 0 0;
     }
 
     .cv-modal-close {
-      background: rgba(255,255,255,.15);
+      background: rgba(255, 255, 255, .15);
       border: none;
       color: #fff;
-      width: 36px; height: 36px;
+      width: 36px;
+      height: 36px;
       border-radius: var(--r-sm);
       display: flex;
       align-items: center;
@@ -649,7 +802,9 @@
       transition: background var(--tr);
     }
 
-    .cv-modal-close:hover { background: rgba(255,255,255,.25); }
+    .cv-modal-close:hover {
+      background: rgba(255, 255, 255, .25);
+    }
 
     /* ── Stepper con flechas de navegación ── */
     .cv-stepper-wrapper {
@@ -679,16 +834,21 @@
       opacity: 0;
       pointer-events: none;
     }
+
     .cv-stepper-btn.visible {
       opacity: 1;
       pointer-events: auto;
     }
-    .cv-stepper-btn:hover { color: var(--vv); }
+
+    .cv-stepper-btn:hover {
+      color: var(--vv);
+    }
 
     .cv-stepper-left {
       left: 0;
       background: linear-gradient(to right, var(--gray1) 60%, transparent);
     }
+
     .cv-stepper-right {
       right: 0;
       background: linear-gradient(to left, var(--gray1) 60%, transparent);
@@ -706,7 +866,10 @@
       scrollbar-width: none;
       width: 100%;
     }
-    .cv-stepper::-webkit-scrollbar { display: none; }
+
+    .cv-stepper::-webkit-scrollbar {
+      display: none;
+    }
 
     /* ── Cada paso ── */
     .cv-step {
@@ -728,11 +891,15 @@
       transition: background var(--tr);
       margin: 0 2px;
     }
-    .cv-step.done:not(:last-child)::after { background: var(--vv); }
+
+    .cv-step.done:not(:last-child)::after {
+      background: var(--vv);
+    }
 
     /* Círculo del número */
     .cv-step-num {
-      width: 30px; height: 30px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       border: 2px solid var(--gray3);
       display: flex;
@@ -747,13 +914,15 @@
       z-index: 1;
       transition: all var(--tr);
     }
+
     .cv-step.active .cv-step-num {
       background: var(--vp);
       border-color: var(--vp);
       color: #fff;
-      box-shadow: 0 0 0 5px rgba(46,125,50,.16), 0 2px 8px rgba(46,125,50,.3);
+      box-shadow: 0 0 0 5px rgba(46, 125, 50, .16), 0 2px 8px rgba(46, 125, 50, .3);
       transform: scale(1.12);
     }
+
     .cv-step.done .cv-step-num {
       background: var(--vv);
       border-color: var(--vv);
@@ -761,18 +930,35 @@
     }
 
     /* Info del paso: oculta */
-    .cv-step-info { display: none; }
+    .cv-step-info {
+      display: none;
+    }
 
 
     /* Panels */
-    .cv-modal-body { padding: 2rem; }
+    .cv-modal-body {
+      padding: 2rem;
+    }
 
-    .cv-panel { display: none; }
-    .cv-panel.active { display: block; animation: panelIn .28s ease; }
+    .cv-panel {
+      display: none;
+    }
+
+    .cv-panel.active {
+      display: block;
+      animation: panelIn .28s ease;
+    }
 
     @keyframes panelIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .cv-panel-title {
@@ -788,18 +974,31 @@
       line-height: 1.3;
     }
 
-    .cv-panel-title i { 
-      color: var(--vv); 
-      margin-top: .15rem; 
-      flex-shrink: 0; 
+    .cv-panel-title i {
+      color: var(--vv);
+      margin-top: .15rem;
+      flex-shrink: 0;
     }
 
     /* Form styles */
-    .cv-form-row { display: grid; gap: 1rem; }
-    .cv-form-row.cv-grid-2 { grid-template-columns: 1fr 1fr; }
-    .cv-form-row.cv-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .cv-form-row {
+      display: grid;
+      gap: 1rem;
+    }
 
-    .cv-form-group { display: flex; flex-direction: column; gap: .35rem; }
+    .cv-form-row.cv-grid-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .cv-form-row.cv-grid-3 {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .cv-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: .35rem;
+    }
 
     .cv-form-group label {
       font-size: .8rem;
@@ -807,7 +1006,10 @@
       color: var(--gray5);
     }
 
-    .cv-form-group label span.req { color: #C62828; margin-left: .15rem; }
+    .cv-form-group label span.req {
+      color: #C62828;
+      margin-left: .15rem;
+    }
 
     .cv-form-control {
       padding: .72rem 1rem;
@@ -828,7 +1030,7 @@
 
     .cv-form-control:focus {
       border-color: var(--vv);
-      box-shadow: 0 0 0 3px rgba(67,160,71,.12);
+      box-shadow: 0 0 0 3px rgba(67, 160, 71, .12);
     }
 
     .cv-form-hint {
@@ -842,7 +1044,9 @@
       gap: .5rem;
     }
 
-    .cv-input-group .cv-form-control { flex: 1; }
+    .cv-input-group .cv-form-control {
+      flex: 1;
+    }
 
     .cv-btn-validate {
       padding: .7rem 1.1rem;
@@ -858,7 +1062,11 @@
       transition: all var(--tr);
     }
 
-    .cv-btn-validate:hover { background: var(--vbg); border-color: var(--vv); color: var(--vp); }
+    .cv-btn-validate:hover {
+      background: var(--vbg);
+      border-color: var(--vv);
+      color: var(--vp);
+    }
 
     /* Service grid (checkcard style) */
     .cv-service-grid {
@@ -879,7 +1087,10 @@
       position: relative;
     }
 
-    .cv-service-card:hover { border-color: var(--vv); background: var(--vbg); }
+    .cv-service-card:hover {
+      border-color: var(--vv);
+      background: var(--vbg);
+    }
 
     .cv-service-card.checked {
       border-color: var(--vv);
@@ -890,7 +1101,8 @@
     .cv-service-card input[type="radio"] {
       position: absolute;
       opacity: 0;
-      width: 0; height: 0;
+      width: 0;
+      height: 0;
     }
 
     .cv-service-card i {
@@ -901,7 +1113,9 @@
       transition: color var(--tr);
     }
 
-    .cv-service-card.checked i { color: var(--vp); }
+    .cv-service-card.checked i {
+      color: var(--vp);
+    }
 
     .cv-service-card span {
       font-size: .75rem;
@@ -911,8 +1125,10 @@
 
     .cv-check-mark {
       position: absolute;
-      top: .5rem; right: .5rem;
-      width: 18px; height: 18px;
+      top: .5rem;
+      right: .5rem;
+      width: 18px;
+      height: 18px;
       background: var(--vv);
       border-radius: 50%;
       display: none;
@@ -922,7 +1138,9 @@
       font-size: .6rem;
     }
 
-    .cv-service-card.checked .cv-check-mark { display: flex; }
+    .cv-service-card.checked .cv-check-mark {
+      display: flex;
+    }
 
     /* Modal footer */
     .cv-modal-footer {
@@ -935,8 +1153,20 @@
       gap: 1rem;
       flex-shrink: 0;
     }
-    .cv-footer-left  { display: flex; align-items: center; gap: .5rem; flex-shrink: 0; }
-    .cv-footer-right { display: flex; align-items: center; gap: .5rem; flex-shrink: 0; }
+
+    .cv-footer-left {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      flex-shrink: 0;
+    }
+
+    .cv-footer-right {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      flex-shrink: 0;
+    }
 
     .cv-btn {
       display: inline-flex;
@@ -958,7 +1188,9 @@
       color: var(--gray5);
     }
 
-    .cv-btn-ghost:hover { background: var(--gray2); }
+    .cv-btn-ghost:hover {
+      background: var(--gray2);
+    }
 
     .cv-btn-primary {
       background: var(--vp);
@@ -984,7 +1216,16 @@
     }
 
     /* Toast */
-    .cv-toast-wrap { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: .6rem; pointer-events: none; }
+    .cv-toast-wrap {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+      pointer-events: none;
+    }
 
     .cv-toast {
       display: flex;
@@ -993,45 +1234,101 @@
       background: #fff;
       border-radius: var(--r-md);
       padding: 1rem 1.25rem;
-      box-shadow: 0 12px 40px rgba(0,0,0,.14), 0 3px 8px rgba(0,0,0,.06);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, .14), 0 3px 8px rgba(0, 0, 0, .06);
       font-size: .85rem;
       color: var(--txt);
       min-width: 300px;
       border-left: 4px solid var(--vv);
-      animation: toastIn .3s cubic-bezier(.34,1.56,.64,1);
+      animation: toastIn .3s cubic-bezier(.34, 1.56, .64, 1);
       pointer-events: auto;
     }
 
-    .cv-toast.error { border-left-color: #EF5350; }
-    .cv-toast i { font-size: 1.1rem; }
-    .cv-toast.success i { color: var(--vv); }
-    .cv-toast.error   i { color: #EF5350; }
+    .cv-toast.error {
+      border-left-color: #EF5350;
+    }
+
+    .cv-toast i {
+      font-size: 1.1rem;
+    }
+
+    .cv-toast.success i {
+      color: var(--vv);
+    }
+
+    .cv-toast.error i {
+      color: #EF5350;
+    }
 
     @keyframes toastIn {
-      from { opacity: 0; transform: translateX(50px) scale(.92); }
-      to   { opacity: 1; transform: translateX(0) scale(1); }
+      from {
+        opacity: 0;
+        transform: translateX(50px) scale(.92);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+      }
     }
 
     /* ══ RESPONSIVE ══════════════════════════════ */
 
     /* Tablet y móvil grande */
     @media (max-width: 768px) {
+
       /* Página general */
-      .cv-kpi-row        { padding: 0 1rem; grid-template-columns: 1fr 1fr; }
-      .cv-content        { padding: 1.25rem 1rem; }
+      .cv-kpi-row {
+        padding: 0 1rem;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .cv-content {
+        padding: 1.25rem 1rem;
+      }
 
       /* Header de página */
-      .cv-page-header    { padding: 1.5rem 1.25rem 3.25rem; margin: calc(-1.75rem) -1.75rem 0 -1.75rem; }
-      .cv-header-body    { flex-direction: column; align-items: flex-start; gap: 1rem; }
-      .cv-btn-new        { width: 100%; justify-content: center; }
+      .cv-page-header {
+        padding: 1.5rem 1.25rem 3.25rem;
+        margin: calc(-1.75rem) -1.75rem 0 -1.75rem;
+      }
+
+      .cv-header-body {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .cv-btn-new {
+        width: 100%;
+        justify-content: center;
+      }
 
       /* Modal */
-      .cv-modal .modal-dialog { margin: .5rem; }
-      .cv-modal-header   { padding: 1rem 1.25rem; }
-      .cv-modal-header-icon { width: 36px; height: 36px; font-size: 1rem; }
-      .cv-modal-title    { font-size: .9rem; }
-      .cv-modal-sub      { font-size: .7rem; }
-      .cv-modal-body     { padding: 1rem; }
+      .cv-modal .modal-dialog {
+        margin: .5rem;
+      }
+
+      .cv-modal-header {
+        padding: 1rem 1.25rem;
+      }
+
+      .cv-modal-header-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+      }
+
+      .cv-modal-title {
+        font-size: .9rem;
+      }
+
+      .cv-modal-sub {
+        font-size: .7rem;
+      }
+
+      .cv-modal-body {
+        padding: 1rem;
+      }
 
       /* Modal footer */
       .cv-modal-footer {
@@ -1040,27 +1337,63 @@
         align-items: stretch;
         gap: .85rem;
       }
-      .cv-modal-footer .cv-footer-left { order: 2; width: 100%; justify-content: center; flex-wrap: wrap; }
-      .cv-modal-footer .cv-footer-right { order: 1; width: 100%; flex-direction: column; align-items: stretch; gap: .85rem; }
-      .cv-modal-footer .cv-footer-right > div { align-items: center !important; margin-right: 0 !important; }
-      .cv-btn-primary, .cv-btn-save { width: 100%; justify-content: center; }
+
+      .cv-modal-footer .cv-footer-left {
+        order: 2;
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .cv-modal-footer .cv-footer-right {
+        order: 1;
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: .85rem;
+      }
+
+      .cv-modal-footer .cv-footer-right>div {
+        align-items: center !important;
+        margin-right: 0 !important;
+      }
+
+      .cv-btn-primary,
+      .cv-btn-save {
+        width: 100%;
+        justify-content: center;
+      }
 
       /* Grids del formulario */
       .cv-form-row.cv-grid-2,
-      .cv-form-row.cv-grid-3 { grid-template-columns: 1fr; }
+      .cv-form-row.cv-grid-3 {
+        grid-template-columns: 1fr;
+      }
 
       /* Stepper */
-      .cv-stepper        { padding: .75rem .5rem; }
+      .cv-stepper {
+        padding: .75rem .5rem;
+      }
 
       /* Toolbar */
-      .cv-toolbar        { gap: .6rem; }
-      .cv-search-wrap    { min-width: 0; }
+      .cv-toolbar {
+        gap: .6rem;
+      }
+
+      .cv-search-wrap {
+        min-width: 0;
+      }
     }
 
     /* Móvil pequeño */
     @media (max-width: 500px) {
-      .cv-kpi-row        { grid-template-columns: 1fr; }
-      .cv-page-header    { padding: 1.25rem 1rem 2.75rem; }
+      .cv-kpi-row {
+        grid-template-columns: 1fr;
+      }
+
+      .cv-page-header {
+        padding: 1.25rem 1rem 2.75rem;
+      }
 
       /* Modal ocupa toda la pantalla */
       .cv-modal .modal-dialog {
@@ -1068,6 +1401,7 @@
         max-width: 100%;
         height: 100%;
       }
+
       #modalVivienda .modal-content {
         height: 100%;
         max-height: none;
@@ -1075,36 +1409,68 @@
         display: flex;
         flex-direction: column;
       }
+
       #formVivienda {
         flex: 1;
         display: flex;
         flex-direction: column;
         min-height: 0;
       }
+
       .cv-modal-body {
         flex: 1;
         overflow-y: auto;
       }
 
       /* Header más compacto */
-      .cv-modal-header   { padding: .85rem 1rem; }
-      .cv-modal-body     { padding: .85rem; }
-      .cv-modal-footer   { padding: .75rem .85rem; }
+      .cv-modal-header {
+        padding: .85rem 1rem;
+      }
+
+      .cv-modal-body {
+        padding: .85rem;
+      }
+
+      .cv-modal-footer {
+        padding: .75rem .85rem;
+      }
 
       /* Cards de servicio */
-      .cv-service-grid   { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); }
+      .cv-service-grid {
+        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      }
 
       /* Toast ajustado */
-      .cv-toast-wrap     { right: .5rem; left: .5rem; top: .75rem; }
-      .cv-toast          { min-width: auto; }
+      .cv-toast-wrap {
+        right: .5rem;
+        left: .5rem;
+        top: .75rem;
+      }
+
+      .cv-toast {
+        min-width: auto;
+      }
     }
 
     /* Móvil muy pequeño */
     @media (max-width: 360px) {
-      .cv-kpi-row        { grid-template-columns: 1fr; gap: .75rem; }
-      .cv-btn-new        { font-size: .82rem; padding: .7rem 1.2rem; }
-      .cv-modal-title    { font-size: .82rem; }
-      .cv-modal-sub      { display: none; }
+      .cv-kpi-row {
+        grid-template-columns: 1fr;
+        gap: .75rem;
+      }
+
+      .cv-btn-new {
+        font-size: .82rem;
+        padding: .7rem 1.2rem;
+      }
+
+      .cv-modal-title {
+        font-size: .82rem;
+      }
+
+      .cv-modal-sub {
+        display: none;
+      }
     }
   </style>
   <script>
@@ -1122,7 +1488,8 @@
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div id="header-placeholder"></div>
   <nav id="sidebar-placeholder"></nav>
-  <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral"><i class="fas fa-bars"></i></button>
+  <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú lateral"><i
+      class="fas fa-bars"></i></button>
 
   <main class="app-main">
 
@@ -1130,7 +1497,7 @@
     <div class="cv-page-header">
       <div class="deco-dots" aria-hidden="true"></div>
       <nav class="cv-breadcrumb" aria-label="Navegación">
-      <a href="dashboard.html"><i class="fas fa-house-chimney"></i></a>
+        <a href="dashboard.html"><i class="fas fa-house-chimney"></i></a>
         <span class="sep"><i class="fas fa-chevron-right" style="font-size:.6rem"></i></span>
         <a href="#">Módulos T</a>
         <span class="sep"><i class="fas fa-chevron-right" style="font-size:.6rem"></i></span>
@@ -1148,7 +1515,8 @@
             <p class="cv-header-sub">Registro único por Jefe de Familia · Regla 1:1 · 9 Consejos Comunales</p>
           </div>
         </div>
-        <button type="button" class="cv-btn-new" data-bs-toggle="modal" data-bs-target="#modalVivienda" id="btnNuevaVivienda">
+        <button type="button" class="cv-btn-new" data-bs-toggle="modal" data-bs-target="#modalVivienda"
+          id="btnNuevaVivienda">
           <i class="fas fa-plus"></i> Registrar Vivienda
         </button>
       </div>
@@ -1205,18 +1573,24 @@
               <small style="color:var(--gray4);font-size:.75rem">Una cédula · una vivienda</small>
             </div>
           </div>
-          
+
           <div style="display:flex; align-items:center; gap:.75rem; flex:1; justify-content: flex-end; flex-wrap:wrap;">
             <div class="cv-search-wrap" style="max-width: 300px; position:relative;">
-              <i class="fas fa-magnifying-glass" style="position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:var(--gray4)"></i>
-              <input type="text" class="cv-search-input" id="cvSearch" placeholder="Buscar por cédula o dirección..." aria-label="Buscar viviendas" style="width:100%; padding:.55rem 1rem .55rem 2.6rem; border-radius:50px; border:1.5px solid var(--gray3);">
+              <i class="fas fa-magnifying-glass"
+                style="position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:var(--gray4)"></i>
+              <input type="text" class="cv-search-input" id="cvSearch" placeholder="Buscar por cédula o dirección..."
+                aria-label="Buscar viviendas"
+                style="width:100%; padding:.55rem 1rem .55rem 2.6rem; border-radius:50px; border:1.5px solid var(--gray3);">
             </div>
-            
-            <button type="button" class="cv-btn cv-btn-ghost" data-bs-toggle="modal" data-bs-target="#modalFiltrosAvanzados" style="padding: .55rem 1rem; border-radius: 50px; border: 1.5px solid var(--gray3); background:#fff; color:var(--gray5);">
+
+            <button type="button" class="cv-btn cv-btn-ghost" data-bs-toggle="modal"
+              data-bs-target="#modalFiltrosAvanzados"
+              style="padding: .55rem 1rem; border-radius: 50px; border: 1.5px solid var(--gray3); background:#fff; color:var(--gray5);">
               <i class="fas fa-filter" style="color: var(--vv);"></i> Filtros
             </button>
-            
-            <button type="button" class="cv-icon-btn" title="Imprimir Lista" onclick="window.print()" aria-label="Imprimir">
+
+            <button type="button" class="cv-icon-btn" title="Imprimir Lista" onclick="window.print()"
+              aria-label="Imprimir">
               <i class="fas fa-print"></i>
             </button>
             <button type="button" class="cv-icon-btn" title="Recargar datos" id="btnRefresh" aria-label="Recargar">
@@ -1246,7 +1620,8 @@
 
           <div class="cv-empty" id="cvEmpty">
             <i class="fas fa-house-circle-xmark"></i>
-            <p>No hay viviendas registradas aún.<br>Presiona <strong>"Registrar Vivienda"</strong> para comenzar el censo.</p>
+            <p>No hay viviendas registradas aún.<br>Presiona <strong>"Registrar Vivienda"</strong> para comenzar el
+              censo.</p>
           </div>
         </div>
 
@@ -1263,7 +1638,8 @@
   <!-- ══════════════════════════════════════════
        MODAL — FILTROS AVANZADOS
   ══════════════════════════════════════════ -->
-  <div class="modal fade cv-modal" id="modalFiltrosAvanzados" tabindex="-1" aria-labelledby="modalFiltrosAvanzadosLabel" aria-hidden="true">
+  <div class="modal fade cv-modal" id="modalFiltrosAvanzados" tabindex="-1" aria-labelledby="modalFiltrosAvanzadosLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="cv-modal-header">
@@ -1368,9 +1744,12 @@
             </div>
           </div>
         </div>
-        <div class="cv-modal-footer" style="justify-content: flex-end; padding: 1.25rem 2rem; background: var(--gray1); border-top: 1px solid var(--gray3);">
-          <button type="button" class="cv-btn cv-btn-ghost" id="btnLimpiarFiltros" style="color:var(--gray5)"><i class="fas fa-eraser"></i> Limpiar</button>
-          <button type="button" class="cv-btn cv-btn-primary" id="btnAplicarFiltros" style="margin-left: 1rem;"><i class="fas fa-check"></i> Aplicar Filtros</button>
+        <div class="cv-modal-footer"
+          style="justify-content: flex-end; padding: 1.25rem 2rem; background: var(--gray1); border-top: 1px solid var(--gray3);">
+          <button type="button" class="cv-btn cv-btn-ghost" id="btnLimpiarFiltros" style="color:var(--gray5)"><i
+              class="fas fa-eraser"></i> Limpiar</button>
+          <button type="button" class="cv-btn cv-btn-primary" id="btnAplicarFiltros" style="margin-left: 1rem;"><i
+              class="fas fa-check"></i> Aplicar Filtros</button>
         </div>
       </div>
     </div>
@@ -1379,27 +1758,35 @@
   <!-- ══════════════════════════════════════════
        MODAL — VERIFICACIÓN DE SEGURIDAD (CONTRASEÑA)
   ══════════════════════════════════════════ -->
-  <div class="modal fade cv-modal" id="modalVerifyPassword" tabindex="-1" aria-labelledby="modalVerifyPasswordLabel" aria-hidden="true">
+  <div class="modal fade cv-modal" id="modalVerifyPassword" tabindex="-1" aria-labelledby="modalVerifyPasswordLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
       <div class="modal-content" style="max-width: 400px; margin: auto;">
         <div class="cv-modal-header" style="border-bottom: none; padding-bottom: 0;">
-          <button type="button" class="cv-modal-close" data-bs-dismiss="modal" aria-label="Cerrar" style="margin-left: auto;">
+          <button type="button" class="cv-modal-close" data-bs-dismiss="modal" aria-label="Cerrar"
+            style="margin-left: auto;">
             <i class="fas fa-xmark"></i>
           </button>
         </div>
         <div class="cv-modal-body" style="text-align: center; padding-top: 0;">
-          <div style="font-size: 3rem; color: var(--vp); margin-bottom: 1rem;"><i class="fas fa-shield-halved"></i></div>
+          <div style="font-size: 3rem; color: var(--vp); margin-bottom: 1rem;"><i class="fas fa-shield-halved"></i>
+          </div>
           <h5 style="font-weight: 800; color: var(--dark); margin-bottom: .5rem;">Autorización Requerida</h5>
-          <p style="font-size: .85rem; color: var(--gray5); margin-bottom: 1.5rem;">Para realizar esta acción sensible, por favor ingrese su clave de usuario.</p>
-          
+          <p style="font-size: .85rem; color: var(--gray5); margin-bottom: 1.5rem;">Para realizar esta acción sensible,
+            por favor ingrese su clave de usuario.</p>
+
           <div class="cv-form-group" style="text-align: left;">
             <label>Contraseña</label>
             <input type="password" class="cv-form-control" id="verifyPasswordInput" placeholder="********">
-            <div id="verifyPasswordError" style="color: #E53935; font-size: .75rem; margin-top: .4rem; display: none; font-weight: 600;"><i class="fas fa-triangle-exclamation"></i> Contraseña incorrecta</div>
+            <div id="verifyPasswordError"
+              style="color: #E53935; font-size: .75rem; margin-top: .4rem; display: none; font-weight: 600;"><i
+                class="fas fa-triangle-exclamation"></i> Contraseña incorrecta</div>
           </div>
         </div>
         <div class="cv-modal-footer" style="padding: 1.5rem; justify-content: center; border-top: none;">
-          <button type="button" class="cv-btn cv-btn-primary" id="btnConfirmarPassword" style="width: 100%; justify-content: center; padding: .8rem;"><i class="fas fa-lock-open"></i> Confirmar y Continuar</button>
+          <button type="button" class="cv-btn cv-btn-primary" id="btnConfirmarPassword"
+            style="width: 100%; justify-content: center; padding: .8rem;"><i class="fas fa-lock-open"></i> Confirmar y
+            Continuar</button>
         </div>
       </div>
     </div>
@@ -1408,9 +1795,8 @@
   <!-- ══════════════════════════════════════════
        MODAL — WIZARD REGISTRO VIVIENDA
   ══════════════════════════════════════════ -->
-  <div class="modal fade cv-modal" id="modalVivienda" tabindex="-1"
-       aria-labelledby="modalViviendaLabel" aria-hidden="true"
-       data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal fade cv-modal" id="modalVivienda" tabindex="-1" aria-labelledby="modalViviendaLabel"
+    aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
 
@@ -1430,20 +1816,42 @@
 
         <!-- Stepper 10 pasos -->
         <div class="cv-stepper-wrapper">
-          <button type="button" class="cv-stepper-btn cv-stepper-left" id="stepperLeftBtn" aria-label="Pasos anteriores"><i class="fas fa-chevron-left"></i></button>
+          <button type="button" class="cv-stepper-btn cv-stepper-left" id="stepperLeftBtn"
+            aria-label="Pasos anteriores"><i class="fas fa-chevron-left"></i></button>
           <div class="cv-stepper" id="cvStepper">
-            <div class="cv-step active" id="step-1" onclick="navigateToStep(1)"><div class="cv-step-num">1</div></div>
-            <div class="cv-step" id="step-2" onclick="navigateToStep(2)"><div class="cv-step-num">2</div></div>
-            <div class="cv-step" id="step-3" onclick="navigateToStep(3)"><div class="cv-step-num">3</div></div>
-            <div class="cv-step" id="step-4" onclick="navigateToStep(4)"><div class="cv-step-num">4</div></div>
-            <div class="cv-step" id="step-5" onclick="navigateToStep(5)"><div class="cv-step-num">5</div></div>
-            <div class="cv-step" id="step-6" onclick="navigateToStep(6)"><div class="cv-step-num">6</div></div>
-            <div class="cv-step" id="step-7" onclick="navigateToStep(7)"><div class="cv-step-num">7</div></div>
-            <div class="cv-step" id="step-8" onclick="navigateToStep(8)"><div class="cv-step-num">8</div></div>
-            <div class="cv-step" id="step-9" onclick="navigateToStep(9)"><div class="cv-step-num">9</div></div>
-            <div class="cv-step" id="step-10" onclick="navigateToStep(10)"><div class="cv-step-num">10</div></div>
+            <div class="cv-step active" id="step-1" onclick="navigateToStep(1)">
+              <div class="cv-step-num">1</div>
+            </div>
+            <div class="cv-step" id="step-2" onclick="navigateToStep(2)">
+              <div class="cv-step-num">2</div>
+            </div>
+            <div class="cv-step" id="step-3" onclick="navigateToStep(3)">
+              <div class="cv-step-num">3</div>
+            </div>
+            <div class="cv-step" id="step-4" onclick="navigateToStep(4)">
+              <div class="cv-step-num">4</div>
+            </div>
+            <div class="cv-step" id="step-5" onclick="navigateToStep(5)">
+              <div class="cv-step-num">5</div>
+            </div>
+            <div class="cv-step" id="step-6" onclick="navigateToStep(6)">
+              <div class="cv-step-num">6</div>
+            </div>
+            <div class="cv-step" id="step-7" onclick="navigateToStep(7)">
+              <div class="cv-step-num">7</div>
+            </div>
+            <div class="cv-step" id="step-8" onclick="navigateToStep(8)">
+              <div class="cv-step-num">8</div>
+            </div>
+            <div class="cv-step" id="step-9" onclick="navigateToStep(9)">
+              <div class="cv-step-num">9</div>
+            </div>
+            <div class="cv-step" id="step-10" onclick="navigateToStep(10)">
+              <div class="cv-step-num">10</div>
+            </div>
           </div>
-          <button type="button" class="cv-stepper-btn cv-stepper-right" id="stepperRightBtn" aria-label="Pasos siguientes"><i class="fas fa-chevron-right"></i></button>
+          <button type="button" class="cv-stepper-btn cv-stepper-right" id="stepperRightBtn"
+            aria-label="Pasos siguientes"><i class="fas fa-chevron-right"></i></button>
         </div>
 
         <!-- Form -->
@@ -1453,7 +1861,8 @@
             <!-- ═══════════════════════════════════════
                  PANEL 1: Datos del Encuestador / Cabecera
             ═══════════════════════════════════════ -->
-            <div class="cv-panel active" id="panel1" data-required="planillaNro,fechaCenso,encuestadorNombre,encuestadorCedula,encuestadoNombre,encuestadoCedula">
+            <div class="cv-panel active" id="panel1"
+              data-required="planillaNro,fechaCenso,encuestadorNombre,encuestadorCedula,encuestadoNombre,encuestadoCedula">
               <div class="cv-panel-title">
                 <i class="fas fa-clipboard-user"></i>
                 Sección I — Datos del Encuestador y Planilla
@@ -1463,20 +1872,25 @@
                 <div class="cv-form-group">
                   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.4rem;">
                     <label for="planillaNro" style="margin:0;">N° de Planilla <span class="req">*</span></label>
-                    <label style="font-size:0.7rem; color:var(--gray5); font-weight:normal; cursor:pointer; display:flex; align-items:center; gap:4px; margin:0;">
+                    <label
+                      style="font-size:0.7rem; color:var(--gray5); font-weight:normal; cursor:pointer; display:flex; align-items:center; gap:4px; margin:0;">
                       <input type="checkbox" id="chkPlanillaAuto" checked> Auto
                     </label>
                   </div>
-                  <input type="text" class="cv-form-control" id="planillaNro" placeholder="N° de Planilla" required readonly style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
+                  <input type="text" class="cv-form-control" id="planillaNro" placeholder="N° de Planilla" required
+                    readonly
+                    style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
                 </div>
                 <div class="cv-form-group">
                   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.4rem;">
                     <label for="fechaCenso" style="margin:0;">Fecha del Censo <span class="req">*</span></label>
-                    <label style="font-size:0.7rem; color:var(--gray5); font-weight:normal; cursor:pointer; display:flex; align-items:center; gap:4px; margin:0;">
+                    <label
+                      style="font-size:0.7rem; color:var(--gray5); font-weight:normal; cursor:pointer; display:flex; align-items:center; gap:4px; margin:0;">
                       <input type="checkbox" id="chkFechaAuto" checked> Auto
                     </label>
                   </div>
-                  <input type="date" class="cv-form-control" id="fechaCenso" required readonly style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
+                  <input type="date" class="cv-form-control" id="fechaCenso" required readonly
+                    style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
                 </div>
                 <div class="cv-form-group">
                   <label for="consejoComunalCab">Consejo Comunal <span class="req">*</span></label>
@@ -1498,11 +1912,15 @@
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="encuestadorNombre">Nombre del Encuestador <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="encuestadorNombre" placeholder="Nombre completo" required readonly style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
+                  <input type="text" class="cv-form-control" id="encuestadorNombre" placeholder="Nombre completo"
+                    required readonly
+                    style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
                 </div>
                 <div class="cv-form-group">
                   <label for="encuestadorCedula">Cédula del Encuestador <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="encuestadorCedula" data-mask="cedula" placeholder="Ej. V-12.345.678" required readonly style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
+                  <input type="text" class="cv-form-control" id="encuestadorCedula" data-mask="cedula"
+                    placeholder="Ej. V-12.345.678" required readonly
+                    style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
                 </div>
               </div>
 
@@ -1516,13 +1934,17 @@
                 <div class="cv-form-group">
                   <label for="encuestadoCedula">Cédula del Encuestado <span class="req">*</span></label>
                   <div class="cv-input-group">
-                    <input type="text" class="cv-form-control" id="encuestadoCedula" data-mask="cedula" placeholder="Ej. V-12.345.678" required>
-                    <button type="button" class="cv-btn-validate" id="btnValidarEncuestado"><i class="fas fa-magnifying-glass"></i></button>
+                    <input type="text" class="cv-form-control" id="encuestadoCedula" data-mask="cedula"
+                      placeholder="Ej. V-12.345.678" required>
+                    <button type="button" class="cv-btn-validate" id="btnValidarEncuestado"><i
+                        class="fas fa-magnifying-glass"></i></button>
                   </div>
                 </div>
                 <div class="cv-form-group">
                   <label for="encuestadoNombre">Nombre del Encuestado <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="encuestadoNombre" placeholder="Nombre completo" required readonly style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
+                  <input type="text" class="cv-form-control" id="encuestadoNombre" placeholder="Nombre completo"
+                    required readonly
+                    style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
                 </div>
               </div>
             </div><!-- /panel1 -->
@@ -1537,10 +1959,13 @@
               </div>
 
               <!-- Resumen del CC seleccionado en Sección I -->
-              <div id="p2InfoCC" style="background:var(--gray1);border:1.5px dashed var(--vp);border-radius:10px;padding:.85rem 1.1rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.7rem;">
+              <div id="p2InfoCC"
+                style="background:var(--gray1);border:1.5px dashed var(--vp);border-radius:10px;padding:.85rem 1.1rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.7rem;">
                 <i class="fas fa-map-pin" style="color:var(--vp);font-size:1.1rem;"></i>
                 <div>
-                  <div style="font-size:.78rem;color:var(--gray5);font-weight:600;text-transform:uppercase;letter-spacing:.04em;">Consejo Comunal (Sección I)</div>
+                  <div
+                    style="font-size:.78rem;color:var(--gray5);font-weight:600;text-transform:uppercase;letter-spacing:.04em;">
+                    Consejo Comunal (Sección I)</div>
                   <div id="p2CCNombre" style="font-size:1rem;font-weight:700;color:var(--vd);">—</div>
                 </div>
               </div>
@@ -1548,16 +1973,19 @@
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="calleAvenida">Calle / Avenida <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="calleAvenida" placeholder="Ej. Calle El Progreso, Av. Principal..." required>
+                  <input type="text" class="cv-form-control" id="calleAvenida"
+                    placeholder="Ej. Calle El Progreso, Av. Principal..." required>
                 </div>
                 <div class="cv-form-group">
                   <label for="numeroCasa">N° de Casa / Apartamento <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="numeroCasa" placeholder="Ej. Casa #12, Apto 3-B..." required>
+                  <input type="text" class="cv-form-control" id="numeroCasa" placeholder="Ej. Casa #12, Apto 3-B..."
+                    required>
                 </div>
               </div>
 
               <div class="cv-form-group">
-                <label for="direccionExacta">Referencia de Ubicación <span style="color:var(--gray4);font-weight:400;">(opcional)</span></label>
+                <label for="direccionExacta">Referencia de Ubicación <span
+                    style="color:var(--gray4);font-weight:400;">(opcional)</span></label>
                 <textarea class="cv-form-control" id="direccionExacta" rows="2"
                   placeholder="Puntos de referencia, color de la casa, entre calles..."></textarea>
               </div>
@@ -1568,28 +1996,27 @@
             <!-- ═══════════════════════════════════════
                  PANEL 3: Datos del Jefe de Familia
             ═══════════════════════════════════════ -->
-            <div class="cv-panel" id="panel3" data-required="jefNombres,jefApellidos,cedulaJefe,jefFechaNac,jefSexo,jefEstadoCivil,jefNivelInstruccion">
+            <div class="cv-panel" id="panel3"
+              data-required="jefNombres,cedulaJefe,jefFechaNac,jefSexo,jefEstadoCivil,jefNivelInstruccion">
               <div class="cv-panel-title">
                 <i class="fas fa-user-tie"></i>
                 Sección III — Datos del Jefe del Grupo Familiar
               </div>
 
-              <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
+              <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="cedulaJefe">Cédula <span class="req">*</span></label>
                   <div class="cv-input-group">
-                    <input type="text" class="cv-form-control" id="cedulaJefe" data-mask="cedula" placeholder="V-12.345.678" required>
-                    <button type="button" class="cv-btn-validate" id="btnValidarCedula"><i class="fas fa-magnifying-glass"></i></button>
+                    <input type="text" class="cv-form-control" id="cedulaJefe" data-mask="cedula"
+                      placeholder="V-12.345.678" required>
+                    <button type="button" class="cv-btn-validate" id="btnValidarCedula"><i
+                        class="fas fa-magnifying-glass"></i></button>
                   </div>
                   <span class="cv-form-hint">Una cédula = una vivienda</span>
                 </div>
                 <div class="cv-form-group">
-                  <label for="jefNombres">Nombres <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="jefNombres" placeholder="Nombres completos" required>
-                </div>
-                <div class="cv-form-group">
-                  <label for="jefApellidos">Apellidos <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="jefApellidos" placeholder="Apellidos completos" required>
+                  <label for="jefNombres">Nombres y Apellidos <span class="req">*</span></label>
+                  <input type="text" class="cv-form-control" id="jefNombres" placeholder="Nombre completo" required>
                 </div>
               </div>
 
@@ -1609,8 +2036,9 @@
                   <label for="jefSexo">Sexo <span class="req">*</span></label>
                   <select class="cv-form-control" id="jefSexo" required>
                     <option value="">Seleccione...</option>
-                    <option value="Masculino">Masculino</option>
-                    <option value="Femenino">Femenino</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                    <option value="Otro">Otro</option>
                   </select>
                 </div>
               </div>
@@ -1620,23 +2048,24 @@
                   <label for="jefEstadoCivil">Estado Civil <span class="req">*</span></label>
                   <select class="cv-form-control" id="jefEstadoCivil" required>
                     <option value="">Seleccione...</option>
-                    <option value="Soltero">Soltero(a)</option>
-                    <option value="Casado">Casado(a)</option>
-                    <option value="Divorciado">Divorciado(a)</option>
-                    <option value="Viudo">Viudo(a)</option>
-                    <option value="Concubino">Concubino(a)</option>
+                    <option value="Soltero/a">Soltero(a)</option>
+                    <option value="Casado/a">Casado(a)</option>
+                    <option value="Divorciado/a">Divorciado(a)</option>
+                    <option value="Viudo/a">Viudo(a)</option>
+                    <option value="Concubino/a">Concubino(a)</option>
                   </select>
                 </div>
                 <div class="cv-form-group">
                   <label for="jefNivelInstruccion">Nivel de Instrucción <span class="req">*</span></label>
                   <select class="cv-form-control" id="jefNivelInstruccion" required>
                     <option value="">Seleccione...</option>
-                    <option value="Sin instrucción">Sin instrucción</option>
                     <option value="Primaria">Primaria</option>
-                    <option value="Secundaria">Secundaria</option>
-                    <option value="Técnico">Técnico Superior</option>
+                    <option value="Bachiller">Bachiller</option>
+                    <option value="Tecnico Medio">Técnico Medio</option>
+                    <option value="Tecnico Superior">Técnico Superior (TSU)</option>
                     <option value="Universitario">Universitario</option>
-                    <option value="Postgrado">Postgrado</option>
+                    <option value="Postgrado">Postgrado / Maestría</option>
+                    <option value="Ninguno">Ninguno</option>
                   </select>
                 </div>
               </div>
@@ -1681,7 +2110,8 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="jefTipoIncapacidad">Tipo de Incapacidad</label>
-                  <input type="text" class="cv-form-control" id="jefTipoIncapacidad" placeholder="Especifique si aplica" disabled>
+                  <input type="text" class="cv-form-control" id="jefTipoIncapacidad" placeholder="Especifique si aplica"
+                    disabled>
                 </div>
               </div>
             </div>
@@ -1698,7 +2128,8 @@
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="cantidadHabitantes">Total de Habitantes en la Vivienda <span class="req">*</span></label>
-                  <input type="number" class="cv-form-control" id="cantidadHabitantes" min="1" max="30" placeholder="Ej. 5" required>
+                  <input type="number" class="cv-form-control" id="cantidadHabitantes" min="1" max="30"
+                    placeholder="Ej. 5" required>
                 </div>
                 <div class="cv-form-group">
                   <label for="condicionGeneral">Condición General de la Vivienda <span class="req">*</span></label>
@@ -1718,14 +2149,17 @@
 
               <div id="familiarList" style="display:flex;flex-direction:column;gap:.75rem">
                 <!-- Familiar 1 -->
-                <div class="familiar-row" style="background:var(--gray1);border:1.5px solid var(--gray3);border-radius:var(--r-md);padding:1rem">
-                  <div style="font-size:.75rem;font-weight:700;color:var(--vp);margin-bottom:.6rem">👤 Integrante #1</div>
+                <div class="familiar-row"
+                  style="background:var(--gray1);border:1.5px solid var(--gray3);border-radius:var(--r-md);padding:1rem">
+                  <div style="font-size:.75rem;font-weight:700;color:var(--vp);margin-bottom:.6rem">👤 Integrante #1
+                  </div>
                   <div class="cv-form-row cv-grid-3">
                     <div class="cv-form-group">
                       <label>Cédula / Fecha Nacimiento</label>
                       <div class="cv-input-group">
                         <input type="text" class="cv-form-control fam-cedula" placeholder="V-XX.XXX.XXX">
-                        <button type="button" class="cv-btn-validate btn-validar-fam"><i class="fas fa-magnifying-glass"></i></button>
+                        <button type="button" class="cv-btn-validate btn-validar-fam"><i
+                            class="fas fa-magnifying-glass"></i></button>
                       </div>
                     </div>
                     <div class="cv-form-group">
@@ -1777,7 +2211,8 @@
                 </div>
               </div>
 
-              <button type="button" id="btnAgregarFamiliar" class="cv-btn cv-btn-ghost" style="margin-top:.75rem;font-size:.82rem">
+              <button type="button" id="btnAgregarFamiliar" class="cv-btn cv-btn-ghost"
+                style="margin-top:.75rem;font-size:.82rem">
                 <i class="fas fa-plus"></i> Agregar Integrante
               </button>
             </div>
@@ -1842,7 +2277,8 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="ventasDe">¿Qué vende / produce?</label>
-                  <input type="text" class="cv-form-control" id="ventasDe" placeholder="Ej. Empanadas, helados, artesanía..." disabled>
+                  <input type="text" class="cv-form-control" id="ventasDe"
+                    placeholder="Ej. Empanadas, helados, artesanía..." disabled>
                 </div>
               </div>
             </div>
@@ -1850,7 +2286,8 @@
             <!-- ═══════════════════════════════════════
                  PANEL 6: Situación de la Vivienda
             ═══════════════════════════════════════ -->
-            <div class="cv-panel" id="panel6" data-required="tipoVivienda,tenencia,condicionesTerreno,materialParedes,materialTecho">
+            <div class="cv-panel" id="panel6"
+              data-required="tipoVivienda,tenencia,condicionesTerreno,materialParedes,materialTecho">
               <div class="cv-panel-title">
                 <i class="fas fa-screwdriver-wrench"></i>
                 Sección VI — Situación de la Vivienda (Estructura)
@@ -1929,7 +2366,8 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="ambientesVivienda">Ambientes disponibles</label>
-                  <input type="text" class="cv-form-control" id="ambientesVivienda" placeholder="Sala, comedor, cocina...">
+                  <input type="text" class="cv-form-control" id="ambientesVivienda"
+                    placeholder="Sala, comedor, cocina...">
                 </div>
               </div>
 
@@ -1991,7 +2429,8 @@
             <!-- ═══════════════════════════════════════
                  PANEL 7: Servicios Básicos
             ═══════════════════════════════════════ -->
-            <div class="cv-panel" id="panel7" data-required="aguasBlancas,aguasServidas,sistemaElectrico,gasDomestico,recoleccionBasura">
+            <div class="cv-panel" id="panel7"
+              data-required="aguasBlancas,aguasServidas,sistemaElectrico,gasDomestico,recoleccionBasura">
               <div class="cv-panel-title">
                 <i class="fas fa-bolt"></i>
                 Sección VII — Servicios Básicos
@@ -2062,11 +2501,13 @@
                 </div>
                 <div class="cv-form-group" id="rowCilindrosGas">
                   <label for="cantidadCilindrosGas">N° Cilindros de Gas</label>
-                  <input type="number" class="cv-form-control" id="cantidadCilindrosGas" min="1" placeholder="Ej. 2" disabled>
+                  <input type="number" class="cv-form-control" id="cantidadCilindrosGas" min="1" placeholder="Ej. 2"
+                    disabled>
                 </div>
                 <div class="cv-form-group">
                   <label for="gasEmpresa">Empresa que suministra</label>
-                  <input type="text" class="cv-form-control" id="gasEmpresa" placeholder="Ej. PDVSA Gas, Distribuidor...">
+                  <input type="text" class="cv-form-control" id="gasEmpresa"
+                    placeholder="Ej. PDVSA Gas, Distribuidor...">
                 </div>
               </div>
 
@@ -2106,7 +2547,8 @@
 
               <div class="cv-form-group">
                 <label for="bombillosNecesita">Bombillos ahorradores que necesita (cantidad)</label>
-                <input type="number" class="cv-form-control" id="bombillosNecesita" min="0" placeholder="Ej. 4" style="max-width:200px">
+                <input type="number" class="cv-form-control" id="bombillosNecesita" min="0" placeholder="Ej. 4"
+                  style="max-width:200px">
               </div>
             </div>
 
@@ -2165,7 +2607,8 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="cualAyudaEspecial">¿Cuál ayuda especial?</label>
-                  <input type="text" class="cv-form-control" id="cualAyudaEspecial" placeholder="Silla de ruedas, prótesis, medicamentos..." disabled>
+                  <input type="text" class="cv-form-control" id="cualAyudaEspecial"
+                    placeholder="Silla de ruedas, prótesis, medicamentos..." disabled>
                 </div>
               </div>
 
@@ -2207,7 +2650,8 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="cualesOrgComunitarias">¿Cuáles organizaciones?</label>
-                  <input type="text" class="cv-form-control" id="cualesOrgComunitarias" placeholder="Ej. Comité de salud, Misiones..." disabled>
+                  <input type="text" class="cv-form-control" id="cualesOrgComunitarias"
+                    placeholder="Ej. Comité de salud, Misiones..." disabled>
                 </div>
               </div>
 
@@ -2254,12 +2698,14 @@
 
               <div class="cv-form-group" style="margin-bottom:1rem">
                 <label for="misiones">Misiones implementadas en el sector</label>
-                <input type="text" class="cv-form-control" id="misiones" placeholder="Ej. Barrio Adentro, Mercal, CLAP, Madres del Barrio...">
+                <input type="text" class="cv-form-control" id="misiones"
+                  placeholder="Ej. Barrio Adentro, Mercal, CLAP, Madres del Barrio...">
               </div>
 
               <div class="cv-form-group">
                 <label for="areaTrabajoInteres">Área de trabajo de interés comunitario (máx. 3)</label>
-                <input type="text" class="cv-form-control" id="areaTrabajoInteres" placeholder="Ej. Salud, Educación, Infraestructura...">
+                <input type="text" class="cv-form-control" id="areaTrabajoInteres"
+                  placeholder="Ej. Salud, Educación, Infraestructura...">
               </div>
             </div>
 
@@ -2292,7 +2738,8 @@
 
               <div class="cv-form-group" style="margin-bottom:1rem">
                 <label for="tipoProyectosDeseados">Tipo de proyectos deseados</label>
-                <input type="text" class="cv-form-control" id="tipoProyectosDeseados" placeholder="Ej. Vialidad, canchas, módulos de salud...">
+                <input type="text" class="cv-form-control" id="tipoProyectosDeseados"
+                  placeholder="Ej. Vialidad, canchas, módulos de salud...">
               </div>
 
               <div class="cv-form-group">
@@ -2316,9 +2763,12 @@
             </div>
             <div class="cv-footer-right">
               <div style="display:flex; flex-direction:column; align-items:flex-end; gap:.25rem; margin-right: .5rem;">
-                <span id="cvStepCounter" style="font-size:.75rem;color:var(--gray4);font-weight:600">Paso 1 de 10 (10%)</span>
-                <div style="width: 100px; height: 6px; background: rgba(46,125,50,.15); border-radius: 4px; overflow: hidden;">
-                  <div id="cvProgressBar" style="width: 10%; height: 100%; background: var(--vp); transition: width .3s ease;"></div>
+                <span id="cvStepCounter" style="font-size:.75rem;color:var(--gray4);font-weight:600">Paso 1 de 10
+                  (10%)</span>
+                <div
+                  style="width: 100px; height: 6px; background: rgba(46,125,50,.15); border-radius: 4px; overflow: hidden;">
+                  <div id="cvProgressBar"
+                    style="width: 10%; height: 100%; background: var(--vp); transition: width .3s ease;"></div>
                 </div>
               </div>
               <button type="button" class="cv-btn cv-btn-primary" id="btnNext">
@@ -2371,7 +2821,7 @@
               </select>
             </div>
           </div>
-          
+
           <div class="cv-form-row cv-grid-2" style="margin-bottom: 1rem;">
             <div class="cv-form-group">
               <label>Servicio de Gas</label>
@@ -2445,7 +2895,8 @@
           </div>
         </div>
         <div class="cv-modal-footer" style="display:flex; justify-content:space-between;">
-          <button type="button" class="cv-btn cv-btn-ghost" id="btnLimpiarFiltros" style="color: #C62828;"><i class="fas fa-trash-can"></i> Limpiar</button>
+          <button type="button" class="cv-btn cv-btn-ghost" id="btnLimpiarFiltros" style="color: #C62828;"><i
+              class="fas fa-trash-can"></i> Limpiar</button>
           <div>
             <button type="button" class="cv-btn cv-btn-ghost" data-bs-dismiss="modal">Cancelar</button>
             <button type="button" class="cv-btn cv-btn-primary" id="btnAplicarFiltros">Aplicar Filtros</button>
@@ -2460,22 +2911,31 @@
   ══════════════════════════════════════════ -->
   <div class="modal fade" id="modalVerifyPassword" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(4px);">
     <div class="modal-dialog modal-sm modal-dialog-centered">
-      <div class="modal-content" style="border-radius: var(--r-lg); border:none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+      <div class="modal-content"
+        style="border-radius: var(--r-lg); border:none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
         <div class="modal-body text-center" style="padding: 2rem 1.5rem;">
-          <div style="width: 50px; height: 50px; background: #FFEBEE; color: #C62828; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 1rem;">
+          <div
+            style="width: 50px; height: 50px; background: #FFEBEE; color: #C62828; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 1rem;">
             <i class="fas fa-lock"></i>
           </div>
-          <h5 style="font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: .5rem;">Autorización Requerida</h5>
-          <p style="font-size: .8rem; color: var(--gray5); margin-bottom: 1.5rem;">Por seguridad, ingrese su contraseña para continuar con esta acción crítica.</p>
-          
+          <h5 style="font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: .5rem;">Autorización
+            Requerida</h5>
+          <p style="font-size: .8rem; color: var(--gray5); margin-bottom: 1.5rem;">Por seguridad, ingrese su contraseña
+            para continuar con esta acción crítica.</p>
+
           <div class="cv-form-group" style="text-align: left;">
-            <input type="password" class="cv-form-control" id="verifyPasswordInput" placeholder="Su contraseña" style="text-align: center; letter-spacing: 2px;">
-            <div id="verifyPasswordError" style="color: #C62828; font-size: .7rem; text-align: center; margin-top: .4rem; display: none;">Contraseña incorrecta</div>
+            <input type="password" class="cv-form-control" id="verifyPasswordInput" placeholder="Su contraseña"
+              style="text-align: center; letter-spacing: 2px;">
+            <div id="verifyPasswordError"
+              style="color: #C62828; font-size: .7rem; text-align: center; margin-top: .4rem; display: none;">Contraseña
+              incorrecta</div>
           </div>
         </div>
         <div style="display:flex; border-top: 1px solid var(--gray3);">
-          <button type="button" class="cv-btn" data-bs-dismiss="modal" style="flex:1; border-radius: 0 0 0 var(--r-lg); background: #fff; color: var(--gray5); border: none; padding: .8rem;">Cancelar</button>
-          <button type="button" class="cv-btn" id="btnConfirmarPassword" style="flex:1; border-radius: 0 0 var(--r-lg) 0; background: var(--vp); color: #fff; border: none; padding: .8rem; font-weight: 600;">Confirmar</button>
+          <button type="button" class="cv-btn" data-bs-dismiss="modal"
+            style="flex:1; border-radius: 0 0 0 var(--r-lg); background: #fff; color: var(--gray5); border: none; padding: .8rem;">Cancelar</button>
+          <button type="button" class="cv-btn" id="btnConfirmarPassword"
+            style="flex:1; border-radius: 0 0 var(--r-lg) 0; background: var(--vp); color: #fff; border: none; padding: .8rem; font-weight: 600;">Confirmar</button>
         </div>
       </div>
     </div>
@@ -2521,7 +2981,7 @@
       try {
         const data = JSON.parse(draftStr);
         if (data._currentCensoId) {
-           window.currentCensoId = data._currentCensoId;
+          window.currentCensoId = data._currentCensoId;
         }
         Object.keys(data).forEach(key => {
           if (key === '_currentStep' || key === '_currentCensoId') return;
@@ -2530,7 +2990,7 @@
             // No sobrescribir si el campo fue deshabilitado/bloqueado por el sistema
             // (ej. Consejo Comunal auto-asignado para un vocero)
             if (el.disabled) return;
-            
+
             if (el.type === 'checkbox' || el.type === 'radio') {
               el.checked = !!data[key];
             } else {
@@ -2559,7 +3019,7 @@
           goToStep(parseInt(data._currentStep, 10));
         }
         showToast('Borrador recuperado con éxito.', 'success');
-      } catch(e) { console.error('Error restaurando borrador', e); }
+      } catch (e) { console.error('Error restaurando borrador', e); }
     }
 
     function clearDraft() {
@@ -2580,7 +3040,7 @@
           valid = false;
           el.style.borderColor = '#EF5350';
           el.style.boxShadow = '0 0 0 3px rgba(239,83,80,.15)';
-          errors.push(el.labels?.[0]?.textContent?.replace(' *','') || el.id);
+          errors.push(el.labels?.[0]?.textContent?.replace(' *', '') || el.id);
           // Auto-reset border on change
           el.addEventListener('change', () => {
             el.style.borderColor = '';
@@ -2594,22 +3054,22 @@
       });
 
       if (!valid) {
-        showToast(`Campos obligatorios incompletos: ${errors.slice(0,3).join(', ')}`, 'error');
+        showToast(`Campos obligatorios incompletos: ${errors.slice(0, 3).join(', ')}`, 'error');
       }
       return valid;
     }
 
     const stepMeta = [
-      { badge: 'Sec. I',    name: 'Datos del Encuestador y Planilla'      },
-      { badge: 'Sec. II',   name: 'Ubicación Geográfica'                  },
-      { badge: 'Sec. III',  name: 'Datos del Jefe del Grupo Familiar'     },
-      { badge: 'Sec. IV',   name: 'Grupo Familiar e Integrantes'          },
-      { badge: 'Sec. V',    name: 'Situación Económica'                   },
-      { badge: 'Sec. VI',   name: 'Condiciones de la Vivienda'            },
-      { badge: 'Sec. VII',  name: 'Servicios Básicos'                     },
-      { badge: 'Sec. VIII', name: 'Salud y Condición del Hogar'           },
-      { badge: 'Sec. IX',   name: 'Participación Comunitaria'             },
-      { badge: 'Sec. X',    name: 'Diagnóstico y Situación de la Comunidad'},
+      { badge: 'Sec. I', name: 'Datos del Encuestador y Planilla' },
+      { badge: 'Sec. II', name: 'Ubicación Geográfica' },
+      { badge: 'Sec. III', name: 'Datos del Jefe del Grupo Familiar' },
+      { badge: 'Sec. IV', name: 'Grupo Familiar e Integrantes' },
+      { badge: 'Sec. V', name: 'Situación Económica' },
+      { badge: 'Sec. VI', name: 'Condiciones de la Vivienda' },
+      { badge: 'Sec. VII', name: 'Servicios Básicos' },
+      { badge: 'Sec. VIII', name: 'Salud y Condición del Hogar' },
+      { badge: 'Sec. IX', name: 'Participación Comunitaria' },
+      { badge: 'Sec. X', name: 'Diagnóstico y Situación de la Comunidad' },
     ];
 
     async function navigateToStep(n) {
@@ -2622,12 +3082,12 @@
         if (validateCurrentPanel()) {
           const targetStepEl = document.getElementById('step-' + n);
           if (targetStepEl && (targetStepEl.classList.contains('done') || n === currentStep + 1)) {
-            
+
             // GUARDADO PROGRESIVO
             const btnSiguiente = document.getElementById('btnNext');
             const originalText = btnSiguiente ? btnSiguiente.innerHTML : '';
             if (btnSiguiente) btnSiguiente.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-            
+
             try {
               const datosDelPaso = recolectarDatosDelPaso(currentStep);
               if (window.api && window.api.guardarPasoCenso) {
@@ -2635,7 +3095,7 @@
                 if (currentStep === 1 && !window.currentCensoId) {
                   window.currentCensoId = Math.floor(Math.random() * 90000000) + 10000000;
                 }
-                
+
                 const res = await window.api.guardarPasoCenso(currentStep, window.currentCensoId, datosDelPaso);
                 if (res && res.id_estudio) {
                   window.currentCensoId = res.id_estudio;
@@ -2665,96 +3125,96 @@
     function recolectarDatosDelPaso(paso) {
       const panel = document.getElementById('panel' + paso);
       if (!panel) return {};
-      
+
       const datos = {};
-      
+
       // Recolectar inputs regulares, excluyendo familiares
       panel.querySelectorAll('input:not([type="radio"]):not([type="checkbox"]):not(.fam-input), select:not(.fam-input), textarea').forEach(el => {
-         if (el.id) {
-           const val = el.value;
-           // Convert camelCase to snake_case for DB compatibility
-           const snakeKey = el.id.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-           datos[snakeKey] = val;
-         }
+        if (el.id) {
+          const val = el.value;
+          // Convert camelCase to snake_case for DB compatibility
+          const snakeKey = el.id.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+          datos[snakeKey] = val;
+        }
       });
 
       // Recolectar radios
       panel.querySelectorAll('input[type="radio"]:checked').forEach(el => {
-         if (el.name) {
-           const snakeKey = el.name.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-           datos[snakeKey] = el.value;
-         }
+        if (el.name) {
+          const snakeKey = el.name.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+          datos[snakeKey] = el.value;
+        }
       });
 
       // Recolectar checkboxes
       panel.querySelectorAll('input[type="checkbox"]').forEach(el => {
-         if (el.checked) {
-            if (el.name) {
-               if (!datos.opciones) datos.opciones = [];
-               datos.opciones.push({ categoria: el.name, valor: el.value, cantidad: 1 });
-            } else if (el.id) {
-               const snakeKey = el.id.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-               datos[snakeKey] = true;
-            }
-         } else {
-            if (el.id && !el.name) {
-               const snakeKey = el.id.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-               datos[snakeKey] = false;
-            }
-         }
+        if (el.checked) {
+          if (el.name) {
+            if (!datos.opciones) datos.opciones = [];
+            datos.opciones.push({ categoria: el.name, valor: el.value, cantidad: 1 });
+          } else if (el.id) {
+            const snakeKey = el.id.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+            datos[snakeKey] = true;
+          }
+        } else {
+          if (el.id && !el.name) {
+            const snakeKey = el.id.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+            datos[snakeKey] = false;
+          }
+        }
       });
 
       // Recolectar Familiares (Sección 3 y 4)
       if (paso === 3 || paso === 4) {
-         const familiares = [];
-         
-         // Jefe (paso 3)
-         if (paso === 3) {
-            const cedula = document.getElementById('cedulaJefe')?.value;
-            const nombres = document.getElementById('jefNombres')?.value;
-            const apellidos = document.getElementById('jefApellidos')?.value;
-            if (cedula || nombres) {
-               familiares.push({
-                 cedula_identidad: cedula,
-                 nombres_apellidos: (nombres + ' ' + (apellidos||'')).trim(),
-                 parentesco: 'Jefe(a) de Familia',
-                 fecha_nacimiento: document.getElementById('jefFechaNac')?.value,
-                 genero: document.getElementById('jefSexo')?.value,
-                 es_jefe_familia: true,
-                 nivel_educativo: document.getElementById('jefNivelInstruccion')?.value,
-                 ocupacion: document.getElementById('jefProfesion')?.value
-               });
-            }
-         }
+        const familiares = [];
 
-         // Otros familiares
-         panel.querySelectorAll('.familiar-row').forEach(row => {
-            const cedula = row.querySelector('.fam-cedula')?.value;
-            const nombres = row.querySelector('.fam-nombres')?.value;
-            const parentesco = row.querySelector('.fam-parentesco')?.value;
-            const fechaNac = row.querySelector('.fam-fechanac')?.value;
-            const sexo = row.querySelector('.fam-sexo')?.value;
-            if (cedula || nombres) {
-               familiares.push({
-                 cedula_identidad: cedula,
-                 nombres_apellidos: nombres,
-                 parentesco: parentesco,
-                 fecha_nacimiento: fechaNac,
-                 genero: sexo,
-                 es_jefe_familia: false
-               });
-            }
-         });
-         
-         if (familiares.length > 0) {
-           if (!datos.familiares) datos.familiares = [];
-           datos.familiares.push(...familiares);
-         }
+        // Jefe (paso 3)
+        if (paso === 3) {
+          const cedula = document.getElementById('cedulaJefe')?.value;
+          const nombres = document.getElementById('jefNombres')?.value;
+          const apellidos = document.getElementById('jefApellidos')?.value;
+          if (cedula || nombres) {
+            familiares.push({
+              cedula_identidad: cedula,
+              nombres_apellidos: (nombres + ' ' + (apellidos || '')).trim(),
+              parentesco: 'Jefe(a) de Familia',
+              fecha_nacimiento: document.getElementById('jefFechaNac')?.value,
+              genero: document.getElementById('jefSexo')?.value,
+              es_jefe_familia: true,
+              nivel_educativo: document.getElementById('jefNivelInstruccion')?.value,
+              ocupacion: document.getElementById('jefProfesion')?.value
+            });
+          }
+        }
+
+        // Otros familiares
+        panel.querySelectorAll('.familiar-row').forEach(row => {
+          const cedula = row.querySelector('.fam-cedula')?.value;
+          const nombres = row.querySelector('.fam-nombres')?.value;
+          const parentesco = row.querySelector('.fam-parentesco')?.value;
+          const fechaNac = row.querySelector('.fam-fechanac')?.value;
+          const sexo = row.querySelector('.fam-sexo')?.value;
+          if (cedula || nombres) {
+            familiares.push({
+              cedula_identidad: cedula,
+              nombres_apellidos: nombres,
+              parentesco: parentesco,
+              fecha_nacimiento: fechaNac,
+              genero: sexo,
+              es_jefe_familia: false
+            });
+          }
+        });
+
+        if (familiares.length > 0) {
+          if (!datos.familiares) datos.familiares = [];
+          datos.familiares.push(...familiares);
+        }
       }
 
       // Si es paso 1, enviamos id_comunidad (asumiendo que la cabecera lo necesita)
       if (paso === 1) {
-         datos.id_comunidad = 1; // Consejo por defecto
+        datos.id_comunidad = 1; // Consejo por defecto
       }
 
       return datos;
@@ -2769,7 +3229,7 @@
       document.querySelectorAll('.cv-step').forEach((s, i) => {
         s.classList.remove('active', 'done');
         if (i + 1 === n) s.classList.add('active');
-        if (i + 1 < n)  s.classList.add('done');
+        if (i + 1 < n) s.classList.add('done');
         const num = s.querySelector('.cv-step-num');
         if (i + 1 < n) num.innerHTML = '<i class="fas fa-check" style="font-size:.65rem"></i>';
         else num.textContent = i + 1;
@@ -2779,7 +3239,7 @@
       document.getElementById('btnPrev').style.display = n > 1 ? 'inline-flex' : 'none';
       document.getElementById('btnNext').style.display = n < totalSteps ? 'inline-flex' : 'none';
       document.getElementById('btnSave').style.display = n === totalSteps ? 'inline-flex' : 'none';
-      
+
       const pct = Math.round((n / totalSteps) * 100);
       document.getElementById('cvStepCounter').textContent = `Paso ${n} de ${totalSteps} (${pct}%)`;
       const pBar = document.getElementById('cvProgressBar');
@@ -2806,12 +3266,12 @@
       const bl = document.getElementById('stepperLeftBtn');
       const br = document.getElementById('stepperRightBtn');
       if (!s || !bl || !br) return;
-      const canScrollLeft  = s.scrollLeft > 5;
+      const canScrollLeft = s.scrollLeft > 5;
       const canScrollRight = Math.ceil(s.scrollLeft + s.clientWidth) < s.scrollWidth - 5;
       bl.classList.toggle('visible', canScrollLeft);
       br.classList.toggle('visible', canScrollRight);
     }
-    
+
     document.getElementById('cvStepper')?.addEventListener('scroll', updateStepperArrows);
     window.addEventListener('resize', updateStepperArrows);
 
@@ -2831,14 +3291,14 @@
         try {
           loadDraft();
           showToast('📋 Borrador restaurado. Continúa donde lo dejaste.', 'success');
-        } catch(e) {
+        } catch (e) {
           clearDraft();
         }
       }
     });
 
     // Indicador de sincronización para pasos encolados
-    (function(){
+    (function () {
       const badge = document.createElement('div');
       badge.id = 'censoSyncStatus';
       badge.style.position = 'fixed';
@@ -2853,7 +3313,7 @@
       badge.style.zIndex = 1200;
       badge.style.display = 'none';
       document.body.appendChild(badge);
-      function updateCount(n){
+      function updateCount(n) {
         if (!n) { badge.style.display = 'none'; return; }
         badge.textContent = `Pasos pendientes: ${n}`;
         badge.style.display = 'block';
@@ -2867,7 +3327,7 @@
         const raw = localStorage.getItem('sicag_censo_queue');
         const q = raw ? JSON.parse(raw) : [];
         updateCount(q.length);
-      } catch(e){}
+      } catch (e) { }
     })();
 
     document.getElementById('btnNext').addEventListener('click', (e) => {
@@ -2947,7 +3407,7 @@
 
     /* ── Lógica de Enfermedades (Excluyente para "Ninguna") ── */
     document.querySelectorAll('input[name="enfermedades"]').forEach(chk => {
-      chk.addEventListener('change', function() {
+      chk.addEventListener('change', function () {
         if (this.value === 'Ninguna' && this.checked) {
           document.querySelectorAll('input[name="enfermedades"]').forEach(other => {
             if (other !== this) {
@@ -2967,7 +3427,7 @@
 
     /* ── Agregar integrante familiar dinámicamente ── */
     let familiarCount = 1;
-    document.getElementById('cantidadHabitantes').addEventListener('change', function() {
+    document.getElementById('cantidadHabitantes').addEventListener('change', function () {
       const total = parseInt(this.value) || 0;
       if (familiarCount > (total - 1) && total > 0) {
         showToast(`Has indicado ${total} habitante(s), pero ya has agregado ${familiarCount} integrante(s) además del jefe.`, 'error');
@@ -2985,7 +3445,7 @@
         showToast(`No puedes agregar más. Total habitantes: ${cantidadTotal} (Jefe + ${cantidadTotal - 1} integrantes).`, 'error');
         return;
       }
-      
+
       familiarCount++;
       const list = document.getElementById('familiarList');
       const row = document.createElement('div');
@@ -3062,14 +3522,16 @@
         const newCedulaInput = row.querySelector('.fam-cedula');
         HabitanteAutocomplete.attachTo(newCedulaInput, (datos) => {
           const nombreInput = row.querySelector('.fam-nombres');
-          if (nombreInput) nombreInput.value = (datos.nombres + ' ' + (datos.apellidos||'')).trim();
+          if (nombreInput) nombreInput.value = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
           const sexoSel = row.querySelector('.fam-sexo');
           if (datos.genero && sexoSel) {
             sexoSel.value = datos.genero === 'Masculino' ? 'M' : (datos.genero === 'Femenino' ? 'F' : '');
           }
-        }, { debounce: 600, onNotFound: () => {
-          showToast('⚠️ Esta cédula no está registrada como habitante. Debe registrarlo primero.', 'error');
-        }});
+        }, {
+          debounce: 600, onNotFound: () => {
+            showToast('⚠️ Esta cédula no está registrada como habitante. Debe registrarlo primero.', 'error');
+          }
+        });
         const btnLupa = row.querySelector('.btn-validar-fam');
         if (btnLupa) btnLupa.addEventListener('click', () => { if (newCedulaInput.forceSearch) newCedulaInput.forceSearch(); });
       }
@@ -3120,10 +3582,10 @@
 
     function getBadgeCondicion(c) {
       const map = {
-        'Buena':      'buena',
-        'Regular':    'regular',
-        'Mala':       'mala',
-        'Alto Riesgo':'alto-riesgo'
+        'Buena': 'buena',
+        'Regular': 'regular',
+        'Mala': 'mala',
+        'Alto Riesgo': 'alto-riesgo'
       };
       const icons = {
         'Buena': 'fa-circle-check',
@@ -3131,19 +3593,19 @@
         'Mala': 'fa-circle-exclamation',
         'Alto Riesgo': 'fa-triangle-exclamation'
       };
-      return `<span class="cv-badge ${map[c]||'regular'}"><i class="fas ${icons[c]||'fa-circle-minus'}"></i>${c||'—'}</span>`;
+      return `<span class="cv-badge ${map[c] || 'regular'}"><i class="fas ${icons[c] || 'fa-circle-minus'}"></i>${c || '—'}</span>`;
     }
 
     function getBadgeGas(g) {
       const noGas = g === 'No posee' || !g;
       return `<span class="cv-badge ${noGas ? 'gas-no' : 'gas-si'}">
-        <i class="fas ${noGas ? 'fa-xmark' : 'fa-check'}"></i>${g||'—'}</span>`;
+        <i class="fas ${noGas ? 'fa-xmark' : 'fa-check'}"></i>${g || '—'}</span>`;
     }
 
     function renderTable() {
-      const q   = (document.getElementById('cvSearch').value || '').toLowerCase();
-      const cc  = document.getElementById('advFilterCC').value;
-      const cond= document.getElementById('advFilterCond').value;
+      const q = (document.getElementById('cvSearch').value || '').toLowerCase();
+      const cc = document.getElementById('advFilterCC').value;
+      const cond = document.getElementById('advFilterCond').value;
       const gas = document.getElementById('advFilterGas').value;
       const agua = document.getElementById('advFilterAgua').value;
       const tipo = document.getElementById('advFilterTipo').value;
@@ -3152,10 +3614,10 @@
       const techo = document.getElementById('advFilterTecho').value;
 
       let data = viviendas.filter(v => {
-        const matchQ  = !q || (v.cedula||'').toLowerCase().includes(q) || (v.sector||'').toLowerCase().includes(q) || (v.direccion||'').toLowerCase().includes(q);
-        const matchCC = !cc   || v.sector === cc;
-        const matchC  = !cond || v.condicion === cond;
-        const matchG  = !gas  || v.gas === gas || (gas === 'Si' && v.gas !== 'No posee');
+        const matchQ = !q || (v.cedula || '').toLowerCase().includes(q) || (v.sector || '').toLowerCase().includes(q) || (v.direccion || '').toLowerCase().includes(q);
+        const matchCC = !cc || v.sector === cc;
+        const matchC = !cond || v.condicion === cond;
+        const matchG = !gas || v.gas === gas || (gas === 'Si' && v.gas !== 'No posee');
         const matchAgua = !agua || v.agua === agua;
         const matchTipo = !tipo || v.tipo === tipo;
         const matchTenencia = !tenencia || v.tenencia === tenencia;
@@ -3164,7 +3626,7 @@
         return matchQ && matchCC && matchC && matchG && matchAgua && matchTipo && matchTenencia && matchParedes && matchTecho;
       });
 
-      const body  = document.getElementById('cvTableBody');
+      const body = document.getElementById('cvTableBody');
       const empty = document.getElementById('cvEmpty');
       document.getElementById('cvCountBadge').textContent = `${data.length} registros`;
 
@@ -3264,16 +3726,16 @@
           body: JSON.stringify({ password })
         });
         const result = await response.json();
-        
+
         if (response.ok && result.valid) {
           bootstrap.Modal.getInstance(document.getElementById('modalVerifyPassword')).hide();
           if (pendingAction === 'edit') {
-             // Iniciar edicion
-             showToast('Modo edición activado. (Lógica backend pdte)', 'success');
-             // editarViviendaReal(pendingId.id, pendingId.index);
+            // Iniciar edicion
+            showToast('Modo edición activado. (Lógica backend pdte)', 'success');
+            // editarViviendaReal(pendingId.id, pendingId.index);
           } else if (pendingAction === 'delete') {
-             // Eliminar
-             eliminarViviendaReal(pendingId.id, pendingId.index);
+            // Eliminar
+            eliminarViviendaReal(pendingId.id, pendingId.index);
           }
         } else {
           errorEl.textContent = 'Contraseña incorrecta';
@@ -3348,15 +3810,14 @@
     function syncEncuestadoDesdeJefe() {
       if (!document.getElementById('chkEncuestadoEsJefe')?.checked) return;
       const nombres = document.getElementById('jefNombres')?.value || '';
-      const apellidos = document.getElementById('jefApellidos')?.value || '';
       const cedula = document.getElementById('cedulaJefe')?.value || '';
       const nomEnc = document.getElementById('encuestadoNombre');
       const cedEnc = document.getElementById('encuestadoCedula');
-      if (nomEnc) nomEnc.value = `${nombres} ${apellidos}`.trim();
+      if (nomEnc) nomEnc.value = nombres.trim();
       if (cedEnc) cedEnc.value = cedula;
     }
 
-    document.getElementById('chkPlanillaAuto').addEventListener('change', function() {
+    document.getElementById('chkPlanillaAuto').addEventListener('change', function () {
       const input = document.getElementById('planillaNro');
       if (this.checked) {
         setAutoFieldState(input, true, 'VIV-' + String(Math.floor(Math.random() * 100000)).padStart(5, '0'));
@@ -3366,7 +3827,7 @@
       }
     });
 
-    document.getElementById('chkFechaAuto').addEventListener('change', function() {
+    document.getElementById('chkFechaAuto').addEventListener('change', function () {
       const input = document.getElementById('fechaCenso');
       if (this.checked) {
         setAutoFieldState(input, true, new Date().toISOString().split('T')[0]);
@@ -3375,7 +3836,7 @@
       }
     });
 
-    document.getElementById('chkEncuestadoEsJefe')?.addEventListener('change', function() {
+    document.getElementById('chkEncuestadoEsJefe')?.addEventListener('change', function () {
       const nomEnc = document.getElementById('encuestadoNombre');
       const cedEnc = document.getElementById('encuestadoCedula');
       const btnValidar = document.getElementById('btnValidarEncuestado');
@@ -3391,7 +3852,7 @@
       }
     });
 
-    ['cedulaJefe', 'jefNombres', 'jefApellidos'].forEach(id => {
+    ['cedulaJefe', 'jefNombres'].forEach(id => {
       document.getElementById(id)?.addEventListener('input', syncEncuestadoDesdeJefe);
     });
 
@@ -3400,13 +3861,13 @@
       document.getElementById('formVivienda').reset();
       window.currentCensoId = null;
       goToStep(1);
-      
+
       document.getElementById('chkPlanillaAuto').checked = true;
       document.getElementById('chkPlanillaAuto').dispatchEvent(new Event('change'));
       document.getElementById('chkFechaAuto').checked = true;
       document.getElementById('chkFechaAuto').dispatchEvent(new Event('change'));
       initEncuestadorAuto();
-      
+
       document.querySelectorAll('.cv-form-control').forEach(el => {
         el.style.borderColor = '';
         el.style.boxShadow = '';
@@ -3420,7 +3881,7 @@
     /* ── Form submit (paso final) ── */
     document.getElementById('formVivienda').addEventListener('submit', async function (e) {
       e.preventDefault();
-      
+
       if (currentStep < totalSteps) {
         // Si presionan Enter en un input antes del último paso, avanzar al siguiente en vez de guardar todo
         document.getElementById('btnNext').click();
@@ -3430,50 +3891,50 @@
       const gv = id => document.getElementById(id)?.value?.trim() || '';
       const v = {
         // Cabecera
-        planillaNro:  gv('planillaNro'),
-        fechaCenso:   gv('fechaCenso'),
-        sector:       gv('consejoComunalCab'),
-        encuestador:  gv('encuestadorNombre'),
+        planillaNro: gv('planillaNro'),
+        fechaCenso: gv('fechaCenso'),
+        sector: gv('consejoComunalCab'),
+        encuestador: gv('encuestadorNombre'),
         // Ubicación
-        estado:       gv('estado'),
-        municipio:    gv('municipio'),
-        parroquia:    gv('parroquia'),
-        sectorGeo:    gv('sector'),
-        comunidad:    gv('nombreComunidad'),
-        direccion:    gv('direccionExacta'),
+        estado: gv('estado'),
+        municipio: gv('municipio'),
+        parroquia: gv('parroquia'),
+        sectorGeo: gv('sector'),
+        comunidad: gv('nombreComunidad'),
+        direccion: gv('direccionExacta'),
         // Jefe familia
-        cedula:       gv('cedulaJefe'),
-        nombres:      gv('jefNombres') + ' ' + gv('jefApellidos'),
-        fechaNac:     gv('jefFechaNac'),
-        sexo:         gv('jefSexo'),
-        estadoCivil:  gv('jefEstadoCivil'),
-        instruccion:  gv('jefNivelInstruccion'),
+        cedula: gv('cedulaJefe'),
+        nombres: gv('jefNombres'),
+        fechaNac: gv('jefFechaNac'),
+        sexo: gv('jefSexo'),
+        estadoCivil: gv('jefEstadoCivil'),
+        instruccion: gv('jefNivelInstruccion'),
         // Grupo familiar
-        habitantes:   gv('cantidadHabitantes'),
-        condicion:    gv('condicionGeneral'),
+        habitantes: gv('cantidadHabitantes'),
+        condicion: gv('condicionGeneral'),
         // Economía
-        trabaja:      gv('trabaja'),
-        ingreso:      gv('ingresoFamiliarRango'),
+        trabaja: gv('trabaja'),
+        ingreso: gv('ingresoFamiliarRango'),
         // Vivienda
-        tipo:         gv('tipoVivienda'),
-        tenencia:     gv('tenencia'),
-        terreno:      gv('condicionesTerreno'),
-        paredes:      gv('materialParedes'),
-        techo:        gv('materialTecho'),
+        tipo: gv('tipoVivienda'),
+        tenencia: gv('tenencia'),
+        terreno: gv('condicionesTerreno'),
+        paredes: gv('materialParedes'),
+        techo: gv('materialTecho'),
         requiereAyuda: gv('requiereAyuda'),
         // Servicios
-        agua:         gv('aguasBlancas'),
-        servidas:     gv('aguasServidas'),
-        gas:          gv('gasDomestico'),
-        electrico:    gv('sistemaElectrico'),
-        basura:       gv('recoleccionBasura'),
+        agua: gv('aguasBlancas'),
+        servidas: gv('aguasServidas'),
+        gas: gv('gasDomestico'),
+        electrico: gv('sistemaElectrico'),
+        basura: gv('recoleccionBasura'),
         // Salud
-        enfermedades: [...document.querySelectorAll('input[name="enfermedades"]:checked')].map(c=>c.value).join(', '),
+        enfermedades: [...document.querySelectorAll('input[name="enfermedades"]:checked')].map(c => c.value).join(', '),
         // Diagnóstico
         potencialidades: gv('potencialidadesComunidad'),
-        problemas:    gv('problemasComunidad'),
-        obs:          gv('observaciones'),
-        fecha:        new Date().toLocaleDateString('es-VE')
+        problemas: gv('problemasComunidad'),
+        obs: gv('observaciones'),
+        fecha: new Date().toLocaleDateString('es-VE')
       };
       if (!v.cedula) {
         showToast('La cédula del jefe de familia es obligatoria.', 'error');
@@ -3521,7 +3982,7 @@
 
     /* ── Search & filters ── */
     document.getElementById('cvSearch').addEventListener('input', renderTable);
-    
+
     document.getElementById('btnAplicarFiltros').addEventListener('click', () => {
       const modalInstance = bootstrap.Modal.getInstance(document.getElementById('modalFiltrosAvanzados'));
       if (modalInstance) modalInstance.hide();
@@ -3589,14 +4050,14 @@
               }
             }
           }
-          
+
           if (matched) {
             selCC.setAttribute('disabled', 'true');
             selCC.style.backgroundColor = 'var(--gray1)';
             selCC.style.fontWeight = '700';
             selCC.style.color = 'var(--vp)';
             // Remover el 'required' para que no haya problemas de validación
-            selCC.removeAttribute('required'); 
+            selCC.removeAttribute('required');
 
             // Si el formulario se resetea (al cerrar el modal o cancelar), 
             // HTML restaura los selects a su primer valor ("Seleccione...").
@@ -3635,9 +4096,11 @@
         HabitanteAutocomplete.attachTo('encuestadoCedula', (datos) => {
           const el = document.getElementById('encuestadoNombre');
           if (el) el.value = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
-        }, { onNotFound: () => {
-          showToast('La cédula del encuestado no está registrada como habitante.', 'error');
-        }});
+        }, {
+          onNotFound: () => {
+            showToast('La cédula del encuestado no está registrada como habitante.', 'error');
+          }
+        });
         document.getElementById('btnValidarEncuestado')?.addEventListener('click', () => {
           const input = document.getElementById('encuestadoCedula');
           if (input?.forceSearch) input.forceSearch();
@@ -3645,7 +4108,7 @@
 
         // ── 4. Autocompletado: Jefe de Familia (Sección III) ──
         // Campos del jefe son solo-lectura; se llenan con la cédula
-        const camposJefe = ['jefNombres','jefApellidos','jefFechaNac','jefSexo','jefEstadoCivil','jefNivelInstruccion','jefProfesion'];
+        const camposJefe = ['jefNombres', 'jefFechaNac', 'jefSexo', 'jefEstadoCivil', 'jefNivelInstruccion', 'jefProfesion', 'jefTiempoComunidad', 'jefInscritoCNE', 'jefTelfCel', 'jefEmail', 'jefIncapacitado'];
         camposJefe.forEach(id => {
           const el = document.getElementById(id);
           if (el && el.tagName !== 'SELECT') {
@@ -3662,15 +4125,18 @@
             const el = document.getElementById(id);
             if (el) { el.style.borderColor = ''; el.style.boxShadow = ''; }
           });
-          document.getElementById('jefNombres').value      = datos.nombres    || '';
-          document.getElementById('jefApellidos').value    = datos.apellidos  || '';
-          document.getElementById('jefProfesion').value    = datos.ocupacion  || '';
+          document.getElementById('jefNombres').value = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
+          document.getElementById('jefProfesion').value = datos.ocupacion || '';
+
+          if (document.getElementById('jefTiempoComunidad')) document.getElementById('jefTiempoComunidad').value = datos.tiempo_comunidad || '';
+          if (document.getElementById('jefTelfCel')) document.getElementById('jefTelfCel').value = datos.telefono || '';
+          if (document.getElementById('jefEmail')) document.getElementById('jefEmail').value = datos.email || '';
 
           if (datos.fecha_nacimiento) {
             try {
               const d = new Date(datos.fecha_nacimiento);
               document.getElementById('jefFechaNac').value = d.toISOString().split('T')[0];
-            } catch(_) {}
+            } catch (_) { }
           }
           if (datos.genero) {
             const s = datos.genero; // 'Masculino' o 'Femenino'
@@ -3686,22 +4152,34 @@
             if (sel) sel.value = datos.estado_civil;
           }
 
+          const selCNE = document.getElementById('jefInscritoCNE');
+          if (selCNE && datos.inscrito_cne !== undefined && datos.inscrito_cne !== null) {
+            selCNE.value = datos.inscrito_cne === true || datos.inscrito_cne === 'true' ? 'Si' : 'No';
+          }
+
+          const selIncap = document.getElementById('jefIncapacitado');
+          if (selIncap && datos.incapacitado !== undefined && datos.incapacitado !== null) {
+            selIncap.value = datos.incapacitado === true || datos.incapacitado === 'true' ? 'Si' : 'No';
+          }
+
           // También sincronizar encuestado si el checkbox está marcado
           const chk = document.getElementById('chkEncuestadoEsJefe');
           if (chk?.checked) {
-            document.getElementById('encuestadoNombre').value = (datos.nombres + ' ' + (datos.apellidos||'')).trim();
+            document.getElementById('encuestadoNombre').value = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
             document.getElementById('encuestadoCedula').value = document.getElementById('cedulaJefe').value;
           }
 
-          showToast(`✅ Jefe de familia cargado: ${datos.nombres} ${datos.apellidos||''}`, 'success');
-        }, { onNotFound: () => {
-          // Limpiar campos y mostrar advertencia
-          camposJefe.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) { el.value = ''; el.style.borderColor = '#EF5350'; }
-          });
-          showToast('⚠️ Esta cédula no está registrada como habitante. Por favor regístrelo primero en "Habitantes".', 'error');
-        }});
+          showToast(`✅ Jefe de familia cargado: ${datos.nombres} ${datos.apellidos || ''}`, 'success');
+        }, {
+          onNotFound: () => {
+            // Limpiar campos y mostrar advertencia
+            camposJefe.forEach(id => {
+              const el = document.getElementById(id);
+              if (el) { el.value = ''; el.style.borderColor = '#EF5350'; }
+            });
+            showToast('⚠️ Esta cédula no está registrada como habitante. Por favor regístrelo primero en "Habitantes".', 'error');
+          }
+        });
 
         document.getElementById('btnValidarCedula')?.addEventListener('click', () => {
           const input = document.getElementById('cedulaJefe');
@@ -3710,19 +4188,19 @@
 
         // ── 5. Autocompletado: Integrantes (Sección IV) ──
         // Función para adjuntar autocomplete a una fila de familiar
-        window.adjuntarAutocompletadoFamiliar = function(row) {
+        window.adjuntarAutocompletadoFamiliar = function (row) {
           const cedulaInput = row.querySelector('.fam-cedula');
           if (!cedulaInput) return;
 
           HabitanteAutocomplete.attachTo(cedulaInput, (datos) => {
             const nombreInput = row.querySelector('.fam-nombres');
-            const sexoSel    = row.querySelector('.fam-sexo');
-            const instrSel   = row.querySelector('.fam-instruccion');
+            const sexoSel = row.querySelector('.fam-sexo');
+            const instrSel = row.querySelector('.fam-instruccion');
             const fechaInput = row.querySelector('.fam-fechanac');
 
-            if (nombreInput) nombreInput.value = (datos.nombres + ' ' + (datos.apellidos||'')).trim();
+            if (nombreInput) nombreInput.value = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
             if (datos.genero && sexoSel) {
-              sexoSel.value = datos.genero === 'Masculino' ? 'M' : (datos.genero === 'Femenino' ? 'F' : '');
+              sexoSel.value = datos.genero;
             }
             if (datos.nivel_educativo && instrSel) {
               instrSel.value = datos.nivel_educativo;
@@ -3731,13 +4209,15 @@
               try {
                 const d = new Date(datos.fecha_nacimiento);
                 fechaInput.value = d.toISOString().split('T')[0];
-              } catch(_) {}
+              } catch (_) { }
             }
-          }, { onNotFound: () => {
-            showToast('⚠️ Esta cédula no está registrada como habitante en el sistema. Debe registrarlo primero.', 'error');
-            const nombreInput = row.querySelector('.fam-nombres');
-            if (nombreInput) { nombreInput.value = ''; nombreInput.style.borderColor = '#EF5350'; }
-          }, debounce: 600 });
+          }, {
+            onNotFound: () => {
+              showToast('⚠️ Esta cédula no está registrada como habitante en el sistema. Debe registrarlo primero.', 'error');
+              const nombreInput = row.querySelector('.fam-nombres');
+              if (nombreInput) { nombreInput.value = ''; nombreInput.style.borderColor = '#EF5350'; }
+            }, debounce: 600
+          });
 
           const btnLupa = row.querySelector('.btn-validar-fam');
           if (btnLupa) {
@@ -3779,8 +4259,5 @@
   </script>
 
 </body>
+
 </html>
-
-
-
-

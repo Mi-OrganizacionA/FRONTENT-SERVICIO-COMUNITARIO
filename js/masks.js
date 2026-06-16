@@ -252,7 +252,7 @@
 
   // IDs de nombres conocidos
   const IDS_NOMBRES = [
-    'habNombres', 'habApellidos', 'jefNombres', 'jefApellidos',
+    'habNombres', 'habApellidos', 'jefNombres',
     'encuestadorNombre', 'encuestadoNombre', 'projResponsable',
     'orgNombre', 'cNombre'
   ];
