@@ -2527,6 +2527,10 @@
           if (key === '_currentStep' || key === '_currentCensoId') return;
           const el = document.getElementById(key);
           if (el) {
+            // No sobrescribir si el campo fue deshabilitado/bloqueado por el sistema
+            // (ej. Consejo Comunal auto-asignado para un vocero)
+            if (el.disabled) return;
+            
             if (el.type === 'checkbox' || el.type === 'radio') {
               el.checked = !!data[key];
             } else {
@@ -3598,6 +3602,31 @@
         };
         selCC.addEventListener('change', syncCC);
         syncCC();
+
+        // Si el formulario se resetea (al cerrar el modal o cancelar), 
+        // HTML restaura los selects a su primer valor ("Seleccione...").
+        // Necesitamos restaurar la auto-asignación inmediatamente después.
+        const formWizard = document.getElementById('formWizard') || document.getElementById('formVivienda');
+        if (formWizard) {
+          formWizard.addEventListener('reset', () => {
+            setTimeout(() => {
+              if (matched) {
+                selCC.value = mapCC[cid] || u.consejo_comunal || u.consejoComunal; // o la variable que coincida
+                // Buscar la opción exacta para restaurar su valor real
+                const valLower = selCC.value.toString().toLowerCase().trim();
+                for (let option of selCC.options) {
+                  const optValLower = option.value.toLowerCase().trim();
+                  const optTextLower = option.text.toLowerCase().trim();
+                  if (optValLower === valLower || optTextLower.includes(valLower)) {
+                    selCC.value = option.value;
+                    break;
+                  }
+                }
+                syncCC();
+              }
+            }, 0);
+          });
+        }
       }
 
       // ── 2. Auto-fill del Encuestador (siempre desde sesión) ──
