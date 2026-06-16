@@ -318,6 +318,33 @@
         console.warn('Error cargando stats públicas:', e.message);
       }
 
+      // 4. Configuración del Portal
+      try {
+        const resC = await fetch(`${baseApi}/system/config-portal`);
+        if (resC.ok) {
+          const dataC = await resC.json();
+          if (dataC.success && dataC.config) {
+            const portalConfig = JSON.parse(dataC.config);
+            localStorage.setItem('sicag_portal_settings', dataC.config);
+            const setEl = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+            setEl('txtContactDir', portalConfig.direccion);
+            setEl('txtContactTlf', portalConfig.telefono);
+            setEl('txtContactHorario', portalConfig.horario);
+            setEl('txtContactCorreo', portalConfig.correo);
+
+            const waNumber = (portalConfig.telefono || '').replace(/\D/g, '');
+            const waLink = waNumber ? `https://wa.me/${waNumber}?text=Hola,%20les%20escribo%20desde%20el%20portal%20SICAG` : '#';
+
+            document.querySelectorAll('.pub-btn-whatsapp').forEach(a => a.href = waLink);
+            document.querySelectorAll('.pub-btn-facebook').forEach(a => a.href = portalConfig.facebook || '#');
+            document.querySelectorAll('.pub-btn-instagram').forEach(a => a.href = portalConfig.instagram || '#');
+            document.querySelectorAll('.pub-btn-tiktok').forEach(a => a.href = portalConfig.tiktok || '#');
+          }
+        }
+      } catch (e) {
+        console.warn('Error cargando config pública:', e.message);
+      }
+
       
       todasLasNoticias = noticias;
       todosLosProyectos = proyectos;

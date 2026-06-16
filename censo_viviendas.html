@@ -2542,6 +2542,15 @@
           if (el) el.dispatchEvent(new Event('change'));
         });
 
+        // Re-restaurar valores de texto para evitar que los eventos 'change' los hayan borrado
+        Object.keys(data).forEach(key => {
+          if (key === '_currentStep' || key === '_currentCensoId') return;
+          const el = document.getElementById(key);
+          if (el && el.type !== 'checkbox' && el.type !== 'radio') {
+            el.value = data[key];
+          }
+        });
+
         if (data._currentStep) {
           goToStep(parseInt(data._currentStep, 10));
         }

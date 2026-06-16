@@ -5,6 +5,8 @@ const { verifyToken, requireRole } = require('../middleware/auth');
 
 router.get('/config', verifyToken, systemController.getConfig);
 router.post('/config', verifyToken, requireRole(['admin']), systemController.saveConfig);
+router.get('/config-portal', systemController.getPortalConfig);
+router.post('/config-portal', verifyToken, requireRole(['admin']), systemController.savePortalConfig);
 router.get('/backup', systemController.downloadBackup); 
 router.get('/public-stats', systemController.getPublicStats);
 router.post('/contacto', systemController.enviarContacto);

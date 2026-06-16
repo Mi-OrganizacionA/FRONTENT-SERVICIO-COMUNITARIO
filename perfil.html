@@ -713,16 +713,33 @@
       const formConfig = document.getElementById('formConfigPortal');
       if (formConfig) {
         // Cargar configuración actual
-        const portalConfig = JSON.parse(localStorage.getItem('sicag_portal_settings') || '{}');
-        document.getElementById('cpDireccion').value = portalConfig.direccion || 'Sector Las Mercedes, San Felipe, Yaracuy, Venezuela';
-        document.getElementById('cpTelefono').value = portalConfig.telefono || '+58 424 000 0000';
-        document.getElementById('cpHorario').value = portalConfig.horario || 'Lunes a Viernes: 8:00 AM – 4:00 PM';
-        document.getElementById('cpCorreo').value = portalConfig.correo || 'sicag@comunasimonrodriguez.gob.ve';
-        document.getElementById('cpFacebook').value = portalConfig.facebook || '#';
-        document.getElementById('cpInstagram').value = portalConfig.instagram || '#';
-        document.getElementById('cpTiktok').value = portalConfig.tiktok || '#';
+        let portalConfig = JSON.parse(localStorage.getItem('sicag_portal_settings') || '{}');
+        const cargarConfig = async () => {
+          try {
+            if (window.api && window.api._fetch) {
+              const res = await window.api._fetch(window.api.baseURL + '/system/config-portal');
+              if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.config) {
+                  portalConfig = JSON.parse(data.config);
+                  localStorage.setItem('sicag_portal_settings', data.config);
+                }
+              }
+            }
+            document.getElementById('cpDireccion').value = portalConfig.direccion || 'Sector Las Mercedes, San Felipe, Yaracuy, Venezuela';
+            document.getElementById('cpTelefono').value = portalConfig.telefono || '+58 424 000 0000';
+            document.getElementById('cpHorario').value = portalConfig.horario || 'Lunes a Viernes: 8:00 AM - 4:00 PM';
+            document.getElementById('cpCorreo').value = portalConfig.correo || 'sicag@comunasimonrodriguez.gob.ve';
+            document.getElementById('cpFacebook').value = portalConfig.facebook || '#';
+            document.getElementById('cpInstagram').value = portalConfig.instagram || '#';
+            document.getElementById('cpTiktok').value = portalConfig.tiktok || '#';
+          } catch (e) {
+            console.error('Error cargando config:', e);
+          }
+        };
+        cargarConfig();
 
-        formConfig.addEventListener('submit', (e) => {
+        formConfig.addEventListener('submit', async (e) => {
           e.preventDefault();
           const btnSaveConfig = document.getElementById('btnSaveConfigPortal');
           btnSaveConfig.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
@@ -738,13 +755,26 @@
             tiktok: document.getElementById('cpTiktok').value
           };
 
-          // Simular tiempo de guardado en API para UX
-          setTimeout(() => {
+          try {
+            if (window.api && window.api._fetch && window.auth) {
+              await window.api._fetch(window.api.baseURL + '/system/config-portal', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${window.auth.getToken()}`
+                },
+                body: JSON.stringify({ settings: newConfig })
+              });
+            }
             localStorage.setItem('sicag_portal_settings', JSON.stringify(newConfig));
             Components.showToast('Configuración pública guardada exitosamente.', 'success');
+          } catch (error) {
+            console.error('Error guardando config:', error);
+            Components.showToast('Error guardando la configuración en el servidor', 'error');
+          } finally {
             btnSaveConfig.innerHTML = '<i class="fas fa-save"></i> Guardar Cambios Públicos';
             btnSaveConfig.disabled = false;
-          }, 800);
+          }
         });
       }
 

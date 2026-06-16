@@ -1,5 +1,5 @@
 /**
- * notificaciones.js — Controlador de Bandeja de Validaciones v3.0
+ * notificaciones.js â€” Controlador de Bandeja de Validaciones v3.0
  * Soporta vista tabla (Admin) y vista solicitudes propias (Vocero)
  */
 class NotificacionesController {
@@ -12,7 +12,7 @@ class NotificacionesController {
     this.pendingBulkAction = null; // 'approve' | 'reject'
     this.detailId  = null;
 
-    // Verificar sesión antes de arrancar
+    // Verificar sesiÃ³n antes de arrancar
     const u = window.auth ? window.auth.getUser() : null;
     if (!u) return;
     this.userRole = u.rol;
@@ -27,7 +27,7 @@ class NotificacionesController {
     this.bindUIEvents();
   }
 
-  /* ─── Adaptar la UI según el rol ─────────────────────────── */
+  /* â”€â”€â”€ Adaptar la UI segÃºn el rol â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   adaptarVistaRol() {
     const isVocero = this.userRole === 'vocero';
 
@@ -45,7 +45,7 @@ class NotificacionesController {
       if (phTitle) phTitle.textContent = 'Mis Solicitudes';
       if (phModule) phModule.innerHTML = '<i class="fas fa-id-badge"></i> Mi Cuenta';
       if (phMainTitle) phMainTitle.textContent = 'Mis Solicitudes';
-      if (phSub) phSub.textContent = 'Aquí puedes ver el estado de las solicitudes que has enviado al administrador.';
+      if (phSub) phSub.textContent = 'AquÃ­ puedes ver el estado de las solicitudes que has enviado al administrador.';
       if (phIcon) phIcon.className = 'fas fa-paper-plane';
       if (tableTitle) tableTitle.textContent = 'Mis solicitudes enviadas';
       // Ocultar checkboxes en vista vocero
@@ -57,7 +57,7 @@ class NotificacionesController {
     }
   }
 
-  /* ─── Carga de datos ──────────────────────────────────────── */
+  /* â”€â”€â”€ Carga de datos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   async cargarDatos() {
     try {
       const isVocero = this.userRole === 'vocero';
@@ -87,7 +87,7 @@ class NotificacionesController {
     }
   }
 
-  /* ─── Filtrado ────────────────────────────────────────────── */
+  /* â”€â”€â”€ Filtrado â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   aplicarFiltros() {
     const tipo    = (document.getElementById('filterTipo')?.value   || '').toLowerCase();
     const estado  = (document.getElementById('filterEstado')?.value || '').toLowerCase();
@@ -107,7 +107,7 @@ class NotificacionesController {
     // Filtro estado
     if (estado) lista = lista.filter(n => (n.estado || 'pendiente').toLowerCase() === estado);
 
-    // Filtro búsqueda libre
+    // Filtro bÃºsqueda libre
     if (busca) {
       lista = lista.filter(n => {
         const desc = this.getDescripcion(n).toLowerCase();
@@ -124,7 +124,7 @@ class NotificacionesController {
     this.renderTabla(lista);
   }
 
-  /* ─── KPI Stats ───────────────────────────────────────────── */
+  /* â”€â”€â”€ KPI Stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   renderStats() {
     const cont = document.getElementById('notificationStats');
     if (!cont) return;
@@ -140,11 +140,11 @@ class NotificacionesController {
 
     const stats = isVocero ? [
       { label: 'Mis Solicitudes', value: base.length, sub: 'Total enviadas', color: 'azul', icon: 'paper-plane', trend: 'up' },
-      { label: 'Pendientes',      value: pendientes,  sub: 'En revisión',    color: 'amarillo', icon: 'clock', trend: pendientes > 0 ? 'down' : 'up' },
+      { label: 'Pendientes',      value: pendientes,  sub: 'En revisiÃ³n',    color: 'amarillo', icon: 'clock', trend: pendientes > 0 ? 'down' : 'up' },
       { label: 'Aprobadas',       value: aprobados,   sub: 'Aceptadas',      color: 'verde', icon: 'check-circle', trend: 'up' },
       { label: 'Rechazadas',      value: rechazados,  sub: 'No aprobadas',   color: 'rojo', icon: 'times-circle', trend: rechazados > 0 ? 'down' : 'up' }
     ] : [
-      { label: 'Pendientes',      value: pendientes,  sub: 'Requieren acción', color: 'amarillo', icon: 'clock', trend: pendientes > 0 ? 'down' : 'up' },
+      { label: 'Pendientes',      value: pendientes,  sub: 'Requieren acciÃ³n', color: 'amarillo', icon: 'clock', trend: pendientes > 0 ? 'down' : 'up' },
       { label: 'Total',           value: base.length, sub: 'En bandeja',        color: 'azul', icon: 'inbox', trend: 'up' },
       { label: 'Aprobadas hoy',   value: aprobados,   sub: 'Procesadas',        color: 'verde', icon: 'check-double', trend: 'up' },
       { label: 'Rechazadas',      value: rechazados,  sub: 'No aprobadas',      color: 'rojo', icon: 'ban', trend: rechazados > 0 ? 'down' : 'up' }
@@ -162,7 +162,7 @@ class NotificacionesController {
     `).join('');
   }
 
-  /* ─── Render Tabla ────────────────────────────────────────── */
+  /* â”€â”€â”€ Render Tabla â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   renderTabla(lista) {
     const tbody = document.getElementById('validacionesTbody');
     const countBadge = document.getElementById('countBadge');
@@ -184,8 +184,8 @@ class NotificacionesController {
       const emptyMsg = document.getElementById('emptyMsg');
       if (emptyTitle) emptyTitle.textContent = isVocero ? 'No tienes solicitudes enviadas' : 'No hay solicitudes pendientes';
       if (emptyMsg) emptyMsg.textContent = isVocero
-        ? 'Cuando envíes noticias, proyectos u otros datos, aparecerán aquí para que veas su estado.'
-        : 'Todo está en orden. Cuando los voceros envíen nuevas solicitudes, aparecerán aquí.';
+        ? 'Cuando envÃ­es noticias, proyectos u otros datos, aparecerÃ¡n aquÃ­ para que veas su estado.'
+        : 'Todo estÃ¡ en orden. Cuando los voceros envÃ­en nuevas solicitudes, aparecerÃ¡n aquÃ­.';
       return;
     }
 
@@ -207,7 +207,7 @@ class NotificacionesController {
             <input type="checkbox" class="v-checkbox row-check" data-id="${n.id}"
               ${isSelected ? 'checked' : ''} title="Seleccionar" aria-label="Seleccionar solicitud ${n.id}">
           </td>
-          <td>${tipoBadge} <span style="font-size:.75rem;color:var(--muted);display:block;margin-top:2px;">${this.escapeHtml(n.tipo_accion || 'INSERT')}</span></td>
+          <td>${tipoBadge} <span style="font-size:.75rem;color:var(--muted);display:block;margin-top:2px;">${this.escapeHtml(n.tipo_accion || 'CREATE')}</span></td>
           <td>
             <div class="v-solicitante">${this.escapeHtml(solicitante)}</div>
             <div class="v-solicitante-sub">${n.consejo_comunal ? this.escapeHtml(n.consejo_comunal) : ''}</div>
@@ -242,7 +242,7 @@ class NotificacionesController {
     this.bindCheckboxEvents();
   }
 
-  /* ─── Bind Eventos de Tabla ───────────────────────────────── */
+  /* â”€â”€â”€ Bind Eventos de Tabla â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   bindCheckboxEvents() {
     const checkAll = document.getElementById('checkAll');
     if (checkAll) {
@@ -274,10 +274,10 @@ class NotificacionesController {
       };
     });
 
-    // Click en fila → abrir detalle
+    // Click en fila â†’ abrir detalle
     document.querySelectorAll('#validacionesTbody tr').forEach(tr => {
       tr.addEventListener('click', (e) => {
-        // No abrir si fue clic en un botón o checkbox
+        // No abrir si fue clic en un botÃ³n o checkbox
         if (e.target.closest('button') || e.target.closest('input[type="checkbox"]')) return;
         const id = parseInt(tr.dataset.id, 10);
         if (id) this.abrirDetalle(id);
@@ -285,7 +285,7 @@ class NotificacionesController {
     });
   }
 
-  /* ─── Barra Masiva ────────────────────────────────────────── */
+  /* â”€â”€â”€ Barra Masiva â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   actualizarBulkBar() {
     const bar = document.getElementById('bulkActionsBar');
     const countEl = document.getElementById('bulkCount');
@@ -295,7 +295,7 @@ class NotificacionesController {
     bar.classList.toggle('visible', n > 0);
   }
 
-  /* ─── Modal Detalle ───────────────────────────────────────── */
+  /* â”€â”€â”€ Modal Detalle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   abrirDetalle(id) {
     this.detailId = id;
     const n = this.todas.find(x => x.id === id);
@@ -311,7 +311,7 @@ class NotificacionesController {
     const isVocero = this.userRole === 'vocero';
     const solicitante = n.nombre_vocero || `Vocero #${n.id_vocero}`;
 
-    if (title) title.innerHTML = `<i class="fas fa-file-lines"></i> ${this.capitalize(n.tabla_afectada?.replace(/_/g, ' '))} — ${this.capitalize(n.tipo_accion || '')}`;
+    if (title) title.innerHTML = `<i class="fas fa-file-lines"></i> ${this.capitalize(n.tabla_afectada?.replace(/_/g, ' '))} â€” ${this.capitalize(n.tipo_accion || '')}`;
 
     // Construir filas de datos temporales
     let datosHtml = '';
@@ -320,12 +320,12 @@ class NotificacionesController {
       datosHtml += `
         <div class="det-meta-item">
           <div class="det-meta-key">${this.capitalize(k.replace(/_/g, ' '))}</div>
-          <div class="det-meta-value">${this.escapeHtml(v != null ? String(v) : '—')}</div>
+          <div class="det-meta-value">${this.escapeHtml(v != null ? String(v) : 'â€”')}</div>
         </div>`;
     }
 
     body.innerHTML = `
-      <!-- Info rápida -->
+      <!-- Info rÃ¡pida -->
       <div class="det-meta-grid">
         <div class="det-meta-item">
           <div class="det-meta-key">ID Solicitud</div>
@@ -337,11 +337,11 @@ class NotificacionesController {
         </div>
         <div class="det-meta-item">
           <div class="det-meta-key">Tabla Afectada</div>
-          <div class="det-meta-value">${this.escapeHtml(n.tabla_afectada || '—')}</div>
+          <div class="det-meta-value">${this.escapeHtml(n.tabla_afectada || 'â€”')}</div>
         </div>
         <div class="det-meta-item">
-          <div class="det-meta-key">Tipo Acción</div>
-          <div class="det-meta-value">${this.escapeHtml(n.tipo_accion || 'INSERT')}</div>
+          <div class="det-meta-key">Tipo AcciÃ³n</div>
+          <div class="det-meta-value">${this.escapeHtml(n.tipo_accion || 'CREATE')}</div>
         </div>
         <div class="det-meta-item">
           <div class="det-meta-key">Fecha</div>
@@ -358,7 +358,7 @@ class NotificacionesController {
         <h4><i class="fas fa-database"></i> Datos de la Solicitud</h4>
         ${n.tabla_afectada === 'recuperacion_clave' ? `
           <div style="background: rgba(46, 125, 50, 0.1); border: 2px dashed #2E7D32; border-radius: 12px; padding: 1.5rem; text-align: center; margin-bottom: 1rem;">
-            <p style="margin: 0; font-size: 0.9rem; color: #1B5E20; font-weight: 600;">CÓDIGO DE VERIFICACIÓN GENERADO</p>
+            <p style="margin: 0; font-size: 0.9rem; color: #1B5E20; font-weight: 600;">CÃ“DIGO DE VERIFICACIÃ“N GENERADO</p>
             <h2 style="margin: 0.5rem 0 0 0; font-size: 2.5rem; color: #2E7D32; letter-spacing: 5px;">${registro.codigo}</h2>
           </div>
         ` : ''}
@@ -375,7 +375,7 @@ class NotificacionesController {
       ` : ''}
     `;
 
-    // Footer: botones de acción (solo admin y si está pendiente)
+    // Footer: botones de acciÃ³n (solo admin y si estÃ¡ pendiente)
     footer.innerHTML = `
       <button class="btn-sicag" style="background:var(--bg);color:var(--sub);border:1px solid var(--border);" id="btnCloseDetalle2">
         <i class="fas fa-xmark"></i> Cerrar
@@ -400,11 +400,11 @@ class NotificacionesController {
     this.detailId = null;
   }
 
-  /* ─── Acciones individuales ───────────────────────────────── */
+  /* â”€â”€â”€ Acciones individuales â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   async aprobarUno(id) {
     try {
       await window.api.aprobarNotificacion(id, 'Aprobado por el administrador.');
-      Components.showToast('✅ Solicitud aprobada correctamente.', 'success');
+      Components.showToast('âœ… Solicitud aprobada correctamente.', 'success');
       this.selected.delete(id);
       await this.cargarDatos();
     } catch (e) {
@@ -413,21 +413,21 @@ class NotificacionesController {
   }
 
   async rechazarUno(id) {
-    const motivo = prompt('Ingresa el motivo del rechazo:');
-    if (!motivo || !motivo.trim()) return;
-    try {
-      await window.api.rechazarNotificacion(id, motivo.trim());
-      Components.showToast('Solicitud rechazada.', 'info');
-      this.selected.delete(id);
-      await this.cargarDatos();
-    } catch (e) {
-      Components.showToast('Error al rechazar: ' + e.message, 'error');
-    }
+    Components.confirmDialog('¿Está seguro de rechazar esta solicitud?', async () => {
+      try {
+        await window.api.rechazarNotificacion(id, 'Rechazado por el administrador.');
+        Components.showToast('Solicitud rechazada.', 'info');
+        this.selected.delete(id);
+        await this.cargarDatos();
+      } catch (e) {
+        Components.showToast('Error al rechazar: ' + e.message, 'error');
+      }
+    });
   }
 
   async cancelarSolicitud(id) {
     Components.confirmDialog(
-      '¿Deseas cancelar esta solicitud? Esta acción no se puede deshacer.',
+      'Â¿Deseas cancelar esta solicitud? Esta acciÃ³n no se puede deshacer.',
       async () => {
         try {
           await window.api.rechazarNotificacion(id, 'Cancelado por el solicitante.');
@@ -440,7 +440,7 @@ class NotificacionesController {
     );
   }
 
-  /* ─── Acciones masivas ────────────────────────────────────── */
+  /* â”€â”€â”€ Acciones masivas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   confirmarAccionMasiva(accion) {
     const n = this.selected.size;
     if (n === 0) return;
@@ -454,9 +454,9 @@ class NotificacionesController {
     const btnOk = document.getElementById('btnConfirmOk');
     const btnLabel = document.getElementById('confirmBtnLabel');
 
-    if (icon) icon.textContent = isApprove ? '✅' : '❌';
+    if (icon) icon.textContent = isApprove ? 'âœ…' : 'âŒ';
     if (title) title.textContent = isApprove ? 'Aprobar en Lote' : 'Rechazar en Lote';
-    if (msg) msg.textContent = `Estás a punto de ${isApprove ? 'aprobar' : 'rechazar'} ${n} solicitud${n !== 1 ? 'es' : ''} seleccionada${n !== 1 ? 's' : ''}. Esta acción afectará directamente la base de datos.`;
+    if (msg) msg.textContent = `EstÃ¡s a punto de ${isApprove ? 'aprobar' : 'rechazar'} ${n} solicitud${n !== 1 ? 'es' : ''} seleccionada${n !== 1 ? 's' : ''}. Esta acciÃ³n afectarÃ¡ directamente la base de datos.`;
     if (btnOk) {
       btnOk.className = `btn-sicag ${isApprove ? 'btn-primary' : 'btn-danger'}`;
     }
@@ -474,19 +474,13 @@ class NotificacionesController {
     const ids = [...this.selected];
     const isApprove = accion === 'approve';
 
-    let motivo = '';
-    if (!isApprove) {
-      motivo = prompt(`Ingresa el motivo del rechazo para las ${ids.length} solicitudes:`);
-      if (!motivo || !motivo.trim()) return;
-    }
-
     let ok = 0, err = 0;
     for (const id of ids) {
       try {
         if (isApprove) {
           await window.api.aprobarNotificacion(id, 'Aprobado en lote por el administrador.');
         } else {
-          await window.api.rechazarNotificacion(id, motivo.trim());
+          await window.api.rechazarNotificacion(id, 'Rechazado en lote por el administrador.');
         }
         ok++;
       } catch (e) {
@@ -499,15 +493,15 @@ class NotificacionesController {
     await this.cargarDatos();
 
     if (err === 0) {
-      Components.showToast(`✅ ${ok} solicitud${ok !== 1 ? 'es' : ''} ${isApprove ? 'aprobada' : 'rechazada'}${ok !== 1 ? 's' : ''} correctamente.`, 'success');
+      Components.showToast(`âœ… ${ok} solicitud${ok !== 1 ? 'es' : ''} ${isApprove ? 'aprobada' : 'rechazada'}${ok !== 1 ? 's' : ''} correctamente.`, 'success');
     } else {
       Components.showToast(`${ok} procesada${ok !== 1 ? 's' : ''}, ${err} con error.`, 'warning');
     }
   }
 
-  /* ─── Bind eventos globales ───────────────────────────────── */
+  /* â”€â”€â”€ Bind eventos globales â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   bindUIEvents() {
-    // Botón Actualizar
+    // BotÃ³n Actualizar
     document.getElementById('btnRefresh')?.addEventListener('click', async () => {
       await this.cargarDatos();
       Components.showToast('Bandeja actualizada.', 'success');
@@ -519,7 +513,7 @@ class NotificacionesController {
       if (e.target === e.currentTarget) this.cerrarDetalle();
     });
 
-    // Cerrar modal confirmación
+    // Cerrar modal confirmaciÃ³n
     document.getElementById('btnConfirmCancel')?.addEventListener('click', () => {
       document.getElementById('modalConfirm').classList.remove('show');
     });
@@ -556,18 +550,18 @@ class NotificacionesController {
     });
   }
 
-  /* ─── Helpers ─────────────────────────────────────────────── */
+  /* â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   getDescripcion(n) {
     const d = n.datos_temporales || {};
-    if (n.tabla_afectada === 'recuperacion_clave') return `Recuperación de clave: ${d.correo_usuario}`;
+    if (n.tabla_afectada === 'recuperacion_clave') return `RecuperaciÃ³n de clave: ${d.correo_usuario}`;
     if (n.tabla_afectada === 'contacto') return `Contacto de: ${d.nombre}`;
     if (d.nombres) return `Habitante: ${d.nombres} ${d.apellidos || ''}`.trim();
     if (d.titulo) return `Noticia: ${d.titulo}`;
     if (d.nombre_proyecto) return `Proyecto: ${d.nombre_proyecto}`;
-    if (d.nombre) return `Organización: ${d.nombre}`;
-    if (d.nuevo_correo) return `Cambio de correo → ${d.nuevo_correo}`;
+    if (d.nombre) return `OrganizaciÃ³n: ${d.nombre}`;
+    if (d.nuevo_correo) return `Cambio de correo â†’ ${d.nuevo_correo}`;
     if (d.cultivo) return `Cultivo: ${d.cultivo}`;
-    return `Tabla: ${n.tabla_afectada || '—'}`;
+    return `Tabla: ${n.tabla_afectada || 'â€”'}`;
   }
 
   getTipoBadge(tabla) {
@@ -576,9 +570,9 @@ class NotificacionesController {
       'usuarios': ['usuario', 'user-shield'],
       'noticias': ['noticia', 'newspaper'],
       'proyectos': ['proyecto', 'seedling'],
-      'organizaciones': ['organización', 'hands-holding-circle'],
-      'produccion_agricola': ['producción', 'tractor'],
-      'recuperacion_clave': ['recuperación', 'key'],
+      'organizaciones': ['organizaciÃ³n', 'hands-holding-circle'],
+      'produccion_agricola': ['producciÃ³n', 'tractor'],
+      'recuperacion_clave': ['recuperaciÃ³n', 'key'],
       'contacto': ['contacto', 'envelope']
     };
     const t = (tabla || '').toLowerCase();
@@ -589,7 +583,7 @@ class NotificacionesController {
         </span>`;
       }
     }
-    return `<span class="v-tipo-badge v-tipo-otro"><i class="fas fa-file"></i> ${this.escapeHtml(tabla || '—')}</span>`;
+    return `<span class="v-tipo-badge v-tipo-otro"><i class="fas fa-file"></i> ${this.escapeHtml(tabla || 'â€”')}</span>`;
   }
 
   getEstadoPill(estado) {
@@ -597,7 +591,7 @@ class NotificacionesController {
       'pendiente': ['status-pendiente', 'Pendiente', 'clock'],
       'aceptado':  ['status-aceptado',  'Aprobado',  'check-circle'],
       'rechazado': ['status-rechazado', 'Rechazado', 'times-circle'],
-      'reenvio':   ['status-reenvio',   'En revisión', 'redo']
+      'reenvio':   ['status-reenvio',   'En revisiÃ³n', 'redo']
     };
     const [cls, label, icon] = map[estado] || map['pendiente'];
     return `<span class="status-pill ${cls}"><i class="fas fa-${icon}"></i> ${label}</span>`;
@@ -627,5 +621,5 @@ class NotificacionesController {
 }
 
 window.notif = new NotificacionesController();
-// Compatibilidad hacia atrás
+// Compatibilidad hacia atrÃ¡s
 window.notificaciones = window.notif;

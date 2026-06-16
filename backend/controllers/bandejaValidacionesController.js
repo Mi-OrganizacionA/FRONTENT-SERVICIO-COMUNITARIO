@@ -55,7 +55,7 @@ class BandejaValidacionesController {
     }
   }
 
-  // Crear solicitud de validación
+  // Crear solicitud de validaciÃ³n
   static async crear(req, res) {
     try {
       const { tabla_afectada, registro_id, tipo_accion, datos_temporales } = req.body;
@@ -78,7 +78,7 @@ class BandejaValidacionesController {
       });
 
       if (existente && JSON.stringify(existente.datos_temporales) === JSON.stringify(datos_temporales)) {
-        logger.info(`Validación duplicada detectada y prevenida para vocero ${req.user.id}`);
+        logger.info(`ValidaciÃ³n duplicada detectada y prevenida para vocero ${req.user.id}`);
         return res.status(200).json({ 
           mensaje: 'Solicitud ya estaba registrada (deduplicada exitosamente)',
           validacion: existente 
@@ -98,23 +98,23 @@ class BandejaValidacionesController {
       await AuditService.log(req.user.id, 'CREATE', 'bandeja_validaciones', validacion.id, null, validacion.toJSON());
       
       res.status(201).json({ 
-        mensaje: 'Solicitud registrada y pendiente de aprobación',
+        mensaje: 'Solicitud registrada y pendiente de aprobaciÃ³n',
         validacion 
       });
     } catch (error) {
-      logger.error('Error creando solicitud de validación:', error);
+      logger.error('Error creando solicitud de validaciÃ³n:', error);
       res.status(400).json({ error: error.message });
     }
   }
 
-  // Aprobar validación (admin)
+  // Aprobar validaciÃ³n (admin)
   static async aprobar(req, res) {
     try {
       const { id } = req.params;
       const { comentarios } = req.body;
 
       const validacion = await BandejaModel.findByPk(id);
-      if (!validacion) return res.status(404).json({ error: 'Validación no encontrada' });
+      if (!validacion) return res.status(404).json({ error: 'ValidaciÃ³n no encontrada' });
       if (validacion.estado_tramite !== 'Pendiente') return res.status(400).json({ error: 'La solicitud ya fue procesada' });
 
       const models = BandejaModel.sequelize.models;
@@ -125,7 +125,7 @@ class BandejaValidacionesController {
       // Mapeo de nombre de tabla a Modelo Sequelize
       const tablaAModelo = {
         'habitantes': models.Habitante,
-        'noticias': models.Noticia,
+        'noticias': models.CarteleraDigital,
         'proyectos': models.Proyecto,
         'organizaciones_sociales': models.OrganizacionSocial,
         'organizaciones': models.OrganizacionSocial,
@@ -141,12 +141,15 @@ class BandejaValidacionesController {
         nuevoRegistro = await models.Usuario.findByPk(validacion.registro_id);
         if (!nuevoRegistro) throw new Error('El usuario a actualizar no existe');
         const nuevoCorreo = datos.nuevo_correo || datos.email;
-        if (!nuevoCorreo) throw new Error('No se especificó un nuevo correo en la solicitud');
+        if (!nuevoCorreo) throw new Error('No se especificÃ³ un nuevo correo en la solicitud');
         await nuevoRegistro.update({ email: nuevoCorreo });
       } else if (tabla === 'recuperacion_clave' || tabla === 'contacto') {
         nuevoRegistro = { id: validacion.registro_id };
       } else if (Modelo) {
         if (validacion.tipo_accion === 'CREATE' || validacion.tipo_accion === 'INSERT') {
+          if (tabla === 'noticias' && validacion.id_vocero) {
+            datos.id_autor = validacion.id_vocero;
+          }
           nuevoRegistro = await Modelo.create(datos);
           
           if (tabla === 'habitantes' && validacion.id_vocero) {
@@ -168,10 +171,10 @@ class BandejaValidacionesController {
           await registro.destroy();
           nuevoRegistro = { id: validacion.registro_id || datos.id };
         } else {
-          throw new Error(`Acción no soportada para la tabla ${tabla}: ${validacion.tipo_accion}`);
+          throw new Error(`AcciÃ³n no soportada para la tabla ${tabla}: ${validacion.tipo_accion}`);
         }
       } else {
-        throw new Error(`Tabla afectada o tipo de acción desconocida: ${tabla} - ${validacion.tipo_accion}`);
+        throw new Error(`Tabla afectada o tipo de acciÃ³n desconocida: ${tabla} - ${validacion.tipo_accion}`);
       }
 
       await validacion.update({
@@ -190,12 +193,12 @@ class BandejaValidacionesController {
         validacion 
       });
     } catch (error) {
-      logger.error('Error aprobando validación:', error);
+      logger.error('Error aprobando validaciÃ³n:', error);
       res.status(400).json({ error: error.message });
     }
   }
 
-  // Rechazar validación (admin)
+  // Rechazar validaciÃ³n (admin)
   static async rechazar(req, res) {
     try {
       const { id } = req.params;
@@ -204,7 +207,7 @@ class BandejaValidacionesController {
       if (!motivo) return res.status(400).json({ error: 'Se requiere motivo del rechazo' });
 
       const validacion = await BandejaModel.findByPk(id);
-      if (!validacion) return res.status(404).json({ error: 'Validación no encontrada' });
+      if (!validacion) return res.status(404).json({ error: 'ValidaciÃ³n no encontrada' });
 
       await validacion.update({
         estado_tramite: 'Rechazado',
@@ -225,12 +228,12 @@ class BandejaValidacionesController {
     }
   }
 
-  // Obtener detalles de una validación
+  // Obtener detalles de una validaciÃ³n
   static async getById(req, res) {
     try {
       const { id } = req.params;
       const validacion = await BandejaModel.findByPk(id);
-      if (!validacion) return res.status(404).json({ error: 'Validación no encontrada' });
+      if (!validacion) return res.status(404).json({ error: 'ValidaciÃ³n no encontrada' });
       res.json(validacion);
     } catch (error) {
       res.status(500).json({ error: error.message });

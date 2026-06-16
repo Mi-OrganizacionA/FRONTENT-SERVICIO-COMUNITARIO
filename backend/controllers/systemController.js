@@ -65,6 +65,33 @@ class SystemController {
     }
   }
 
+  static async getPortalConfig(req, res) {
+    try {
+      const config = await ConfiguracionModel.findOne({ where: { clave: 'PortalSettings' } });
+      res.json({ success: true, config: config ? config.valor : null });
+    } catch (error) {
+      logger.error('Error fetching portal config:', error);
+      res.status(500).json({ error: 'Error al obtener configuración del portal' });
+    }
+  }
+
+  static async savePortalConfig(req, res) {
+    try {
+      const { settings } = req.body;
+      const config = await ConfiguracionModel.findOne({ where: { clave: 'PortalSettings' } });
+      if (config) {
+        config.valor = JSON.stringify(settings);
+        await config.save();
+      } else {
+        await ConfiguracionModel.create({ clave: 'PortalSettings', valor: JSON.stringify(settings) });
+      }
+      res.json({ success: true, message: 'Configuración del portal guardada' });
+    } catch (error) {
+      logger.error('Error saving portal config:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  }
+
   static async downloadBackup(req, res) {
     try {
       // Si se pasa token por query param, validar. 
