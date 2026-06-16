@@ -2,10 +2,15 @@ const logger = require("../utils/logger");
 const AuditService = require("../services/auditService");
 
 let EstudioDemografico;
+let models;
 
 class EstudioDemograficoController {
   static setModel(model) {
     EstudioDemografico = model;
+  }
+  
+  static setModels(m) {
+    models = m;
   }
 
   static async getAll(req, res, next) {
@@ -42,10 +47,7 @@ class EstudioDemograficoController {
   }
 
   static async crear(req, res, next) {
-    const models = require('../models').initModels ? require('../models').initModels : require('../models');
-    // Si models exporta initModels, o si exporta un objeto con todos.
-    // Usualmente require('../models') exporta { sequelize, ...models } en proyectos Sequelize.
-    const db = require('../models'); 
+    const db = models; 
     const sequelize = db.sequelize;
 
     const t = await sequelize.transaction();
@@ -132,7 +134,7 @@ class EstudioDemograficoController {
   }
 
   static async guardarPaso(req, res, next) {
-    const db = require('../models').initModels ? require('../models').initModels : require('../models');
+    const db = models;
     // db may be an object with models or a function; derive sequelize instance reliably
     const sequelize = db && db.sequelize ? db.sequelize : (EstudioDemografico && EstudioDemografico.sequelize);
     if (!sequelize) {

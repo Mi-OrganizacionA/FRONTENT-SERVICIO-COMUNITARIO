@@ -3525,7 +3525,7 @@
           if (nombreInput) nombreInput.value = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
           const sexoSel = row.querySelector('.fam-sexo');
           if (datos.genero && sexoSel) {
-            sexoSel.value = datos.genero === 'Masculino' ? 'M' : (datos.genero === 'Femenino' ? 'F' : '');
+            sexoSel.value = datos.genero;
           }
         }, {
           debounce: 600, onNotFound: () => {
@@ -4012,6 +4012,23 @@
     // AUTOCOMPLETADO Y LÓGICA AVANZADA DEL WIZARD
     // ============================================================
     document.addEventListener('DOMContentLoaded', () => {
+
+      // 🔥 HOTFIX PROTECCIÓN DE CAMPOS:
+      // Se fuerza a que el campo de recolección de basura no sea bloqueado
+      // por el autocompletado del navegador (ej. Chrome Autofill) o extensiones.
+      setInterval(() => {
+        const selectsSeguros = ['recoleccionBasura', 'aguasBlancas', 'aguasServidas', 'sistemaElectrico'];
+        selectsSeguros.forEach(id => {
+          const el = document.getElementById(id);
+          if (el && (el.disabled || el.readOnly || el.style.pointerEvents === 'none')) {
+            el.removeAttribute('disabled');
+            el.removeAttribute('readonly');
+            el.readOnly = false;
+            el.style.pointerEvents = 'auto';
+            el.style.backgroundColor = '';
+          }
+        });
+      }, 500);
 
       // ── 1. Sincronizar nombre del Consejo Comunal al Paso 2 ──
       const selCC = document.getElementById('consejoComunalCab');

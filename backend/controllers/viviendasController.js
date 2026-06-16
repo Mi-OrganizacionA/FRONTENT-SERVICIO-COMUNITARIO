@@ -1,7 +1,9 @@
 let Vivienda;
+let models;
 
 module.exports = {
   setModel: (model) => { Vivienda = model; },
+  setModels: (m) => { models = m; },
 
   getAll: async (req, res, next) => {
     try {
@@ -27,7 +29,7 @@ module.exports = {
         }
       }
 
-      const db = require('../models');
+      const db = models;
       
       // Validar si el Censo está abierto
       const censoConfig = await db.Configuracion.findOne({ where: { clave: 'Censo' } });
@@ -80,7 +82,7 @@ module.exports = {
   exportarPdfCenso: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const db = require('../models');
+      const db = models;
       const PdfGeneradorViviendas = require('../services/pdfGeneradorViviendas');
       
       const vivienda = await db.Vivienda.findByPk(id, {

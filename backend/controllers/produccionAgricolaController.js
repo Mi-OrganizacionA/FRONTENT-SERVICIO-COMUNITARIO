@@ -2,10 +2,14 @@ const logger = require('../utils/logger');
 const AuditService = require('../services/auditService');
 const ProduccionAgricolaService = require('../services/produccionAgricolaService');
 let ProduccionAgricolaModel = null;
+let dbModels = null;
 
 class ProduccionAgricolaController {
   static setModel(model) {
     ProduccionAgricolaModel = model;
+  }
+  static setModels(models) {
+    dbModels = models;
   }
 
   // Obtener todas las producciones (con filtros opcionales)
@@ -93,9 +97,8 @@ class ProduccionAgricolaController {
     try {
       const { consejoId } = req.params;
       
-      // Importar modelo de Habitante dinámicamente (evita circular dependency)
-      const models = require('../models');
-      const { Habitante } = models;
+      // Utiliza dbModels inyectado
+      const { Habitante } = dbModels;
       
       const estadisticas = await ProduccionAgricolaService.getEstadisticasPorConsejo(
         ProduccionAgricolaModel,

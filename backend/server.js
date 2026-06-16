@@ -123,6 +123,7 @@ async function start() {
       CarteleraDigitalController.setModel(models.CarteleraDigital);
       PersonaGrupoSocialController.setModel(models.PersonaGrupoSocial);
       EstudioDemograficoController.setModel(models.EstudioDemografico);
+      EstudioDemograficoController.setModels(models);
       CensoReportesController.setModels(models);
       AuditService.setModel(models.LogAuditoria);
       SystemController.setConfiguracionModel(models.Configuracion);
@@ -130,6 +131,8 @@ async function start() {
       SystemController.setModels(models);
       SystemController.setBandejaModel(models.BandejaValidaciones);
       SearchController.setModels(models);
+      ViviendasController.setModels(models);
+      ProduccionAgricolaController.setModels(models);
 
       await runMigrations(sequelize);
     }
