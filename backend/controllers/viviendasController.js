@@ -16,7 +16,7 @@ module.exports = {
         where,
         include: [
           { model: db.Habitante, as: 'jefe', attributes: ['cedula', 'nombres', 'apellidos'] },
-          { model: db.ConsejoComunal, as: 'consejo', attributes: ['nombre'] }
+          { model: db.ConsejoComunal, as: 'consejo', attributes: ['nombre_comunidad'] }
         ]
       });
 
@@ -26,7 +26,7 @@ module.exports = {
         return {
           ...raw,
           cedula: raw.jefe ? raw.jefe.cedula : null,
-          sector: raw.consejo ? raw.consejo.nombre : null,
+          sector: raw.consejo ? raw.consejo.nombre_comunidad : null,
           habitantes: raw.cantidad_habitaciones || 0, // Placeholder, idealmente contar desde Habitantes
           tipo: raw.tipo_vivienda,
           condicion: raw.condiciones_salubridad,
