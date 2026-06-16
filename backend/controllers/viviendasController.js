@@ -87,8 +87,29 @@ module.exports = {
 
   update: async (req, res, next) => {
     try {
+      const db = models;
       const data = await Vivienda.findByPk(req.params.id);
       if (!data) return res.status(404).json({ error: 'Vivienda no encontrada' });
+
+      // Lógica de Aprobación Automática
+      const config = await db.Configuracion.findOne({ where: { clave: 'Aprobación Automática Habitantes' } });
+      const globalConfig = await db.Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+      
+      const autoApprove = (globalConfig && globalConfig.valor === 'true') || 
+                          (config && config.valor === 'true') || 
+                          req.user?.rol === 'admin';
+
+      if (!autoApprove) {
+        await db.BandejaValidaciones.create({
+          id_vocero: req.user.id,
+          tabla_afectada: 'viviendas',
+          tipo_accion: 'UPDATE',
+          datos_temporales: { id: req.params.id, ...req.body },
+          estado_tramite: 'Pendiente'
+        });
+        return res.status(202).json({ mensaje: 'Solicitud de edición enviada a la bandeja de validaciones.' });
+      }
+
       await data.update(req.body);
       res.json(data);
     } catch (error) { next(error); }
@@ -96,8 +117,29 @@ module.exports = {
 
   remove: async (req, res, next) => {
     try {
+      const db = models;
       const data = await Vivienda.findByPk(req.params.id);
       if (!data) return res.status(404).json({ error: 'Vivienda no encontrada' });
+
+      // Lógica de Aprobación Automática
+      const config = await db.Configuracion.findOne({ where: { clave: 'Aprobación Automática Habitantes' } });
+      const globalConfig = await db.Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+      
+      const autoApprove = (globalConfig && globalConfig.valor === 'true') || 
+                          (config && config.valor === 'true') || 
+                          req.user?.rol === 'admin';
+
+      if (!autoApprove) {
+        await db.BandejaValidaciones.create({
+          id_vocero: req.user.id,
+          tabla_afectada: 'viviendas',
+          tipo_accion: 'DELETE',
+          datos_temporales: { id: req.params.id },
+          estado_tramite: 'Pendiente'
+        });
+        return res.status(202).json({ mensaje: 'Solicitud de eliminación enviada a la bandeja de validaciones.' });
+      }
+
       await data.destroy();
       res.json({ success: true });
     } catch (error) { next(error); }
@@ -114,10 +156,11 @@ module.exports = {
       });
       if (!vivienda) return res.status(404).json({ error: 'Vivienda no encontrada' });
 
-      const habitantes = await db.Habitante.findAll({
-        where: { vivienda_id: id },
-        order: [['es_jefe_familia', 'DESC'], ['fecha_nacimiento', 'ASC']]
-      });
+      const jefe = await db.Habitante.findByPk(vivienda.id_jefe_familia);
+      if (jefe) {
+        jefe.es_jefe_familia = true;
+      }
+      const habitantes = jefe ? [jefe] : [];
 
       const pdfBuffer = await PdfGeneradorViviendas.generarPdf(
         vivienda.toJSON(),

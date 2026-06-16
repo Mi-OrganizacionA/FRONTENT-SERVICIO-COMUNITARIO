@@ -3559,18 +3559,18 @@
         if (window.api && window.api.getViviendas) {
           const data = await window.api.getViviendas();
           viviendas = data.map(v => ({
-            id: v.id_vivienda,
-            cedula: v.cedula_jefe_familia,
-            sector: v.sector_comunidad,
-            habitantes: v.cantidad_habitantes,
-            condicion: v.condicion_general,
-            tipo: v.tipo_vivienda,
-            tenencia: v.tenencia,
-            paredes: v.material_paredes,
-            techo: v.material_techo,
-            agua: v.aguas_blancas,
-            gas: v.gas_domestico,
-            direccion: v.direccion_exacta,
+            id: v.id,
+            cedula: v.cedula,
+            sector: v.sector,
+            habitantes: v.habitantes,
+            condicion: v.condicion,
+            tipo: v.tipo,
+            tenencia: v.tenencia || 'Propia',
+            paredes: v.tipo_paredes || '',
+            techo: v.tipo_techo || '',
+            agua: v.agua || '',
+            gas: v.gas || '',
+            direccion: v.direccion || '',
             fechaCenso: v.fecha_registro
           }));
         }
@@ -3692,82 +3692,41 @@
 
     function intentarEditar(id, index) {
       if (!id || id === 'undefined') { showToast('ID de vivienda no válido.', 'error'); return; }
-      pendingAction = 'edit';
-      pendingId = { id, index };
-      document.getElementById('verifyPasswordInput').value = '';
-      document.getElementById('verifyPasswordError').style.display = 'none';
-      const modal = new bootstrap.Modal(document.getElementById('modalVerifyPassword'));
-      modal.show();
+      showToast('Formulario de edición en desarrollo.', 'info');
+      // Futura lógica: abrir un modal con los datos para editar y enviar PUT
     }
 
-    function intentarEliminar(id, index) {
+    async function intentarEliminar(id, index) {
       if (!id || id === 'undefined') { showToast('ID de vivienda no válido.', 'error'); return; }
-      pendingAction = 'delete';
-      pendingId = { id, index };
-      document.getElementById('verifyPasswordInput').value = '';
-      document.getElementById('verifyPasswordError').style.display = 'none';
-      const modal = new bootstrap.Modal(document.getElementById('modalVerifyPassword'));
-      modal.show();
-    }
-
-    document.getElementById('btnConfirmarPassword').addEventListener('click', async () => {
-      const password = document.getElementById('verifyPasswordInput').value;
-      const errorEl = document.getElementById('verifyPasswordError');
-      if (!password) {
-        errorEl.textContent = 'Ingrese la contraseña';
-        errorEl.style.display = 'block';
+      
+      if (!confirm('¿Está seguro que desea enviar la solicitud de eliminación para esta vivienda?')) {
         return;
       }
 
       try {
-        // Leer token desde memoria (no desde localStorage)
-        const token = window.auth?.getToken();
-        const response = await fetch('/api/auth/verify-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          credentials: 'include',
-          body: JSON.stringify({ password })
-        });
-        const result = await response.json();
-
-        if (response.ok && result.valid) {
-          bootstrap.Modal.getInstance(document.getElementById('modalVerifyPassword')).hide();
-          if (pendingAction === 'edit') {
-            // Iniciar edicion
-            showToast('Modo edición activado. (Lógica backend pdte)', 'success');
-            // editarViviendaReal(pendingId.id, pendingId.index);
-          } else if (pendingAction === 'delete') {
-            // Eliminar
-            eliminarViviendaReal(pendingId.id, pendingId.index);
-          }
-        } else {
-          errorEl.textContent = 'Contraseña incorrecta';
-          errorEl.style.display = 'block';
-        }
-      } catch (err) {
-        errorEl.textContent = 'Error de conexión';
-        errorEl.style.display = 'block';
-      }
-    });
-
-    async function eliminarViviendaReal(id, index) {
-      try {
-        // Leer token desde memoria (no desde localStorage)
-        const token = window.auth?.getToken();
-        const response = await fetch(`/api/viviendas/${id}`, {
+        const token = window.auth?.getToken() || '';
+        const baseURL = window.api?.baseURL || 'https://sicag-api.onrender.com/api';
+        const response = await fetch(`${baseURL}/viviendas/${id}`, {
           method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${token}` },
-          credentials: 'include'
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          },
+          credentials: 'omit' // Para evitar el error de CORS temporalmente si usa otra config
         });
-        if (response.ok) {
+        
+        if (response.status === 202) {
+          const result = await response.json();
+          showToast(result.mensaje || 'Solicitud de eliminación enviada a revisión.', 'info');
+        } else if (response.ok) {
           viviendas.splice(index, 1);
           renderTable();
-          showToast('Vivienda eliminada correctamente.');
+          showToast('Vivienda eliminada directamente.', 'success');
         } else {
-          showToast('No se pudo eliminar la vivienda.', 'error');
+          showToast('Error al intentar eliminar la vivienda.', 'error');
         }
       } catch (e) {
-        showToast('Error de conexión al eliminar.', 'error');
+        showToast('Error de red al eliminar.', 'error');
       }
     }
 
