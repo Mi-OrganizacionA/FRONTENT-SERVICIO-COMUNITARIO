@@ -181,42 +181,32 @@ class EstudioDemograficoController {
 
       const id_estudio = data.id;
 
-      // Procesar cada sección si viene en el payload, usando el mapeo para corregir los keys
+      // Procesar cada sección pasándole el payload plano (req.body) al traductor de cada paso
       if (req.body.familiares && req.body.familiares.length > 0) {
-        const mappedFam = mapFrontendData({ familiares: req.body.familiares }, 3).familiares;
-        const fams = mappedFam.map(f => ({ ...f, id_estudio: data.id }));
-        await db.CensoCaracteristicaFamiliar.bulkCreate(fams, { transaction: t });
+        const mappedFam = mapFrontendData(req.body, 3).familiares;
+        if (mappedFam) {
+          const fams = mappedFam.map(f => ({ ...f, id_estudio: data.id }));
+          await db.CensoCaracteristicaFamiliar.bulkCreate(fams, { transaction: t });
+        }
       }
 
-      if (req.body.economia) {
-        const mappedEco = mapFrontendData(req.body.economia, 5);
-        await db.CensoSituacionEconomica.create({ ...mappedEco, id_estudio: data.id }, { transaction: t });
-      }
+      const mappedEco = mapFrontendData(req.body, 5);
+      await db.CensoSituacionEconomica.create({ ...mappedEco, id_estudio: data.id }, { transaction: t });
 
-      if (req.body.vivienda) {
-        const mappedViv = mapFrontendData(req.body.vivienda, 6);
-        await db.CensoSituacionVivienda.create({ ...mappedViv, id_estudio: data.id }, { transaction: t });
-      }
+      const mappedViv = mapFrontendData(req.body, 6);
+      await db.CensoSituacionVivienda.create({ ...mappedViv, id_estudio: data.id }, { transaction: t });
 
-      if (req.body.servicios) {
-        const mappedSer = mapFrontendData(req.body.servicios, 7);
-        await db.CensoServicios.create({ ...mappedSer, id_estudio: data.id }, { transaction: t });
-      }
+      const mappedSer = mapFrontendData(req.body, 7);
+      await db.CensoServicios.create({ ...mappedSer, id_estudio: data.id }, { transaction: t });
 
-      if (req.body.salud) {
-        const mappedSal = mapFrontendData(req.body.salud, 8);
-        await db.CensoSalud.create({ ...mappedSal, id_estudio: data.id }, { transaction: t });
-      }
+      const mappedSal = mapFrontendData(req.body, 8);
+      await db.CensoSalud.create({ ...mappedSal, id_estudio: data.id }, { transaction: t });
 
-      if (req.body.participacion) {
-        const mappedPar = mapFrontendData(req.body.participacion, 9);
-        await db.CensoParticipacionComunitaria.create({ ...mappedPar, id_estudio: data.id }, { transaction: t });
-      }
+      const mappedPar = mapFrontendData(req.body, 9);
+      await db.CensoParticipacionComunitaria.create({ ...mappedPar, id_estudio: data.id }, { transaction: t });
 
-      if (req.body.comunidad) {
-        const mappedCom = mapFrontendData(req.body.comunidad, 10);
-        await db.CensoSituacionComunidad.create({ ...mappedCom, id_estudio: data.id }, { transaction: t });
-      }
+      const mappedCom = mapFrontendData(req.body, 10);
+      await db.CensoSituacionComunidad.create({ ...mappedCom, id_estudio: data.id }, { transaction: t });
 
       // 9. Crear Opciones Multiples (Checkboxes separados)
       if (opciones && opciones.length > 0) {
