@@ -198,7 +198,7 @@ class PdfGeneradorViviendas {
     await page.setViewport({ width: 1024, height: 1200 });
 
     // Cargamos el HTML y esperamos a que el script de inyección modifique el DOM
-    await page.setContent(finalHTML, { waitUntil: 'networkidle0' });
+    await page.setContent(finalHTML, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
     // 7. Generar el PDF
     // Las plantillas tienen un ancho fijo. Ajustamos el formato para que entre bien.
@@ -353,6 +353,7 @@ class PdfGeneradorViviendas {
 
     const page = await browser.newPage();
     await page.setContent(finalHTML, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
       margin: { top: '10px', bottom: '10px', left: '10px', right: '10px' }
