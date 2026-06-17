@@ -3572,7 +3572,7 @@
             // Cédula del encuestado o del jefe (campo del paso 3 del wizard)
             cedula: v.encuestado_cedula || v.cedula_jefe || '—',
             // Nombre de la comunidad (del paso 2: ubicación geográfica)
-            sector: v.nombre_comunidad || v.sector || '—',
+            sector: v.consejo?.nombre || v.nombre_comunidad || v.sector || '—',
             // Cantidad de habitantes (basado en la relación familiares)
             habitantes: (v.familiares && v.familiares.length) ? v.familiares.length : '—',
             // Condición general (del paso 6: situación de vivienda)
