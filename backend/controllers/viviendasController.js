@@ -170,7 +170,7 @@ module.exports = {
 
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename=censo_vivienda_${id}.pdf`);
-      res.send(pdfBuffer);
+      res.send(Buffer.from(pdfBuffer));
     } catch (error) { 
       console.error("Error exportando PDF:", error);
       res.status(500).json({ error: "Error generando PDF" });

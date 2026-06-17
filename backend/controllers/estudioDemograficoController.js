@@ -407,7 +407,7 @@ class EstudioDemograficoController {
 
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `inline; filename=censo_demografico_${id}.pdf`);
-      res.send(pdfBuffer);
+      res.send(Buffer.from(pdfBuffer));
     } catch (error) {
       console.error('Error exportando PDF del estudio demográfico:', error);
       res.status(500).json({ error: 'Error generando el PDF: ' + error.message });
