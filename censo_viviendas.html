@@ -1589,7 +1589,7 @@
               <i class="fas fa-filter" style="color: var(--vv);"></i> Filtros
             </button>
 
-            <button type="button" class="cv-icon-btn" title="Imprimir Lista" onclick="window.print()"
+            <button type="button" class="cv-icon-btn" title="Imprimir Lista" onclick="imprimirListaFiltrada()"
               aria-label="Imprimir">
               <i class="fas fa-print"></i>
             </button>
@@ -3054,6 +3054,25 @@
         }
       });
 
+      if (currentStep === 3) {
+        const cedulaInput = document.getElementById('cedulaJefe');
+        if (cedulaInput && cedulaInput.value) {
+          const cedula = cedulaInput.value.trim();
+          const cedulaLimpia = cedula.replace(/\./g, '').replace(/-/g, '');
+          const partes = cedulaLimpia.match(/^([VEve])(\d+)$/i);
+          if (!partes || partes[2].length < 6 || partes[2].length > 8) {
+            valid = false;
+            cedulaInput.style.borderColor = '#EF5350';
+            cedulaInput.style.boxShadow = '0 0 0 3px rgba(239,83,80,.15)';
+            errors.push('La cédula del jefe de familia no es válida (6 a 8 dígitos).');
+            cedulaInput.addEventListener('input', () => {
+              cedulaInput.style.borderColor = '';
+              cedulaInput.style.boxShadow = '';
+            }, { once: true });
+          }
+        }
+      }
+
       if (!valid) {
         showToast(`Campos obligatorios incompletos: ${errors.slice(0, 3).join(', ')}`, 'error');
       }
@@ -3563,6 +3582,9 @@
        DATA & TABLE (integra con censo-viviendas.js si existe)
     ══════════════════════════════════════════ */
     let viviendas = [];
+    let currentPage = 1;
+    const PAGE_SIZE = 10;
+
     async function loadViviendasData() {
       try {
         if (window.api && window.api.getEstudiosDemograficos) {
@@ -3645,6 +3667,10 @@
         return matchQ && matchCC && matchC && matchG && matchAgua && matchTipo && matchTenencia && matchParedes && matchTecho;
       });
 
+      const totalPages = Math.ceil(data.length / PAGE_SIZE) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+      const paginated = data.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
       const body = document.getElementById('cvTableBody');
       const empty = document.getElementById('cvEmpty');
       document.getElementById('cvCountBadge').textContent = `${data.length} registros`;
@@ -3652,14 +3678,17 @@
       if (!data.length) {
         body.innerHTML = '';
         empty.style.display = 'block';
+        document.getElementById('cvPagination').style.display = 'none';
         updateKPIs();
         return;
       }
 
       empty.style.display = 'none';
-      body.innerHTML = data.map((v, i) => `
+      document.getElementById('cvPagination').style.display = 'flex';
+      
+      body.innerHTML = paginated.map((v, i) => `
         <tr>
-          <td>${i + 1}</td>
+          <td>${(currentPage - 1) * PAGE_SIZE + i + 1}</td>
           <td><span class="cv-cedula">${v.cedula || '—'}</span></td>
           <td><span class="cv-sector"><i class="fas fa-map-pin"></i>${v.sector || '—'}</span></td>
           <td style="font-weight:600;color:var(--dark)">${v.habitantes || '—'}</td>
@@ -3671,6 +3700,9 @@
           </span></td>
           <td>
             <div style="display:flex;gap:.3rem">
+              <button type="button" class="cv-act-btn view" title="Previsualizar" onclick="previsualizarCenso('${v.id || v._id}')" aria-label="Ver detalles">
+                <i class="fas fa-eye"></i>
+              </button>
               <button type="button" class="cv-act-btn view" title="Imprimir PDF" onclick="imprimirPdfVivienda('${v.id || v._id}')" aria-label="Imprimir PDF">
                 <i class="fas fa-file-pdf" style="color: #C62828;"></i>
               </button>
@@ -3685,7 +3717,76 @@
         </tr>
       `).join('');
 
+      renderPagination(totalPages);
       updateKPIs();
+    }
+
+    function renderPagination(totalPages) {
+      const pagBtns = document.getElementById('cvPagBtns');
+      let html = '';
+      html += `<button class="cv-pag-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="currentPage--; renderTable()">Anterior</button>`;
+      for (let i = 1; i <= totalPages; i++) {
+        html += `<button class="cv-pag-btn ${i === currentPage ? 'active' : ''}" onclick="currentPage=${i}; renderTable()">${i}</button>`;
+      }
+      html += `<button class="cv-pag-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="currentPage++; renderTable()">Siguiente</button>`;
+      if (pagBtns) pagBtns.innerHTML = html;
+      
+      const info = document.getElementById('cvPagInfo');
+      if (info) info.remove();
+    }
+
+    function previsualizarCenso(id) {
+      const v = viviendas.find(x => x.id == id || x._id == id);
+      if(!v) return;
+      const html = `
+        <div style="font-size: 0.9rem;">
+          <h6><strong>Jefe de Familia:</strong> ${v.cedula} - ${v.sector}</h6>
+          <p><strong>Dirección:</strong> ${v.direccion}</p>
+          <p><strong>Condición de Vivienda:</strong> ${v.condicion}</p>
+          <p><strong>Habitantes:</strong> ${v.habitantes}</p>
+          <p><strong>Servicios:</strong> Gas: ${v.gas} | Agua: ${v.agua}</p>
+        </div>
+      `;
+      document.getElementById('modalPrevisualizarBody').innerHTML = html;
+      new bootstrap.Modal(document.getElementById('modalPrevisualizarCenso')).show();
+    }
+
+    function imprimirListaFiltrada() {
+      const q = (document.getElementById('cvSearch').value || '').toLowerCase();
+      const cc = document.getElementById('advFilterCC').value;
+      const cond = document.getElementById('advFilterCond').value;
+      const gas = document.getElementById('advFilterGas').value;
+      const agua = document.getElementById('advFilterAgua').value;
+      const tipo = document.getElementById('advFilterTipo').value;
+      const tenencia = document.getElementById('advFilterTenencia').value;
+      const paredes = document.getElementById('advFilterParedes').value;
+      const techo = document.getElementById('advFilterTecho').value;
+
+      let data = viviendas.filter(v => {
+        const matchQ = !q || (v.cedula || '').toLowerCase().includes(q) || (v.sector || '').toLowerCase().includes(q) || (v.direccion || '').toLowerCase().includes(q);
+        const matchCC = !cc || v.sector === cc;
+        const matchC = !cond || v.condicion === cond;
+        const matchG = !gas || v.gas === gas || (gas === 'Si' && v.gas !== 'No posee');
+        const matchAgua = !agua || v.agua === agua;
+        const matchTipo = !tipo || v.tipo === tipo;
+        const matchTenencia = !tenencia || v.tenencia === tenencia;
+        const matchParedes = !paredes || v.paredes === paredes;
+        const matchTecho = !techo || v.techo === techo;
+        return matchQ && matchCC && matchC && matchG && matchAgua && matchTipo && matchTenencia && matchParedes && matchTecho;
+      });
+
+      let html = `<html><head><title>Reporte de Censos de Vivienda</title>
+      <style>body{font-family:sans-serif;} table{width:100%;border-collapse:collapse;font-size:12px;} th,td{border:1px solid #ddd;padding:8px;text-align:left;} th{background:#f4f4f4;}</style>
+      </head><body>
+      <h2>Reporte de Viviendas Censadas</h2>
+      <table><thead><tr><th>N°</th><th>Cédula</th><th>Sector</th><th>Habitantes</th><th>Tipo</th><th>Condición</th><th>Gas</th><th>Agua</th></tr></thead><tbody>
+      ${data.map((v, i) => `<tr><td>${i+1}</td><td>${v.cedula||'-'}</td><td>${v.sector||'-'}</td><td>${v.habitantes||'-'}</td><td>${v.tipo||'-'}</td><td>${v.condicion||'-'}</td><td>${v.gas||'-'}</td><td>${v.agua||'-'}</td></tr>`).join('')}
+      </tbody></table>
+      <script>window.onload=function(){window.print();}</script></body></html>`;
+
+      const win = window.open('', '_blank');
+      win.document.write(html);
+      win.document.close();
     }
 
     function updateKPIs() {
@@ -3708,10 +3809,40 @@
       window.open(`${baseURL}/estudios-demograficos/${id}/exportar-pdf?token=${token}`, '_blank');
     }
 
-    function intentarEditar(id, index) {
+    async function intentarEditar(id, index) {
       if (!id || id === 'undefined') { showToast('ID de vivienda no válido.', 'error'); return; }
-      showToast('Formulario de edición en desarrollo.', 'info');
-      // Futura lógica: abrir un modal con los datos para editar y enviar PUT
+      
+      try {
+        const v = viviendas.find(x => x.id == id || x._id == id);
+        if (!v) { showToast('No se encontró la vivienda localmente', 'error'); return; }
+        
+        window.currentCensoId = id;
+        window.isEditingCenso = true;
+        
+        showToast('Edición iniciada. Llene los pasos y guarde el formulario.', 'success');
+        
+        const formWizard = document.getElementById('formVivienda');
+        if (formWizard) formWizard.reset();
+        
+        // Simular carga de algunos datos básicos (en la realidad habría un GET detallado)
+        if (document.getElementById('cedulaJefe')) document.getElementById('cedulaJefe').value = v.cedula || '';
+        if (document.getElementById('direccionExacta')) document.getElementById('direccionExacta').value = v.direccion || '';
+        
+        // Ir al paso 1
+        currentStep = 1;
+        goToStep(1);
+        
+        // Cerrar modal de vista si estaba abierto
+        const activeModal = document.querySelector('.modal.show');
+        if (activeModal) {
+          const bsModal = bootstrap.Modal.getInstance(activeModal);
+          if (bsModal) bsModal.hide();
+        }
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (e) {
+        showToast('Error preparando edición', 'error');
+      }
     }
 
     async function intentarEliminar(id, index) {
@@ -3833,6 +3964,7 @@
     document.getElementById('btnNuevaVivienda').addEventListener('click', () => {
       document.getElementById('formVivienda').reset();
       window.currentCensoId = null;
+      window.isEditingCenso = false;
       goToStep(1);
 
       document.getElementById('chkPlanillaAuto').checked = true;
@@ -3874,7 +4006,10 @@
         parroquia: gv('parroquia'),
         sectorGeo: gv('sector'),
         comunidad: gv('nombreComunidad'),
-        direccion: gv('direccionExacta'),
+        calle_avenida: gv('calleAvenida'),
+        numero_casa: gv('numeroCasa'),
+        referencia_ubicacion: gv('direccionExacta'),
+        direccion: [gv('calleAvenida'), gv('numeroCasa'), gv('direccionExacta')].filter(Boolean).join(', '),
         // Jefe familia
         cedula: gv('cedulaJefe'),
         nombres: gv('jefNombres'),
@@ -3932,15 +4067,26 @@
         datosCenso.nombre_encuestador = datosCenso.encuestador_nombre || u?.nombre || '';
         datosCenso.id_estudio_borrador = window.currentCensoId || null; // ID del borrador progresivo si existe
 
-        // Pasar por el interceptor de validación (igual que proyectos/organizaciones)
-        if (window.api && window.api.crearCensoDemografico) {
-          const res = await window.api.crearCensoDemografico(datosCenso);
-
-          // Si fue a la bandeja (res.validacion existe), mostrar mensaje informativo
-          if (res && res.validacion) {
-            showToast('📋 Censo enviado al administrador para aprobación.', 'info');
-          } else {
-            showToast('✅ Censo registrado correctamente.', 'success');
+        // Pasar por el interceptor de validación
+        if (window.api) {
+          let res;
+          if (window.currentCensoId && window.isEditingCenso) {
+            if (window.api.actualizarEstudioDemografico) {
+              res = await window.api.actualizarEstudioDemografico(window.currentCensoId, datosCenso);
+              if (res && res.validacion) {
+                showToast('📋 Edición enviada al administrador para aprobación.', 'info');
+              } else {
+                showToast('✅ Censo actualizado correctamente.', 'success');
+              }
+              window.isEditingCenso = false;
+            }
+          } else if (window.api.crearCensoDemografico) {
+            res = await window.api.crearCensoDemografico(datosCenso);
+            if (res && res.validacion) {
+              showToast('📋 Censo enviado al administrador para aprobación.', 'info');
+            } else {
+              showToast('✅ Censo registrado correctamente.', 'success');
+            }
           }
         }
 
@@ -4008,6 +4154,11 @@
       const selCC = document.getElementById('consejoComunalCab');
       const p2CCNombre = document.getElementById('p2CCNombre');
       const u = window.auth?.getUser?.() || window.auth?.user || JSON.parse(sessionStorage.getItem('sicag_user') || '{}');
+
+      if (u && u.rol === 'vocero') {
+        const filterCCRow = document.getElementById('advFilterCC')?.closest('.cv-form-group');
+        if (filterCCRow) filterCCRow.style.display = 'none';
+      }
 
       if (selCC && p2CCNombre) {
         // Auto-asignar comunidad si es vocero
@@ -4251,6 +4402,19 @@
     });
   </script>
 
+  <div class="modal fade" id="modalPrevisualizarCenso" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-eye"></i> Detalle del Censo de Vivienda</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modalPrevisualizarBody">
+          Cargando...
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>

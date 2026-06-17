@@ -8,6 +8,64 @@ class DashboardController {
     this.habitantes = [];
     this.proyectos = [];
     this.init();
+    window.generarReporteGeneral = this.generarReporteGeneral.bind(this);
+  }
+
+  generarReporteGeneral() {
+    let html = `
+      <html><head><title>Reporte General - Comuna Socialista Agroecológica Simón Rodríguez</title>
+      <style>
+        body { font-family: 'Inter', sans-serif; padding: 20px; color: #333; }
+        h1, h2 { text-align: center; color: #1B5E20; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background: #4CAF50; color: white; }
+        .logo { display: block; margin: 0 auto 20px auto; max-width: 150px; }
+        .summary { display: flex; justify-content: space-around; background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .summary div { text-align: center; }
+        .summary h3 { margin: 0; font-size: 24px; color: #1B5E20; }
+        .summary p { margin: 5px 0 0 0; font-size: 14px; color: #666; }
+      </style>
+      </head><body>
+      <img src="assets/img/logo_comuna_fondoremovido.svg" class="logo" alt="Logo Comuna">
+      <h1>Reporte General de la Comuna</h1>
+      <h2>Comuna Socialista Agroecológica Simón Rodríguez</h2>
+      <p style="text-align:center;">Fecha de emisión: ${new Date().toLocaleDateString('es-VE')}</p>
+      
+      <div class="summary">
+        <div><h3>${this.habitantes.length}</h3><p>Habitantes</p></div>
+        <div><h3>${this.viviendas?.length || 0}</h3><p>Viviendas</p></div>
+        <div><h3>${this.stats?.consejeros || 0}</h3><p>Voceros</p></div>
+      </div>
+      
+      <h3>Resumen de Viviendas por Consejo Comunal</h3>
+      <table>
+        <thead><tr><th>Consejo Comunal</th><th>Viviendas Censadas</th></tr></thead>
+        <tbody>
+    `;
+
+    const ccMap = {};
+    if (this.viviendas) {
+      this.viviendas.forEach(v => {
+        const cc = v.consejo?.nombre_comunidad || v.sector || 'Sin Asignar';
+        ccMap[cc] = (ccMap[cc] || 0) + 1;
+      });
+    }
+
+    for (const [cc, count] of Object.entries(ccMap)) {
+      html += `<tr><td>${cc}</td><td>${count}</td></tr>`;
+    }
+
+    html += `
+        </tbody>
+      </table>
+      <script>window.onload = () => window.print();</script>
+      </body></html>
+    `;
+
+    const win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
   }
 
   async init() {
@@ -265,7 +323,7 @@ class DashboardController {
     if (this.viviendas && this.viviendas.length > 0) {
       const condicionMap = { 'Buena': 0, 'Regular': 0, 'Mala': 0, 'Alto Riesgo': 0 };
       this.viviendas.forEach(v => {
-        const cond = v.condicion_general || 'Regular';
+        const cond = v.situacion_vivienda?.condiciones_salubridad || v.condicion_general || 'Regular';
         if (condicionMap[cond] !== undefined) condicionMap[cond]++;
         else condicionMap['Regular']++;
       });
@@ -295,7 +353,7 @@ class DashboardController {
       // --- Barras tipo de gas ---
       const gasMap = {};
       this.viviendas.forEach(v => {
-        const gas = v.gas_domestico || 'No posee';
+        const gas = v.servicios?.gas_tipo || v.gas_domestico || 'No posee';
         gasMap[gas] = (gasMap[gas] || 0) + 1;
       });
       const gasLabels = Object.keys(gasMap);

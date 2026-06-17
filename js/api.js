@@ -1655,6 +1655,23 @@ class APIManager {
   }
 
   /**
+   * Actualiza un censo demográfico.
+   */
+  async actualizarEstudioDemografico(id, datosCenso) {
+    return await this._interceptarValidacion('estudios_demograficos', 'UPDATE', { id, ...datosCenso }, async () => {
+      if (this.isDevelopment) return { success: true, id };
+      const response = await fetch(`${this.baseURL}/estudios-demograficos/${id}`, {
+        method: 'PUT',
+        ...this._getHeaders(),
+        body: JSON.stringify(datosCenso)
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Error al actualizar el censo demográfico');
+      return data;
+    });
+  }
+
+  /**
    * Elimina un censo demográfico.
    * Pasa por _interceptarValidacion: si el usuario es Vocero va a la Bandeja,
    * si es Admin o hay auto-aprobación se elimina directo.

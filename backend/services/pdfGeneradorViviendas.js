@@ -50,6 +50,9 @@ class PdfGeneradorViviendas {
     const part = estudio.participacion_comunitaria || {};
     const com = estudio.situacion_comunidad || {};
     const comunidad = estudio.consejo?.nombre_comunidad || estudio.nombre_comunidad || '—';
+    
+    const direccionFull = [estudio.calle_avenida, estudio.numero_casa, estudio.referencia_ubicacion]
+      .filter(Boolean).join(', ') || estudio.direccion_comunidad || estudio.direccion || '—';
 
     const html = `<!DOCTYPE html>
 <html lang="es">
@@ -112,8 +115,8 @@ class PdfGeneradorViviendas {
     <div class="meta">
       <span><strong>Planilla N°:</strong> ${val(estudio.planilla_nro)}</span>
       <span><strong>Fecha:</strong> ${formatDate(estudio.fecha_censo)}</span>
-      <span><strong>RIF:</strong> ${val(estudio.rif)}</span>
-      <span><strong>N° Cuenta:</strong> ${val(estudio.nro_cuenta)}</span>
+      <span><strong>RIF:</strong> C-405140160</span>
+      <span><strong>Situr:</strong> 22-11-0001</span>
     </div>
   </div>
 
@@ -122,12 +125,12 @@ class PdfGeneradorViviendas {
     <div class="section-title">I. Ubicación Geográfica de la Comunidad</div>
     <div class="section-body">
       <div class="grid-3">
-        <div class="field"><label>Estado</label><span>${val(estudio.estado)}</span></div>
-        <div class="field"><label>Municipio</label><span>${val(estudio.municipio)}</span></div>
-        <div class="field"><label>Parroquia</label><span>${val(estudio.parroquia)}</span></div>
-        <div class="field"><label>Sector</label><span>${val(estudio.sector)}</span></div>
+        <div class="field"><label>Estado</label><span>${estudio.estado || 'Yaracuy'}</span></div>
+        <div class="field"><label>Municipio</label><span>${estudio.municipio || 'San Felipe'}</span></div>
+        <div class="field"><label>Parroquia</label><span>${estudio.parroquia || 'San Felipe'}</span></div>
+        <div class="field"><label>Sector</label><span>${estudio.sector || 'Las Mercedes'}</span></div>
         <div class="field"><label>Comunidad</label><span>${val(comunidad)}</span></div>
-        <div class="field"><label>Dirección</label><span>${val(estudio.direccion_comunidad)}</span></div>
+        <div class="field"><label>Dirección</label><span>${direccionFull}</span></div>
       </div>
     </div>
   </div>

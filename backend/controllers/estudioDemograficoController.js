@@ -335,10 +335,21 @@ class EstudioDemograficoController {
   static async actualizar(req, res, next) {
     try {
       const data = await EstudioDemografico.findByPk(req.params.id);
-      if (!data) return res.status(404).json({ error: "Estudio demogrfico no encontrado" });
+      if (!data) return res.status(404).json({ error: "Estudio demográfico no encontrado" });
       
-      // Chequeo de lock: si tuviera un campo especifico. Usaremos una propiedad custom si quisieran.
-      // Aqu simplemente actualizamos.
+      const db = require('../models');
+      const autoApprove = req.user?.rol === 'admin';
+      if (!autoApprove) {
+        await db.BandejaValidaciones.create({
+          id_vocero: req.user.id,
+          tabla_afectada: 'estudios_demograficos',
+          tipo_accion: 'UPDATE',
+          datos_temporales: { id: req.params.id, ...req.body },
+          estado_tramite: 'Pendiente'
+        });
+        return res.status(202).json({ validacion: true, mensaje: 'Solicitud de edición enviada al administrador para revisión.' });
+      }
+
       const datosAntiguos = data.toJSON();
       await data.update(req.body);
 
