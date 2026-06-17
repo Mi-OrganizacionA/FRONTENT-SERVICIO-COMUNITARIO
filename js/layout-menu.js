@@ -10,7 +10,7 @@
         { href: 'censo.html', icon: 'users', label: 'Censo Comunitario' },
         { href: 'censo_viviendas.html', icon: 'house-chimney-crack', label: 'Censo Viviendas' },
         { href: 'noticias.html', icon: 'newspaper', label: 'Cartelera Digital' },
-        { href: 'proyectos.html', icon: 'seedling', label: 'Proyectos Agroecológicos' },
+        { href: 'proyectos.html', icon: 'seedling', label: 'Proyectos Comunales' },
         { href: 'produccion_agricola.html', icon: 'tractor', label: 'Producción Agrícola' },
         { href: 'organizaciones.html', icon: 'hands-holding-circle', label: 'Organizaciones Sociales' }
       ]
@@ -50,7 +50,7 @@
         { href: 'censo.html', icon: 'users', label: 'Censo Comunitario' },
         { href: 'censo_viviendas.html', icon: 'house-chimney-crack', label: 'Censo Viviendas' },
         { href: 'noticias.html', icon: 'newspaper', label: 'Cartelera Digital' },
-        { href: 'proyectos.html', icon: 'seedling', label: 'Proyectos Agroecológicos' },
+        { href: 'proyectos.html', icon: 'seedling', label: 'Proyectos Comunales' },
         { href: 'produccion_agricola.html', icon: 'tractor', label: 'Producción Agrícola' },
         { href: 'organizaciones.html', icon: 'hands-holding-circle', label: 'Organizaciones Sociales' }
       ]
