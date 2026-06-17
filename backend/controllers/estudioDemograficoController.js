@@ -106,40 +106,41 @@ class EstudioDemograficoController {
 
       const id_estudio = data.id;
 
-      // 2. Crear Familiares (Sección III)
-      if (familiares && familiares.length > 0) {
-        const fams = familiares.map(f => ({ ...f, id_estudio }));
+      // Procesar cada sección si viene en el payload, usando el mapeo para corregir los keys
+      if (req.body.familiares && req.body.familiares.length > 0) {
+        const mappedFam = mapFrontendData({ familiares: req.body.familiares }, 3).familiares;
+        const fams = mappedFam.map(f => ({ ...f, id_estudio: data.id }));
         await db.CensoCaracteristicaFamiliar.bulkCreate(fams, { transaction: t });
       }
 
-      // 3. Crear Economía (Sección IV)
-      if (economia) {
-        await db.CensoSituacionEconomica.create({ ...economia, id_estudio }, { transaction: t });
+      if (req.body.economia) {
+        const mappedEco = mapFrontendData(req.body.economia, 5);
+        await db.CensoSituacionEconomica.create({ ...mappedEco, id_estudio: data.id }, { transaction: t });
       }
 
-      // 4. Crear Vivienda (Sección V)
-      if (vivienda) {
-        await db.CensoSituacionVivienda.create({ ...vivienda, id_estudio }, { transaction: t });
+      if (req.body.vivienda) {
+        const mappedViv = mapFrontendData(req.body.vivienda, 6);
+        await db.CensoSituacionVivienda.create({ ...mappedViv, id_estudio: data.id }, { transaction: t });
       }
 
-      // 5. Crear Salud (Sección VI)
-      if (salud) {
-        await db.CensoSalud.create({ ...salud, id_estudio }, { transaction: t });
+      if (req.body.servicios) {
+        const mappedSer = mapFrontendData(req.body.servicios, 7);
+        await db.CensoServicios.create({ ...mappedSer, id_estudio: data.id }, { transaction: t });
       }
 
-      // 6. Crear Servicios (Sección VII)
-      if (servicios) {
-        await db.CensoServicios.create({ ...servicios, id_estudio }, { transaction: t });
+      if (req.body.salud) {
+        const mappedSal = mapFrontendData(req.body.salud, 8);
+        await db.CensoSalud.create({ ...mappedSal, id_estudio: data.id }, { transaction: t });
       }
 
-      // 7. Crear Participacion (Sección VIII)
-      if (participacion) {
-        await db.CensoParticipacionComunitaria.create({ ...participacion, id_estudio }, { transaction: t });
+      if (req.body.participacion) {
+        const mappedPar = mapFrontendData(req.body.participacion, 9);
+        await db.CensoParticipacionComunitaria.create({ ...mappedPar, id_estudio: data.id }, { transaction: t });
       }
 
-      // 8. Crear Comunidad (Sección IX)
-      if (comunidad) {
-        await db.CensoSituacionComunidad.create({ ...comunidad, id_estudio }, { transaction: t });
+      if (req.body.comunidad) {
+        const mappedCom = mapFrontendData(req.body.comunidad, 10);
+        await db.CensoSituacionComunidad.create({ ...mappedCom, id_estudio: data.id }, { transaction: t });
       }
 
       // 9. Crear Opciones Multiples (Checkboxes separados)
@@ -194,47 +195,50 @@ class EstudioDemograficoController {
       else {
         if (!id_estudio) throw new Error("Falta el id_estudio para vincular el paso " + paso);
         
+        // Mapear los datos al esquema de la base de datos
+        const dbDatos = mapFrontendData(datos, paso);
+        
         switch (paso) {
           case 3: // Jefe
           case 4: // Otros Familiares
-            if (datos.familiares && datos.familiares.length > 0) {
+            if (dbDatos.familiares && dbDatos.familiares.length > 0) {
               if (paso === 3) {
-                await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio, es_jefe_familia: true }, transaction: t });
+                await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio, parentesco: 'Jefe(a) de Familia' }, transaction: t });
               } else {
-                await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio, es_jefe_familia: false }, transaction: t });
+                await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio, parentesco: { [db.Sequelize.Op.ne]: 'Jefe(a) de Familia' } }, transaction: t });
               }
-              const fams = datos.familiares.map(f => ({ ...f, id_estudio }));
+              const fams = dbDatos.familiares.map(f => ({ ...f, id_estudio }));
               await db.CensoCaracteristicaFamiliar.bulkCreate(fams, { transaction: t });
             }
             break;
           case 5: { // Economía
-            const [eco, ecoCreated] = await db.CensoSituacionEconomica.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
-            if (!ecoCreated) await eco.update(datos, { transaction: t });
+            const [eco, ecoCreated] = await db.CensoSituacionEconomica.findOrCreate({ where: { id_estudio }, defaults: { ...dbDatos }, transaction: t });
+            if (!ecoCreated) await eco.update(dbDatos, { transaction: t });
             break;
           }
           case 6: { // Vivienda
-            const [viv, vivCreated] = await db.CensoSituacionVivienda.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
-            if (!vivCreated) await viv.update(datos, { transaction: t });
+            const [viv, vivCreated] = await db.CensoSituacionVivienda.findOrCreate({ where: { id_estudio }, defaults: { ...dbDatos }, transaction: t });
+            if (!vivCreated) await viv.update(dbDatos, { transaction: t });
             break;
           }
           case 7: { // Servicios
-            const [ser, serCreated] = await db.CensoServicios.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
-            if (!serCreated) await ser.update(datos, { transaction: t });
+            const [ser, serCreated] = await db.CensoServicios.findOrCreate({ where: { id_estudio }, defaults: { ...dbDatos }, transaction: t });
+            if (!serCreated) await ser.update(dbDatos, { transaction: t });
             break;
           }
           case 8: { // Salud
-            const [sal, salCreated] = await db.CensoSalud.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
-            if (!salCreated) await sal.update(datos, { transaction: t });
+            const [sal, salCreated] = await db.CensoSalud.findOrCreate({ where: { id_estudio }, defaults: { ...dbDatos }, transaction: t });
+            if (!salCreated) await sal.update(dbDatos, { transaction: t });
             break;
           }
           case 9: { // Participación
-            const [par, parCreated] = await db.CensoParticipacionComunitaria.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
-            if (!parCreated) await par.update(datos, { transaction: t });
+            const [par, parCreated] = await db.CensoParticipacionComunitaria.findOrCreate({ where: { id_estudio }, defaults: { ...dbDatos }, transaction: t });
+            if (!parCreated) await par.update(dbDatos, { transaction: t });
             break;
           }
           case 10: { // Comunidad
-            const [com, comCreated] = await db.CensoSituacionComunidad.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
-            if (!comCreated) await com.update(datos, { transaction: t });
+            const [com, comCreated] = await db.CensoSituacionComunidad.findOrCreate({ where: { id_estudio }, defaults: { ...dbDatos }, transaction: t });
+            if (!comCreated) await com.update(dbDatos, { transaction: t });
             break;
           }
           default:
@@ -242,13 +246,13 @@ class EstudioDemograficoController {
         }
 
         // Manejar opciones múltiples independientemente del paso (ya que varios pasos tienen opciones)
-        if (datos.opciones && datos.opciones.length > 0) {
-          const categoriasEnPaso = [...new Set(datos.opciones.map(o => o.categoria))];
+        if (dbDatos.opciones && dbDatos.opciones.length > 0) {
+          const categoriasEnPaso = [...new Set(dbDatos.opciones.map(o => o.categoria))];
           await db.CensoOpcionMultiple.destroy({ 
             where: { id_estudio, categoria: categoriasEnPaso }, 
             transaction: t 
           });
-          const ops = datos.opciones.map(o => ({ ...o, id_estudio }));
+          const ops = dbDatos.opciones.map(o => ({ ...o, id_estudio }));
           await db.CensoOpcionMultiple.bulkCreate(ops, { transaction: t });
         }
       }
@@ -264,10 +268,10 @@ class EstudioDemograficoController {
   static async actualizar(req, res, next) {
     try {
       const data = await EstudioDemografico.findByPk(req.params.id);
-      if (!data) return res.status(404).json({ error: "Estudio demogr�fico no encontrado" });
+      if (!data) return res.status(404).json({ error: "Estudio demogrfico no encontrado" });
       
       // Chequeo de lock: si tuviera un campo especifico. Usaremos una propiedad custom si quisieran.
-      // Aqu� simplemente actualizamos.
+      // Aqu simplemente actualizamos.
       const datosAntiguos = data.toJSON();
       await data.update(req.body);
 
@@ -281,24 +285,24 @@ class EstudioDemograficoController {
   static async finalizar(req, res, next) {
     try {
       const data = await EstudioDemografico.findByPk(req.params.id);
-      if (!data) return res.status(404).json({ error: "Estudio demogr�fico no encontrado" });
+      if (!data) return res.status(404).json({ error: "Estudio demogrfico no encontrado" });
 
-      // No hay campo explicito de finalizado, as� que lo representamos con fecha_censo
-      // y asumimos que actualizar validar� en el futuro si lo desea.
+      // No hay campo explicito de finalizado, as que lo representamos con fecha_censo
+      // y asumimos que actualizar validar en el futuro si lo desea.
       const datosAntiguos = data.toJSON();
       await data.update({ fecha_censo: new Date() }); // Marcar como completado hoy si no lo estaba
 
       if (req.user) {
         await AuditService.log(req.user.id, "UPDATE", "estudios_demograficos", data.id, datosAntiguos, data.toJSON());
       }
-      res.json({ success: true, message: "Estudio demogr�fico finalizado y bloqueado para ediciones.", data });
+      res.json({ success: true, message: "Estudio demogrfico finalizado y bloqueado para ediciones.", data });
     } catch (error) { next(error); }
   }
 
   static async eliminar(req, res, next) {
     try {
       const data = await EstudioDemografico.findByPk(req.params.id);
-      if (!data) return res.status(404).json({ error: "Estudio demogr�fico no encontrado" });
+      if (!data) return res.status(404).json({ error: "Estudio demogrfico no encontrado" });
 
       const datosAntiguos = data.toJSON();
       await data.update({ activo: false });

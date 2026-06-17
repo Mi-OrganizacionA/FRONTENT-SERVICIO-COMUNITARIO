@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 class PdfGeneradorViviendas {
   /**
@@ -331,10 +332,25 @@ class PdfGeneradorViviendas {
 
     const finalHTML = htmlP1.replace('</body>', page2Content + inyectorJS + '</body>');
 
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+    let browser;
+    try {
+      browser = await puppeteer.launch({
+        headless: 'new',
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+      });
+    } catch (err) {
+      if (err.message.includes('Could not find Chrome')) {
+        console.log('Descargando Chrome bajo demanda para Puppeteer...');
+        execSync('npx puppeteer browsers install chrome', { stdio: 'inherit' });
+        browser = await puppeteer.launch({
+          headless: 'new',
+          args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+      } else {
+        throw err;
+      }
+    }
+
     const page = await browser.newPage();
     await page.setViewport({ width: 1024, height: 1200 });
     await page.setContent(finalHTML, { waitUntil: 'networkidle0' });
