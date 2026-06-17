@@ -1654,6 +1654,24 @@ class APIManager {
     });
   }
 
+  /**
+   * Elimina un censo demográfico.
+   * Pasa por _interceptarValidacion: si el usuario es Vocero va a la Bandeja,
+   * si es Admin o hay auto-aprobación se elimina directo.
+   */
+  async eliminarEstudioDemografico(id) {
+    return await this._interceptarValidacion('estudios_demograficos', 'DELETE', { id }, async () => {
+      if (this.isDevelopment) return { success: true };
+      const response = await fetch(`${this.baseURL}/estudios-demograficos/${id}`, {
+        method: 'DELETE',
+        ...this._getHeaders()
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Error al eliminar el censo demográfico');
+      return data;
+    });
+  }
+
   _filterProyectos(proyectos, filtros) {
     let resultado = proyectos;
     if (filtros.consejoComunal) {
