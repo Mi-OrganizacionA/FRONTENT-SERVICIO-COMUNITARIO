@@ -54,6 +54,15 @@ class ReportesController {
     const btnAplicarFiltros = document.getElementById('btnAplicarFiltros');
     const btnLimpiarFiltros = document.getElementById('btnLimpiarFiltros');
 
+    // Ocultar filtro de consejo si es vocero
+    const user = window.auth ? window.auth.getUser() : null;
+    const isVocero = user && user.rol && user.rol.toLowerCase() === 'vocero';
+    
+    if (isVocero) {
+      const formGroupConsejo = document.getElementById('filtroConsejo')?.closest('.form-group') || document.getElementById('filtroConsejo')?.parentElement;
+      if (formGroupConsejo) formGroupConsejo.style.display = 'none';
+    }
+
     if (btnOpenFilters && modalFiltros) {
       btnOpenFilters.addEventListener('click', () => modalFiltros.style.display = 'flex');
     }
@@ -146,7 +155,10 @@ class ReportesController {
   getFiltrosUrl() {
     const desde = document.getElementById('filtroDesde')?.value;
     const hasta = document.getElementById('filtroHasta')?.value;
-    const consejo_id = document.getElementById('filtroConsejo')?.value;
+    const user = window.auth ? window.auth.getUser() : null;
+    const isVocero = user && user.rol && user.rol.toLowerCase() === 'vocero';
+    const consejo_id = isVocero ? user.id_comunidad_asignada : document.getElementById('filtroConsejo')?.value;
+
     const edad_min = document.getElementById('filtroEdadMin')?.value;
     const edad_max = document.getElementById('filtroEdadMax')?.value;
     const nac_min = document.getElementById('filtroNacMin')?.value;
@@ -186,9 +198,13 @@ class ReportesController {
     try {
       const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
       
+      const user = window.auth ? window.auth.getUser() : null;
+      const isVocero = user && user.rol && user.rol.toLowerCase() === 'vocero';
+      const paramConsejo = isVocero ? `?consejo_id=${user.id_comunidad_asignada}` : '';
+
       // La instrucción del usuario es que los KPIs generales y las gráficas visuales NO se filtren,
-      // siempre deben mostrar el padrón completo sin importar lo que haya en el Modal.
-      const res = await fetch(`${baseUrl}/censo-reportes/kpis`);
+      // siempre deben mostrar el padrón completo sin importar lo que haya en el Modal (a menos que sea vocero).
+      const res = await fetch(`${baseUrl}/censo-reportes/kpis${paramConsejo}`);
       if (!res.ok) throw new Error('Error al cargar KPIs');
       const kpis = await res.json();
       
@@ -244,8 +260,12 @@ class ReportesController {
       if (!tbody) return;
 
       const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
-      // La tabla inferior también debe mostrar SIEMPRE el resumen completo, ignorando los filtros del modal.
-      const res = await fetch(`${baseUrl}/censo-reportes/resumen`);
+      const user = window.auth ? window.auth.getUser() : null;
+      const isVocero = user && user.rol && user.rol.toLowerCase() === 'vocero';
+      const paramConsejo = isVocero ? `?consejo_id=${user.id_comunidad_asignada}` : '';
+
+      // La tabla inferior también debe mostrar SIEMPRE el resumen completo, ignorando los filtros del modal (a menos que sea vocero).
+      const res = await fetch(`${baseUrl}/censo-reportes/resumen${paramConsejo}`);
       if (!res.ok) throw new Error('Error al cargar resumen');
       
       const datos = await res.json();

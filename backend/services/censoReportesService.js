@@ -13,7 +13,6 @@ class CensoReportesService {
       if (filtros.nac_min) where.fecha_nacimiento[Op.gte] = new Date(filtros.nac_min);
       if (filtros.nac_max) where.fecha_nacimiento[Op.lte] = new Date(filtros.nac_max);
     }
-    // Edades (Solo si no viene nacimiento)
     else if (filtros.edad_min || filtros.edad_max) {
       where.fecha_nacimiento = {};
       const hoy = new Date();
@@ -29,7 +28,7 @@ class CensoReportesService {
       }
     }
 
-    if (filtros.genero) where.sexo = filtros.genero; // Map genero to sexo
+    if (filtros.genero) where.sexo = filtros.genero;
     
     if (filtros.salud) {
       if (filtros.salud === 'discapacidad') {
@@ -46,16 +45,16 @@ class CensoReportesService {
     }
     if (filtros.trabajo !== undefined && filtros.trabajo !== null && filtros.trabajo !== '') {
       where.profesion = (filtros.trabajo === '1') ? { [Op.ne]: null, [Op.not]: '' } : { [Op.or]: [null, ''] }; 
-      // "trabaja_actualmente" no existe, inferimos de profesion si la persona labora
     }
     return where;
   }
 
   /**
-   * Helper para construir where de EstudioDemografico
+   * Helper para construir where de EstudioDemografico (nuevos)
    */
   static _buildFiltrosEstudio(filtros, Op) {
-    const where = {};
+    const where = { activo: true }; // IMPORTANTE: Solo contar censos completados
+    
     if (filtros.consejo_id || filtros.id_comunidad) {
       where.id_comunidad = filtros.consejo_id || filtros.id_comunidad;
     }
@@ -63,10 +62,75 @@ class CensoReportesService {
       where.fecha_creacion = {
         [Op.between]: [new Date(filtros.fecha_desde), new Date(filtros.fecha_hasta + 'T23:59:59Z')]
       };
-    } else if (filtros.desde && filtros.hasta) { // Alias común
+    } else if (filtros.desde && filtros.hasta) {
       where.fecha_creacion = {
         [Op.between]: [new Date(filtros.desde), new Date(filtros.hasta + 'T23:59:59Z')]
       };
+    }
+    return where;
+  }
+
+  /**
+   * Helper para construir where del modelo legacy Habitante
+   */
+  static _buildFiltrosHabitanteLegacy(filtros, Op) {
+    const where = { activo: true };
+    
+    if (filtros.consejo_id || filtros.id_comunidad) {
+      where.consejo_comunal_id = filtros.consejo_id || filtros.id_comunidad;
+    }
+
+    if (filtros.nac_min || filtros.nac_max) {
+      where.fecha_nacimiento = {};
+      if (filtros.nac_min) where.fecha_nacimiento[Op.gte] = new Date(filtros.nac_min);
+      if (filtros.nac_max) where.fecha_nacimiento[Op.lte] = new Date(filtros.nac_max);
+    } else if (filtros.edad_min || filtros.edad_max) {
+      where.fecha_nacimiento = {};
+      const hoy = new Date();
+      if (filtros.edad_min) {
+        const maxFecha = new Date(hoy);
+        maxFecha.setFullYear(hoy.getFullYear() - parseInt(filtros.edad_min));
+        where.fecha_nacimiento[Op.lte] = maxFecha;
+      }
+      if (filtros.edad_max) {
+        const minFecha = new Date(hoy);
+        minFecha.setFullYear(hoy.getFullYear() - parseInt(filtros.edad_max) - 1);
+        where.fecha_nacimiento[Op.gt] = minFecha;
+      }
+    }
+
+    if (filtros.genero) {
+      // El viejo Habitante usa 'M' y 'F' o 'Masculino'/'Femenino'
+      const isM = ['M', 'Masculino', 'MASCULINO'].includes(filtros.genero);
+      where.genero = isM ? { [Op.in]: ['M', 'Masculino'] } : { [Op.in]: ['F', 'Femenino'] };
+    }
+    
+    if (filtros.salud) {
+      if (filtros.salud === 'discapacidad') {
+         where.condicion_salud = { [Op.notIn]: ['Ninguna', 'Buena', ''] };
+      } else if (filtros.salud === 'encamado') {
+         where.condicion_salud = { [Op.iLike]: '%encamado%' };
+      } else {
+         where.condicion_salud = { [Op.iLike]: `%${filtros.salud}%` };
+      }
+    }
+    
+    if (filtros.cne !== undefined && filtros.cne !== null && filtros.cne !== '') {
+      where.inscrito_cne = filtros.cne === '1';
+    }
+    if (filtros.trabajo !== undefined && filtros.trabajo !== null && filtros.trabajo !== '') {
+      where.trabaja_actualmente = filtros.trabajo === '1';
+    }
+    return where;
+  }
+
+  /**
+   * Helper para construir where de Vivienda Legacy
+   */
+  static _buildFiltrosViviendaLegacy(filtros, Op) {
+    const where = { activo: true };
+    if (filtros.consejo_id || filtros.id_comunidad) {
+      where.id_comunidad = filtros.consejo_id || filtros.id_comunidad;
     }
     return where;
   }
@@ -76,8 +140,18 @@ class CensoReportesService {
    */
   static async getFechaMinima(models) {
     try {
-      const minDate = await models.EstudioDemografico.min('fecha_creacion');
-      return minDate ? new Date(minDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+      const minDateE = await models.EstudioDemografico.min('fecha_creacion');
+      const minDateH = await models.Habitante.min('fecha_registro');
+      
+      let dates = [];
+      if (minDateE) dates.push(new Date(minDateE));
+      if (minDateH) dates.push(new Date(minDateH));
+      
+      if (dates.length > 0) {
+        const min = new Date(Math.min(...dates));
+        return min.toISOString().split('T')[0];
+      }
+      return new Date().toISOString().split('T')[0];
     } catch(err) {
       return new Date().toISOString().split('T')[0];
     }
@@ -87,77 +161,75 @@ class CensoReportesService {
    * Obtiene los KPIs generales del censo
    */
   static async getKpis(models, filtros = {}) {
-    const { CensoCaracteristicaFamiliar, EstudioDemografico } = models;
+    const { CensoCaracteristicaFamiliar, EstudioDemografico, Habitante, Vivienda } = models;
+    
     const whereFamiliar = CensoReportesService._buildFiltrosFamiliar(filtros, Op);
     const whereEstudio = CensoReportesService._buildFiltrosEstudio(filtros, Op);
+    
+    const whereHabLegacy = CensoReportesService._buildFiltrosHabitanteLegacy(filtros, Op);
+    const whereVivLegacy = CensoReportesService._buildFiltrosViviendaLegacy(filtros, Op);
 
-    const baseInclude = {
-      model: EstudioDemografico,
-      where: whereEstudio,
-      required: true
-    };
+    const includeEstudio = { model: EstudioDemografico, where: whereEstudio, required: true };
 
     // 1. Total Personas
-    const totalPersonas = await CensoCaracteristicaFamiliar.count({ 
-      where: whereFamiliar,
-      include: [baseInclude] 
-    });
+    const tpNuevos = await CensoCaracteristicaFamiliar.count({ where: whereFamiliar, include: [includeEstudio] });
+    const tpViejos = await Habitante.count({ where: whereHabLegacy });
+    const totalPersonas = tpNuevos + tpViejos;
 
     // 2. Discapacidad
-    const conDiscapacidad = await CensoCaracteristicaFamiliar.count({
-      where: {
-        ...whereFamiliar,
-        discapacidad_tipo: { [Op.ne]: null, [Op.not]: '' }
-      },
-      include: [baseInclude]
+    const discNuevos = await CensoCaracteristicaFamiliar.count({
+      where: { ...whereFamiliar, discapacidad_tipo: { [Op.ne]: null, [Op.not]: '' } },
+      include: [includeEstudio]
     });
+    const discViejos = await Habitante.count({
+      where: { ...whereHabLegacy, condicion_salud: { [Op.notIn]: ['Ninguna', 'Buena', ''] } }
+    });
+    const conDiscapacidad = discNuevos + discViejos;
 
-    // 3. Viviendas (Estudios demográficos)
-    const totalViviendas = await EstudioDemografico.count({ where: whereEstudio });
+    // 3. Viviendas
+    const vivNuevos = await EstudioDemografico.count({ where: whereEstudio });
+    const vivViejos = await Vivienda.count({ where: whereVivLegacy });
+    const totalViviendas = vivNuevos + vivViejos;
 
     // 4. Adultos mayores (60+ años)
-    const hace60 = new Date();
-    hace60.setFullYear(hace60.getFullYear() - 60);
-    const adultosMayores = await CensoCaracteristicaFamiliar.count({
-      where: {
-        ...whereFamiliar,
-        fecha_nacimiento: { [Op.lte]: hace60 }
-      },
-      include: [baseInclude]
+    const hace60 = new Date(); hace60.setFullYear(hace60.getFullYear() - 60);
+    const amNuevos = await CensoCaracteristicaFamiliar.count({
+      where: { ...whereFamiliar, fecha_nacimiento: { [Op.lte]: hace60 } },
+      include: [includeEstudio]
     });
-
-    // Niños y adolescentes (< 18 años)
-    const hace18 = new Date();
-    hace18.setFullYear(hace18.getFullYear() - 18);
-    const ninos = await CensoCaracteristicaFamiliar.count({
-      where: {
-        ...whereFamiliar,
-        fecha_nacimiento: { [Op.gt]: hace18 }
-      },
-      include: [baseInclude]
+    const amViejos = await Habitante.count({
+      where: { ...whereHabLegacy, fecha_nacimiento: { [Op.lte]: hace60 } }
     });
+    const adultosMayores = amNuevos + amViejos;
 
-    return {
-      totalPersonas,
-      conDiscapacidad,
-      totalViviendas,
-      adultosMayores,
-      ninos
-    };
+    // 5. Niños y adolescentes (< 18 años)
+    const hace18 = new Date(); hace18.setFullYear(hace18.getFullYear() - 18);
+    const niNuevos = await CensoCaracteristicaFamiliar.count({
+      where: { ...whereFamiliar, fecha_nacimiento: { [Op.gt]: hace18 } },
+      include: [includeEstudio]
+    });
+    const niViejos = await Habitante.count({
+      where: { ...whereHabLegacy, fecha_nacimiento: { [Op.gt]: hace18 } }
+    });
+    const ninos = niNuevos + niViejos;
+
+    return { totalPersonas, conDiscapacidad, totalViviendas, adultosMayores, ninos };
   }
 
   /**
    * Obtiene la tabla resumen agrupada por Consejo Comunal
    */
   static async getResumenPorConsejo(models, filtros = {}) {
-    const { ConsejoComunal, CensoCaracteristicaFamiliar, EstudioDemografico } = models;
+    const { ConsejoComunal, CensoCaracteristicaFamiliar, EstudioDemografico, Habitante, Vivienda } = models;
     const consejos = await ConsejoComunal.findAll({ attributes: ['id', 'nombre_comunidad'] });
     const resumen = [];
     
-    const filtrosClon = { ...filtros };
-    delete filtrosClon.consejo_id;
-    const globalFamiliarWhere = CensoReportesService._buildFiltrosFamiliar(filtrosClon, Op);
-    const globalEstudioWhere = CensoReportesService._buildFiltrosEstudio(filtrosClon, Op);
+    const fClon = { ...filtros }; delete fClon.consejo_id;
+    
+    const wf = CensoReportesService._buildFiltrosFamiliar(fClon, Op);
+    const we = CensoReportesService._buildFiltrosEstudio(fClon, Op);
+    const wh = CensoReportesService._buildFiltrosHabitanteLegacy(fClon, Op);
+    const wv = CensoReportesService._buildFiltrosViviendaLegacy(fClon, Op);
 
     const hace18 = new Date(); hace18.setFullYear(hace18.getFullYear() - 18);
     const hace60 = new Date(); hace60.setFullYear(hace60.getFullYear() - 60);
@@ -167,44 +239,52 @@ class CensoReportesService {
     for (let c of consejos) {
       if (filtros.consejo_id && filtros.consejo_id.toString() !== c.id.toString()) continue;
 
-      const habs = await CensoCaracteristicaFamiliar.findAll({ 
-        where: globalFamiliarWhere, 
-        attributes: ['fecha_nacimiento', 'discapacidad_tipo'],
-        include: [{
-          model: EstudioDemografico,
-          where: { ...globalEstudioWhere, id_comunidad: c.id },
-          required: true
-        }]
+      // Nuevos
+      const habsN = await CensoCaracteristicaFamiliar.findAll({ 
+        where: wf, attributes: ['fecha_nacimiento', 'discapacidad_tipo'],
+        include: [{ model: EstudioDemografico, where: { ...we, id_comunidad: c.id }, required: true }]
       });
-      const vivs = await EstudioDemografico.count({ where: { ...globalEstudioWhere, id_comunidad: c.id } });
+      const vivsN = await EstudioDemografico.count({ where: { ...we, id_comunidad: c.id } });
+
+      // Viejos
+      const habsV = await Habitante.findAll({
+        where: { ...wh, consejo_comunal_id: c.id }, attributes: ['fecha_nacimiento', 'condicion_salud']
+      });
+      const vivsV = await Vivienda.count({ where: { ...wv, id_comunidad: c.id } });
 
       let electores = 0, ninos = 0, mayores = 0, disc = 0;
-      habs.forEach(h => {
+      
+      const countHab = (h, isNew) => {
         if (h.fecha_nacimiento) {
           const fn = new Date(h.fecha_nacimiento);
           if (fn <= hace18) electores++;
           if (fn > hace18) ninos++;
           if (fn <= hace60) mayores++;
         }
-        if (h.discapacidad_tipo && h.discapacidad_tipo.trim() !== '') disc++;
-      });
+        if (isNew) {
+          if (h.discapacidad_tipo && h.discapacidad_tipo.trim() !== '') disc++;
+        } else {
+          if (h.condicion_salud && !['Ninguna', 'Buena', ''].includes(h.condicion_salud)) disc++;
+        }
+      };
+
+      habsN.forEach(h => countHab(h, true));
+      habsV.forEach(h => countHab(h, false));
+
+      const totalH = habsN.length + habsV.length;
+      const totalV = vivsN + vivsV;
 
       resumen.push({
         consejo: c.nombre_comunidad,
-        total_hab: habs.length,
-        electores, ninos, mayores, disc,
-        viviendas: vivs
+        total_hab: totalH, electores, ninos, mayores, disc,
+        viviendas: totalV
       });
       
-      tHab += habs.length; tElec += electores; tNinos += ninos; 
-      tMayores += mayores; tDisc += disc; tViv += vivs;
+      tHab += totalH; tElec += electores; tNinos += ninos; 
+      tMayores += mayores; tDisc += disc; tViv += totalV;
     }
 
-    resumen.push({ 
-      consejo: 'TOTAL', total_hab: tHab, electores: tElec, 
-      ninos: tNinos, mayores: tMayores, disc: tDisc, viviendas: tViv 
-    });
-    
+    resumen.push({ consejo: 'TOTAL', total_hab: tHab, electores: tElec, ninos: tNinos, mayores: tMayores, disc: tDisc, viviendas: tViv });
     return resumen;
   }
 
@@ -212,117 +292,101 @@ class CensoReportesService {
    * Extrae los datos formateados según el tipo de reporte solicitado
    */
   static async getReporteData(models, tipo, filtros = {}) {
-    const { CensoCaracteristicaFamiliar, EstudioDemografico, ConsejoComunal, CensoSituacionVivienda } = models;
+    const { CensoCaracteristicaFamiliar, EstudioDemografico, Habitante, Vivienda, ConsejoComunal, CensoSituacionVivienda } = models;
     let title = 'Reporte del Sistema';
     let headers = [];
-    let rawData = [];
+    
+    let rowsNuevos = [];
+    let rowsViejos = [];
 
-    const whereFamiliar = CensoReportesService._buildFiltrosFamiliar(filtros, Op);
-    const whereEstudio = CensoReportesService._buildFiltrosEstudio(filtros, Op);
+    const wf = CensoReportesService._buildFiltrosFamiliar(filtros, Op);
+    const we = CensoReportesService._buildFiltrosEstudio(filtros, Op);
+    const wh = CensoReportesService._buildFiltrosHabitanteLegacy(filtros, Op);
+    const wv = CensoReportesService._buildFiltrosViviendaLegacy(filtros, Op);
 
-    const includeEstudioBase = {
-      model: EstudioDemografico,
-      where: whereEstudio,
-      required: true,
-      include: [
-        { model: ConsejoComunal, as: 'consejo', attributes: ['nombre_comunidad'] }
-      ]
+    const incEstudio = { model: EstudioDemografico, where: we, required: true, include: [{ model: ConsejoComunal, as: 'consejo' }] };
+    const incConsejoLegacy = [{ model: ConsejoComunal, as: 'consejo' }];
+
+    const calcEdad = (d) => {
+      if(!d) return 'N/A';
+      return Math.abs(new Date(Date.now() - new Date(d).getTime()).getUTCFullYear() - 1970);
     };
 
     switch (tipo) {
       case 'total-personas':
         title = 'Listado Total de Personas';
         headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Género', 'Consejo Comunal'];
-        rawData = await CensoCaracteristicaFamiliar.findAll({
-          where: whereFamiliar,
-          include: [includeEstudioBase],
-          order: [['id_familiar', 'DESC']]
-        });
+        
+        rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });
+        rowsViejos = await Habitante.findAll({ where: wh, include: incConsejoLegacy });
         break;
 
       case 'discapacidad':
         title = 'Personas con Discapacidad';
         headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Tipo Incapacidad', 'Consejo Comunal'];
-        whereFamiliar.discapacidad_tipo = { [Op.ne]: null, [Op.not]: '' };
-        rawData = await CensoCaracteristicaFamiliar.findAll({
-          where: whereFamiliar,
-          include: [includeEstudioBase]
-        });
+        
+        wf.discapacidad_tipo = { [Op.ne]: null, [Op.not]: '' };
+        wh.condicion_salud = { [Op.notIn]: ['Ninguna', 'Buena', ''] };
+        
+        rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });
+        rowsViejos = await Habitante.findAll({ where: wh, include: incConsejoLegacy });
         break;
 
       case 'viviendas':
         title = 'Censo de Viviendas';
         headers = ['Tipo Vivienda', 'Dirección', 'Consejo Comunal'];
-        const includeViv = [
-          { model: ConsejoComunal, as: 'consejo', attributes: ['nombre_comunidad'] },
-          { model: CensoSituacionVivienda, as: 'situacion_vivienda' }
-        ];
-        rawData = await EstudioDemografico.findAll({
-          where: whereEstudio,
-          include: includeViv
-        });
+        
+        rowsNuevos = await EstudioDemografico.findAll({ where: we, include: [{ model: ConsejoComunal, as: 'consejo' }, { model: CensoSituacionVivienda, as: 'situacion_vivienda' }] });
+        rowsViejos = await Vivienda.findAll({ where: wv, include: incConsejoLegacy });
         break;
 
       case 'adultos-mayores':
-        title = 'Adultos Mayores (60+ años)';
-        headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Género', 'Consejo Comunal'];
-        const hace60 = new Date();
-        hace60.setFullYear(hace60.getFullYear() - 60);
-        whereFamiliar.fecha_nacimiento = { [Op.lte]: hace60 };
-        rawData = await CensoCaracteristicaFamiliar.findAll({
-          where: whereFamiliar,
-          include: [includeEstudioBase]
-        });
-        break;
-
       case 'ninos':
-        title = 'Niños y Adolescentes';
-        headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Género', 'Consejo Comunal'];
-        const hace18 = new Date();
-        hace18.setFullYear(hace18.getFullYear() - 18);
-        whereFamiliar.fecha_nacimiento = { [Op.gt]: hace18 };
-        rawData = await CensoCaracteristicaFamiliar.findAll({
-          where: whereFamiliar,
-          include: [includeEstudioBase]
-        });
-        break;
-
       case 'electores':
-        title = 'Registro Electoral Comunitario';
+        const h60 = new Date(); h60.setFullYear(h60.getFullYear() - 60);
+        const h18 = new Date(); h18.setFullYear(h18.getFullYear() - 18);
+        
+        if (tipo === 'adultos-mayores') {
+           title = 'Adultos Mayores (60+ años)';
+           wf.fecha_nacimiento = { [Op.lte]: h60 }; wh.fecha_nacimiento = { [Op.lte]: h60 };
+        } else if (tipo === 'ninos') {
+           title = 'Niños y Adolescentes';
+           wf.fecha_nacimiento = { [Op.gt]: h18 }; wh.fecha_nacimiento = { [Op.gt]: h18 };
+        } else {
+           title = 'Registro Electoral Comunitario';
+           wf.fecha_nacimiento = { [Op.lte]: h18 }; wh.fecha_nacimiento = { [Op.lte]: h18 };
+        }
+        
         headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Género', 'Consejo Comunal'];
-        const date18 = new Date(); date18.setFullYear(date18.getFullYear() - 18);
-        whereFamiliar.fecha_nacimiento = { [Op.lte]: date18 };
-        rawData = await CensoCaracteristicaFamiliar.findAll({ where: whereFamiliar, include: [includeEstudioBase] });
+        rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });
+        rowsViejos = await Habitante.findAll({ where: wh, include: incConsejoLegacy });
         break;
 
       case 'embarazadas':
       case 'lactantes':
         title = `Mujeres ${tipo === 'embarazadas' ? 'Embarazadas' : 'Lactantes'} (Censo Demográfico)`;
         headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Género', 'Consejo Comunal'];
-        whereFamiliar.sexo = { [Op.in]: ['F', 'Femenino'] };
-        rawData = await CensoCaracteristicaFamiliar.findAll({ where: whereFamiliar, include: [includeEstudioBase] });
+        wf.sexo = { [Op.in]: ['F', 'Femenino'] };
+        wh.genero = { [Op.in]: ['F', 'Femenino'] };
+        rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });
+        rowsViejos = await Habitante.findAll({ where: wh, include: incConsejoLegacy });
         break;
 
       case 'encamados':
         title = 'Personas Encamadas o con Limitaciones Severas';
         headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Tipo Incapacidad', 'Consejo Comunal'];
-        whereFamiliar.discapacidad_tipo = { [Op.iLike]: '%encamado%' };
-        rawData = await CensoCaracteristicaFamiliar.findAll({ where: whereFamiliar, include: [includeEstudioBase] });
+        wf.discapacidad_tipo = { [Op.iLike]: '%encamado%' };
+        wh.condicion_salud = { [Op.iLike]: '%encamado%' };
+        rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });
+        rowsViejos = await Habitante.findAll({ where: wh, include: incConsejoLegacy });
         break;
 
       case 'por-cc':
-        title = 'Padrón Ordenado por Consejo Comunal';
-        headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Género', 'Consejo Comunal'];
-        rawData = await CensoCaracteristicaFamiliar.findAll({ 
-          where: whereFamiliar, 
-          include: [includeEstudioBase]
-        });
-        break;
-
       case 'genero':
-        title = 'Padrón Ordenado por Género';
+        title = tipo === 'genero' ? 'Padrón Ordenado por Género' : 'Padrón Ordenado por Consejo Comunal';
         headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Género', 'Consejo Comunal'];
-        rawData = await CensoCaracteristicaFamiliar.findAll({ where: whereFamiliar, include: [includeEstudioBase], order: [['sexo', 'ASC']] });
+        rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });
+        rowsViejos = await Habitante.findAll({ where: wh, include: incConsejoLegacy });
         break;
 
       case 'resumen-consejos':
@@ -334,11 +398,9 @@ class CensoReportesService {
           rows: resList.map(r => [r.consejo, r.total_hab, r.electores, r.ninos, r.mayores, r.disc, r.viviendas])
         };
 
-      default:
-        throw new Error('Tipo de reporte no soportado: ' + tipo);
+      default: throw new Error('Tipo de reporte no soportado: ' + tipo);
     }
 
-    // Identificar columnas extras solicitadas por el usuario
     const extraCols = filtros.extras ? filtros.extras.split(',') : [];
     if (tipo !== 'viviendas' && tipo !== 'resumen-consejos') {
       if (extraCols.includes('telefono')) headers.push('Teléfono');
@@ -347,55 +409,51 @@ class CensoReportesService {
       if (extraCols.includes('nivel_academico')) headers.push('Nivel Acad.');
     }
 
-    // Calcular edad helper
-    const calcEdad = (d) => {
-      if(!d) return 'N/A';
-      const diff = Date.now() - new Date(d).getTime();
-      return Math.abs(new Date(diff).getUTCFullYear() - 1970);
-    };
+    let rowsCombinados = [];
 
-    // Mapeo de los resultados crudos a las filas de la tabla
-    const rows = rawData.map(item => {
-      if (tipo === 'viviendas') {
-        return [
-          item.situacion_vivienda ? item.situacion_vivienda.tipo_vivienda : 'N/A',
-          item.direccion_comunidad || 'N/A',
-          item.consejo ? item.consejo.nombre_comunidad : 'N/A'
-        ];
-      }
+    // Mapear Nuevos
+    if (tipo === 'viviendas') {
+       rowsNuevos.forEach(v => rowsCombinados.push([
+         v.situacion_vivienda ? v.situacion_vivienda.tipo_vivienda : 'N/A',
+         v.direccion_comunidad || 'N/A',
+         v.consejo ? v.consejo.nombre_comunidad : 'N/A'
+       ]));
+       rowsViejos.forEach(v => rowsCombinados.push([
+         v.tipo_vivienda || 'N/A',
+         v.direccion || 'N/A',
+         v.consejo ? v.consejo.nombre_comunidad : 'N/A'
+       ]));
+    } else {
+       const mapPersona = (item, isNew) => {
+         const cedula = isNew ? item.cedula_identidad : item.cedula;
+         const nombre = isNew ? item.nombres_apellidos : `${item.nombres || ''} ${item.apellidos || ''}`.trim();
+         const fnac = item.fecha_nacimiento ? new Date(item.fecha_nacimiento).toISOString().split('T')[0] : 'N/A';
+         const edad = calcEdad(item.fecha_nacimiento);
+         const genero = isNew ? item.sexo : item.genero;
+         const saludStr = isNew ? item.discapacidad_tipo : item.condicion_salud;
+         const consejo = isNew 
+            ? (item.EstudioDemografico && item.EstudioDemografico.consejo ? item.EstudioDemografico.consejo.nombre_comunidad : 'N/A')
+            : (item.consejo ? item.consejo.nombre_comunidad : 'N/A');
 
-      // Para los reportes de personas (CensoCaracteristicaFamiliar)
-      const fullName = item.nombres_apellidos || 'N/A';
-      const consejoName = item.EstudioDemografico && item.EstudioDemografico.consejo ? item.EstudioDemografico.consejo.nombre_comunidad : 'N/A';
-      const cedula = item.cedula_identidad || 'N/A';
-      const fnac = item.fecha_nacimiento ? new Date(item.fecha_nacimiento).toISOString().split('T')[0] : 'N/A';
-      const edad = calcEdad(item.fecha_nacimiento);
-
-      let rowData = [];
-
-      if (tipo === 'total-personas' || tipo === 'por-cc' || tipo === 'genero' || tipo === 'embarazadas' || tipo === 'lactantes') 
-        rowData = [cedula, fullName, fnac, edad, item.sexo || 'N/A', consejoName];
-      else if (tipo === 'discapacidad' || tipo === 'encamados') 
-        rowData = [cedula, fullName, fnac, edad, item.discapacidad_tipo || 'N/A', consejoName];
-      else if (tipo === 'electores' || tipo === 'adultos-mayores') 
-        rowData = [cedula, fullName, fnac, edad, item.sexo || 'N/A', consejoName];
-      else if (tipo === 'ninos') 
-        rowData = [cedula, fullName, fnac, edad, item.sexo || 'N/A', consejoName];
-      
-      // Añadir extras al rowData si se solicitaron
-      if (extraCols.includes('telefono')) rowData.push('N/A'); // No tenemos telefono individual
-      if (extraCols.includes('salud')) rowData.push(item.discapacidad_tipo || 'N/A');
-      if (extraCols.includes('trabajo')) rowData.push(item.profesion ? 'Sí' : 'No');
-      if (extraCols.includes('nivel_academico')) rowData.push(item.grado_instruccion || 'N/A');
-
-      return rowData;
-    });
-
-    if (tipo === 'por-cc') {
-       rows.sort((a,b) => a[5].localeCompare(b[5])); // Sort by Consejo Comunal string
+         let rd = [];
+         if (tipo === 'discapacidad' || tipo === 'encamados') rd = [cedula || 'N/A', nombre || 'N/A', fnac, edad, saludStr || 'N/A', consejo];
+         else rd = [cedula || 'N/A', nombre || 'N/A', fnac, edad, genero || 'N/A', consejo];
+         
+         if (extraCols.includes('telefono')) rd.push(isNew ? 'N/A' : (item.telefono || 'N/A'));
+         if (extraCols.includes('salud')) rd.push(saludStr || 'N/A');
+         if (extraCols.includes('trabajo')) rd.push(isNew ? (item.profesion ? 'Sí' : 'No') : (item.trabaja_actualmente ? 'Sí' : 'No'));
+         if (extraCols.includes('nivel_academico')) rd.push(isNew ? (item.grado_instruccion || 'N/A') : (item.nivel_educativo || 'N/A'));
+         
+         rowsCombinados.push(rd);
+       };
+       rowsNuevos.forEach(p => mapPersona(p, true));
+       rowsViejos.forEach(p => mapPersona(p, false));
     }
 
-    return { title, headers, rows };
+    if (tipo === 'por-cc') rowsCombinados.sort((a,b) => a[5].localeCompare(b[5]));
+    if (tipo === 'genero') rowsCombinados.sort((a,b) => a[4].localeCompare(b[4]));
+
+    return { title, headers, rows: rowsCombinados };
   }
 }
 
