@@ -189,7 +189,7 @@ class PdfGeneradorViviendas {
     // 6. Lanzar Puppeteer
     const browser = await puppeteer.launch({ 
       headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--no-zygote', '--single-process']
     });
     
     const page = await browser.newPage();
@@ -336,7 +336,7 @@ class PdfGeneradorViviendas {
     try {
       browser = await puppeteer.launch({
         headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--no-zygote', '--single-process']
       });
     } catch (err) {
       if (err.message.includes('Could not find Chrome')) {
@@ -344,7 +344,7 @@ class PdfGeneradorViviendas {
         execSync('npx puppeteer browsers install chrome', { stdio: 'inherit' });
         browser = await puppeteer.launch({
           headless: 'new',
-          args: ['--no-sandbox', '--disable-setuid-sandbox']
+          args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--no-zygote', '--single-process']
         });
       } else {
         throw err;
