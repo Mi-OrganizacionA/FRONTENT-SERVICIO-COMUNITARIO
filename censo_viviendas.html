@@ -2399,8 +2399,8 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="condicionesSalubridad">Condiciones de Salubridad</label>
-                  <select class="cv-form-control" id="condicionesSalubridad">
+                  <label for="condicionesSalubridad">Condiciones de Salubridad <span class="text-danger">*</span></label>
+                  <select class="cv-form-control" id="condicionesSalubridad" required>
                     <option value="">Seleccione...</option>
                     <option value="Buenas">✅ Buenas</option>
                     <option value="Regulares">🟡 Regulares</option>
@@ -2524,8 +2524,8 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="telefoniaServicio">Telefonía</label>
-                  <select class="cv-form-control" id="telefoniaServicio">
+                  <label for="telefoniaServicio">Telefonía <span class="text-danger">*</span></label>
+                  <select class="cv-form-control" id="telefoniaServicio" required>
                     <option value="">Seleccione...</option>
                     <option value="Movistar">📱 Movistar</option>
                     <option value="Digitel">📱 Digitel</option>
@@ -2535,8 +2535,8 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="transporte">Transporte cercano</label>
-                  <select class="cv-form-control" id="transporte">
+                  <label for="transporte">Transporte cercano <span class="text-danger">*</span></label>
+                  <select class="cv-form-control" id="transporte" required>
                     <option value="">Seleccione...</option>
                     <option value="Bus público">🚌 Bus público</option>
                     <option value="Mototaxi">🏍️ Mototaxi</option>
@@ -3218,6 +3218,15 @@
         datos.id_comunidad = 1; // Consejo por defecto
       }
 
+      // Si es paso 8 (Salud), asegurar que "enfermedades" tenga al menos "Ninguna" si no se seleccionó nada
+      if (paso === 8) {
+        if (!datos.opciones) datos.opciones = [];
+        const tieneEnfermedad = datos.opciones.some(o => o.categoria === 'enfermedades');
+        if (!tieneEnfermedad) {
+          datos.opciones.push({ categoria: 'enfermedades', valor: 'Ninguna', cantidad: 1 });
+        }
+      }
+
       return datos;
     }
 
@@ -3564,20 +3573,20 @@
             cedula: v.encuestado_cedula || v.cedula_jefe || '—',
             // Nombre de la comunidad (del paso 2: ubicación geográfica)
             sector: v.nombre_comunidad || v.sector || '—',
-            // Cantidad de habitantes (del paso 4)
-            habitantes: v.cantidad_habitantes || '—',
+            // Cantidad de habitantes (basado en la relación familiares)
+            habitantes: (v.familiares && v.familiares.length) ? v.familiares.length : '—',
             // Condición general (del paso 6: situación de vivienda)
-            condicion: v.condiciones_salubridad || v.condicion_general || '—',
+            condicion: v.situacion_vivienda?.condiciones_salubridad || v.condicion_general || '—',
             // Tipo de vivienda (del paso 6)
-            tipo: v.tipo_vivienda || '—',
+            tipo: v.situacion_vivienda?.tipo_vivienda || '—',
             // Tenencia (del paso 6)
-            tenencia: v.forma_tenencia || v.tenencia || '—',
+            tenencia: v.situacion_vivienda?.forma_tenencia || v.tenencia || '—',
             // Materiales (del paso 6)
-            paredes: v.tipo_paredes || v.material_paredes || '—',
-            techo: v.tipo_techo || v.material_techo || '—',
+            paredes: v.situacion_vivienda?.tipo_paredes || v.material_paredes || '—',
+            techo: v.situacion_vivienda?.tipo_techo || v.material_techo || '—',
             // Servicios (del paso 7)
-            agua: v.aguas_blancas_tipo || v.aguas_blancas || '—',
-            gas: v.gas_tipo || v.gas_domestico || '—',
+            agua: v.servicios?.aguas_blancas_tipo || v.aguas_blancas || '—',
+            gas: v.servicios?.gas_tipo || v.gas_domestico || '—',
             // Dirección (del paso 2)
             direccion: v.direccion_comunidad || v.direccion_exacta || '—',
             fechaCenso: v.fecha_censo || v.fecha_creacion

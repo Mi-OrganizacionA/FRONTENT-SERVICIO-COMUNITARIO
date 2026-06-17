@@ -19,9 +19,16 @@ class EstudioDemograficoController {
       const where = { activo: true };
       if (consejoId) where.id_comunidad = consejoId;
       
+      const db = models;
       const data = await EstudioDemografico.findAll({
         where,
-        order: [["fecha_creacion", "DESC"]]
+        order: [["fecha_creacion", "DESC"]],
+        include: [
+          { model: db.CensoCaracteristicaFamiliar, as: 'familiares' },
+          { model: db.CensoSituacionVivienda, as: 'situacion_vivienda' },
+          { model: db.CensoSalud, as: 'salud' },
+          { model: db.CensoServicios, as: 'servicios' }
+        ]
       });
       res.json(data);
     } catch (error) { next(error); }
@@ -38,9 +45,16 @@ class EstudioDemograficoController {
   static async getPorConsejo(req, res, next) {
     try {
       const { consejoId } = req.params;
+      const db = models;
       const data = await EstudioDemografico.findAll({
         where: { id_comunidad: consejoId, activo: true },
-        order: [["fecha_creacion", "DESC"]]
+        order: [["fecha_creacion", "DESC"]],
+        include: [
+          { model: db.CensoCaracteristicaFamiliar, as: 'familiares' },
+          { model: db.CensoSituacionVivienda, as: 'situacion_vivienda' },
+          { model: db.CensoSalud, as: 'salud' },
+          { model: db.CensoServicios, as: 'servicios' }
+        ]
       });
       res.json(data);
     } catch (error) { next(error); }
@@ -304,12 +318,12 @@ class EstudioDemograficoController {
       const estudio = await EstudioDemografico.findByPk(id, {
         include: [
           { model: db.CensoCaracteristicaFamiliar,  as: 'familiares'    },
-          { model: db.CensoSituacionVivienda,        as: 'vivienda'      },
+          { model: db.CensoSituacionVivienda,        as: 'situacion_vivienda' },
           { model: db.CensoSalud,                    as: 'salud'         },
           { model: db.CensoServicios,                as: 'servicios'     },
-          { model: db.CensoParticipacionComunitaria, as: 'participacion' },
-          { model: db.CensoSituacionEconomica,       as: 'economia'      },
-          { model: db.CensoSituacionComunidad,       as: 'comunidad'     },
+          { model: db.CensoParticipacionComunitaria, as: 'participacion_comunitaria' },
+          { model: db.CensoSituacionEconomica,       as: 'situacion_economica' },
+          { model: db.CensoSituacionComunidad,       as: 'situacion_comunidad' },
           { model: db.ConsejoComunal,                as: 'consejo'       }
         ]
       });
