@@ -48,7 +48,12 @@ class EstudioDemograficoController {
 
   static async crear(req, res, next) {
     const db = models; 
-    const sequelize = db.sequelize;
+    // Asegurar que obtenemos la instancia de sequelize correctamente
+    const sequelize = (db && db.sequelize) || (EstudioDemografico && EstudioDemografico.sequelize);
+
+    if (!sequelize) {
+      return next(new Error('Sequelize instance no disponible para transacciones en crear'));
+    }
 
     const t = await sequelize.transaction();
     try {
@@ -62,8 +67,23 @@ class EstudioDemograficoController {
         servicios, 
         participacion, 
         comunidad, 
-        opciones 
+        opciones,
+        id_estudio_borrador
       } = req.body;
+
+      // Si se envió un id_estudio_borrador, significa que el wizard ya creó el registro en la BD paso a paso.
+      // Solo debemos activarlo y finalizarlo.
+      if (id_estudio_borrador) {
+        const estudio = await EstudioDemografico.findByPk(id_estudio_borrador, { transaction: t });
+        if (estudio) {
+          await estudio.update({ activo: true, fecha_censo: new Date() }, { transaction: t });
+          await t.commit();
+          if (req.user) {
+            await AuditService.log(req.user.id, "UPDATE", "estudios_demograficos", estudio.id, null, estudio.toJSON());
+          }
+          return res.status(200).json({ success: true, id_estudio: estudio.id });
+        }
+      }
 
       if (!id_comunidad && !cabecera?.id_comunidad) {
         throw new Error("id_comunidad es requerido");
@@ -154,7 +174,8 @@ class EstudioDemograficoController {
         
         const [estudio, created] = await EstudioDemografico.findOrCreate({
           where: { id: id_estudio },
-          defaults: { ...datos, activo: true, fecha_creacion: new Date() },
+          // Los borradores se crean inactivos para no mostrarse en getAll hasta ser aprobados
+          defaults: { ...datos, activo: false, fecha_creacion: new Date() },
           transaction: t
         });
         
