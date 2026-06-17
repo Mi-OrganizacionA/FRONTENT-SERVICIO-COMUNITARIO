@@ -274,22 +274,22 @@ ul {
   background: rgba(0, 0, 0, .6);
 }
 
-  .pub-hero-controls .hero-dots {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: .55rem;
-  }
+.pub-hero-controls .hero-dots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .55rem;
+}
 
-  .hero-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255, 255, 255, .5);
-    cursor: pointer;
-    transition: background .25s ease, transform .25s ease;
-  }
+.hero-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, .5);
+  cursor: pointer;
+  transition: background .25s ease, transform .25s ease;
+}
 }
 
 .pub-hero-overlay {
@@ -629,7 +629,8 @@ ul {
   scroll-behavior: smooth;
   scrollbar-width: thin;
 }
-.pub-grid-scrollable > div {
+
+.pub-grid-scrollable>div {
   flex: 0 0 350px;
   max-width: 350px;
   scroll-snap-align: start;
@@ -1855,14 +1856,22 @@ ul {
   .pub-nav-links,
   .pub-nav-ctas {
     display: none;
-    position: absolute; /* Usar siempre absolute. Fixed se rompe por el backdrop-filter (bug de Chrome Mobile). */
+    position: absolute;
+    /* Usar siempre absolute. Fixed se rompe por el backdrop-filter (bug de Chrome Mobile). */
     z-index: 1998;
     animation: fadeInMenu .3s cubic-bezier(.4, 0, .2, 1) forwards;
   }
 
   @keyframes fadeInMenu {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .pub-nav-links.mobile-open,
@@ -1872,16 +1881,20 @@ ul {
 
   /* Fondo Fullscreen de Enlaces a prueba de balas */
   .pub-nav-links {
-    top: 64px; /* Pegado debajo de los 64px del nav */
+    top: 64px;
+    /* Pegado debajo de los 64px del nav */
     left: -5vw;
-    width: 110vw; /* Cubrir extra ancho por seguridad */
-    height: 150vh; /* Altura masiva que asegura tapar todo si se hace scroll hacia abajo */
-    background: rgba(18, 40, 18, .98); /* Verde ultra oscuro */
+    width: 110vw;
+    /* Cubrir extra ancho por seguridad */
+    height: 150vh;
+    /* Altura masiva que asegura tapar todo si se hace scroll hacia abajo */
+    background: rgba(18, 40, 18, .98);
+    /* Verde ultra oscuro */
     flex-direction: column;
     padding: 2.5rem 5vw;
     gap: .75rem;
     border: none;
-    border-top: 1px solid rgba(255,255,255,.05);
+    border-top: 1px solid rgba(255, 255, 255, .05);
   }
 
   .pub-nav-links li {
@@ -1895,25 +1908,27 @@ ul {
     border-radius: var(--r-md);
     font-size: 1.1rem;
     font-weight: 600;
-    color: rgba(255,255,255,.9);
-    background: rgba(255,255,255,.05);
+    color: rgba(255, 255, 255, .9);
+    background: rgba(255, 255, 255, .05);
     text-align: center;
-    border: 1px solid rgba(255,255,255,.05);
+    border: 1px solid rgba(255, 255, 255, .05);
     transition: all var(--tr);
   }
 
   .pub-nav-links a.active {
     background: var(--vv);
     color: #fff;
-    border-color: rgba(255,255,255,.15);
+    border-color: rgba(255, 255, 255, .15);
   }
 
   /* Botón CTA Fijo abajo calculado */
   .pub-nav-ctas {
-    top: calc(100vh - 7.5rem) !important; /* Top matemático anclado al fondo visual, ignorando su contenedor de 64px */
+    top: calc(100vh - 7.5rem) !important;
+    /* Top matemático anclado al fondo visual, ignorando su contenedor de 64px */
     left: 1.5rem;
     right: 1.5rem;
-    bottom: auto; /* Resetear bottom para evitar bugs de caja */
+    bottom: auto;
+    /* Resetear bottom para evitar bugs de caja */
     padding: 0;
     background: transparent;
     box-shadow: none;
@@ -2056,8 +2071,8 @@ ul {
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
   }
-  
-  .pub-grid-scrollable > div {
+
+  .pub-grid-scrollable>div {
     flex: 0 0 85%;
     max-width: 85%;
     scroll-snap-align: center;
@@ -2067,9 +2082,12 @@ ul {
   .pub-grid-scrollable::-webkit-scrollbar {
     display: none;
   }
+
   .pub-grid-scrollable {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
   }
 
   .pub-hab-card {
@@ -2089,16 +2107,19 @@ ul {
   .pub-carousel-wrap::-webkit-scrollbar {
     display: none;
   }
+
   .pub-carousel-wrap {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
 
   .pub-carousel-track {
-    transform: none !important; /* Desactiva la traslación JS en móvil */
+    transform: none !important;
+    /* Desactiva la traslación JS en móvil */
     justify-content: flex-start !important;
     gap: 1rem;
-    width: max-content; /* Permite que los hijos estiren el ancho */
+    width: max-content;
+    /* Permite que los hijos estiren el ancho */
   }
 
   .pub-news-card {
@@ -2205,7 +2226,8 @@ ul {
   }
 
   .pub-hero-badge span {
-    display: none; /* Show only the icon on very small screens */
+    display: none;
+    /* Show only the icon on very small screens */
   }
 
   .pub-news-card {
@@ -2248,6 +2270,7 @@ ul {
 
 /* ── Standard Mobile: ≤ 480px ── */
 @media (max-width: 480px) {
+
   /* Hero */
   .pub-hero {
     min-height: 100svh;
@@ -2379,10 +2402,7 @@ ul {
     gap: .75rem;
   }
 
-  /* Nav brand — hide subtitle on narrow mobile */
-  .pub-nav-brand .brand-sub {
-    display: none;
-  }
+
 
   .pub-nav-brand {
     font-size: .95rem;
@@ -2433,7 +2453,7 @@ ul {
 
   .pub-stat-item {
     padding: .75rem 1rem;
-    border-bottom: 1px solid rgba(255,255,255,.12);
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
   }
 
   .pub-stat-num {
@@ -2500,7 +2520,7 @@ ul {
   transform: translateY(40px);
 }
 
-.js-anime-ready .pub-hero-content > p {
+.js-anime-ready .pub-hero-content>p {
   opacity: 0;
   transform: translateY(25px);
 }
@@ -2640,7 +2660,8 @@ ul {
   flex-wrap: wrap;
 }
 
-.pub-fs-search-inner input, .pub-fs-search-inner select {
+.pub-fs-search-inner input,
+.pub-fs-search-inner select {
   flex: 1;
   min-width: 200px;
   padding: .85rem 1rem;
@@ -2652,7 +2673,8 @@ ul {
   transition: border-color var(--tr);
 }
 
-.pub-fs-search-inner input:focus, .pub-fs-search-inner select:focus {
+.pub-fs-search-inner input:focus,
+.pub-fs-search-inner select:focus {
   border-color: var(--vv);
 }
 
@@ -2694,7 +2716,8 @@ ul {
   transition: all var(--tr);
 }
 
-.pub-page-btn:hover, .pub-page-btn.active {
+.pub-page-btn:hover,
+.pub-page-btn.active {
   background: var(--vp);
   color: #fff;
   border-color: var(--vp);
