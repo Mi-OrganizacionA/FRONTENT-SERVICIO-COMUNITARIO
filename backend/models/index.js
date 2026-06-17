@@ -67,8 +67,6 @@ async function initModels(sequelize) {
   CarteleraDigital.belongsTo(Usuario, { foreignKey: 'id_autor', as: 'autor' });
 
   // Relaciones del Censo de Viviendas
-  EstudioDemografico.belongsTo(ConsejoComunal, { foreignKey: 'id_comunidad', as: 'consejo' });
-  ConsejoComunal.hasMany(EstudioDemografico, { foreignKey: 'id_comunidad', as: 'estudios_demograficos' });
 
   EstudioDemografico.hasMany(CensoCaracteristicaFamiliar, { foreignKey: 'id_estudio', as: 'familiares' });
   CensoCaracteristicaFamiliar.belongsTo(EstudioDemografico, { foreignKey: 'id_estudio' });
