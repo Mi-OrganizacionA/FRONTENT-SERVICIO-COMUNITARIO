@@ -3,335 +3,329 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
+// Helper: formatea una fecha al estilo DD/MM/YYYY
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return '—';
+  return d.toLocaleDateString('es-VE');
+}
+
+// Helper: convierte boolean a "Sí" o "No"
+function boolStr(val) {
+  if (val === null || val === undefined) return '—';
+  return val ? 'Sí' : 'No';
+}
+
+// Helper: devuelve el valor o "—" si está vacío
+function val(v) {
+  if (v === null || v === undefined || v === '') return '—';
+  return v;
+}
+
+// Calcula la edad a partir de fecha_nacimiento
+function calcAge(dateStr) {
+  if (!dateStr) return '—';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  return Math.abs(new Date(diff).getUTCFullYear() - 1970);
+}
+
 class PdfGeneradorViviendas {
+
   /**
-   * Genera el PDF completo usando Puppeteer
-   */
-  static async generarPdf(vivienda, habitantes, consejoComunal) {
-    // 1. Leer las plantillas
-    const p1Path = path.join(__dirname, '../templates/censo_p1.html');
-    const p2Path = path.join(__dirname, '../templates/censo_p2.html');
-    
-    let htmlP1 = fs.existsSync(p1Path) ? fs.readFileSync(p1Path, 'utf8') : '<h1>P1 no encontrada</h1>';
-    let htmlP2 = fs.existsSync(p2Path) ? fs.readFileSync(p2Path, 'utf8') : '<h1>P2 no encontrada</h1>';
-
-    // 2. Extraer solo el div.page de P2 (y sus tags internos)
-    // Para ello usamos un regex o split simple, ya que asuminos que tiene <div class="page">
-    let page2Content = '';
-    const matchP2 = htmlP2.match(/<div class="page">([\s\S]*?)<\/div>\s*<\/body>/);
-    if (matchP2) {
-      page2Content = `<div class="page" style="page-break-before: always; margin-top:20px;">${matchP2[1]}</div>`;
-    } else {
-      page2Content = `<div class="page" style="page-break-before: always; margin-top:20px;">${htmlP2}</div>`;
-    }
-
-    // 3. Preparar los datos a inyectar en JSON puro
-    const payload = {
-      vivienda: vivienda || {},
-      habitantes: habitantes || [],
-      consejo: consejoComunal || {}
-    };
-
-    // 4. Script inyector masivo (se ejecuta dentro de Chromium)
-    const inyectorJS = `
-    <script>
-      const dbData = ${JSON.stringify(payload)};
-      
-      document.addEventListener("DOMContentLoaded", () => {
-        try {
-          // Llenar Datos Geográficos (Sección I)
-          const geoCells = document.querySelectorAll('.geo-cell .cell-value');
-          if (geoCells.length >= 6) {
-            geoCells[0].innerHTML = 'Yaracuy'; // Estado
-            geoCells[1].innerHTML = 'San Felipe'; // Municipio
-            geoCells[2].innerHTML = 'Albarico'; // Parroquia
-            geoCells[4].innerHTML = dbData.consejo.nombre_comunidad || ''; 
-            geoCells[5].innerHTML = dbData.vivienda.direccion || '';
-          }
-
-          // Separar habitantes: Jefe de familia vs resto
-          const jefe = dbData.habitantes.find(h => h.es_jefe_familia) || dbData.habitantes[0] || {};
-          const familiaResto = dbData.habitantes.filter(h => h.id !== jefe.id);
-
-          // Llenar Datos Personales del Jefe (Sección II)
-          const fields = document.querySelectorAll('.jefe-nombres .line');
-          if (fields.length >= 2) {
-            fields[0].innerHTML = '&nbsp;' + (jefe.nombres || '');
-            fields[1].innerHTML = '&nbsp;' + (jefe.apellidos || '');
-          }
-
-          // CI
-          const ciLine = document.querySelector('.jefe-ci .line');
-          if(ciLine) ciLine.innerHTML = '&nbsp;' + (jefe.cedula || '');
-
-          // Fechas y Edades
-          const jNacimiento = document.querySelector('.jefe-nacimiento');
-          if (jNacimiento) {
-            const dateLine = jNacimiento.querySelectorAll('.line');
-            if (dateLine[0] && jefe.fecha_nacimiento) dateLine[0].innerHTML = '&nbsp;' + new Date(jefe.fecha_nacimiento).toLocaleDateString();
-            
-            // Calculo simple de edad
-            if (dateLine[1] && jefe.fecha_nacimiento) {
-              const diff = Date.now() - new Date(jefe.fecha_nacimiento).getTime();
-              const age = Math.abs(new Date(diff).getUTCFullYear() - 1970);
-              dateLine[1].innerHTML = '&nbsp;' + age;
-            }
-          }
-
-          // Marcar Checkboxes si es CNE inscrito
-          if (jNacimiento && jNacimiento.querySelectorAll('input[type="checkbox"]').length >= 2) {
-            const chks = jNacimiento.querySelectorAll('input[type="checkbox"]');
-            if (jefe.inscrito_cne) chks[0].setAttribute('checked', 'true');
-            else chks[1].setAttribute('checked', 'true');
-          }
-
-          // Sexo
-          const jSexo = document.querySelector('.jefe-sexo');
-          if(jSexo && jSexo.querySelectorAll('input[type="checkbox"]').length >= 2) {
-            const chks = jSexo.querySelectorAll('input[type="checkbox"]');
-            if (jefe.genero === 'M') chks[0].setAttribute('checked', 'true');
-            if (jefe.genero === 'F') chks[1].setAttribute('checked', 'true');
-          }
-
-          // Multi-hoja Familia
-          // Si hay más de 10 personas, clonar page1.
-          const pageContainer = document.body;
-          const originalPage1 = document.querySelector('.page');
-          const allFamily = dbData.habitantes;
-          const pagesNeeded = Math.ceil(allFamily.length / 10) || 1;
-
-          for(let p = 1; p < pagesNeeded; p++) {
-             const cln = document.createElement('div');
-             cln.className = 'page';
-             cln.style.pageBreakBefore = 'always';
-             cln.style.marginTop = '20px';
-             
-             // Extraer solo el título y la tabla de familia (Sección III)
-             const titleBox = originalPage1.querySelector('.title-box');
-             const section3 = originalPage1.querySelector('.section3-wrapper');
-             
-             let htmlContent = '';
-             if (titleBox) {
-                const titleClone = titleBox.cloneNode(true);
-                titleClone.innerHTML = 'ESTUDIO DEMOGRÁFICO Y SOCIOECONÓMICO — CONT. (Pág. ' + (p + 1) + ')';
-                htmlContent += titleClone.outerHTML;
-             }
-             if (section3) {
-                const section3Clone = section3.cloneNode(true);
-                const header = section3Clone.querySelector('.section-header');
-                if (header) header.innerHTML = 'III. CARACTERÍSTICAS DEL GRUPO FAMILIAR (CONTINUACIÓN)';
-                section3Clone.querySelector('.familia-table tbody').innerHTML = '';
-                htmlContent += section3Clone.outerHTML;
-             }
-             
-             cln.innerHTML = htmlContent;
-             // Inserta el clon ANTES de la pagina 2
-             pageContainer.insertBefore(cln, pageContainer.lastElementChild);
-          }
-
-          // Ahora llenar en los tbody correspondientes
-          const tbodyList = document.querySelectorAll('.familia-table tbody');
-          
-          let famIdx = 0;
-          for(let tb = 0; tb < pagesNeeded; tb++) {
-            const currentTbody = tbodyList[tb];
-            if(!currentTbody) continue;
-            currentTbody.innerHTML = '';
-            
-            for(let i = 0; i < 10; i++) {
-              const tr = document.createElement('tr');
-              if (famIdx < allFamily.length) {
-                const hab = allFamily[famIdx];
-                let age = '';
-                let fnac = '';
-                if (hab.fecha_nacimiento) {
-                  fnac = new Date(hab.fecha_nacimiento).toLocaleDateString();
-                  const diff = Date.now() - new Date(hab.fecha_nacimiento).getTime();
-                  age = Math.abs(new Date(diff).getUTCFullYear() - 1970);
-                }
-
-                tr.innerHTML = \`
-                  <td class="num">\${famIdx + 1}</td>
-                  <td>\${hab.nombres} \${hab.apellidos}</td>
-                  <td>\${hab.genero || ''}</td>
-                  <td>\${hab.cedula || ''}</td>
-                  <td>\${fnac}</td>
-                  <td>\${age}</td>
-                  <td>\${hab.incapacitado_tipo || ''}</td>
-                  <td></td>
-                  <td>\${hab.es_jefe_familia ? 'Jefe' : 'Familiar'}</td>
-                  <td>\${hab.nivel_academico || ''}</td>
-                  <td>\${hab.inscrito_cne ? 'SI' : 'NO'}</td>
-                  <td>\${hab.ocupacion || ''}</td>
-                  <td></td>
-                  <td></td>
-                \`;
-                famIdx++;
-              } else {
-                tr.innerHTML = \`<td class="num">\${famIdx + 1}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>\`;
-                famIdx++;
-              }
-              currentTbody.appendChild(tr);
-            }
-          }
-
-        } catch(e) {
-          console.error("Error injectando data", e);
-        }
-      });
-    </script>
-    `;
-
-    // 5. Unir Todo el HTML
-    // Reemplazamos </body> por la Página 2 + el inyector JS + </body>
-    const finalHTML = htmlP1.replace('</body>', page2Content + inyectorJS + '</body>');
-
-    // 6. Lanzar Puppeteer
-    const browser = await puppeteer.launch({ 
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu', '--no-zygote', '--single-process']
-    });
-    
-    const page = await browser.newPage();
-    
-    // Forzamos un tamaño de ventana para que coincida con .page width: 950px o carta
-    await page.setViewport({ width: 1024, height: 1200 });
-
-    // Cargamos el HTML y esperamos a que el script de inyección modifique el DOM
-    await page.setContent(finalHTML, { waitUntil: 'domcontentloaded', timeout: 60000 });
-
-    // 7. Generar el PDF
-    // Las plantillas tienen un ancho fijo. Ajustamos el formato para que entre bien.
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: { top: '10px', bottom: '10px', left: '10px', right: '10px' }
-    });
-
-    await browser.close();
-
-    return pdfBuffer;
-  }
-  /**
-   * Genera el PDF usando TODAS las secciones del estudio demográfico.
-   * @param {Object} estudio - Objeto completo con todas las tablas hijas incluidas.
+   * Genera el PDF del Estudio Demográfico completo.
+   * @param {Object} estudio - Objeto JSON con todas las relaciones incluidas.
    */
   static async generarPdfEstudio(estudio) {
-    const p1Path = path.join(__dirname, '../templates/censo_p1.html');
-    const p2Path = path.join(__dirname, '../templates/censo_p2.html');
+    // Leer el logo SVG como string e incrustar inline en el HTML
+    const logoPath = path.join(__dirname, '../../assets/img/logo_comuna_fondoremovido.svg');
+    const logoSvg = fs.existsSync(logoPath) ? fs.readFileSync(logoPath, 'utf8') : '';
+
+    const familiares = Array.isArray(estudio.familiares) ? estudio.familiares : [];
+    const jefe = familiares.find(f => f.parentesco && f.parentesco.toLowerCase().includes('jefe')) || familiares[0] || {};
+    const sv = estudio.situacion_vivienda || {};
+    const sal = estudio.salud || {};
+    const ser = estudio.servicios || {};
+    const eco = estudio.situacion_economica || {};
+    const part = estudio.participacion_comunitaria || {};
+    const com = estudio.situacion_comunidad || {};
+    const comunidad = estudio.consejo?.nombre_comunidad || estudio.nombre_comunidad || '—';
+
+    const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    /* --- RESET Y BASE --- */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 8.5px; color: #1a1a1a; background: #fff; padding: 12mm; }
     
-    let htmlP1 = fs.existsSync(p1Path) ? fs.readFileSync(p1Path, 'utf8') : '<h1>P1 no encontrada</h1>';
-    let htmlP2 = fs.existsSync(p2Path) ? fs.readFileSync(p2Path, 'utf8') : '<h1>P2 no encontrada</h1>';
+    /* --- ENCABEZADO --- */
+    .header { display: flex; align-items: center; gap: 12px; border-bottom: 2.5px solid #1a5276; padding-bottom: 8px; margin-bottom: 10px; }
+    .header .logo { height: 55px; width: auto; flex-shrink: 0; }
+    .header .logo svg { height: 55px; width: auto; }
+    .header .title { flex: 1; text-align: center; }
+    .header .title h1 { font-size: 12px; color: #1a5276; text-transform: uppercase; }
+    .header .title h2 { font-size: 8px; color: #555; font-weight: normal; }
+    .header .meta { font-size: 8px; text-align: right; line-height: 1.7; }
+    .header .meta span { display: block; }
+    .header .meta strong { color: #1a5276; }
+    
+    /* --- SECCIONES --- */
+    .section { margin-bottom: 7px; page-break-inside: avoid; border-left: 3px solid #f39c12; }
+    .section-title { background: #d6eaf8; color: #1a5276; font-size: 8px; font-weight: bold; padding: 3px 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-body { padding: 5px 7px; }
+    
+    /* --- GRID DE CAMPOS --- */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 12px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3px 12px; }
+    .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 3px 12px; }
+    .field { display: flex; flex-direction: column; }
+    .field label { font-size: 6.5px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.3px; }
+    .field span { font-size: 8.5px; border-bottom: 0.5px solid #bdc3c7; padding: 1px 0; min-height: 12px; }
+    
+    /* --- TABLA FAMILIAR --- */
+    table { width: 100%; border-collapse: collapse; font-size: 7px; }
+    th { background: #2c3e50; color: #fff; padding: 3px 4px; text-align: left; }
+    td { border-bottom: 0.5px solid #ecf0f1; padding: 2px 4px; }
+    tr:nth-child(even) td { background: #f9f9f9; }
+    
+    /* --- CHECKBOX SIMULADO --- */
+    .check-field { display: flex; align-items: center; gap: 4px; margin: 2px 0; }
+    .check-field label { font-size: 7.5px; flex: 1; }
+    .check-box { width: 9px; height: 9px; border: 1px solid #7f8c8d; display: inline-block; text-align: center; line-height: 9px; font-size: 7px; flex-shrink: 0; }
+    
+    /* --- FIRMA --- */
+    .firma-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 5px; }
+    .firma-box { border-top: 1px solid #1a1a1a; padding-top: 3px; font-size: 7px; text-align: center; color: #555; }
+  </style>
+</head>
+<body>
 
-    // Extraer div.page de la página 2
-    let page2Content = '';
-    const matchP2 = htmlP2.match(/<div class="page">([\s\S]*?)<\/div>\s*<\/body>/);
-    if (matchP2) {
-      page2Content = `<div class="page" style="page-break-before: always; margin-top:20px;">${matchP2[1]}</div>`;
-    }
+  <!-- ENCABEZADO -->
+  <div class="header">
+    <div class="logo">${logoSvg}</div>
+    <div class="title">
+      <h1>Estudio Demográfico y Socioeconómico</h1>
+      <h2>Comuna Socialista Agroecológica Simón Rodríguez</h2>
+    </div>
+    <div class="meta">
+      <span><strong>Planilla N°:</strong> ${val(estudio.planilla_nro)}</span>
+      <span><strong>Fecha:</strong> ${formatDate(estudio.fecha_censo)}</span>
+      <span><strong>RIF:</strong> ${val(estudio.rif)}</span>
+      <span><strong>N° Cuenta:</strong> ${val(estudio.nro_cuenta)}</span>
+    </div>
+  </div>
 
-    // Payload completo para inyectar en Puppeteer
-    const payload = {
-      cabecera: {
-        planilla_nro: estudio.planilla_nro || '',
-        fecha_censo: estudio.fecha_censo || '',
-        encuestador_nombre: estudio.encuestador_nombre || '',
-        encuestado_nombre: estudio.encuestado_nombre || '',
-        encuestado_cedula: estudio.encuestado_cedula || ''
-      },
-      geo: {
-        estado: estudio.estado || 'Yaracuy',
-        municipio: estudio.municipio || 'San Felipe',
-        parroquia: estudio.parroquia || 'Albarico',
-        sector: estudio.sector || '',
-        nombre_comunidad: estudio.consejo?.nombre_comunidad || estudio.nombre_comunidad || '',
-        direccion: estudio.direccion_comunidad || ''
-      },
-      // Grupo familiar (de CensoCaracteristicaFamiliar)
-      familiares: Array.isArray(estudio.familiares) ? estudio.familiares : [],
-      // Situación de vivienda (de CensoSituacionVivienda)
-      vivienda: estudio.vivienda || {},
-      // Salud (de CensoSalud)
-      salud: estudio.salud || {},
-      // Servicios básicos (de CensoServicios)
-      servicios: estudio.servicios || {},
-      // Participación comunitaria (de CensoParticipacionComunitaria)
-      participacion: estudio.participacion || {},
-      // Economía (de CensoSituacionEconomica)
-      economia: estudio.economia || {},
-      // Diagnóstico de la comunidad (de CensoSituacionComunidad)
-      comunidad: estudio.comunidad || {}
-    };
+  <!-- SECCIÓN I: UBICACIÓN -->
+  <div class="section">
+    <div class="section-title">I. Ubicación Geográfica de la Comunidad</div>
+    <div class="section-body">
+      <div class="grid-3">
+        <div class="field"><label>Estado</label><span>${val(estudio.estado)}</span></div>
+        <div class="field"><label>Municipio</label><span>${val(estudio.municipio)}</span></div>
+        <div class="field"><label>Parroquia</label><span>${val(estudio.parroquia)}</span></div>
+        <div class="field"><label>Sector</label><span>${val(estudio.sector)}</span></div>
+        <div class="field"><label>Comunidad</label><span>${val(comunidad)}</span></div>
+        <div class="field"><label>Dirección</label><span>${val(estudio.direccion_comunidad)}</span></div>
+      </div>
+    </div>
+  </div>
 
-    // Inyector JS que se ejecuta dentro de Puppeteer (Chromium)
-    const inyectorJS = `
-    <script>
-      const dbData = ${JSON.stringify(payload)};
-      document.addEventListener("DOMContentLoaded", () => {
-        try {
-          // Cabecera: Planilla N° y Fecha
-          const headerLines = document.querySelectorAll('.header-right .line');
-          if (headerLines[0]) headerLines[0].innerHTML = '&nbsp;' + dbData.cabecera.planilla_nro;
-          if (headerLines[1]) headerLines[1].innerHTML = '&nbsp;' + dbData.cabecera.fecha_censo;
+  <!-- SECCIÓN II: JEFE DE FAMILIA -->
+  <div class="section">
+    <div class="section-title">II. Datos del Jefe del Grupo Familiar</div>
+    <div class="section-body">
+      <div class="grid-4">
+        <div class="field" style="grid-column: span 2;"><label>Nombres y Apellidos</label><span>${val(jefe.nombres_apellidos)}</span></div>
+        <div class="field"><label>C.I.</label><span>${val(jefe.cedula_identidad)}</span></div>
+        <div class="field"><label>Sexo</label><span>${val(jefe.sexo)}</span></div>
+        <div class="field"><label>Fecha de Nacimiento</label><span>${formatDate(jefe.fecha_nacimiento)}</span></div>
+        <div class="field"><label>Edad</label><span>${calcAge(jefe.fecha_nacimiento)}</span></div>
+        <div class="field"><label>Parentesco</label><span>${val(jefe.parentesco)}</span></div>
+        <div class="field"><label>Grado de Instrucción</label><span>${val(jefe.grado_instruccion)}</span></div>
+        <div class="field"><label>Profesión/Oficio</label><span>${val(jefe.profesion)}</span></div>
+        <div class="field"><label>Inscrito CNE</label><span>${boolStr(jefe.inscrito_cne)}</span></div>
+        <div class="field"><label>Pensionado</label><span>${boolStr(jefe.pensionado)}</span></div>
+        <div class="field"><label>Ingreso Mensual Bs.</label><span>${val(jefe.ingreso_mensual_bs)}</span></div>
+      </div>
+    </div>
+  </div>
 
-          // Sección I: Ubicación geográfica
-          const geoCells = document.querySelectorAll('.geo-cell .cell-value');
-          if (geoCells.length >= 6) {
-            geoCells[0].innerHTML = dbData.geo.estado;
-            geoCells[1].innerHTML = dbData.geo.municipio;
-            geoCells[2].innerHTML = dbData.geo.parroquia;
-            geoCells[3].innerHTML = dbData.geo.sector;
-            geoCells[4].innerHTML = dbData.geo.nombre_comunidad;
-            geoCells[5].innerHTML = dbData.geo.direccion;
-          }
+  <!-- SECCIÓN III: GRUPO FAMILIAR -->
+  <div class="section">
+    <div class="section-title">III. Características del Grupo Familiar (${familiares.length} miembro(s))</div>
+    <div class="section-body">
+      <table>
+        <thead>
+          <tr>
+            <th>N°</th><th>Nombres y Apellidos</th><th>Sexo</th><th>C.I.</th>
+            <th>F. Nacimiento</th><th>Edad</th><th>Discapacidad</th><th>Parentesco</th>
+            <th>Instrucción</th><th>CNE</th><th>Profesión</th><th>Pensionado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${familiares.map((f, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${val(f.nombres_apellidos)}</td>
+            <td>${val(f.sexo)}</td>
+            <td>${val(f.cedula_identidad)}</td>
+            <td>${formatDate(f.fecha_nacimiento)}</td>
+            <td>${calcAge(f.fecha_nacimiento)}</td>
+            <td>${val(f.discapacidad_tipo)}</td>
+            <td>${val(f.parentesco)}</td>
+            <td>${val(f.grado_instruccion)}</td>
+            <td>${boolStr(f.inscrito_cne)}</td>
+            <td>${val(f.profesion)}</td>
+            <td>${boolStr(f.pensionado)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-          // Sección II: Jefe del grupo familiar
-          const jefe = dbData.familiares.find(f => f.es_jefe_familia) || dbData.familiares[0] || {};
-          const jefeFields = document.querySelectorAll('.jefe-nombres .line');
-          if (jefeFields[0]) jefeFields[0].innerHTML = '&nbsp;' + (jefe.nombres || '');
-          if (jefeFields[1]) jefeFields[1].innerHTML = '&nbsp;' + (jefe.apellidos || '');
-          const ciLine = document.querySelector('.jefe-ci .line');
-          if (ciLine) ciLine.innerHTML = '&nbsp;' + (jefe.cedula_identidad || '');
+  <!-- SECCIONES IV, V, VI en grid de 3 columnas -->
+  <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; page-break-inside: avoid;">
+    
+    <!-- SECCIÓN IV: VIVIENDA -->
+    <div class="section">
+      <div class="section-title">IV. Situación de la Vivienda</div>
+      <div class="section-body">
+        <div class="field"><label>Condiciones del Terreno</label><span>${val(sv.condiciones_terreno)}</span></div>
+        <div class="field"><label>Forma de Tenencia</label><span>${val(sv.forma_tenencia)}</span></div>
+        <div class="field"><label>Tipo de Vivienda</label><span>${val(sv.tipo_vivienda)}</span></div>
+        <div class="field"><label>N° Habitaciones</label><span>${val(sv.cantidad_habitaciones)}</span></div>
+        <div class="field"><label>Tipo de Paredes</label><span>${val(sv.tipo_paredes)}</span></div>
+        <div class="field"><label>Tipo de Techo</label><span>${val(sv.tipo_techo)}</span></div>
+        <div class="field"><label>Pertenece a OCV</label><span>${boolStr(sv.pertenece_ocv)}</span></div>
+        <div class="field"><label>Terreno Propio</label><span>${boolStr(sv.terreno_propio)}</span></div>
+        <div class="field"><label>Inscrita en SIVIH</label><span>${boolStr(sv.inscrita_sivih)}</span></div>
+        <div class="field"><label>Cotiza Pol. Habitacional</label><span>${boolStr(sv.cotiza_politica_habitacional)}</span></div>
+        <div class="field"><label>Requiere Ayuda de Mejora</label><span>${val(sv.requiere_ayuda_mejora)}</span></div>
+        <div class="field"><label>Insectos / Roedores</label><span>${boolStr(sv.presencia_insectos_roedores)}</span></div>
+        <div class="field"><label>Animales Domésticos</label><span>${boolStr(sv.tiene_animales_domesticos)}</span></div>
+        <div class="field"><label>Condiciones Salubridad</label><span>${val(sv.condiciones_salubridad)}</span></div>
+      </div>
+    </div>
 
-          // Sección III: Tabla familiar completa
-          const tbody = document.querySelector('.familia-table tbody');
-          if (tbody) {
-            tbody.innerHTML = '';
-            dbData.familiares.forEach((f, i) => {
-              let edad = '';
-              let fnac = '';
-              if (f.fecha_nacimiento) {
-                fnac = new Date(f.fecha_nacimiento).toLocaleDateString('es-VE');
-                const diff = Date.now() - new Date(f.fecha_nacimiento).getTime();
-                edad = Math.abs(new Date(diff).getUTCFullYear() - 1970);
-              }
-              const tr = document.createElement('tr');
-              tr.innerHTML = \`
-                <td class="num">\${i + 1}</td>
-                <td>\${(f.nombres_apellidos || f.nombres || '') + ' ' + (f.apellidos || '')}</td>
-                <td>\${f.genero || ''}</td>
-                <td>\${f.cedula_identidad || f.cedula || ''}</td>
-                <td>\${fnac}</td>
-                <td>\${edad}</td>
-                <td></td>
-                <td></td>
-                <td>\${f.parentesco || (f.es_jefe_familia ? 'Jefe(a)' : 'Familiar')}</td>
-                <td>\${f.nivel_educativo || ''}</td>
-                <td>\${f.inscrito_cne ? 'SI' : 'NO'}</td>
-                <td>\${f.ocupacion || ''}</td>
-                <td>\${f.es_pensionado ? 'SI' : 'NO'}</td>
-                <td></td>
-              \`;
-              tbody.appendChild(tr);
-            });
-          }
-        } catch(e) { console.error("Error inyectando datos en PDF", e); }
-      });
-    </script>
-    `;
+    <!-- SECCIÓN V: SERVICIOS -->
+    <div class="section">
+      <div class="section-title">V. Servicios Básicos</div>
+      <div class="section-body">
+        <div class="field"><label>Agua Blanca (tipo)</label><span>${val(ser.aguas_blancas_tipo)}</span></div>
+        <div class="field"><label>Tanque (litros)</label><span>${val(ser.tiene_tanque_litros)}</span></div>
+        <div class="field"><label>Pipotes (cantidad)</label><span>${val(ser.tiene_pipotes_cantidad)}</span></div>
+        <div class="field"><label>Medidor de Agua</label><span>${boolStr(ser.tiene_medidor_agua)}</span></div>
+        <div class="field"><label>Aguas Servidas</label><span>${val(ser.aguas_servidas_tipo)}</span></div>
+        <div class="field"><label>Gas (tipo)</label><span>${val(ser.gas_tipo)}</span></div>
+        <div class="field"><label>Empresa de Gas</label><span>${val(ser.gas_empresa_suministra)}</span></div>
+        <div class="field"><label>Duración / Precio Gas</label><span>${val(ser.gas_duracion_y_precio)}</span></div>
+        <div class="field"><label>Sistema Eléctrico</label><span>${val(ser.sistema_electrico_tipo)}</span></div>
+        <div class="field"><label>Medidor de Luz</label><span>${boolStr(ser.tiene_medidor_luz)}</span></div>
+        <div class="field"><label>Bombillos ahorradores</label><span>${val(ser.bombillos_ahorradores_necesita)}</span></div>
+        <div class="field"><label>Recolección de Basura</label><span>${val(ser.recoleccion_basura_tipo)}</span></div>
+        <div class="field"><label>Telefonía</label><span>${val(ser.telefonia_tipo)}</span></div>
+        <div class="field"><label>Transporte</label><span>${val(ser.transporte_tipo)}</span></div>
+      </div>
+    </div>
 
-    const finalHTML = htmlP1.replace('</body>', page2Content + inyectorJS + '</body>');
+    <!-- SECCIÓN VI: SALUD -->
+    <div class="section">
+      <div class="section-title">VI. Salud y Exclusión Social</div>
+      <div class="section-body">
+        <div class="field"><label>Necesita Ayuda Especial</label><span>${boolStr(sal.necesita_ayuda_especial)}</span></div>
+        <div class="field"><label>¿Cuál Ayuda?</label><span>${val(sal.cual_ayuda_especial)}</span></div>
+        <div class="field"><label>Niños en calle (cant.)</label><span>${val(sal.exclusion_ninos_calle_cant)}</span></div>
+        <div class="field"><label>Indigentes (cant.)</label><span>${val(sal.exclusion_indigentes_cant)}</span></div>
+        <div class="field"><label>Enfermos terminales</label><span>${val(sal.exclusion_enfermos_term_cant)}</span></div>
+        <div class="field"><label>Discapacitados</label><span>${val(sal.exclusion_discapacitados_cant)}</span></div>
+        <div class="field"><label>Tercera Edad</label><span>${val(sal.exclusion_tercera_edad_cant)}</span></div>
+        <div class="field"><label>Otros</label><span>${val(sal.exclusion_otros)}</span></div>
+      </div>
+    </div>
 
+  </div><!-- fin grid IV-V-VI -->
+
+  <!-- SECCIÓN VII: SITUACIÓN ECONÓMICA -->
+  <div class="section">
+    <div class="section-title">VII. Situación Económica</div>
+    <div class="section-body">
+      <div class="grid-4">
+        <div class="field"><label>¿Trabaja?</label><span>${boolStr(eco.trabaja)}</span></div>
+        <div class="field"><label>¿Dónde Trabaja?</label><span>${val(eco.donde_trabaja)}</span></div>
+        <div class="field"><label>Ingreso Familiar</label><span>${val(eco.ingreso_familiar_rango)}</span></div>
+        <div class="field"><label>Actividad Comercial en Vivienda</label><span>${boolStr(eco.actividad_comercial_vivienda)}</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN VIII: PARTICIPACIÓN COMUNITARIA -->
+  <div class="section">
+    <div class="section-title">VIII. Participación Comunitaria</div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div>
+          <div class="check-field"><div class="check-box">${part.existen_org_comunitarias ? '✓' : ''}</div><label>¿Existen organizaciones comunitarias? → ${val(part.cuales_org_comunitarias)}</label></div>
+          <div class="check-field"><div class="check-box">${part.participa_usted ? '✓' : ''}</div><label>¿Participa usted en alguna organización?</label></div>
+          <div class="check-field"><div class="check-box">${part.participa_familiar ? '✓' : ''}</div><label>¿Participa un familiar?</label></div>
+          <div class="check-field"><div class="check-box">${part.cree_pueblo_interviene_decisiones ? '✓' : ''}</div><label>¿Cree que el pueblo interviene en decisiones?</label></div>
+          <div class="check-field"><div class="check-box">${part.acuerdo_pueblo_protagonismo_presupuesto ? '✓' : ''}</div><label>¿Acuerdo con protagonismo del pueblo en presupuesto?</label></div>
+          <div class="check-field"><div class="check-box">${part.info_sobre_consejos_comunales ? '✓' : ''}</div><label>¿Tiene información sobre los CC? → ${val(part.como_obtuvo_info_consejos)}</label></div>
+          <div class="check-field"><div class="check-box">${part.dispuesto_apoyar_consejo ? '✓' : ''}</div><label>¿Dispuesto a apoyar al CC?</label></div>
+          <div class="check-field"><div class="check-box">${part.asiste_asambleas_ciudadanos ? '✓' : ''}</div><label>¿Asiste a Asambleas de Ciudadanos?</label></div>
+        </div>
+        <div>
+          <div class="field"><label>¿Por qué no asiste?</label><span>${val(part.porque_no_asiste)}</span></div>
+          <div class="field"><label>¿Cómo resolver problemas del sector?</label><span>${val(part.como_resolver_problemas_sector)}</span></div>
+          <div class="field"><label>¿Quién debe resolver los problemas?</label><span>${val(part.quien_resolver_problemas)}</span></div>
+          <div class="field"><label>Tipo de proyectos deseados</label><span>${val(part.tipo_proyectos_deseados)}</span></div>
+          <div class="field"><label>¿Cómo apoyaría los proyectos?</label><span>${val(part.como_apoyaria_proyectos)}</span></div>
+          <div class="field"><label>Compromiso con el sector</label><span>${val(part.compromiso_con_sector)}</span></div>
+          <div class="field"><label>Opinión sobre el censo energético</label><span>${val(part.opinion_censo_energetico)}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN IX: SITUACIÓN DE LA COMUNIDAD -->
+  <div class="section">
+    <div class="section-title">IX. Situación de la Comunidad</div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="field"><label>Principales Potencialidades y Ventajas</label><span style="min-height:30px;">${val(com.principales_potencialidades_ventajas)}</span></div>
+        <div class="field"><label>Principales Problemas y Debilidades</label><span style="min-height:30px;">${val(com.principales_problemas_debilidades)}</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN X: DATOS DEL ENCUESTADOR -->
+  <div class="section">
+    <div class="section-title">X. Datos del Encuestador y Encuestado</div>
+    <div class="section-body">
+      <div class="firma-row">
+        <div>
+          <div class="grid-2" style="margin-bottom:8px;">
+            <div class="field"><label>Nombre del Encuestador</label><span>${val(estudio.encuestador_nombre)}</span></div>
+            <div class="field"><label>C.I. del Encuestador</label><span>${val(estudio.encuestador_cedula)}</span></div>
+          </div>
+          <div class="firma-box">Firma del Encuestador</div>
+        </div>
+        <div>
+          <div class="grid-2" style="margin-bottom:8px;">
+            <div class="field"><label>Nombre del Encuestado</label><span>${val(estudio.encuestado_nombre)}</span></div>
+            <div class="field"><label>C.I. del Encuestado</label><span>${val(estudio.encuestado_cedula)}</span></div>
+          </div>
+          <div class="firma-box">Firma del Encuestado / Conforme</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>`;
+
+    // Lanzar Puppeteer con flags de estabilidad para servidores Linux
     let browser;
     try {
       browser = await puppeteer.launch({
@@ -340,7 +334,6 @@ class PdfGeneradorViviendas {
       });
     } catch (err) {
       if (err.message.includes('Could not find Chrome')) {
-        console.log('Descargando Chrome bajo demanda para Puppeteer...');
         execSync('npx puppeteer browsers install chrome', { stdio: 'inherit' });
         browser = await puppeteer.launch({
           headless: 'new',
@@ -352,7 +345,8 @@ class PdfGeneradorViviendas {
     }
 
     const page = await browser.newPage();
-    await page.setContent(finalHTML, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    // HTML estático puro, sin recursos externos → networkidle0 es seguro y confirma que el DOM está listo
+    await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 });
     const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
@@ -360,6 +354,51 @@ class PdfGeneradorViviendas {
     });
     await browser.close();
     return pdfBuffer;
+  }
+
+  /**
+   * Método legado: mantener firma pero redirigir al nuevo método.
+   * Se llama desde viviendasController.js.
+   */
+  static async generarPdf(vivienda, habitantes, consejoComunal) {
+    // Construir un objeto estudio compatible con generarPdfEstudio
+    const estudioSimulado = {
+      planilla_nro: vivienda.planilla_nro || null,
+      fecha_censo: vivienda.fecha_creacion,
+      rif: vivienda.rif || null,
+      nro_cuenta: vivienda.nro_cuenta || null,
+      estado: 'Yaracuy',
+      municipio: 'San Felipe',
+      parroquia: 'Albarico',
+      sector: vivienda.sector || null,
+      nombre_comunidad: consejoComunal?.nombre_comunidad || null,
+      direccion_comunidad: vivienda.direccion || null,
+      encuestador_nombre: null,
+      encuestador_cedula: null,
+      encuestado_nombre: habitantes[0] ? `${habitantes[0].nombres} ${habitantes[0].apellidos}` : null,
+      encuestado_cedula: habitantes[0]?.cedula || null,
+      consejo: consejoComunal,
+      familiares: habitantes.map(h => ({
+        nombres_apellidos: `${h.nombres || ''} ${h.apellidos || ''}`.trim(),
+        sexo: h.genero,
+        cedula_identidad: h.cedula,
+        fecha_nacimiento: h.fecha_nacimiento,
+        discapacidad_tipo: h.incapacitado_tipo,
+        parentesco: h.es_jefe_familia ? 'Jefe(a)' : 'Familiar',
+        grado_instruccion: h.nivel_academico,
+        inscrito_cne: h.inscrito_cne,
+        profesion: h.ocupacion,
+        pensionado: h.pensionado,
+        ingreso_mensual_bs: null
+      })),
+      situacion_vivienda: null,
+      salud: null,
+      servicios: null,
+      situacion_economica: null,
+      participacion_comunitaria: null,
+      situacion_comunidad: null
+    };
+    return PdfGeneradorViviendas.generarPdfEstudio(estudioSimulado);
   }
 }
 
