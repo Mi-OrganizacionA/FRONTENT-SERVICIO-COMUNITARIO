@@ -122,6 +122,40 @@ class BandejaValidacionesController {
       const datos = validacion.datos_temporales;
       let nuevoRegistro;
 
+      // Manejo especial para estudios_demograficos (múltiples tablas hijas)
+      if (tabla === 'estudios_demograficos' && (validacion.tipo_accion === 'CREATE' || validacion.tipo_accion === 'INSERT')) {
+        // Reutilizar la lógica del controller de EstudioDemografico
+        const estudioDemograficoController = require('./estudioDemograficoController');
+        
+        // Crear un objeto req/res simulado para reutilizar el método crear
+        const mockReq = {
+          body: datos,
+          user: { id: validacion.id_vocero, rol: 'vocero' }
+        };
+        let respuesta;
+        const mockRes = {
+          status: () => mockRes,
+          json: (data) => { respuesta = data; }
+        };
+        
+        await estudioDemograficoController.crear(mockReq, mockRes, (err) => { if (err) throw err; });
+        nuevoRegistro = respuesta;
+
+        await validacion.update({
+          estado_tramite: 'Aprobado',
+          id_validador: req.user ? req.user.id : null,
+          comentarios_validador: comentarios,
+          fecha_validacion: new Date(),
+          registro_id: nuevoRegistro && nuevoRegistro.id ? nuevoRegistro.id : validacion.registro_id
+        });
+
+        const AuditService = require('../services/auditService');
+        await AuditService.log(req.user ? req.user.id : 0, 'VALIDACION_APROBADA', 'bandeja_validaciones', id,
+          { estado: 'Pendiente' }, { estado: 'Aprobado', tabla: 'estudios_demograficos' });
+
+        return res.json({ mensaje: 'Censo demográfico aprobado e insertado en el sistema', validacion });
+      }
+
       // Mapeo de nombre de tabla a Modelo Sequelize
       const tablaAModelo = {
         'habitantes': models.Habitante,

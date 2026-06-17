@@ -3556,28 +3556,37 @@
     let viviendas = [];
     async function loadViviendasData() {
       try {
-        if (window.api && window.api.getViviendas) {
-          const data = await window.api.getViviendas();
-          viviendas = data.map(v => ({
+        if (window.api && window.api.getEstudiosDemograficos) {
+          const data = await window.api.getEstudiosDemograficos();
+          viviendas = Array.isArray(data) ? data.map(v => ({
             id: v.id,
-            cedula: v.cedula,
-            sector: v.sector,
-            habitantes: v.habitantes,
-            condicion: v.condicion,
-            tipo: v.tipo,
-            tenencia: v.tenencia || 'Propia',
-            paredes: v.tipo_paredes || '',
-            techo: v.tipo_techo || '',
-            agua: v.agua || '',
-            gas: v.gas || '',
-            direccion: v.direccion || '',
-            fechaCenso: v.fecha_registro
-          }));
+            // Cédula del encuestado o del jefe (campo del paso 3 del wizard)
+            cedula: v.encuestado_cedula || v.cedula_jefe || '—',
+            // Nombre de la comunidad (del paso 2: ubicación geográfica)
+            sector: v.nombre_comunidad || v.sector || '—',
+            // Cantidad de habitantes (del paso 4)
+            habitantes: v.cantidad_habitantes || '—',
+            // Condición general (del paso 6: situación de vivienda)
+            condicion: v.condiciones_salubridad || v.condicion_general || '—',
+            // Tipo de vivienda (del paso 6)
+            tipo: v.tipo_vivienda || '—',
+            // Tenencia (del paso 6)
+            tenencia: v.forma_tenencia || v.tenencia || '—',
+            // Materiales (del paso 6)
+            paredes: v.tipo_paredes || v.material_paredes || '—',
+            techo: v.tipo_techo || v.material_techo || '—',
+            // Servicios (del paso 7)
+            agua: v.aguas_blancas_tipo || v.aguas_blancas || '—',
+            gas: v.gas_tipo || v.gas_domestico || '—',
+            // Dirección (del paso 2)
+            direccion: v.direccion_comunidad || v.direccion_exacta || '—',
+            fechaCenso: v.fecha_censo || v.fecha_creacion
+          })) : [];
         }
         renderTable();
       } catch (err) {
-        console.error('Error al cargar viviendas:', err);
-        showToast('Error de conexión al obtener viviendas.', 'error');
+        console.error('Error al cargar censos:', err);
+        showToast('Error de conexión al obtener registros de censo.', 'error');
       }
     }
 
@@ -3687,7 +3696,7 @@
       }
       const token = window.auth?.getToken() || '';
       const baseURL = window.api?.baseURL || 'https://sicag-api.onrender.com/api';
-      window.open(`${baseURL}/viviendas/${id}/exportar-pdf?token=${token}`, '_blank');
+      window.open(`${baseURL}/estudios-demograficos/${id}/exportar-pdf?token=${token}`, '_blank');
     }
 
     function intentarEditar(id, index) {
@@ -3903,47 +3912,43 @@
         return;
       }
       try {
-        if (window.api && window.api.crearVivienda) {
-          const mapNameId = {
-            'Jobito I': 1, 'Jobito II': 2, 'Brisas del Yurubí': 3, 'Andrés Eloy Blanco': 4,
-            'Las Mercedes I': 5, 'Las Mercedes II': 6, 'Santa Cruz de las Mercedes': 7,
-            'Fortaleza del Corozo': 8, 'Vencedores del Corozo': 9
-          };
-          const u = window.auth?.getUser?.() || window.auth?.user || JSON.parse(sessionStorage.getItem('sicag_user') || '{}');
-          const idComunidad = mapNameId[v.sector] || u?.id_comunidad_asignada || null;
+        // Recolectar todos los datos de las 10 secciones del wizard
+        const datosCenso = {};
+        for (let paso = 1; paso <= totalSteps; paso++) {
+          const datosDelPaso = typeof recolectarDatosDelPaso === 'function' ? recolectarDatosDelPaso(paso) : {};
+          Object.assign(datosCenso, datosDelPaso);
+        }
 
-          const registroBD = {
-            id_comunidad: idComunidad,
-            id_jefe_familia: window.currentJefeFamiliaId || null,
-            direccion: v.direccion,
-            tipo_vivienda: v.tipo,
-            tipo_paredes: v.paredes,
-            tipo_techo: v.techo,
-            condiciones_salubridad: v.condicion,
-            requiere_ayuda_mejora: v.requiereAyuda
-          };
-          const res = await window.api.crearVivienda(registroBD);
-          if (res && res.mensaje) {
-            showToast(res.mensaje, 'info');
+        // Enriquecer con metadatos clave
+        const mapNameId = {
+          'Jobito I': 1, 'Jobito II': 2, 'Brisas del Yurubí': 3, 'Andrés Eloy Blanco': 4,
+          'Las Mercedes I': 5, 'Las Mercedes II': 6, 'Santa Cruz de las Mercedes': 7,
+          'Fortaleza del Corozo': 8, 'Vencedores del Corozo': 9
+        };
+        const u = window.auth?.getUser?.() || {};
+        datosCenso.id_comunidad = mapNameId[datosCenso.consejo_comunal_cab] || u?.id_comunidad_asignada || 1;
+        datosCenso.nombre_encuestador = datosCenso.encuestador_nombre || u?.nombre || '';
+        datosCenso.id_estudio_borrador = window.currentCensoId || null; // ID del borrador progresivo si existe
+
+        // Pasar por el interceptor de validación (igual que proyectos/organizaciones)
+        if (window.api && window.api.crearCensoDemografico) {
+          const res = await window.api.crearCensoDemografico(datosCenso);
+
+          // Si fue a la bandeja (res.validacion existe), mostrar mensaje informativo
+          if (res && res.validacion) {
+            showToast('📋 Censo enviado al administrador para aprobación.', 'info');
           } else {
-            showToast('Vivienda guardada correctamente', 'success');
+            showToast('✅ Censo registrado correctamente.', 'success');
           }
         }
-        await loadViviendasData();
-        // Si existe un estudio iniciado en el wizard, marcarlo como finalizado
-        try {
-          if (window.currentCensoId && window.api && window.api.finalizarEstudio) {
-            await window.api.finalizarEstudio(window.currentCensoId);
-            clearDraft();
-          }
-        } catch (e) {
-          console.warn('No se pudo finalizar el estudio:', e);
-        }
+
+        if (typeof clearDraft === 'function') clearDraft();
         bootstrap.Modal.getInstance(document.getElementById('modalVivienda')).hide();
-        showToast(`Vivienda de ${v.cedula} registrada correctamente. ✅`);
+        await loadViviendasData();
+
       } catch (err) {
         console.error(err);
-        showToast('Error al guardar la vivienda en el servidor', 'error');
+        showToast('Error al guardar el censo: ' + (err.message || 'Error desconocido'), 'error');
       }
     });
 

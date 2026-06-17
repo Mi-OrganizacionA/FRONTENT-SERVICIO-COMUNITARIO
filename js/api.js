@@ -1,4 +1,4 @@
-﻿/**
+/**
  * MÃ³dulo centralizado de API (SICAG v3.0)
  *
  * Mejoras de seguridad y robustez:
@@ -851,6 +851,7 @@ class APIManager {
           'voceros':             '/voceros',
           'noticias':            '/cartelera',
           'viviendas':           '/viviendas',
+          'estudios_demograficos': '/estudios-demograficos',
         };
         const metodosMap = { CREATE: 'POST', UPDATE: 'PUT', DELETE: 'DELETE' };
 
@@ -1612,6 +1613,47 @@ class APIManager {
     }
   }
 
+  // --- CENSO DEMOGRÁFICO (creación completa con validación) ---
+
+  /**
+   * Obtiene todos los estudios demográficos del backend.
+   * Usado por la tabla del listado de censo_viviendas.html.
+   */
+  async getEstudiosDemograficos(filtros = {}) {
+    if (this.isDevelopment) return [];
+    const params = new URLSearchParams(filtros);
+    try {
+      const response = await this._fetch(`${this.baseURL}/estudios-demograficos?${params}`, this._getHeaders());
+      if (!response.ok) throw new Error('Error fetching estudios demograficos');
+      return await response.json();
+    } catch (error) {
+      this._enableMockMode(error);
+      if (this.isDevelopment) return [];
+      throw error;
+    }
+  }
+
+  /**
+   * Crea un censo demográfico completo (todas las 10 secciones).
+   * Pasa por _interceptarValidacion: si el usuario es Vocero va a la Bandeja,
+   * si es Admin o hay auto-aprobación se guarda directo.
+   * 
+   * @param {Object} datosCenso - Objeto con TODOS los datos de las 10 secciones del wizard.
+   */
+  async crearCensoDemografico(datosCenso) {
+    return await this._interceptarValidacion('estudios_demograficos', 'CREATE', datosCenso, async () => {
+      if (this.isDevelopment) return { success: true, id: Math.floor(Math.random() * 9000) + 1000 };
+      const response = await fetch(`${this.baseURL}/estudios-demograficos`, {
+        method: 'POST',
+        ...this._getHeaders(),
+        body: JSON.stringify(datosCenso)
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Error al crear el censo demográfico');
+      return data;
+    });
+  }
+
   _filterProyectos(proyectos, filtros) {
     let resultado = proyectos;
     if (filtros.consejoComunal) {
@@ -1680,21 +1722,7 @@ class APIManager {
     }
   }
 
-  /**
-   * Crea una nueva vivienda en el backend.
-   * @param {Object} datos - Datos del formulario de vivienda
-   * @returns {Promise<Object>} - La vivienda creada
-   */
-  async crearVivienda(datos) {
-    const response = await this._fetch(`${this.baseURL}/viviendas`, {
-      method: 'POST',
-      ...this._getHeaders(),
-      body: JSON.stringify(datos)
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || 'Error al crear la vivienda');
-    return data;
-  }
+
 
   /**
    * Actualiza los datos de una vivienda existente.

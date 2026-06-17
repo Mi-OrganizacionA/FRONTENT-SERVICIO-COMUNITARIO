@@ -269,8 +269,41 @@ class EstudioDemograficoController {
       if (req.user) {
         await AuditService.log(req.user.id, "DELETE", "estudios_demograficos", data.id, datosAntiguos, data.toJSON());
       }
-      res.json({ success: true, message: "Estudio eliminado l�gicamente" });
+      res.json({ success: true, message: "Estudio eliminado lógicamente" });
     } catch (error) { next(error); }
+  }
+
+  static async exportarPdf(req, res, next) {
+    try {
+      const { id } = req.params;
+      const db = models;
+      const PdfGeneradorViviendas = require('../services/pdfGeneradorViviendas');
+
+      // Cargar el estudio demográfico con TODAS sus relaciones
+      const estudio = await EstudioDemografico.findByPk(id, {
+        include: [
+          { model: db.CensoCaracteristicaFamiliar,  as: 'familiares'    },
+          { model: db.CensoSituacionVivienda,        as: 'vivienda'      },
+          { model: db.CensoSalud,                    as: 'salud'         },
+          { model: db.CensoServicios,                as: 'servicios'     },
+          { model: db.CensoParticipacionComunitaria, as: 'participacion' },
+          { model: db.CensoSituacionEconomica,       as: 'economia'      },
+          { model: db.CensoSituacionComunidad,       as: 'comunidad'     },
+          { model: db.ConsejoComunal,                as: 'consejo'       }
+        ]
+      });
+
+      if (!estudio) return res.status(404).json({ error: 'Estudio demográfico no encontrado' });
+
+      const pdfBuffer = await PdfGeneradorViviendas.generarPdfEstudio(estudio.toJSON());
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename=censo_demografico_${id}.pdf`);
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error('Error exportando PDF del estudio demográfico:', error);
+      res.status(500).json({ error: 'Error generando el PDF: ' + error.message });
+    }
   }
 }
 

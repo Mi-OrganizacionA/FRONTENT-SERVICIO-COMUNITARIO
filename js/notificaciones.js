@@ -555,6 +555,11 @@ class NotificacionesController {
     const d = n.datos_temporales || {};
     if (n.tabla_afectada === 'recuperacion_clave') return `RecuperaciÃ³n de clave: ${d.correo_usuario}`;
     if (n.tabla_afectada === 'contacto') return `Contacto de: ${d.nombre}`;
+    if (n.tabla_afectada === 'estudios_demograficos') {
+      const cedula = d.encuestado_cedula || d.cedula_jefe || '';
+      const comunidad = d.nombre_comunidad || d.sector || '';
+      return `Censo de vivienda${cedula ? ': C.I. ' + cedula : ''}${comunidad ? ' — ' + comunidad : ''}`;
+    }
     if (d.nombres) return `Habitante: ${d.nombres} ${d.apellidos || ''}`.trim();
     if (d.titulo) return `Noticia: ${d.titulo}`;
     if (d.nombre_proyecto) return `Proyecto: ${d.nombre_proyecto}`;
@@ -573,7 +578,8 @@ class NotificacionesController {
       'organizaciones': ['organizaciÃ³n', 'hands-holding-circle'],
       'produccion_agricola': ['producciÃ³n', 'tractor'],
       'recuperacion_clave': ['recuperaciÃ³n', 'key'],
-      'contacto': ['contacto', 'envelope']
+      'contacto': ['contacto', 'envelope'],
+      'estudios_demograficos': ['censo vivienda', 'house-chimney-user']
     };
     const t = (tabla || '').toLowerCase();
     for (const [key, [label, icon]] of Object.entries(map)) {
