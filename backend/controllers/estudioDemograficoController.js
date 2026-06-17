@@ -85,18 +85,11 @@ class EstudioDemograficoController {
         id_estudio_borrador
       } = req.body;
 
-      // Si se envió un id_estudio_borrador, significa que el wizard ya creó el registro en la BD paso a paso.
-      // Solo debemos activarlo y finalizarlo.
+      // Si se envió un id_estudio_borrador, significa que el wizard guardó progresivamente.
+      // Para asegurar la integridad total de los datos según el envío final, eliminamos el borrador
+      // y lo recreamos completamente con el payload final.
       if (id_estudio_borrador) {
-        const estudio = await EstudioDemografico.findByPk(id_estudio_borrador, { transaction: t });
-        if (estudio) {
-          await estudio.update({ activo: true, fecha_censo: new Date() }, { transaction: t });
-          await t.commit();
-          if (req.user) {
-            await AuditService.log(req.user.id, "UPDATE", "estudios_demograficos", estudio.id, null, estudio.toJSON());
-          }
-          return res.status(200).json({ success: true, id_estudio: estudio.id });
-        }
+        await EstudioDemografico.destroy({ where: { id: id_estudio_borrador }, transaction: t });
       }
 
       if (!id_comunidad && !cabecera?.id_comunidad) {
@@ -202,26 +195,26 @@ class EstudioDemograficoController {
         if (!id_estudio) throw new Error("Falta el id_estudio para vincular el paso " + paso);
         
         switch (paso) {
-          case 3: // Jefe y Familiares
+          case 3: // Jefe
+          case 4: // Otros Familiares
             if (datos.familiares && datos.familiares.length > 0) {
-              await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio }, transaction: t });
+              if (paso === 3) {
+                await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio, es_jefe_familia: true }, transaction: t });
+              } else {
+                await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio, es_jefe_familia: false }, transaction: t });
+              }
               const fams = datos.familiares.map(f => ({ ...f, id_estudio }));
               await db.CensoCaracteristicaFamiliar.bulkCreate(fams, { transaction: t });
             }
             break;
-          case 4: { // Economía
+          case 5: { // Economía
             const [eco, ecoCreated] = await db.CensoSituacionEconomica.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
             if (!ecoCreated) await eco.update(datos, { transaction: t });
             break;
           }
-          case 5: { // Vivienda
+          case 6: { // Vivienda
             const [viv, vivCreated] = await db.CensoSituacionVivienda.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
             if (!vivCreated) await viv.update(datos, { transaction: t });
-            break;
-          }
-          case 6: { // Salud
-            const [sal, salCreated] = await db.CensoSalud.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
-            if (!salCreated) await sal.update(datos, { transaction: t });
             break;
           }
           case 7: { // Servicios
@@ -229,25 +222,34 @@ class EstudioDemograficoController {
             if (!serCreated) await ser.update(datos, { transaction: t });
             break;
           }
-          case 8: { // Participación
+          case 8: { // Salud
+            const [sal, salCreated] = await db.CensoSalud.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
+            if (!salCreated) await sal.update(datos, { transaction: t });
+            break;
+          }
+          case 9: { // Participación
             const [par, parCreated] = await db.CensoParticipacionComunitaria.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
             if (!parCreated) await par.update(datos, { transaction: t });
             break;
           }
-          case 9: { // Comunidad
+          case 10: { // Comunidad
             const [com, comCreated] = await db.CensoSituacionComunidad.findOrCreate({ where: { id_estudio }, defaults: { ...datos }, transaction: t });
             if (!comCreated) await com.update(datos, { transaction: t });
             break;
           }
-          case 10: // Opciones Múltiples (Guardado Final o intermedio si aplica)
-            if (datos.opciones && datos.opciones.length > 0) {
-              await db.CensoOpcionMultiple.destroy({ where: { id_estudio }, transaction: t });
-              const ops = datos.opciones.map(o => ({ ...o, id_estudio }));
-              await db.CensoOpcionMultiple.bulkCreate(ops, { transaction: t });
-            }
-            break;
           default:
             throw new Error("Paso no reconocido");
+        }
+
+        // Manejar opciones múltiples independientemente del paso (ya que varios pasos tienen opciones)
+        if (datos.opciones && datos.opciones.length > 0) {
+          const categoriasEnPaso = [...new Set(datos.opciones.map(o => o.categoria))];
+          await db.CensoOpcionMultiple.destroy({ 
+            where: { id_estudio, categoria: categoriasEnPaso }, 
+            transaction: t 
+          });
+          const ops = datos.opciones.map(o => ({ ...o, id_estudio }));
+          await db.CensoOpcionMultiple.bulkCreate(ops, { transaction: t });
         }
       }
 
