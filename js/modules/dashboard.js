@@ -92,7 +92,7 @@ class DashboardController {
       const pHabitantes = window.api.getHabitantes().catch(() => []);
       const pNoticias = window.api.getNoticias().catch(() => []);
       const pResumen = window.api.getDashboardResumen().catch(() => []);
-      const pViviendas = window.api.getViviendas().catch(() => []);
+      const pViviendas = window.api.getEstudiosDemograficos ? window.api.getEstudiosDemograficos().catch(() => []) : window.api.getViviendas().catch(() => []);
       
       this.stats = await pStats;
       this.habitantes = await pHabitantes;

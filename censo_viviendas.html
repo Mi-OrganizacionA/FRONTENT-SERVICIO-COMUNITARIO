@@ -3782,7 +3782,7 @@
       <table><thead><tr><th>N°</th><th>Cédula</th><th>Sector</th><th>Habitantes</th><th>Tipo</th><th>Condición</th><th>Gas</th><th>Agua</th></tr></thead><tbody>
       ${data.map((v, i) => `<tr><td>${i+1}</td><td>${v.cedula||'-'}</td><td>${v.sector||'-'}</td><td>${v.habitantes||'-'}</td><td>${v.tipo||'-'}</td><td>${v.condicion||'-'}</td><td>${v.gas||'-'}</td><td>${v.agua||'-'}</td></tr>`).join('')}
       </tbody></table>
-      <script>window.onload=function(){window.print();}</script></body></html>`;
+      <script>window.onload=function(){window.print();}<\/script></body></html>`;
 
       const win = window.open('', '_blank');
       win.document.write(html);
