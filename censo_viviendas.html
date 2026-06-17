@@ -690,7 +690,8 @@
     }
 
     .cv-pag-btn {
-      width: 34px;
+      min-width: 34px;
+      padding: 0 10px;
       height: 34px;
       border-radius: var(--r-sm);
       border: 1.5px solid var(--gray3);
@@ -3738,13 +3739,86 @@
     function previsualizarCenso(id) {
       const v = viviendas.find(x => x.id == id || x._id == id);
       if(!v) return;
+      
+      const jefeNombre = v.nombres || v.jefe_nombres || 'No registrado';
+      const jefeCedula = v.cedula || 'No registrada';
+      const sector = v.sector || 'Sin Asignar';
+      const tipoVivienda = v.tipo || 'No especificado';
+      const condicion = v.condicion || 'No especificada';
+      const tenencia = v.tenencia || 'No especificada';
+      const gas = v.gas || 'No posee';
+      const agua = v.agua || 'No tiene';
+      const electrico = v.sistema_electrico || v.electrico || 'No especificado';
+      const habitantes = v.habitantes || 1;
+      const direccion = v.direccion || 'Sin dirección';
+      
       const html = `
-        <div style="font-size: 0.9rem;">
-          <h6><strong>Jefe de Familia:</strong> ${v.cedula} - ${v.sector}</h6>
-          <p><strong>Dirección:</strong> ${v.direccion}</p>
-          <p><strong>Condición de Vivienda:</strong> ${v.condicion}</p>
-          <p><strong>Habitantes:</strong> ${v.habitantes}</p>
-          <p><strong>Servicios:</strong> Gas: ${v.gas} | Agua: ${v.agua}</p>
+        <div class="container-fluid" style="font-family: 'Inter', sans-serif;">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <h6 class="text-muted mb-1"><i class="fas fa-id-card text-success"></i> Jefe de Familia</h6>
+              <p class="mb-0 fw-bold fs-5">${jefeNombre}</p>
+              <p class="text-secondary">${jefeCedula}</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+              <h6 class="text-muted mb-1"><i class="fas fa-map-marker-alt text-danger"></i> Consejo Comunal</h6>
+              <p class="mb-0 fw-bold fs-5">${sector}</p>
+              <span class="badge bg-success rounded-pill px-3 py-2 mt-1"><i class="fas fa-users"></i> ${habitantes} Habitante(s)</span>
+            </div>
+          </div>
+          
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body bg-light rounded">
+              <h6 class="card-title fw-bold text-success mb-3"><i class="fas fa-home"></i> Datos de la Vivienda</h6>
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <small class="text-muted d-block">Tipo de Vivienda</small>
+                  <span class="fw-medium">${tipoVivienda}</span>
+                </div>
+                <div class="col-sm-6">
+                  <small class="text-muted d-block">Condición General</small>
+                  <span class="fw-medium">${condicion}</span>
+                </div>
+                <div class="col-sm-6">
+                  <small class="text-muted d-block">Tenencia</small>
+                  <span class="fw-medium">${tenencia}</span>
+                </div>
+                <div class="col-sm-6">
+                  <small class="text-muted d-block">Dirección Exacta</small>
+                  <span class="fw-medium">${direccion}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card border-0 shadow-sm">
+            <div class="card-body bg-light rounded">
+              <h6 class="card-title fw-bold text-primary mb-3"><i class="fas fa-plug"></i> Servicios Básicos</h6>
+              <div class="row g-3">
+                <div class="col-sm-4 text-center">
+                  <div class="p-2 border rounded bg-white">
+                    <i class="fas fa-fire-burner text-warning fs-4 mb-2"></i>
+                    <small class="d-block text-muted">Gas Doméstico</small>
+                    <strong>${gas}</strong>
+                  </div>
+                </div>
+                <div class="col-sm-4 text-center">
+                  <div class="p-2 border rounded bg-white">
+                    <i class="fas fa-faucet-drip text-info fs-4 mb-2"></i>
+                    <small class="d-block text-muted">Agua Potable</small>
+                    <strong>${agua}</strong>
+                  </div>
+                </div>
+                <div class="col-sm-4 text-center">
+                  <div class="p-2 border rounded bg-white">
+                    <i class="fas fa-bolt text-warning fs-4 mb-2"></i>
+                    <small class="d-block text-muted">Electricidad</small>
+                    <strong>${electrico}</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       `;
       document.getElementById('modalPrevisualizarBody').innerHTML = html;
