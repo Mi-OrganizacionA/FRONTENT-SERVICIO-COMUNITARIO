@@ -4,6 +4,81 @@ const AuditService = require("../services/auditService");
 let EstudioDemografico;
 let models;
 
+// Función auxiliar para mapear datos del frontend a los nombres de columna exactos de Sequelize
+// y transformar "Si"/"No" en booleanos verdaderos.
+function mapFrontendData(datos, paso) {
+  if (!datos) return {};
+  const mapped = { ...datos };
+
+  // 1. Transformar booleanos 'Si'/'No'
+  for (const key in mapped) {
+    if (mapped[key] === 'Si') mapped[key] = true;
+    if (mapped[key] === 'No') mapped[key] = false;
+  }
+
+  // 2. Mapeos específicos por paso
+  if (paso === 3 || paso === 4) {
+    if (mapped.familiares) {
+      mapped.familiares = mapped.familiares.map(f => {
+        const nf = { ...f };
+        if (nf.genero) nf.sexo = nf.genero;
+        if (nf.nivel_educativo) nf.grado_instruccion = nf.nivel_educativo;
+        if (nf.ocupacion) nf.profesion = nf.ocupacion;
+        delete nf.genero;
+        delete nf.nivel_educativo;
+        delete nf.ocupacion;
+        delete nf.es_jefe_familia; // Esta columna no existe en BD, usamos parentesco
+        return nf;
+      });
+    }
+  }
+
+  if (paso === 5) {
+    if (mapped.ingreso_bs) mapped.ingreso_familiar_rango = mapped.ingreso_bs;
+  }
+
+  if (paso === 6) {
+    if (mapped.tenencia) mapped.forma_tenencia = mapped.tenencia;
+    if (mapped.material_paredes) mapped.tipo_paredes = mapped.material_paredes;
+    if (mapped.material_techo) mapped.tipo_techo = mapped.material_techo;
+    if (mapped.num_cuartos) mapped.cantidad_habitaciones = parseInt(mapped.num_cuartos) || 0;
+    if (mapped.inscrita_s_i_v_i_h) mapped.inscrita_sivih = mapped.inscrita_s_i_v_i_h;
+    if (mapped.requiere_ayuda) mapped.requiere_ayuda_mejora = mapped.requiere_ayuda;
+    if (mapped.presencia_insectos !== undefined) mapped.presencia_insectos_roedores = mapped.presencia_insectos;
+    if (mapped.tiene_animales !== undefined) mapped.tiene_animales_domesticos = mapped.tiene_animales;
+  }
+
+  if (paso === 7) {
+    if (mapped.aguas_blancas) mapped.aguas_blancas_tipo = mapped.aguas_blancas;
+    if (mapped.tiene_tanque) mapped.tiene_tanque_litros = parseInt(mapped.tiene_tanque) || 0;
+    if (mapped.aguas_servidas) mapped.aguas_servidas_tipo = mapped.aguas_servidas;
+    if (mapped.sistema_electrico) mapped.sistema_electrico_tipo = mapped.sistema_electrico;
+    if (mapped.gas_domestico) mapped.gas_tipo = mapped.gas_domestico;
+    if (mapped.cantidad_cilindros_gas) mapped.cantidad_cilindros_gas = parseInt(mapped.cantidad_cilindros_gas) || 0;
+    if (mapped.gas_empresa) mapped.gas_empresa_suministra = mapped.gas_empresa;
+    if (mapped.recoleccion_basura) mapped.recoleccion_basura_tipo = mapped.recoleccion_basura;
+    if (mapped.telefonia_servicio) mapped.telefonia_tipo = mapped.telefonia_servicio;
+    if (mapped.transporte) mapped.transporte_tipo = mapped.transporte;
+    if (mapped.bombillos_necesita) mapped.bombillos_ahorradores_necesita = parseInt(mapped.bombillos_necesita) || 0;
+  }
+
+  if (paso === 8) {
+    if (mapped.exclusion_ninos_calle !== undefined) mapped.exclusion_ninos_calle_cant = parseInt(mapped.exclusion_ninos_calle) || 0;
+    if (mapped.exclusion_indigentes !== undefined) mapped.exclusion_indigentes_cant = parseInt(mapped.exclusion_indigentes) || 0;
+    if (mapped.exclusion_enfermos_term !== undefined) mapped.exclusion_enfermos_term_cant = parseInt(mapped.exclusion_enfermos_term) || 0;
+    if (mapped.exclusion_discapacitados !== undefined) mapped.exclusion_discapacitados_cant = parseInt(mapped.exclusion_discapacitados) || 0;
+    if (mapped.exclusion_tercera_edad !== undefined) mapped.exclusion_tercera_edad_cant = parseInt(mapped.exclusion_tercera_edad) || 0;
+  }
+
+  if (paso === 9) {
+    if (mapped.asiste_asambleas !== undefined) mapped.asiste_asambleas_ciudadanos = mapped.asiste_asambleas;
+    if (mapped.info_c_cs !== undefined) mapped.info_sobre_consejos_comunales = mapped.info_c_cs;
+    if (mapped.dispuesto_apoyar !== undefined) mapped.dispuesto_apoyar_consejo = mapped.dispuesto_apoyar;
+  }
+
+  return mapped;
+}
+
 class EstudioDemograficoController {
   static setModel(model) {
     EstudioDemografico = model;
