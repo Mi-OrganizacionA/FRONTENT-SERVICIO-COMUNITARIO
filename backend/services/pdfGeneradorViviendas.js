@@ -352,9 +352,7 @@ class PdfGeneradorViviendas {
     }
 
     const page = await browser.newPage();
-    await page.setViewport({ width: 1024, height: 1200 });
-    await page.setContent(finalHTML, { waitUntil: 'load' });
-    const pdfBuffer = await page.pdf({
+    await page.setContent(finalHTML, { waitUntil: 'domcontentloaded', timeout: 60000 });
       format: 'A4',
       printBackground: true,
       margin: { top: '10px', bottom: '10px', left: '10px', right: '10px' }

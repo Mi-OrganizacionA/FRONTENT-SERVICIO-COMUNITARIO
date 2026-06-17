@@ -99,7 +99,7 @@ class EstudioDemograficoController {
         where,
         order: [["fecha_creacion", "DESC"]],
         include: [
-          { model: db.ConsejoComunal, as: 'consejo', attributes: ['nombre'] },
+          { model: db.ConsejoComunal, as: 'consejo', attributes: ['nombre_comunidad'] },
           { model: db.CensoCaracteristicaFamiliar, as: 'familiares' },
           { model: db.CensoSituacionVivienda, as: 'situacion_vivienda' },
           { model: db.CensoSalud, as: 'salud' },
@@ -126,7 +126,7 @@ class EstudioDemograficoController {
         where: { id_comunidad: consejoId, activo: true },
         order: [["fecha_creacion", "DESC"]],
         include: [
-          { model: db.ConsejoComunal, as: 'consejo', attributes: ['nombre'] },
+          { model: db.ConsejoComunal, as: 'consejo', attributes: ['nombre_comunidad'] },
           { model: db.CensoCaracteristicaFamiliar, as: 'familiares' },
           { model: db.CensoSituacionVivienda, as: 'situacion_vivienda' },
           { model: db.CensoSalud, as: 'salud' },
