@@ -92,7 +92,14 @@ class EstudioDemograficoController {
     try {
       const { consejoId } = req.query;
       const where = { activo: true };
-      if (consejoId) where.id_comunidad = consejoId;
+      
+      // Seguridad Backend: Forzar filtro de comunidad si es vocero
+      if (req.user && req.user.rol === 'vocero') {
+        const idComunidad = req.user.consejo_comunal_id || req.user.id_comunidad_asignada;
+        where.id_comunidad = idComunidad;
+      } else if (consejoId) {
+        where.id_comunidad = consejoId;
+      }
       
       const db = models;
       const data = await EstudioDemografico.findAll({

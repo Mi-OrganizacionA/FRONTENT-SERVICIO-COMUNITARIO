@@ -44,6 +44,10 @@ class CensoReportesController {
         trabajo: req.query.trabajo
       };
 
+      if (req.user && req.user.rol === 'vocero') {
+        filtros.consejo_id = req.user.consejo_comunal_id || req.user.id_comunidad_asignada;
+      }
+
       if (!CensoReportesController.dbModels) throw new Error('Modelos de base de datos no inyectados en CensoReportesController');
       const kpis = await CensoReportesService.getKpis(CensoReportesController.dbModels, filtros);
       
@@ -60,7 +64,11 @@ class CensoReportesController {
   static async getResumen(req, res) {
     try {
       if (!CensoReportesController.dbModels) throw new Error('Modelos no inyectados');
-      const { desde, hasta, consejo_id, edad_min, edad_max, genero, salud, cne, trabajo } = req.query;
+      const { desde, hasta, edad_min, edad_max, genero, salud, cne, trabajo } = req.query;
+      let consejo_id = req.query.consejo_id;
+      if (req.user && req.user.rol === 'vocero') {
+        consejo_id = req.user.consejo_comunal_id || req.user.id_comunidad_asignada;
+      }
       const resumen = await CensoReportesService.getResumenPorConsejo(CensoReportesController.dbModels, {
         desde, hasta, consejo_id, edad_min, edad_max, genero, salud, cne, trabajo
       });
@@ -76,10 +84,15 @@ class CensoReportesController {
    */
   static async exportarReporte(req, res) {
     try {
-      const { tipo, format, desde, hasta, consejo_id, edad_min, edad_max, genero, salud, cne, trabajo, nac_min, nac_max, extras } = req.query;
+      const { tipo, format, desde, hasta, edad_min, edad_max, genero, salud, cne, trabajo, nac_min, nac_max, extras } = req.query;
+      let consejo_id = req.query.consejo_id;
 
       if (!tipo || !format) {
         return res.status(400).json({ error: 'Parámetros "tipo" y "format" son requeridos.' });
+      }
+
+      if (req.user && req.user.rol === 'vocero') {
+        consejo_id = req.user.consejo_comunal_id || req.user.id_comunidad_asignada;
       }
 
       const filtros = { desde, hasta, consejo_id, edad_min, edad_max, genero, salud, cne, trabajo, nac_min, nac_max, extras };
