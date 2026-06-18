@@ -1621,6 +1621,13 @@ class APIManager {
    */
   async getEstudiosDemograficos(filtros = {}) {
     if (this.isDevelopment) return [];
+    
+    // Filtro automático para vocero
+    const user = window.auth ? window.auth.getUser() : null;
+    if (user && user.rol && user.rol.toLowerCase() === 'vocero' && user.id_comunidad_asignada) {
+       filtros.consejoId = user.id_comunidad_asignada;
+    }
+
     const params = new URLSearchParams(filtros);
     try {
       const response = await this._fetch(`${this.baseURL}/estudios-demograficos?${params}`, this._getHeaders());
