@@ -3619,7 +3619,8 @@
             gas: v.servicios?.gas_tipo || v.gas_domestico || '—',
             // Dirección (del paso 2)
             direccion: v.direccion_comunidad || v.direccion_exacta || '—',
-            fechaCenso: v.fecha_censo || v.fecha_creacion
+            fechaCenso: v.fecha_censo || v.fecha_creacion,
+            raw: v
           };}) : [];
         }
         renderTable();
@@ -3689,6 +3690,7 @@
         document.getElementById('cvPagination').style.display = 'none';
         updateKPIs();
         return;
+      }
       empty.style.display = 'none';
       document.getElementById('cvPagination').style.display = 'flex';
       
@@ -3770,6 +3772,11 @@
       }
     }
 
+    function cerrarModalPrevisualizar() {
+      const modal = document.getElementById('modalPrevisualizarCenso');
+      if (modal) modal.classList.remove('show');
+    }
+
     function previsualizarCenso(id) {
       const v = viviendas.find(x => x.id == id || x._id == id);
       if(!v) return;
@@ -3781,30 +3788,37 @@
       const habitantes = v.habitantes || 1;
       const direccion = v.direccion || 'Sin dirección';
 
+      const getSafeObj = (obj) => {
+        if (!obj) return {};
+        if (Array.isArray(obj)) return obj[0] || {};
+        return obj;
+      };
+
       // Vivienda
-      const viv = raw.situacion_vivienda || {};
-      const tipoVivienda = viv.tipo_vivienda || 'No especificado';
-      const condicion = viv.condiciones_salubridad || 'No especificada';
-      const tenencia = viv.forma_tenencia || 'No especificada';
-      const paredes = viv.tipo_paredes || 'No especificado';
-      const techo = viv.tipo_techo || 'No especificado';
-      const habitaciones = viv.cantidad_habitaciones || '1';
+      const viv = getSafeObj(raw.situacion_vivienda);
+      const tipoVivienda = viv.tipo_vivienda || raw.tipo || raw.tipo_vivienda || 'No especificado';
+      const condicion = viv.condiciones_salubridad || raw.condicion_general || 'No especificada';
+      const tenencia = viv.forma_tenencia || raw.tenencia || 'No especificada';
+      const paredes = viv.tipo_paredes || raw.material_paredes || raw.paredes || 'No especificado';
+      const techo = viv.tipo_techo || raw.material_techo || raw.techo || 'No especificado';
+      const numHabitaciones = viv.cantidad_habitaciones || raw.habitaciones || raw.num_cuartos || '1';
 
       // Servicios
-      const serv = raw.servicios || {};
-      const gas = serv.gas_tipo || 'No posee';
-      const agua = serv.aguas_blancas_tipo || 'No tiene';
-      const electrico = serv.sistema_electrico || 'No especificado';
-      const basura = serv.aseo_urbano_frecuencia || 'No especificado';
-      const internet = serv.tiene_internet ? 'Sí posee' : 'No posee';
+      const serv = getSafeObj(raw.servicios);
+      const gas = serv.gas_tipo || raw.gas_domestico || raw.gas || 'No posee';
+      const agua = serv.aguas_blancas_tipo || raw.aguas_blancas || raw.agua || 'No tiene';
+      const electrico = serv.sistema_electrico_tipo || serv.sistema_electrico || raw.electrico || 'No especificado';
+      const basura = serv.recoleccion_basura_tipo || raw.aseo_urbano_frecuencia || 'No especificado';
+      const telefonia = serv.telefonia_tipo || raw.telefonia || 'No posee';
 
       // Familiares (HTML)
       let famHtml = '';
-      if (raw.familiares && raw.familiares.length > 0) {
+      const arrayFams = Array.isArray(raw.familiares) ? raw.familiares : (raw.familiares ? [raw.familiares] : []);
+      if (arrayFams.length > 0) {
         famHtml = `
-          <div class="table-responsive">
-            <table class="table table-sm table-hover align-middle" style="font-size: 0.85rem;">
-              <thead class="table-light">
+          <div style="overflow-x: auto;">
+            <table class="table-sicag" style="width:100%; font-size: 0.85rem;">
+              <thead>
                 <tr>
                   <th>Nombre y Apellido</th>
                   <th>Cédula</th>
@@ -3814,11 +3828,11 @@
                 </tr>
               </thead>
               <tbody>
-                ${raw.familiares.map(f => `
+                ${arrayFams.map(f => `
                   <tr>
-                    <td class="fw-medium">${f.nombres_apellidos}</td>
+                    <td style="font-weight:600;">${f.nombres_apellidos || '—'}</td>
                     <td>${f.cedula_identidad || 'N/A'}</td>
-                    <td><span class="badge bg-secondary">${f.parentesco}</span></td>
+                    <td><span class="badge" style="background:#e0e0e0;color:#333;padding:2px 6px;border-radius:4px;font-size:0.75rem;">${f.parentesco || '—'}</span></td>
                     <td>${f.fecha_nacimiento ? new Date(f.fecha_nacimiento).toLocaleDateString() : '—'}</td>
                     <td>${f.grado_instruccion || '—'}</td>
                   </tr>
@@ -3828,107 +3842,79 @@
           </div>
         `;
       } else {
-        famHtml = `<p class="text-muted small mb-0"><i class="fas fa-info-circle"></i> No hay familiares registrados en el censo.</p>`;
+        famHtml = `<div style="color:var(--muted); font-size:0.9rem; font-style:italic;">No hay familiares registrados en el censo.</div>`;
       }
 
       // Salud (HTML)
       let saludHtml = '';
-      if (raw.salud && raw.salud.length > 0) {
-        saludHtml = raw.salud.map(s => `
-          <span class="badge bg-danger rounded-pill px-2 py-1 mb-1 me-1"><i class="fas fa-notes-medical"></i> ${s.enfermedad_condicion || 'Condición reportada'}</span>
-        `).join('');
+      const arraySalud = Array.isArray(raw.salud) ? raw.salud : (raw.salud ? [raw.salud] : []);
+      const necesitaAyuda = arraySalud[0] ? arraySalud[0].necesita_ayuda_especial : null;
+      if (necesitaAyuda) {
+        saludHtml = `<span style="display:inline-block; background:rgba(198,40,40,.1); color:var(--ru); padding:4px 10px; border-radius:15px; font-size:0.85rem; font-weight:600;"><i class="fas fa-notes-medical"></i> Requiere ayuda especial: ${arraySalud[0].cual_ayuda_especial || 'No especificado'}</span>`;
       } else {
-        saludHtml = `<span class="text-muted small">Ninguna condición de salud reportada.</span>`;
+        saludHtml = `<span style="color:var(--muted); font-size:0.9rem;">Ninguna condición crítica reportada.</span>`;
       }
 
       const html = `
-        <div class="container-fluid" style="font-family: 'Inter', sans-serif;">
+        <div style="font-size: 0.9rem;">
           <!-- Cabecera Principal -->
-          <div class="row mb-3 bg-light p-3 rounded shadow-sm align-items-center">
-            <div class="col-md-7">
-              <h6 class="text-success mb-1 fw-bold"><i class="fas fa-id-card"></i> Jefe de Familia</h6>
-              <h5 class="mb-0 fw-bold text-dark">${jefeNombre}</h5>
-              <div class="text-secondary small mt-1">
-                <span class="me-3"><i class="far fa-id-badge"></i> ${jefeCedula}</span>
-                <span><i class="fas fa-map-marker-alt text-danger"></i> ${sector}</span>
+          <div style="background: rgba(46,125,50,0.05); padding: 1rem; border-radius: var(--r-md); border: 1px solid rgba(46,125,50,0.1); margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <div style="font-weight:700; color:var(--vp); font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.2rem;"><i class="fas fa-id-card"></i> Jefe de Familia</div>
+              <div style="font-size:1.1rem; font-weight:700; color:var(--dark); margin-bottom:0.3rem;">${jefeNombre}</div>
+              <div style="color:var(--sub); display:flex; gap:1rem;">
+                <span><i class="far fa-id-badge"></i> ${jefeCedula}</span>
+                <span><i class="fas fa-map-marker-alt" style="color:var(--ru);"></i> ${sector}</span>
               </div>
             </div>
-            <div class="col-md-5 text-md-end mt-2 mt-md-0">
-              <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3 py-2 fs-6">
-                <i class="fas fa-users"></i> ${habitantes} Habitante(s)
-              </span>
+            <div style="background:var(--vp); color:white; padding: 0.4rem 0.8rem; border-radius:20px; font-weight:600; font-size:0.85rem;">
+              <i class="fas fa-users"></i> ${habitantes} Habitante(s)
             </div>
           </div>
           
-          <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-            <li class="nav-item" role="presentation">
-              <button class="nav-link active rounded-pill px-4 py-2" id="pills-viv-tab" data-bs-toggle="pill" data-bs-target="#pills-viv" type="button" role="tab"><i class="fas fa-home me-1"></i> Vivienda</button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link rounded-pill px-4 py-2" id="pills-fam-tab" data-bs-toggle="pill" data-bs-target="#pills-fam" type="button" role="tab"><i class="fas fa-users me-1"></i> Núcleo Familiar</button>
-            </li>
-          </ul>
+          <div class="form-section-header form-section-verde" style="margin-bottom:1rem;">
+            <i class="fas fa-home"></i> Datos Estructurales
+          </div>
+          <div class="mfg-3" style="margin-bottom: 1.5rem;">
+            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Tipo de Vivienda</label><span style="font-weight:500;">${tipoVivienda}</span></div>
+            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Condición</label><span style="font-weight:500;">${condicion}</span></div>
+            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Tenencia</label><span style="font-weight:500;">${tenencia}</span></div>
+            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Paredes</label><span style="font-weight:500;">${paredes}</span></div>
+            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Techo</label><span style="font-weight:500;">${techo}</span></div>
+            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Habitaciones</label><span style="font-weight:500;">${numHabitaciones}</span></div>
+            <div style="grid-column: 1 / -1;"><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Dirección Exacta</label><span style="font-weight:500;">${direccion}</span></div>
+          </div>
           
-          <div class="tab-content" id="pills-tabContent">
-            <!-- TAB VIVIENDA Y SERVICIOS -->
-            <div class="tab-pane fade show active" id="pills-viv" role="tabpanel">
-              <div class="card border-0 shadow-sm mb-3">
-                <div class="card-body">
-                  <h6 class="fw-bold text-success mb-3 border-bottom pb-2">Datos Estructurales</h6>
-                  <div class="row g-3">
-                    <div class="col-sm-4"><small class="text-muted d-block">Tipo de Vivienda</small><span class="fw-medium">${tipoVivienda}</span></div>
-                    <div class="col-sm-4"><small class="text-muted d-block">Condición</small><span class="fw-medium">${condicion}</span></div>
-                    <div class="col-sm-4"><small class="text-muted d-block">Tenencia</small><span class="fw-medium">${tenencia}</span></div>
-                    <div class="col-sm-4"><small class="text-muted d-block">Paredes</small><span class="fw-medium">${paredes}</span></div>
-                    <div class="col-sm-4"><small class="text-muted d-block">Techo</small><span class="fw-medium">${techo}</span></div>
-                    <div class="col-sm-4"><small class="text-muted d-block">Habitaciones</small><span class="fw-medium">${habitaciones}</span></div>
-                    <div class="col-12"><small class="text-muted d-block">Dirección Exacta</small><span class="fw-medium">${direccion}</span></div>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                  <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body">
-                      <h6 class="fw-bold text-primary mb-3 border-bottom pb-2"><i class="fas fa-plug"></i> Servicios Básicos</h6>
-                      <ul class="list-group list-group-flush small">
-                        <li class="list-group-item px-0 d-flex justify-content-between"><span><i class="fas fa-faucet-drip text-info me-2"></i>Agua</span> <strong>${agua}</strong></li>
-                        <li class="list-group-item px-0 d-flex justify-content-between"><span><i class="fas fa-fire-burner text-warning me-2"></i>Gas</span> <strong>${gas}</strong></li>
-                        <li class="list-group-item px-0 d-flex justify-content-between"><span><i class="fas fa-bolt text-warning me-2"></i>Electricidad</span> <strong>${electrico}</strong></li>
-                        <li class="list-group-item px-0 d-flex justify-content-between"><span><i class="fas fa-trash text-secondary me-2"></i>Aseo Urbano</span> <strong>${basura}</strong></li>
-                        <li class="list-group-item px-0 d-flex justify-content-between border-0"><span><i class="fas fa-wifi text-primary me-2"></i>Internet</span> <strong>${internet}</strong></li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body">
-                      <h6 class="fw-bold text-danger mb-3 border-bottom pb-2"><i class="fas fa-heartbeat"></i> Situación de Salud</h6>
-                      <div class="p-2 bg-danger bg-opacity-10 rounded">
-                        ${saludHtml}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          <div class="mfg-2" style="margin-bottom: 1.5rem; align-items: start;">
+            <!-- Servicios -->
+            <div style="border: 1px solid var(--border); border-radius: var(--r-md); padding: 1rem;">
+              <h6 style="color:var(--vp); font-weight:700; border-bottom: 1px solid var(--border); padding-bottom:0.5rem; margin-top:0; margin-bottom:0.8rem;"><i class="fas fa-plug"></i> Servicios Básicos</h6>
+              <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                <div style="display:flex; justify-content:space-between;"><span><i class="fas fa-faucet-drip" style="color:#0288D1; width:20px;"></i> Agua</span> <strong>${agua}</strong></div>
+                <div style="display:flex; justify-content:space-between;"><span><i class="fas fa-fire-burner" style="color:#F57C00; width:20px;"></i> Gas</span> <strong>${gas}</strong></div>
+                <div style="display:flex; justify-content:space-between;"><span><i class="fas fa-bolt" style="color:#FBC02D; width:20px;"></i> Electricidad</span> <strong>${electrico}</strong></div>
+                <div style="display:flex; justify-content:space-between;"><span><i class="fas fa-trash" style="color:#757575; width:20px;"></i> Aseo Urbano</span> <strong>${basura}</strong></div>
+                <div style="display:flex; justify-content:space-between;"><span><i class="fas fa-phone" style="color:#1976D2; width:20px;"></i> Telefonía</span> <strong>${telefonia}</strong></div>
               </div>
             </div>
             
-            <!-- TAB NÚCLEO FAMILIAR -->
-            <div class="tab-pane fade" id="pills-fam" role="tabpanel">
-              <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                  <h6 class="fw-bold text-success mb-3 border-bottom pb-2"><i class="fas fa-users"></i> Integrantes de la Familia</h6>
-                  ${famHtml}
-                </div>
+            <!-- Salud -->
+            <div style="border: 1px solid var(--border); border-radius: var(--r-md); padding: 1rem; background:rgba(198,40,40,0.02);">
+              <h6 style="color:var(--ru); font-weight:700; border-bottom: 1px solid rgba(198,40,40,0.1); padding-bottom:0.5rem; margin-top:0; margin-bottom:0.8rem;"><i class="fas fa-heartbeat"></i> Situación de Salud</h6>
+              <div>
+                ${saludHtml}
               </div>
             </div>
           </div>
+
+          <div class="form-section-header form-section-verde" style="margin-bottom:1rem;">
+            <i class="fas fa-users"></i> Integrantes de la Familia
+          </div>
+          ${famHtml}
         </div>
       `;
       document.getElementById('modalPrevisualizarBody').innerHTML = html;
-      new bootstrap.Modal(document.getElementById('modalPrevisualizarCenso')).show();
+      document.getElementById('modalPrevisualizarCenso').classList.add('show');
     }
 
     function imprimirListaFiltrada() {
@@ -4582,16 +4568,20 @@
     });
   </script>
 
-  <div class="modal fade" id="modalPrevisualizarCenso" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title"><i class="fas fa-eye"></i> Detalle del Censo de Vivienda</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" id="modalPrevisualizarBody">
-          Cargando...
-        </div>
+  <!-- ════════════════════════════════════════
+       MODAL: Previsualizar Censo
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modalPrevisualizarCenso" role="dialog" aria-modal="true">
+    <div class="modal-content-sicag" style="max-width: 800px;">
+      <div class="modal-header-sicag">
+        <h3><i class="fas fa-eye" style="color:var(--vv)"></i> Detalle del Censo de Vivienda</h3>
+        <button type="button" class="modal-close" onclick="cerrarModalPrevisualizar()" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body-sicag" id="modalPrevisualizarBody">
+        Cargando...
+      </div>
+      <div class="modal-footer-sicag">
+        <button type="button" class="btn-sicag btn-outline-verde" onclick="cerrarModalPrevisualizar()">Cerrar</button>
       </div>
     </div>
   </div>
