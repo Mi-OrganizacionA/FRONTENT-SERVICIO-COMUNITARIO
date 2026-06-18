@@ -60,6 +60,9 @@ async function initModels(sequelize) {
   ConsejoComunal.hasMany(EstudioDemografico, { foreignKey: 'id_comunidad', as: 'estudios' });
   ConsejoComunal.hasMany(ProduccionAgricola, { foreignKey: 'consejo_comunal_id', as: 'producciones' });
 
+  Configuracion.belongsTo(Usuario, { foreignKey: 'modificado_por', as: 'editor' });
+  Usuario.hasMany(Configuracion, { foreignKey: 'modificado_por', as: 'configuraciones_editadas' });
+
   // Vinculaciones con usuarios y validaciones
   BandejaValidaciones.belongsTo(Usuario, { foreignKey: 'id_vocero', as: 'vocero' });
   BandejaValidaciones.belongsTo(Usuario, { foreignKey: 'id_validador', as: 'validador' });

@@ -1,4 +1,4 @@
-﻿const { DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
   const LogAuditoria = sequelize.define('LogAuditoria', {
@@ -6,7 +6,7 @@ module.exports = (sequelize) => {
     id_usuario: { 
       type: DataTypes.INTEGER, 
       references: { model: 'usuarios', key: 'id' }, 
-      allowNull: false 
+      allowNull: true 
     },
     accion: { 
       type: DataTypes.ENUM('CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'VALIDACION'), 

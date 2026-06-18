@@ -53,9 +53,14 @@ class SystemController {
       const config = await ConfiguracionModel.findOne({ where: { clave: nombre } });
       if (config) {
         config.valor = estado ? 'true' : 'false';
+        if (req.user && req.user.id) config.modificado_por = req.user.id;
         await config.save();
       } else {
-        await ConfiguracionModel.create({ clave: nombre, valor: estado ? 'true' : 'false' });
+        await ConfiguracionModel.create({ 
+          clave: nombre, 
+          valor: estado ? 'true' : 'false',
+          modificado_por: req.user ? req.user.id : null
+        });
       }
       logger.info(`Configuración actualizada: ${nombre} -> ${estado}`);
       res.json({ success: true, message: 'Configuración guardada' });
@@ -81,9 +86,14 @@ class SystemController {
       const config = await ConfiguracionModel.findOne({ where: { clave: 'PortalSettings' } });
       if (config) {
         config.valor = JSON.stringify(settings);
+        if (req.user && req.user.id) config.modificado_por = req.user.id;
         await config.save();
       } else {
-        await ConfiguracionModel.create({ clave: 'PortalSettings', valor: JSON.stringify(settings) });
+        await ConfiguracionModel.create({ 
+          clave: 'PortalSettings', 
+          valor: JSON.stringify(settings),
+          modificado_por: req.user ? req.user.id : null
+        });
       }
       res.json({ success: true, message: 'Configuración del portal guardada' });
     } catch (error) {

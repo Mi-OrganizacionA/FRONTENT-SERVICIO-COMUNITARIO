@@ -3590,10 +3590,17 @@
       try {
         if (window.api && window.api.getEstudiosDemograficos) {
           const data = await window.api.getEstudiosDemograficos();
-          viviendas = Array.isArray(data) ? data.map(v => ({
+          viviendas = Array.isArray(data) ? data.map(v => {
+            // Buscar al verdadero Jefe de Familia en el censo (Paso 4: Características Familiares)
+            const jefe = (v.familiares || []).find(f => f.parentesco && f.parentesco.toLowerCase().includes('jefe'));
+            const nombreReal = jefe ? jefe.nombres_apellidos : (v.encuestado_nombre || '—');
+            const cedulaReal = jefe ? jefe.cedula_identidad : (v.encuestado_cedula || '—');
+
+            return {
             id: v.id,
-            // Cédula del encuestado o del jefe (campo del paso 3 del wizard)
-            cedula: v.encuestado_cedula || v.cedula_jefe || '—',
+            // Cédula y Nombre reales del jefe
+            cedula: cedulaReal,
+            nombres: nombreReal,
             // Nombre de la comunidad (del paso 2: ubicación geográfica)
             sector: v.consejo?.nombre_comunidad || v.nombre_comunidad || v.sector || '—',
             // Cantidad de habitantes (basado en la relación familiares)
@@ -3613,7 +3620,7 @@
             // Dirección (del paso 2)
             direccion: v.direccion_comunidad || v.direccion_exacta || '—',
             fechaCenso: v.fecha_censo || v.fecha_creacion
-          })) : [];
+          };}) : [];
         }
         renderTable();
       } catch (err) {
@@ -3682,8 +3689,6 @@
         document.getElementById('cvPagination').style.display = 'none';
         updateKPIs();
         return;
-      }
-
       empty.style.display = 'none';
       document.getElementById('cvPagination').style.display = 'flex';
       
@@ -3718,103 +3723,204 @@
         </tr>
       `).join('');
 
-      renderPagination(totalPages);
+      renderPagination(totalPages, data.length);
       updateKPIs();
     }
 
-    function renderPagination(totalPages) {
+    function renderPagination(totalPages, totalRecords) {
       const pagBtns = document.getElementById('cvPagBtns');
       let html = '';
-      html += `<button class="cv-pag-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="currentPage--; renderTable()">Anterior</button>`;
-      for (let i = 1; i <= totalPages; i++) {
+      
+      // Botón Anterior
+      html += `<button class="cv-pag-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="currentPage--; renderTable()"><i class="fas fa-chevron-left"></i></button>`;
+      
+      // Lógica de truncado de páginas
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, currentPage + 2);
+      
+      if (startPage > 1) {
+        html += `<button class="cv-pag-btn" onclick="currentPage=1; renderTable()">1</button>`;
+        if (startPage > 2) {
+          html += `<span class="cv-pag-btn" style="pointer-events: none; border: none; background: transparent; color: var(--gray4);">...</span>`;
+        }
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
         html += `<button class="cv-pag-btn ${i === currentPage ? 'active' : ''}" onclick="currentPage=${i}; renderTable()">${i}</button>`;
       }
-      html += `<button class="cv-pag-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="currentPage++; renderTable()">Siguiente</button>`;
+      
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          html += `<span class="cv-pag-btn" style="pointer-events: none; border: none; background: transparent; color: var(--gray4);">...</span>`;
+        }
+        html += `<button class="cv-pag-btn" onclick="currentPage=${totalPages}; renderTable()">${totalPages}</button>`;
+      }
+      
+      // Botón Siguiente
+      html += `<button class="cv-pag-btn" ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''} onclick="currentPage++; renderTable()"><i class="fas fa-chevron-right"></i></button>`;
+      
       if (pagBtns) pagBtns.innerHTML = html;
       
+      // Actualizar info en lugar de eliminarla
       const info = document.getElementById('cvPagInfo');
-      if (info) info.remove();
+      if (info) {
+          const startRecord = totalRecords === 0 ? 0 : ((currentPage - 1) * PAGE_SIZE) + 1;
+          const endRecord = Math.min(currentPage * PAGE_SIZE, totalRecords);
+          info.innerHTML = `Mostrando ${startRecord} - ${endRecord} de ${totalRecords} registros`;
+      }
     }
 
     function previsualizarCenso(id) {
       const v = viviendas.find(x => x.id == id || x._id == id);
       if(!v) return;
       
-      const jefeNombre = v.nombres || v.jefe_nombres || 'No registrado';
+      const raw = v.raw || {};
+      const jefeNombre = v.nombres || 'No registrado';
       const jefeCedula = v.cedula || 'No registrada';
       const sector = v.sector || 'Sin Asignar';
-      const tipoVivienda = v.tipo || 'No especificado';
-      const condicion = v.condicion || 'No especificada';
-      const tenencia = v.tenencia || 'No especificada';
-      const gas = v.gas || 'No posee';
-      const agua = v.agua || 'No tiene';
-      const electrico = v.sistema_electrico || v.electrico || 'No especificado';
       const habitantes = v.habitantes || 1;
       const direccion = v.direccion || 'Sin dirección';
-      
+
+      // Vivienda
+      const viv = raw.situacion_vivienda || {};
+      const tipoVivienda = viv.tipo_vivienda || 'No especificado';
+      const condicion = viv.condiciones_salubridad || 'No especificada';
+      const tenencia = viv.forma_tenencia || 'No especificada';
+      const paredes = viv.tipo_paredes || 'No especificado';
+      const techo = viv.tipo_techo || 'No especificado';
+      const habitaciones = viv.cantidad_habitaciones || '1';
+
+      // Servicios
+      const serv = raw.servicios || {};
+      const gas = serv.gas_tipo || 'No posee';
+      const agua = serv.aguas_blancas_tipo || 'No tiene';
+      const electrico = serv.sistema_electrico || 'No especificado';
+      const basura = serv.aseo_urbano_frecuencia || 'No especificado';
+      const internet = serv.tiene_internet ? 'Sí posee' : 'No posee';
+
+      // Familiares (HTML)
+      let famHtml = '';
+      if (raw.familiares && raw.familiares.length > 0) {
+        famHtml = `
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle" style="font-size: 0.85rem;">
+              <thead class="table-light">
+                <tr>
+                  <th>Nombre y Apellido</th>
+                  <th>Cédula</th>
+                  <th>Parentesco</th>
+                  <th>Nacimiento</th>
+                  <th>Nivel Educ.</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${raw.familiares.map(f => `
+                  <tr>
+                    <td class="fw-medium">${f.nombres_apellidos}</td>
+                    <td>${f.cedula_identidad || 'N/A'}</td>
+                    <td><span class="badge bg-secondary">${f.parentesco}</span></td>
+                    <td>${f.fecha_nacimiento ? new Date(f.fecha_nacimiento).toLocaleDateString() : '—'}</td>
+                    <td>${f.grado_instruccion || '—'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } else {
+        famHtml = `<p class="text-muted small mb-0"><i class="fas fa-info-circle"></i> No hay familiares registrados en el censo.</p>`;
+      }
+
+      // Salud (HTML)
+      let saludHtml = '';
+      if (raw.salud && raw.salud.length > 0) {
+        saludHtml = raw.salud.map(s => `
+          <span class="badge bg-danger rounded-pill px-2 py-1 mb-1 me-1"><i class="fas fa-notes-medical"></i> ${s.enfermedad_condicion || 'Condición reportada'}</span>
+        `).join('');
+      } else {
+        saludHtml = `<span class="text-muted small">Ninguna condición de salud reportada.</span>`;
+      }
+
       const html = `
         <div class="container-fluid" style="font-family: 'Inter', sans-serif;">
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <h6 class="text-muted mb-1"><i class="fas fa-id-card text-success"></i> Jefe de Familia</h6>
-              <p class="mb-0 fw-bold fs-5">${jefeNombre}</p>
-              <p class="text-secondary">${jefeCedula}</p>
+          <!-- Cabecera Principal -->
+          <div class="row mb-3 bg-light p-3 rounded shadow-sm align-items-center">
+            <div class="col-md-7">
+              <h6 class="text-success mb-1 fw-bold"><i class="fas fa-id-card"></i> Jefe de Familia</h6>
+              <h5 class="mb-0 fw-bold text-dark">${jefeNombre}</h5>
+              <div class="text-secondary small mt-1">
+                <span class="me-3"><i class="far fa-id-badge"></i> ${jefeCedula}</span>
+                <span><i class="fas fa-map-marker-alt text-danger"></i> ${sector}</span>
+              </div>
             </div>
-            <div class="col-md-6 text-md-end">
-              <h6 class="text-muted mb-1"><i class="fas fa-map-marker-alt text-danger"></i> Consejo Comunal</h6>
-              <p class="mb-0 fw-bold fs-5">${sector}</p>
-              <span class="badge bg-success rounded-pill px-3 py-2 mt-1"><i class="fas fa-users"></i> ${habitantes} Habitante(s)</span>
+            <div class="col-md-5 text-md-end mt-2 mt-md-0">
+              <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3 py-2 fs-6">
+                <i class="fas fa-users"></i> ${habitantes} Habitante(s)
+              </span>
             </div>
           </div>
           
-          <div class="card border-0 shadow-sm mb-3">
-            <div class="card-body bg-light rounded">
-              <h6 class="card-title fw-bold text-success mb-3"><i class="fas fa-home"></i> Datos de la Vivienda</h6>
-              <div class="row g-3">
-                <div class="col-sm-6">
-                  <small class="text-muted d-block">Tipo de Vivienda</small>
-                  <span class="fw-medium">${tipoVivienda}</span>
+          <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active rounded-pill px-4 py-2" id="pills-viv-tab" data-bs-toggle="pill" data-bs-target="#pills-viv" type="button" role="tab"><i class="fas fa-home me-1"></i> Vivienda</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link rounded-pill px-4 py-2" id="pills-fam-tab" data-bs-toggle="pill" data-bs-target="#pills-fam" type="button" role="tab"><i class="fas fa-users me-1"></i> Núcleo Familiar</button>
+            </li>
+          </ul>
+          
+          <div class="tab-content" id="pills-tabContent">
+            <!-- TAB VIVIENDA Y SERVICIOS -->
+            <div class="tab-pane fade show active" id="pills-viv" role="tabpanel">
+              <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                  <h6 class="fw-bold text-success mb-3 border-bottom pb-2">Datos Estructurales</h6>
+                  <div class="row g-3">
+                    <div class="col-sm-4"><small class="text-muted d-block">Tipo de Vivienda</small><span class="fw-medium">${tipoVivienda}</span></div>
+                    <div class="col-sm-4"><small class="text-muted d-block">Condición</small><span class="fw-medium">${condicion}</span></div>
+                    <div class="col-sm-4"><small class="text-muted d-block">Tenencia</small><span class="fw-medium">${tenencia}</span></div>
+                    <div class="col-sm-4"><small class="text-muted d-block">Paredes</small><span class="fw-medium">${paredes}</span></div>
+                    <div class="col-sm-4"><small class="text-muted d-block">Techo</small><span class="fw-medium">${techo}</span></div>
+                    <div class="col-sm-4"><small class="text-muted d-block">Habitaciones</small><span class="fw-medium">${habitaciones}</span></div>
+                    <div class="col-12"><small class="text-muted d-block">Dirección Exacta</small><span class="fw-medium">${direccion}</span></div>
+                  </div>
                 </div>
-                <div class="col-sm-6">
-                  <small class="text-muted d-block">Condición General</small>
-                  <span class="fw-medium">${condicion}</span>
+              </div>
+              
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                      <h6 class="fw-bold text-primary mb-3 border-bottom pb-2"><i class="fas fa-plug"></i> Servicios Básicos</h6>
+                      <ul class="list-group list-group-flush small">
+                        <li class="list-group-item px-0 d-flex justify-content-between"><span><i class="fas fa-faucet-drip text-info me-2"></i>Agua</span> <strong>${agua}</strong></li>
+                        <li class="list-group-item px-0 d-flex justify-content-between"><span><i class="fas fa-fire-burner text-warning me-2"></i>Gas</span> <strong>${gas}</strong></li>
+                        <li class="list-group-item px-0 d-flex justify-content-between"><span><i class="fas fa-bolt text-warning me-2"></i>Electricidad</span> <strong>${electrico}</strong></li>
+                        <li class="list-group-item px-0 d-flex justify-content-between"><span><i class="fas fa-trash text-secondary me-2"></i>Aseo Urbano</span> <strong>${basura}</strong></li>
+                        <li class="list-group-item px-0 d-flex justify-content-between border-0"><span><i class="fas fa-wifi text-primary me-2"></i>Internet</span> <strong>${internet}</strong></li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
-                <div class="col-sm-6">
-                  <small class="text-muted d-block">Tenencia</small>
-                  <span class="fw-medium">${tenencia}</span>
-                </div>
-                <div class="col-sm-6">
-                  <small class="text-muted d-block">Dirección Exacta</small>
-                  <span class="fw-medium">${direccion}</span>
+                <div class="col-md-6">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                      <h6 class="fw-bold text-danger mb-3 border-bottom pb-2"><i class="fas fa-heartbeat"></i> Situación de Salud</h6>
+                      <div class="p-2 bg-danger bg-opacity-10 rounded">
+                        ${saludHtml}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="card border-0 shadow-sm">
-            <div class="card-body bg-light rounded">
-              <h6 class="card-title fw-bold text-primary mb-3"><i class="fas fa-plug"></i> Servicios Básicos</h6>
-              <div class="row g-3">
-                <div class="col-sm-4 text-center">
-                  <div class="p-2 border rounded bg-white">
-                    <i class="fas fa-fire-burner text-warning fs-4 mb-2"></i>
-                    <small class="d-block text-muted">Gas Doméstico</small>
-                    <strong>${gas}</strong>
-                  </div>
-                </div>
-                <div class="col-sm-4 text-center">
-                  <div class="p-2 border rounded bg-white">
-                    <i class="fas fa-faucet-drip text-info fs-4 mb-2"></i>
-                    <small class="d-block text-muted">Agua Potable</small>
-                    <strong>${agua}</strong>
-                  </div>
-                </div>
-                <div class="col-sm-4 text-center">
-                  <div class="p-2 border rounded bg-white">
-                    <i class="fas fa-bolt text-warning fs-4 mb-2"></i>
-                    <small class="d-block text-muted">Electricidad</small>
-                    <strong>${electrico}</strong>
-                  </div>
+            
+            <!-- TAB NÚCLEO FAMILIAR -->
+            <div class="tab-pane fade" id="pills-fam" role="tabpanel">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <h6 class="fw-bold text-success mb-3 border-bottom pb-2"><i class="fas fa-users"></i> Integrantes de la Familia</h6>
+                  ${famHtml}
                 </div>
               </div>
             </div>
