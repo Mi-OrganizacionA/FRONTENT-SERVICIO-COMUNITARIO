@@ -181,8 +181,7 @@ class BandejaValidacionesController {
           estado_tramite: 'Aprobado',
           id_validador: req.user ? req.user.id : null,
           comentarios_validador: comentarios,
-          fecha_validacion: new Date(),
-          registro_id: idCenso
+          fecha_validacion: new Date()
         });
 
         const AuditService = require('../services/auditService');
@@ -208,8 +207,7 @@ class BandejaValidacionesController {
           estado_tramite: 'Aprobado',
           id_validador: req.user ? req.user.id : null,
           comentarios_validador: comentarios,
-          fecha_validacion: new Date(),
-          registro_id: idCenso
+          fecha_validacion: new Date()
         });
 
         const AuditService = require('../services/auditService');
@@ -278,8 +276,7 @@ class BandejaValidacionesController {
         estado_tramite: 'Aprobado',
         id_validador: req.user ? req.user.id : null,
         comentarios_validador: comentarios,
-        fecha_validacion: new Date(),
-        registro_id: nuevoRegistro && nuevoRegistro.id ? nuevoRegistro.id : validacion.registro_id
+        fecha_validacion: new Date()
       });
 
       await AuditService.log(req.user ? req.user.id : 0, 'VALIDACION_APROBADA', 'bandeja_validaciones', id, 

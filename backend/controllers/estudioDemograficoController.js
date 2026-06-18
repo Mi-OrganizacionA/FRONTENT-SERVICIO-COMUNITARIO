@@ -90,6 +90,11 @@ function mapFrontendData(datos, paso) {
     // misiones, area_trabajo_interes no existen en el modelo: safeData los filtrará
   }
 
+  if (paso === 10) {
+    if (mapped.potencialidades_comunidad !== undefined) mapped.principales_potencialidades_ventajas = mapped.potencialidades_comunidad;
+    if (mapped.problemas_comunidad !== undefined)       mapped.principales_problemas_debilidades = mapped.problemas_comunidad;
+  }
+
   return mapped;
 }
 
@@ -322,33 +327,45 @@ class EstudioDemograficoController {
             }
             break;
           case 5: { // Economía
-            const [eco, ecoCreated] = await db.CensoSituacionEconomica.findOrCreate({ where: { id_estudio }, defaults: { ...dbDatos }, transaction: t });
-            if (!ecoCreated) await eco.update(dbDatos, { transaction: t });
+            const cols5 = Object.keys(db.CensoSituacionEconomica.getAttributes());
+            const safe5 = Object.fromEntries(cols5.filter(c => c in dbDatos).map(c => [c, dbDatos[c]]));
+            const [eco, ecoC] = await db.CensoSituacionEconomica.findOrCreate({ where: { id_estudio }, defaults: { ...safe5 }, transaction: t });
+            if (!ecoC) await eco.update(safe5, { transaction: t });
             break;
           }
           case 6: { // Vivienda
-            const [viv, vivCreated] = await db.CensoSituacionVivienda.findOrCreate({ where: { id_estudio }, defaults: { ...dbDatos }, transaction: t });
-            if (!vivCreated) await viv.update(dbDatos, { transaction: t });
+            const cols6 = Object.keys(db.CensoSituacionVivienda.getAttributes());
+            const safe6 = Object.fromEntries(cols6.filter(c => c in dbDatos).map(c => [c, dbDatos[c]]));
+            const [viv, vivC] = await db.CensoSituacionVivienda.findOrCreate({ where: { id_estudio }, defaults: { ...safe6 }, transaction: t });
+            if (!vivC) await viv.update(safe6, { transaction: t });
             break;
           }
           case 7: { // Servicios
-            const [ser, serCreated] = await db.CensoServicios.findOrCreate({ where: { id_estudio }, defaults: { ...dbDatos }, transaction: t });
-            if (!serCreated) await ser.update(dbDatos, { transaction: t });
+            const cols7 = Object.keys(db.CensoServicios.getAttributes());
+            const safe7 = Object.fromEntries(cols7.filter(c => c in dbDatos).map(c => [c, dbDatos[c]]));
+            const [ser, serC] = await db.CensoServicios.findOrCreate({ where: { id_estudio }, defaults: { ...safe7 }, transaction: t });
+            if (!serC) await ser.update(safe7, { transaction: t });
             break;
           }
           case 8: { // Salud
-            const [sal, salCreated] = await db.CensoSalud.findOrCreate({ where: { id_estudio }, defaults: { ...dbDatos }, transaction: t });
-            if (!salCreated) await sal.update(dbDatos, { transaction: t });
+            const cols8 = Object.keys(db.CensoSalud.getAttributes());
+            const safe8 = Object.fromEntries(cols8.filter(c => c in dbDatos).map(c => [c, dbDatos[c]]));
+            const [sal, salC] = await db.CensoSalud.findOrCreate({ where: { id_estudio }, defaults: { ...safe8 }, transaction: t });
+            if (!salC) await sal.update(safe8, { transaction: t });
             break;
           }
           case 9: { // Participación
-            const [par, parCreated] = await db.CensoParticipacionComunitaria.findOrCreate({ where: { id_estudio }, defaults: { ...dbDatos }, transaction: t });
-            if (!parCreated) await par.update(dbDatos, { transaction: t });
+            const cols9 = Object.keys(db.CensoParticipacionComunitaria.getAttributes());
+            const safe9 = Object.fromEntries(cols9.filter(c => c in dbDatos).map(c => [c, dbDatos[c]]));
+            const [par, parC] = await db.CensoParticipacionComunitaria.findOrCreate({ where: { id_estudio }, defaults: { ...safe9 }, transaction: t });
+            if (!parC) await par.update(safe9, { transaction: t });
             break;
           }
           case 10: { // Comunidad
-            const [com, comCreated] = await db.CensoSituacionComunidad.findOrCreate({ where: { id_estudio }, defaults: { ...dbDatos }, transaction: t });
-            if (!comCreated) await com.update(dbDatos, { transaction: t });
+            const cols10 = Object.keys(db.CensoSituacionComunidad.getAttributes());
+            const safe10 = Object.fromEntries(cols10.filter(c => c in dbDatos).map(c => [c, dbDatos[c]]));
+            const [com, comC] = await db.CensoSituacionComunidad.findOrCreate({ where: { id_estudio }, defaults: { ...safe10 }, transaction: t });
+            if (!comC) await com.update(safe10, { transaction: t });
             break;
           }
           default:
