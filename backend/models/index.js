@@ -5,7 +5,6 @@ async function initModels(sequelize) {
   const Habitante = require('./Habitante')(sequelize);
   const Proyecto = require('./Proyecto')(sequelize);
   const Votacion = require('./Votacion')(sequelize);
-  const Noticia = require('./Noticia')(sequelize);
   const Vivienda = require('./Vivienda')(sequelize);
   const Reporte7T = require('./Reporte7T')(sequelize);
   const ConsejoComunal = require('./ConsejoComunal')(sequelize);
@@ -93,7 +92,7 @@ async function initModels(sequelize) {
   CensoOpcionMultiple.belongsTo(EstudioDemografico, { foreignKey: 'id_estudio' });
 
   return {
-    Usuario, Habitante, Proyecto, Votacion, Noticia, Vivienda, Reporte7T, ConsejoComunal,
+    Usuario, Habitante, Proyecto, Votacion, Vivienda, Reporte7T, ConsejoComunal,
     EstudioDemografico, ProduccionAgricola, OrganizacionSocial, PersonaGrupoSocial,
     BandejaValidaciones, CarteleraDigital, LogAuditoria,
     CensoCaracteristicaFamiliar, CensoSituacionEconomica, CensoSituacionVivienda,
