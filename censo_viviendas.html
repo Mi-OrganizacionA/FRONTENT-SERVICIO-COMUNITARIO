@@ -4050,6 +4050,15 @@
       const famArr = getSafe(raw.familiares) instanceof Array ? raw.familiares : (Array.isArray(raw.familiares) ? raw.familiares : []);
       const jefe = famArr.find(f => f.parentesco === 'Jefe(a) de Familia' || f.es_jefe_familia) || {};
       setVal('cedulaJefe',            jefe.cedula_identidad);
+
+      // Disparar autocompletado para llenar campos faltantes que solo existen en la tabla Habitantes (Ej. Estado Civil, Teléfono)
+      setTimeout(() => {
+        const inputCedula = document.getElementById('cedulaJefe');
+        if (inputCedula && inputCedula.forceSearch && inputCedula.value) {
+          inputCedula.forceSearch();
+        }
+      }, 500);
+
       setVal('jefNombres',            jefe.nombres_apellidos);
       setVal('jefFechaNac',           jefe.fecha_nacimiento ? (jefe.fecha_nacimiento.split('T')[0]) : '');
       setVal('jefSexo',               jefe.sexo   || jefe.genero);
@@ -4064,7 +4073,7 @@
       setVal('jefTipoIncapacidad',    raw.jef_tipo_incapacidad);
 
       // ── PANEL 4: Características del Grupo Familiar ──
-      setVal('cantidadHabitantes', raw.cantidad_habitantes);
+      setVal('cantidadHabitantes', raw.cantidad_habitantes || famArr.length || 1);
       setVal('condicionGeneral',   raw.condicion_general);
 
       const otrosFamiliares = famArr.filter(f => f.parentesco !== 'Jefe(a) de Familia' && !f.es_jefe_familia);
