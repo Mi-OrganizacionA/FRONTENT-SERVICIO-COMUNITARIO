@@ -307,8 +307,17 @@
     if (window.api && badge) {
       window.api.getNotificaciones()
         .then(notifs => {
-          // 'notifs' es el array correcto (antes se usaba 'pendientes' por error)
-          const count = Array.isArray(notifs) ? notifs.length : 0;
+          const arr = Array.isArray(notifs) ? notifs : [];
+          const user = window.auth ? window.auth.getUser() : null;
+          const isVocero = user && user.rol === 'vocero';
+          
+          // Para vocero: contar solo las pendientes. Para admin: el endpoint ya filtra solo pendientes.
+          const count = isVocero
+            ? arr.filter(n => {
+                const est = (n.estado_tramite || n.estado || '').toLowerCase();
+                return est === 'pendiente' || est === '';
+              }).length
+            : arr.length;
 
           // Actualizar badge visual en el header
           badge.textContent = count > 99 ? '99+' : count;

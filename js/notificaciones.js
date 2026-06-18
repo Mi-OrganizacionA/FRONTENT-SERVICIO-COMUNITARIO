@@ -11,6 +11,8 @@ class NotificacionesController {
     this.userId    = null;
     this.pendingBulkAction = null; // 'approve' | 'reject'
     this.detailId  = null;
+    this.paginaActual = 1;
+    this.porPagina = 10;
 
     // Verificar sesiÃ³n antes de arrancar
     const u = window.auth ? window.auth.getUser() : null;
@@ -48,12 +50,20 @@ class NotificacionesController {
       if (phSub) phSub.textContent = 'AquÃ­ puedes ver el estado de las solicitudes que has enviado al administrador.';
       if (phIcon) phIcon.className = 'fas fa-paper-plane';
       if (tableTitle) tableTitle.textContent = 'Mis solicitudes enviadas';
-      // Ocultar checkboxes en vista vocero
-      if (thCheck) thCheck.style.display = 'none';
-      if (checkAll) checkAll.style.display = 'none';
+      // Mostrar checkboxes en vista vocero para selección múltiple
+      if (thCheck) thCheck.style.display = '';
+      if (checkAll) checkAll.style.display = '';
       // Ocultar filtro de tipo
       const ft = document.getElementById('filterTipo');
       if (ft) ft.style.display = 'none';
+
+      // Adaptar botones de la barra masiva para Vocero
+      const approveBtn = document.getElementById('btnBulkApprove');
+      const rejectBtn  = document.getElementById('btnBulkReject');
+      if (approveBtn) approveBtn.style.display = 'none'; // Vocero no puede aprobar
+      if (rejectBtn) {
+        rejectBtn.innerHTML = '<i class="fas fa-ban"></i> Cancelar Seleccionadas';
+      }
     }
   }
 
@@ -119,6 +129,7 @@ class NotificacionesController {
     // Ordenar por fecha descendente
     lista.sort((a, b) => new Date(b.fecha_solicitud) - new Date(a.fecha_solicitud));
     this.filtradas = lista;
+    this.paginaActual = 1; // Resetear al primer filtrado
 
     this.renderStats();
     this.renderTabla(lista);
@@ -177,22 +188,43 @@ class NotificacionesController {
 
     if (!tbody) return;
 
-    if (lista.length === 0) {
+    if (this.todas.length === 0) {
       if (tableSection) tableSection.style.display = 'none';
       if (emptyState) emptyState.style.display = 'block';
       const emptyTitle = document.getElementById('emptyTitle');
       const emptyMsg = document.getElementById('emptyMsg');
       if (emptyTitle) emptyTitle.textContent = isVocero ? 'No tienes solicitudes enviadas' : 'No hay solicitudes pendientes';
       if (emptyMsg) emptyMsg.textContent = isVocero
-        ? 'Cuando envÃ­es noticias, proyectos u otros datos, aparecerÃ¡n aquÃ­ para que veas su estado.'
-        : 'Todo estÃ¡ en orden. Cuando los voceros envÃ­en nuevas solicitudes, aparecerÃ¡n aquÃ­.';
+        ? 'Cuando envíes noticias, proyectos u otros datos, aparecerán aquí para que veas su estado.'
+        : 'Todo está en orden. Cuando los voceros envíen nuevas solicitudes, aparecerán aquí.';
+      return;
+    }
+
+    if (lista.length === 0) {
+      if (tableSection) tableSection.style.display = 'block';
+      if (emptyState) emptyState.style.display = 'none';
+      if (tbody) tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align:center; padding:3rem 1rem; color:var(--muted);">
+            <i class="fas fa-search" style="font-size:2rem; display:block; margin-bottom:.75rem; opacity:.4;"></i>
+            <strong style="font-size:.95rem; color:var(--txt);">
+              ${isVocero ? 'No tienes solicitudes con este filtro' : 'No hay solicitudes con este filtro'}
+            </strong>
+            <p style="font-size:.82rem; margin-top:.35rem; opacity:.7;">Prueba cambiando el estado o la búsqueda.</p>
+          </td>
+        </tr>`;
+      if (document.getElementById('paginadorValidaciones')) document.getElementById('paginadorValidaciones').innerHTML = '';
       return;
     }
 
     if (tableSection) tableSection.style.display = 'block';
     if (emptyState) emptyState.style.display = 'none';
 
-    tbody.innerHTML = lista.map((n, idx) => {
+    // Calcular slice de la página actual
+    const inicio = (this.paginaActual - 1) * this.porPagina;
+    const paginaData = lista.slice(inicio, inicio + this.porPagina);
+
+    tbody.innerHTML = paginaData.map((n, idx) => {
       const isSelected = this.selected.has(n.id);
       const estado = (n.estado || 'pendiente').toLowerCase();
       const desc = this.getDescripcion(n);
@@ -203,7 +235,7 @@ class NotificacionesController {
 
       return `
         <tr class="${isSelected ? 'selected' : ''}" data-id="${n.id}" role="row">
-          <td class="td-check" ${isVocero ? 'style="display:none"' : ''}>
+          <td class="td-check">
             <input type="checkbox" class="v-checkbox row-check" data-id="${n.id}"
               ${isSelected ? 'checked' : ''} title="Seleccionar" aria-label="Seleccionar solicitud ${n.id}">
           </td>
@@ -239,7 +271,46 @@ class NotificacionesController {
       `;
     }).join('');
 
+    this.renderPaginacion(lista.length);
     this.bindCheckboxEvents();
+  }
+
+  /* ─── Paginación ────────────────────────────────────────────────────────── */
+  renderPaginacion(total) {
+    const el = document.getElementById('paginadorValidaciones');
+    if (!el) return;
+    const totalPags = Math.ceil(total / this.porPagina);
+    if (totalPags <= 1) { el.innerHTML = ''; return; }
+
+    // Calcular páginas visibles: siempre primera, última y ±2 alrededor de la actual
+    const visible = new Set([1, totalPags]);
+    for (let i = Math.max(1, this.paginaActual - 2); i <= Math.min(totalPags, this.paginaActual + 2); i++) {
+      visible.add(i);
+    }
+    const sorted = [...visible].sort((a, b) => a - b);
+
+    let html = '<div class="paginador-wrap">';
+    // Botón anterior
+    if (this.paginaActual > 1) {
+      html += `<button class="paginador-btn" onclick="window.notif.irPagina(${this.paginaActual - 1})"><i class="fas fa-chevron-left"></i></button>`;
+    }
+    let prev = 0;
+    for (const p of sorted) {
+      if (prev && p - prev > 1) html += '<span class="paginador-dots">...</span>';
+      html += `<button class="paginador-btn${p === this.paginaActual ? ' active' : ''}" onclick="window.notif.irPagina(${p})">${p}</button>`;
+      prev = p;
+    }
+    // Botón siguiente
+    if (this.paginaActual < totalPags) {
+      html += `<button class="paginador-btn" onclick="window.notif.irPagina(${this.paginaActual + 1})"><i class="fas fa-chevron-right"></i></button>`;
+    }
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
+  irPagina(n) {
+    this.paginaActual = n;
+    this.renderTabla(this.filtradas);
   }
 
   /* â”€â”€â”€ Bind Eventos de Tabla â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
@@ -289,7 +360,7 @@ class NotificacionesController {
   actualizarBulkBar() {
     const bar = document.getElementById('bulkActionsBar');
     const countEl = document.getElementById('bulkCount');
-    if (!bar || this.userRole === 'vocero') return;
+    if (!bar) return;
     const n = this.selected.size;
     if (countEl) countEl.textContent = n;
     bar.classList.toggle('visible', n > 0);
@@ -474,13 +545,16 @@ class NotificacionesController {
     const ids = [...this.selected];
     const isApprove = accion === 'approve';
 
+    const isVocero = this.userRole === 'vocero';
+
     let ok = 0, err = 0;
     for (const id of ids) {
       try {
-        if (isApprove) {
+        if (isApprove && !isVocero) {
           await window.api.aprobarNotificacion(id, 'Aprobado en lote por el administrador.');
         } else {
-          await window.api.rechazarNotificacion(id, 'Rechazado en lote por el administrador.');
+          const motivo = isVocero ? 'Cancelado en lote por el solicitante.' : 'Rechazado en lote por el administrador.';
+          await window.api.rechazarNotificacion(id, motivo);
         }
         ok++;
       } catch (e) {

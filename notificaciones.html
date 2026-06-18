@@ -125,29 +125,34 @@
       cursor: pointer; border-radius: 4px;
     }
 
-    /* ── Barra flotante de acciones masivas ── */
+    /* ── Barra de acciones masivas estática ── */
     .bulk-actions-bar {
-      position: fixed;
-      bottom: 1.5rem;
-      left: 50%;
-      transform: translateX(-50%) translateY(120%);
-      background: var(--vx);
-      color: #fff;
-      border-radius: 50px;
-      padding: 0.75rem 1.5rem;
-      display: flex;
+      display: none;
+      padding: 0.75rem 1.25rem;
+      background: rgba(67,160,71,.06);
+      border-top: 1px solid rgba(67,160,71,.2);
       align-items: center;
-      gap: 1rem;
-      box-shadow: 0 8px 30px rgba(0,0,0,.3);
-      z-index: 800;
-      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-      white-space: nowrap;
+      gap: 0.75rem;
       flex-wrap: wrap;
+      border-radius: 0 0 var(--r-lg) var(--r-lg);
       justify-content: center;
     }
     .bulk-actions-bar.visible {
-      transform: translateX(-50%) translateY(0);
+      display: flex;
     }
+
+    /* Paginación */
+    .paginador-wrap { display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap; }
+    .paginador-btn {
+      min-width: 34px; height: 34px; padding: 0 0.5rem;
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      background: var(--bg); color: var(--txt); font-size: 0.83rem;
+      font-family: inherit; font-weight: 600; cursor: pointer;
+      transition: all var(--tr);
+    }
+    .paginador-btn:hover { border-color: var(--vp); color: var(--vp); }
+    .paginador-btn.active { background: var(--vp); border-color: var(--vp); color: #fff; }
+    .paginador-dots { color: var(--muted); padding: 0 0.3rem; }
     .bulk-count {
       font-weight: 700;
       font-size: 0.9rem;
@@ -254,14 +259,15 @@
     @media (max-width: 768px) {
       .validaciones-toolbar { flex-direction: column; align-items: stretch; }
       .validaciones-toolbar-right { justify-content: flex-start; }
-      .v-table thead th.th-accion { display: none; }
-      .v-table tbody td.td-accion { display: none; }
-      .bulk-actions-bar { left: 1rem; right: 1rem; transform: translateY(120%); border-radius: var(--r-lg); bottom: 1rem; }
-      .bulk-actions-bar.visible { transform: translateY(0); }
+      .v-btn-sm { padding: 0.25rem 0.45rem; font-size: 0.7rem; }
+      .v-btn-sm span { display: none; }
+      .v-table tbody td:nth-child(3) { max-width: 100px !important; }
       .det-meta-grid { grid-template-columns: 1fr 1fr; }
       .det-data-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 480px) {
+      .v-table thead th:nth-child(2),
+      .v-table tbody td:nth-child(2) { display: none; }
       .det-meta-grid { grid-template-columns: 1fr; }
       .modal-confirm-actions .btn-sicag { width: 100%; justify-content: center; }
     }
@@ -378,6 +384,20 @@
           </tbody>
         </table>
       </div>
+      <div id="paginadorValidaciones" style="padding:.6rem 1.25rem; border-top:1px solid var(--border);"></div>
+      <!-- BARRA DE ACCIONES MASIVAS -->
+      <div class="bulk-actions-bar" id="bulkActionsBar" role="toolbar" aria-label="Acciones masivas">
+        <span class="bulk-count"><span id="bulkCount">0</span> seleccionada(s)</span>
+        <button class="bulk-btn bulk-btn-approve" id="btnBulkApprove" type="button">
+          <i class="fas fa-check-double"></i> Aprobar Seleccionados
+        </button>
+        <button class="bulk-btn bulk-btn-reject" id="btnBulkReject" type="button">
+          <i class="fas fa-ban"></i> Rechazar Seleccionados
+        </button>
+        <button class="bulk-btn bulk-btn-clear" id="btnBulkClear" type="button">
+          <i class="fas fa-xmark"></i> Cancelar
+        </button>
+      </div>
     </div>
 
     <!-- Vista vacía -->
@@ -390,20 +410,6 @@
     </div>
 
   </main>
-
-  <!-- BARRA FLOTANTE DE ACCIONES MASIVAS (solo Admin) -->
-  <div class="bulk-actions-bar" id="bulkActionsBar" role="toolbar" aria-label="Acciones masivas">
-    <span class="bulk-count"><span id="bulkCount">0</span> seleccionada(s)</span>
-    <button class="bulk-btn bulk-btn-approve" id="btnBulkApprove" type="button">
-      <i class="fas fa-check-double"></i> Aprobar Seleccionados
-    </button>
-    <button class="bulk-btn bulk-btn-reject" id="btnBulkReject" type="button">
-      <i class="fas fa-times-circle"></i> Rechazar Seleccionados
-    </button>
-    <button class="bulk-btn bulk-btn-clear" id="btnBulkClear" type="button">
-      <i class="fas fa-xmark"></i> Cancelar
-    </button>
-  </div>
 
   <!-- MODAL DE DETALLE DE SOLICITUD -->
   <div class="modal-overlay" id="modalDetalle" role="dialog" aria-modal="true" aria-labelledby="modalDetTitle">
