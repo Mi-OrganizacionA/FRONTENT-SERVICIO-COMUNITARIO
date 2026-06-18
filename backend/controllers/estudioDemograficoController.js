@@ -340,31 +340,85 @@ class EstudioDemograficoController {
   }
 
   static async actualizar(req, res, next) {
+    const db = models;
+    const sequelize = (db && db.sequelize) || (EstudioDemografico && EstudioDemografico.sequelize);
+    if (!sequelize) return next(new Error('Sequelize no disponible'));
+
+    const id = req.params.id;
+    const autoApprove = req.user?.rol === 'admin';
+
+    // Si es Vocero, enviar a la Bandeja de Validaciones
+    if (!autoApprove) {
+      await db.BandejaValidaciones.create({
+        id_vocero: req.user.id,
+        tabla_afectada: 'estudios_demograficos',
+        tipo_accion: 'UPDATE',
+        datos_temporales: { id, ...req.body },
+        estado_tramite: 'Pendiente'
+      });
+      return res.status(202).json({ validacion: true, mensaje: 'Solicitud de edición enviada al administrador para revisión.' });
+    }
+
+    // Si es Admin, procesar directo con transacción completa
+    const t = await sequelize.transaction();
     try {
-      const data = await EstudioDemografico.findByPk(req.params.id);
-      if (!data) return res.status(404).json({ error: "Estudio demográfico no encontrado" });
-      
-      const db = require('../models');
-      const autoApprove = req.user?.rol === 'admin';
-      if (!autoApprove) {
-        await db.BandejaValidaciones.create({
-          id_vocero: req.user.id,
-          tabla_afectada: 'estudios_demograficos',
-          tipo_accion: 'UPDATE',
-          datos_temporales: { id: req.params.id, ...req.body },
-          estado_tramite: 'Pendiente'
-        });
-        return res.status(202).json({ validacion: true, mensaje: 'Solicitud de edición enviada al administrador para revisión.' });
+      const estudio = await EstudioDemografico.findByPk(id);
+      if (!estudio) {
+        await t.rollback();
+        return res.status(404).json({ error: 'Estudio demográfico no encontrado' });
       }
 
-      const datosAntiguos = data.toJSON();
-      await data.update(req.body);
+      const datosAntiguos = estudio.toJSON();
+      const body = req.body;
+
+      // 1. Actualizar cabecera principal
+      await estudio.update(mapFrontendData(body, 2), { transaction: t });
+
+      // 2. Actualizar Familiares (si vienen en el body)
+      if (body.familiares && body.familiares.length > 0) {
+        await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio: id }, transaction: t });
+        const mappedFam = mapFrontendData(body, 3).familiares || body.familiares;
+        const fams = mappedFam.map(f => ({ ...f, id_estudio: id }));
+        await db.CensoCaracteristicaFamiliar.bulkCreate(fams, { transaction: t });
+      }
+
+      // 3. Actualizar módulos hijos (findOrCreate + update)
+      const updateChild = async (Modelo, paso) => {
+        const dbDatos = mapFrontendData(body, paso);
+        // Evitamos crear con campos vacíos si no hay datos significativos
+        if (Object.keys(dbDatos).length === 0) return;
+        const [record, created] = await Modelo.findOrCreate({ 
+          where: { id_estudio: id }, 
+          defaults: { ...dbDatos, id_estudio: id }, 
+          transaction: t 
+        });
+        if (!created) await record.update(dbDatos, { transaction: t });
+      };
+
+      await updateChild(db.CensoSituacionEconomica, 5);
+      await updateChild(db.CensoSituacionVivienda, 6);
+      await updateChild(db.CensoServicios, 7);
+      await updateChild(db.CensoSalud, 8);
+      await updateChild(db.CensoParticipacionComunitaria, 9);
+      await updateChild(db.CensoSituacionComunidad, 10);
+
+      // 4. Actualizar opciones múltiples (checkboxes)
+      if (body.opciones && body.opciones.length > 0) {
+        const categorias = [...new Set(body.opciones.map(o => o.categoria))];
+        await db.CensoOpcionMultiple.destroy({ where: { id_estudio: id, categoria: categorias }, transaction: t });
+        await db.CensoOpcionMultiple.bulkCreate(body.opciones.map(o => ({ ...o, id_estudio: id })), { transaction: t });
+      }
+
+      await t.commit();
 
       if (req.user) {
-        await AuditService.log(req.user.id, "UPDATE", "estudios_demograficos", data.id, datosAntiguos, data.toJSON());
+        await AuditService.log(req.user.id, 'UPDATE', 'estudios_demograficos', id, datosAntiguos, estudio.toJSON());
       }
-      res.json(data);
-    } catch (error) { next(error); }
+      res.json({ success: true, message: 'Censo actualizado correctamente' });
+    } catch (error) {
+      await t.rollback();
+      next(error);
+    }
   }
 
   static async finalizar(req, res, next) {

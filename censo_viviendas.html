@@ -3185,6 +3185,15 @@
         }
       });
 
+      // Ajustes específicos por paso
+      if (paso === 2) {
+        if (datos.direccion_exacta !== undefined) {
+          datos.referencia_ubicacion = datos.direccion_exacta;
+          delete datos.direccion_exacta;
+        }
+        datos.direccion = [datos.calle_avenida, datos.numero_casa, datos.referencia_ubicacion].filter(Boolean).join(', ');
+      }
+
       // Recolectar Familiares (Sección 3 y 4)
       if (paso === 3 || paso === 4) {
         const familiares = [];
@@ -3314,6 +3323,7 @@
 
     document.getElementById('modalVivienda').addEventListener('shown.bs.modal', () => {
       updateStepperArrows();
+      if (window.isEditingCenso) return; // En modo edición, no restaurar borrador
       const draftStr = localStorage.getItem('borradorCensoVivienda');
       if (draftStr) {
         // Auto-restaurar el borrador sin bloquear con confirm() nativo
@@ -3373,6 +3383,8 @@
 
     // Reset wizard on modal close (Cancelar)
     document.getElementById('modalVivienda').addEventListener('hidden.bs.modal', () => {
+      window.isEditingCenso = false;  // Limpiar bandera de edición
+      window.currentCensoId = null;   // Limpiar ID de edición
       document.getElementById('formVivienda').reset();
       clearDraft();
       // Clear validation styles
@@ -3618,7 +3630,7 @@
             agua: v.servicios?.aguas_blancas_tipo || v.aguas_blancas || '—',
             gas: v.servicios?.gas_tipo || v.gas_domestico || '—',
             // Dirección (del paso 2)
-            direccion: v.direccion_comunidad || v.direccion_exacta || '—',
+            direccion: v.direccion || [v.calle_avenida, v.numero_casa, v.referencia_ubicacion].filter(Boolean).join(', ') || v.direccion_comunidad || '—',
             fechaCenso: v.fecha_censo || v.fecha_creacion,
             raw: v
           };}) : [];
@@ -3976,39 +3988,164 @@
     }
 
     async function intentarEditar(id, index) {
-      if (!id || id === 'undefined') { showToast('ID de vivienda no válido.', 'error'); return; }
+      if (!id || id === 'undefined') { showToast('ID no válido.', 'error'); return; }
       
-      try {
-        const v = viviendas.find(x => x.id == id || x._id == id);
-        if (!v) { showToast('No se encontró la vivienda localmente', 'error'); return; }
-        
-        window.currentCensoId = id;
-        window.isEditingCenso = true;
-        
-        showToast('Edición iniciada. Llene los pasos y guarde el formulario.', 'success');
-        
-        const formWizard = document.getElementById('formVivienda');
-        if (formWizard) formWizard.reset();
-        
-        // Simular carga de algunos datos básicos (en la realidad habría un GET detallado)
-        if (document.getElementById('cedulaJefe')) document.getElementById('cedulaJefe').value = v.cedula || '';
-        if (document.getElementById('direccionExacta')) document.getElementById('direccionExacta').value = v.direccion || '';
-        
-        // Ir al paso 1
-        currentStep = 1;
-        goToStep(1);
-        
-        // Cerrar modal de vista si estaba abierto
-        const activeModal = document.querySelector('.modal.show');
-        if (activeModal) {
-          const bsModal = bootstrap.Modal.getInstance(activeModal);
-          if (bsModal) bsModal.hide();
-        }
-        
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } catch (e) {
-        showToast('Error preparando edición', 'error');
+      const v = viviendas.find(x => x.id == id || x._id == id);
+      if (!v) { showToast('No se encontró el censo localmente.', 'error'); return; }
+      if (!v.raw) { showToast('Datos del censo no disponibles.', 'error'); return; }
+
+      // Configurar banderas globales ANTES de abrir el modal
+      window.currentCensoId = id;
+      window.isEditingCenso = true;
+
+      // Resetear el formulario limpiamente (sin dejar datos del registro anterior)
+      const form = document.getElementById('formVivienda');
+      if (form) form.reset();
+
+      // Pre-llenar todos los campos desde los datos guardados en la BD
+      hidratarFormulario(v.raw);
+
+      // Ir al paso 1 y abrir el modal
+      goToStep(1);
+      
+      // Cerrar modal de vista si estaba abierto
+      const activeModal = document.querySelector('.modal.show');
+      if (activeModal && activeModal.id !== 'modalVivienda') {
+        const bsModal = bootstrap.Modal.getInstance(activeModal);
+        if (bsModal) bsModal.hide();
       }
+
+      new bootstrap.Modal(document.getElementById('modalVivienda')).show();
+    }
+
+    function hidratarFormulario(raw) {
+      const boolToSiNo = (val) => val === true ? 'Si' : val === false ? 'No' : (val ?? '');
+      const getSafe = (obj) => Array.isArray(obj) ? (obj[0] || {}) : (obj || {});
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined && val !== null) el.value = val; };
+
+      // ── PANEL 1: Encuestador y Cabecera ──
+      // Desactivar checkboxes "Auto" en modo edición para que no sobreescriban los valores
+      const chkPlanillaAuto = document.getElementById('chkPlanillaAuto');
+      if (chkPlanillaAuto) { chkPlanillaAuto.checked = false; chkPlanillaAuto.dispatchEvent(new Event('change')); }
+      const chkFechaAuto = document.getElementById('chkFechaAuto');
+      if (chkFechaAuto) { chkFechaAuto.checked = false; chkFechaAuto.dispatchEvent(new Event('change')); }
+
+      setVal('planillaNro',        raw.planilla_nro || raw.planillaNro);
+      
+      const rawFechaCenso = raw.fecha_censo || raw.fechaCenso;
+      setVal('fechaCenso',         rawFechaCenso ? rawFechaCenso.split('T')[0] : '');
+      
+      setVal('consejoComunalCab',  raw.consejo_comunal_cab || raw.sector);
+      setVal('encuestadorNombre',  raw.encuestador_nombre || raw.encuestador);
+      setVal('encuestadorCedula',  raw.encuestador_cedula);
+      setVal('encuestadoNombre',   raw.encuestado_nombre);
+      setVal('encuestadoCedula',   raw.encuestado_cedula);
+
+      // ── PANEL 2: Dirección ──
+      setVal('calleAvenida',   raw.calle_avenida);
+      setVal('numeroCasa',     raw.numero_casa);
+      setVal('direccionExacta', raw.referencia_ubicacion || raw.direccion_exacta);
+
+      // ── PANEL 3: Jefe de Familia ──
+      const famArr = getSafe(raw.familiares) instanceof Array ? raw.familiares : (Array.isArray(raw.familiares) ? raw.familiares : []);
+      const jefe = famArr.find(f => f.parentesco === 'Jefe(a) de Familia' || f.es_jefe_familia) || {};
+      setVal('cedulaJefe',            jefe.cedula_identidad);
+      setVal('jefNombres',            jefe.nombres_apellidos);
+      setVal('jefFechaNac',           jefe.fecha_nacimiento ? (jefe.fecha_nacimiento.split('T')[0]) : '');
+      setVal('jefSexo',               jefe.sexo   || jefe.genero);
+      setVal('jefEstadoCivil',        raw.estado_civil_jefe || jefe.estado_civil);
+      setVal('jefNivelInstruccion',   jefe.grado_instruccion || raw.nivel_instruccion_jefe || jefe.nivel_educativo);
+      setVal('jefProfesion',          jefe.profesion || jefe.ocupacion);
+      setVal('jefTiempoComunidad',    raw.tiempo_comunidad || jefe.tiempo_comunidad);
+      setVal('jefInscritoCNE',        boolToSiNo(raw.inscrito_cne || jefe.inscrito_cne));
+      setVal('jefTelfCel',            raw.telefono_celular || raw.jef_telf_cel || jefe.telefono);
+      setVal('jefEmail',              raw.email_jefe || raw.jef_email || jefe.email);
+      setVal('jefIncapacitado',       boolToSiNo(raw.jef_incapacitado || jefe.incapacitado));
+      setVal('jefTipoIncapacidad',    raw.jef_tipo_incapacidad);
+
+      // ── PANEL 4: Características del Grupo Familiar ──
+      setVal('cantidadHabitantes', raw.cantidad_habitantes);
+      setVal('condicionGeneral',   raw.condicion_general);
+
+      const otrosFamiliares = famArr.filter(f => f.parentesco !== 'Jefe(a) de Familia' && !f.es_jefe_familia);
+      const famContainer = document.getElementById('familiaresContainer') || document.querySelector('.familiar-rows-container');
+      if (famContainer) famContainer.innerHTML = '';
+      otrosFamiliares.forEach(fam => {
+        const addBtn = document.getElementById('btnAgregarFamiliar');
+        if (addBtn) addBtn.click();
+        const rows = document.querySelectorAll('.familiar-row');
+        const row = rows[rows.length - 1];
+        if (!row) return;
+        const set = (cls, val) => { const el = row.querySelector(cls); if (el) el.value = val || ''; };
+        set('.fam-cedula',    fam.cedula_identidad);
+        set('.fam-nombres',   fam.nombres_apellidos);
+        set('.fam-parentesco', fam.parentesco);
+        set('.fam-fechanac',  fam.fecha_nacimiento ? fam.fecha_nacimiento.split('T')[0] : '');
+        set('.fam-sexo',      fam.sexo || fam.genero);
+        set('.fam-instruccion', fam.grado_instruccion || fam.nivel_educativo);
+      });
+
+      // ── PANEL 5: Situación Económica ──
+      const eco = getSafe(raw.situacion_economica);
+      setVal('trabaja',                     boolToSiNo(eco.trabaja));
+      setVal('dondeTrabaja',                eco.donde_trabaja);
+      setVal('ingresoFamiliarRango',        eco.ingreso_familiar_rango);
+      setVal('ingresoBs',                   eco.ingreso_bs);
+      setVal('actividadComercialVivienda',  boolToSiNo(eco.actividad_comercial_vivienda));
+      setVal('ventasDe',                    eco.ventas_de);
+
+      // ── PANEL 6: Situación de la Vivienda (Estructura) ──
+      const viv = getSafe(raw.situacion_vivienda);
+      setVal('tipoVivienda',        viv.tipo_vivienda);
+      setVal('tenencia',            viv.forma_tenencia);
+      setVal('condicionesTerreno',  viv.condiciones_terreno);
+      setVal('materialParedes',     viv.tipo_paredes);
+      setVal('materialTecho',       viv.tipo_techo);
+      setVal('cantidadHabitaciones', viv.cantidad_habitaciones);
+      setVal('requiereAyuda',       boolToSiNo(viv.requiere_ayuda_mejora));
+
+      // ── PANEL 7: Servicios Básicos ──
+      const serv = getSafe(raw.servicios);
+      setVal('aguasBlancas',     serv.aguas_blancas_tipo);
+      setVal('aguasServidas',    serv.aguas_servidas_tipo);
+      setVal('sistemaElectrico', serv.sistema_electrico_tipo);
+      setVal('gasDomestico',     serv.gas_tipo);
+      setVal('recoleccionBasura', serv.recoleccion_basura_tipo);
+      setVal('telefoniaServicio', serv.telefonia_tipo);
+
+      // ── PANEL 8: Salud ──
+      const salud = getSafe(raw.salud);
+      const enfermedades = (salud.enfermedades_lista || '').split(',').map(s => s.trim()).filter(Boolean);
+      const opcionesEnf = (raw.opciones || []).filter(o => o.categoria === 'enfermedades').map(o => o.valor);
+      const todasEnf = [...new Set([...enfermedades, ...opcionesEnf])];
+      document.querySelectorAll('input[name="enfermedades"]').forEach(cb => {
+        cb.checked = todasEnf.includes(cb.value);
+      });
+      setVal('necesitaAyudaEspecial', boolToSiNo(salud.necesita_ayuda_especial));
+      setVal('cualAyudaEspecial',     salud.cual_ayuda_especial);
+      setVal('exclusionNinosCalle',   salud.exclusion_ninos_calle_cant);
+      setVal('exclusionDiscapacitados', salud.exclusion_discapacitados_cant);
+      setVal('exclusionTerceraEdad',  salud.exclusion_tercera_edad_cant);
+
+      // ── PANEL 9: Participación Comunitaria ──
+      const part = getSafe(raw.participacion_comunitaria);
+      setVal('existenOrgComunitarias',   boolToSiNo(part.existen_org_comunitarias));
+      setVal('cualesOrgComunitarias',    part.cuales_org_comunitarias);
+      setVal('participaUsted',           boolToSiNo(part.participa_usted));
+      setVal('participaFamiliar',        boolToSiNo(part.participa_familiar));
+      setVal('asisteAsambleas',          boolToSiNo(part.asiste_asambleas_ciudadanos));
+      setVal('infoCCs',                  boolToSiNo(part.info_sobre_consejos_comunales));
+      setVal('dispuestoApoyar',          boolToSiNo(part.dispuesto_apoyar_consejo));
+      setVal('misiones',                 part.misiones);
+      setVal('areaTrabajoInteres',       part.area_trabajo_interes);
+
+      // ── PANEL 10: Diagnóstico ──
+      const com = getSafe(raw.situacion_comunidad);
+      setVal('potencialidadesComunidad', com.potencialidades_comunidad);
+      setVal('problemasComunidad',       com.problemas_comunidad);
+      setVal('comoResolverProblemas',    com.como_resolver_problemas);
+      setVal('tipoProyectosDeseados',    com.tipo_proyectos_deseados);
+      setVal('observaciones',            com.observaciones);
     }
 
     async function intentarEliminar(id, index) {
@@ -4391,6 +4528,7 @@
 
       // ── 2. Auto-fill del Encuestador (siempre desde sesión) ──
       const fillEncuestador = () => {
+        if (window.isEditingCenso) return; // No sobreescribir los datos del encuestador original
         const nom = document.getElementById('encuestadorNombre');
         const ced = document.getElementById('encuestadorCedula');
         if (nom) nom.value = u.nombres ? (u.nombres + ' ' + (u.apellidos || '')).trim() : (u.nombre || 'Administrador');

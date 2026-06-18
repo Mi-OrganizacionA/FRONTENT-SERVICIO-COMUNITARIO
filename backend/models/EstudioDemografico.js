@@ -1,4 +1,4 @@
-﻿const { DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
   const EstudioDemografico = sequelize.define('EstudioDemografico', {
@@ -24,6 +24,10 @@ module.exports = (sequelize) => {
     sector: DataTypes.STRING(100),
     nombre_comunidad: DataTypes.STRING(200),
     direccion_comunidad: DataTypes.TEXT,
+    calle_avenida: DataTypes.STRING(200),
+    numero_casa: DataTypes.STRING(50),
+    referencia_ubicacion: DataTypes.TEXT,
+    direccion: DataTypes.TEXT,
     fecha_creacion: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     activo: { type: DataTypes.BOOLEAN, defaultValue: true }
   }, { tableName: 'estudios_demograficos', timestamps: false });

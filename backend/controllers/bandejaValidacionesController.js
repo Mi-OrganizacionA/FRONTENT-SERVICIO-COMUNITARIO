@@ -156,6 +156,69 @@ class BandejaValidacionesController {
         return res.json({ mensaje: 'Censo demográfico aprobado e insertado en el sistema', validacion });
       }
 
+      // Manejo especial para estudios_demograficos UPDATE (actualiza todas las tablas hijas)
+      if (tabla === 'estudios_demograficos' && validacion.tipo_accion === 'UPDATE') {
+        const estudioDemograficoController = require('./estudioDemograficoController');
+        const idCenso = datos.id || validacion.registro_id;
+        if (!idCenso) throw new Error('No se encontró el ID del estudio demográfico a actualizar');
+
+        // Crear req/res simulados para reutilizar el método actualizar (que ya maneja transacción completa)
+        const mockReq = {
+          params: { id: String(idCenso) },
+          body: datos,
+          user: { id: req.user ? req.user.id : validacion.id_vocero, rol: 'admin' } // Forzar rol admin para que no vuelva a la bandeja
+        };
+        let respuesta;
+        const mockRes = {
+          status: () => mockRes,
+          json: (data) => { respuesta = data; }
+        };
+
+        await estudioDemograficoController.actualizar(mockReq, mockRes, (err) => { if (err) throw err; });
+        nuevoRegistro = respuesta;
+
+        await validacion.update({
+          estado_tramite: 'Aprobado',
+          id_validador: req.user ? req.user.id : null,
+          comentarios_validador: comentarios,
+          fecha_validacion: new Date(),
+          registro_id: idCenso
+        });
+
+        const AuditService = require('../services/auditService');
+        await AuditService.log(req.user ? req.user.id : 0, 'VALIDACION_APROBADA', 'bandeja_validaciones', id,
+          { estado: 'Pendiente' }, { estado: 'Aprobado', tabla: 'estudios_demograficos', accion: 'UPDATE' });
+
+        return res.json({ mensaje: 'Edición del censo demográfico aprobada y aplicada', validacion });
+      }
+
+      // Manejo especial para estudios_demograficos DELETE (eliminación lógica: activo = false)
+      if (tabla === 'estudios_demograficos' && validacion.tipo_accion === 'DELETE') {
+        const EstudioDemografico = models.EstudioDemografico;
+        const idCenso = datos.id || validacion.registro_id;
+        if (!idCenso) throw new Error('No se encontró el ID del estudio demográfico a eliminar');
+
+        const estudio = await EstudioDemografico.findByPk(idCenso);
+        if (!estudio) throw new Error('El censo demográfico a eliminar no existe');
+
+        await estudio.update({ activo: false });
+        nuevoRegistro = { id: idCenso };
+
+        await validacion.update({
+          estado_tramite: 'Aprobado',
+          id_validador: req.user ? req.user.id : null,
+          comentarios_validador: comentarios,
+          fecha_validacion: new Date(),
+          registro_id: idCenso
+        });
+
+        const AuditService = require('../services/auditService');
+        await AuditService.log(req.user ? req.user.id : 0, 'VALIDACION_APROBADA', 'bandeja_validaciones', id,
+          { estado: 'Pendiente' }, { estado: 'Aprobado', tabla: 'estudios_demograficos', accion: 'DELETE' });
+
+        return res.json({ mensaje: 'Eliminación del censo demográfico aprobada', validacion });
+      }
+
       // Mapeo de nombre de tabla a Modelo Sequelize
       const tablaAModelo = {
         'habitantes': models.Habitante,

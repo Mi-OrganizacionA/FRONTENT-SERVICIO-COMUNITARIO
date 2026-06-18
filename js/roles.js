@@ -6,6 +6,7 @@
     'dashboard.html',
     'censo.html',
     'censo_viviendas.html',
+    'reportes.html',
     'cartografia.html',
     'noticias.html',
     'proyectos.html',

@@ -178,9 +178,22 @@
     }
   </style>
   <script>
-    if (!sessionStorage.getItem('sicag_user')) { // Token en memoria, usuario en sessionStorage
-      window.location.replace('login.html');
-    }
+    (function() {
+      // Verificar sesión
+      const userStr = sessionStorage.getItem('sicag_user');
+      if (!userStr) { window.location.replace('login.html'); return; }
+      
+      // Verificar que sea administrador
+      try {
+        const user = JSON.parse(userStr);
+        if (user && user.rol && user.rol !== 'admin') {
+          // El vocero no tiene acceso; redirigir a su página principal
+          window.location.replace('censo_viviendas.html');
+        }
+      } catch(e) {
+        window.location.replace('login.html');
+      }
+    })();
   </script>
   <link rel="icon" type="image/png" href="assets/img/logo_comuna_fondoremovido.png">
   <link rel="apple-touch-icon" href="assets/img/logo_comuna_fondoremovido.png">
