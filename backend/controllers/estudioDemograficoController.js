@@ -108,9 +108,13 @@ class EstudioDemograficoController {
         include: [
           { model: db.ConsejoComunal, as: 'consejo', attributes: ['nombre_comunidad'] },
           { model: db.CensoCaracteristicaFamiliar, as: 'familiares' },
+          { model: db.CensoSituacionEconomica, as: 'situacion_economica' },
           { model: db.CensoSituacionVivienda, as: 'situacion_vivienda' },
           { model: db.CensoSalud, as: 'salud' },
-          { model: db.CensoServicios, as: 'servicios' }
+          { model: db.CensoServicios, as: 'servicios' },
+          { model: db.CensoParticipacionComunitaria, as: 'participacion_comunitaria' },
+          { model: db.CensoSituacionComunidad, as: 'situacion_comunidad' },
+          { model: db.CensoOpcionMultiple, as: 'opciones_multiples' }
         ]
       });
       res.json(data);
@@ -119,8 +123,21 @@ class EstudioDemograficoController {
 
   static async getById(req, res, next) {
     try {
-      const data = await EstudioDemografico.findByPk(req.params.id);
-      if (!data) return res.status(404).json({ error: "Estudio demogr�fico no encontrado" });
+      const db = models;
+      const data = await EstudioDemografico.findByPk(req.params.id, {
+        include: [
+          { model: db.ConsejoComunal, as: 'consejo', attributes: ['nombre_comunidad'] },
+          { model: db.CensoCaracteristicaFamiliar, as: 'familiares' },
+          { model: db.CensoSituacionEconomica, as: 'situacion_economica' },
+          { model: db.CensoSituacionVivienda, as: 'situacion_vivienda' },
+          { model: db.CensoSalud, as: 'salud' },
+          { model: db.CensoServicios, as: 'servicios' },
+          { model: db.CensoParticipacionComunitaria, as: 'participacion_comunitaria' },
+          { model: db.CensoSituacionComunidad, as: 'situacion_comunidad' },
+          { model: db.CensoOpcionMultiple, as: 'opciones_multiples' }
+        ]
+      });
+      if (!data) return res.status(404).json({ error: "Estudio demográfico no encontrado" });
       res.json(data);
     } catch (error) { next(error); }
   }
@@ -135,9 +152,13 @@ class EstudioDemograficoController {
         include: [
           { model: db.ConsejoComunal, as: 'consejo', attributes: ['nombre_comunidad'] },
           { model: db.CensoCaracteristicaFamiliar, as: 'familiares' },
+          { model: db.CensoSituacionEconomica, as: 'situacion_economica' },
           { model: db.CensoSituacionVivienda, as: 'situacion_vivienda' },
           { model: db.CensoSalud, as: 'salud' },
-          { model: db.CensoServicios, as: 'servicios' }
+          { model: db.CensoServicios, as: 'servicios' },
+          { model: db.CensoParticipacionComunitaria, as: 'participacion_comunitaria' },
+          { model: db.CensoSituacionComunidad, as: 'situacion_comunidad' },
+          { model: db.CensoOpcionMultiple, as: 'opciones_multiples' }
         ]
       });
       res.json(data);
@@ -387,12 +408,20 @@ class EstudioDemograficoController {
         const dbDatos = mapFrontendData(body, paso);
         // Evitamos crear con campos vacíos si no hay datos significativos
         if (Object.keys(dbDatos).length === 0) return;
+
+        // Filtrar estrictamente a las columnas que el modelo acepta
+        const columnasValidas = Object.keys(Modelo.getAttributes());
+        const safeData = {};
+        for (const col of columnasValidas) {
+          if (col in dbDatos) safeData[col] = dbDatos[col];
+        }
+
         const [record, created] = await Modelo.findOrCreate({ 
           where: { id_estudio: id }, 
-          defaults: { ...dbDatos, id_estudio: id }, 
+          defaults: { ...safeData, id_estudio: id }, 
           transaction: t 
         });
-        if (!created) await record.update(dbDatos, { transaction: t });
+        if (!created) await record.update(safeData, { transaction: t });
       };
 
       await updateChild(db.CensoSituacionEconomica, 5);

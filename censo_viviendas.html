@@ -2129,9 +2129,9 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="cantidadHabitantes">Total de Habitantes en la Vivienda <span class="req">*</span></label>
-                  <input type="number" class="cv-form-control" id="cantidadHabitantes" min="1" max="30"
-                    placeholder="Ej. 5" required>
+                  <label for="cantidadHabitantes">Cantidad de Integrantes Extra (Sin contar al Jefe) <span class="req">*</span></label>
+                  <input type="number" class="cv-form-control" id="cantidadHabitantes" min="0" max="30"
+                    placeholder="Ej. 2" required>
                 </div>
                 <div class="cv-form-group">
                   <label for="condicionGeneral">Condición General de la Vivienda <span class="req">*</span></label>
@@ -3470,21 +3470,23 @@
     /* ── Agregar integrante familiar dinámicamente ── */
     let familiarCount = 1;
     document.getElementById('cantidadHabitantes').addEventListener('change', function () {
-      const total = parseInt(this.value) || 0;
-      if (familiarCount > (total - 1) && total > 0) {
-        showToast(`Has indicado ${total} habitante(s), pero ya has agregado ${familiarCount} integrante(s) además del jefe.`, 'error');
+      const extraMembers = parseInt(this.value) || 0;
+      const currentRows = document.querySelectorAll('.familiar-row').length;
+      if (currentRows > extraMembers) {
+        showToast(`Has indicado ${extraMembers} integrante(s) extra, pero ya has agregado ${currentRows}.`, 'warning');
       }
     });
 
     document.getElementById('btnAgregarFamiliar').addEventListener('click', () => {
-      const cantidadTotal = parseInt(document.getElementById('cantidadHabitantes').value) || 0;
-      if (cantidadTotal < 2) {
-        showToast('Primero indique el total de habitantes (mínimo 2) para agregar integrantes.', 'error');
+      const cantidadExtra = parseInt(document.getElementById('cantidadHabitantes').value) || 0;
+      if (cantidadExtra < 1) {
+        showToast('Para agregar integrantes, indique una cantidad mayor a 0.', 'error');
         document.getElementById('cantidadHabitantes').focus();
         return;
       }
-      if (familiarCount >= (cantidadTotal - 1)) {
-        showToast(`No puedes agregar más. Total habitantes: ${cantidadTotal} (Jefe + ${cantidadTotal - 1} integrantes).`, 'error');
+      const currentRows = document.querySelectorAll('.familiar-row').length;
+      if (currentRows >= cantidadExtra) {
+        showToast(`No puedes agregar más. Has indicado un máximo de ${cantidadExtra} integrante(s) adicional(es).`, 'error');
         return;
       }
 
@@ -4073,18 +4075,27 @@
       setVal('jefTipoIncapacidad',    raw.jef_tipo_incapacidad);
 
       // ── PANEL 4: Características del Grupo Familiar ──
-      setVal('cantidadHabitantes', raw.cantidad_habitantes || famArr.length || 1);
+      const otrosFamiliares = famArr.filter(f => f.parentesco !== 'Jefe(a) de Familia' && !f.es_jefe_familia);
+      setVal('cantidadHabitantes', raw.cantidad_habitantes !== undefined ? raw.cantidad_habitantes : otrosFamiliares.length);
       setVal('condicionGeneral',   raw.condicion_general);
 
-      const otrosFamiliares = famArr.filter(f => f.parentesco !== 'Jefe(a) de Familia' && !f.es_jefe_familia);
-      const famContainer = document.getElementById('familiaresContainer') || document.querySelector('.familiar-rows-container');
+      const famContainer = document.getElementById('familiarList');
       if (famContainer) famContainer.innerHTML = '';
-      otrosFamiliares.forEach(fam => {
+      
+      // Override familiarCount behavior if necessary by just letting btnAgregarFamiliar work, but wait!
+      // btnAgregarFamiliar relies on `familiarCount` variable. Let's just simulate clicks.
+      otrosFamiliares.forEach((fam, i) => {
         const addBtn = document.getElementById('btnAgregarFamiliar');
         if (addBtn) addBtn.click();
+        
         const rows = document.querySelectorAll('.familiar-row');
         const row = rows[rows.length - 1];
         if (!row) return;
+        
+        // Fix the label since familiarCount closure might be wrong if we clear the HTML
+        const labelDiv = row.querySelector('div[style*="font-size:.75rem"]');
+        if (labelDiv) labelDiv.innerHTML = `👤 Integrante #${i + 1}`;
+
         const set = (cls, val) => { const el = row.querySelector(cls); if (el) el.value = val || ''; };
         set('.fam-cedula',    fam.cedula_identidad);
         set('.fam-nombres',   fam.nombres_apellidos);
