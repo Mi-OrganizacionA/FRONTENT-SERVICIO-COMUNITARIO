@@ -4602,93 +4602,19 @@
       // Cargar opciones desde API
       if (selCC) {
         (async () => {
+          let consejos = [];
           try {
             const apiBase = window.api?.baseURL || 'http://localhost:3000/api';
             const headers = window.api?._getHeaders?.() || { 'Authorization': `Bearer ${window.auth?.getToken?.()}` };
             const res = await fetch(`${apiBase}/system/consejos`, { headers });
-              let consejos = [];
-              if (res.ok) {
-                consejos = await res.json();
-              } else {
-                throw new Error("API falló, usando fallback");
-              }
-              
-              // Evitar borrar todo si hay valores ya cargados, mejor armar el html
-              let optionsHtml = '<option value="">Seleccione...</option>';
-              let filterHtml = '<option value="">Todos</option>';
-              
-              consejos.forEach(c => {
-                if (c.id !== 10) { // Ocultar ID 10
-                  optionsHtml += `<option value="${c.id}">${c.nombre_comunidad}</option>`;
-                  filterHtml += `<option value="${c.id}">${c.nombre_comunidad}</option>`;
-                }
-              });
-
-              // Guardar el valor actual si existía (ej. al hidratarFormulario)
-              const currentVal = selCC.value;
-              const currentFilterVal = advFilterCC?.value;
-
-              selCC.innerHTML = optionsHtml;
-              if (advFilterCC) advFilterCC.innerHTML = filterHtml;
-
-              if (currentVal && currentVal !== '') selCC.value = currentVal;
-              if (advFilterCC && currentFilterVal && currentFilterVal !== '') advFilterCC.value = currentFilterVal;
-              
-              // Auto-asignar comunidad si es vocero
-              if (u.rol === 'vocero') {
-                const cid = u.id_comunidad_asignada || u.id_comunidad;
-                let matched = false;
-                let matchedValue = '';
-
-                if (cid) {
-                  for (let option of selCC.options) {
-                    if (option.value === String(cid)) {
-                      selCC.value = option.value;
-                      matchedValue = option.value;
-                      matched = true;
-                      break;
-                    }
-                  }
-                }
-
-
-          if (matched) {
-            selCC.setAttribute('disabled', 'true');
-            selCC.style.backgroundColor = 'var(--gray1)';
-            selCC.style.fontWeight = '700';
-            selCC.style.color = 'var(--vp)';
-            // Remover el 'required' para que no haya problemas de validación
-            selCC.removeAttribute('required');
-
-            // Si el formulario se resetea (al cerrar el modal o cancelar), 
-            // HTML restaura los selects a su primer valor ("Seleccione...").
-            // Necesitamos restaurar la auto-asignación inmediatamente después.
-            const formWizard = document.getElementById('formWizard') || document.getElementById('formVivienda');
-            if (formWizard) {
-              formWizard.addEventListener('reset', () => {
-                setTimeout(() => {
-                  selCC.value = matchedValue;
-                  p2CCNombre.textContent = `C.C. ${selCC.options[selCC.selectedIndex]?.text || matchedValue}`;
-                }, 0);
-              });
+            if (res.ok) {
+              consejos = await res.json();
+            } else {
+              throw new Error("API falló, usando fallback");
             }
-          }
-        } // Fin de if vocero
-        
-        // Sync después de cargar
-        const syncCC = () => {
-          if (!selCC.value) {
-            p2CCNombre.textContent = '— (seleccione en Sección I)';
-          } else {
-            p2CCNombre.textContent = `C.C. ${selCC.options[selCC.selectedIndex]?.text}`;
-          }
-        };
-        selCC.addEventListener('change', syncCC);
-        syncCC();
           } catch (e) {
             console.error('Error cargando consejos comunales:', e);
-            // Fallback completo si la API falla
-            const consejosFallback = [
+            consejos = [
               { id: 1, nombre_comunidad: "Jobito I" },
               { id: 2, nombre_comunidad: "Jobito II" },
               { id: 3, nombre_comunidad: "Brisas del Yurubí" },
@@ -4699,13 +4625,74 @@
               { id: 8, nombre_comunidad: "Fortaleza del Corozo" },
               { id: 9, nombre_comunidad: "Vencedores del Corozo" }
             ];
-            let optionsHtml = '<option value="">Seleccione...</option>';
-            consejosFallback.forEach(c => {
-              optionsHtml += `<option value="${c.id}">${c.nombre_comunidad}</option>`;
-            });
-            selCC.innerHTML = optionsHtml;
-            if (advFilterCC) advFilterCC.innerHTML = '<option value="">Todos</option>' + optionsHtml.replace('<option value="">Seleccione...</option>', '');
           }
+
+          // Evitar borrar todo si hay valores ya cargados, mejor armar el html
+          let optionsHtml = '<option value="">Seleccione...</option>';
+          let filterHtml = '<option value="">Todos</option>';
+          
+          consejos.forEach(c => {
+            if (c.id !== 10) { // Ocultar ID 10
+              optionsHtml += `<option value="${c.id}">${c.nombre_comunidad}</option>`;
+              filterHtml += `<option value="${c.id}">${c.nombre_comunidad}</option>`;
+            }
+          });
+
+          // Guardar el valor actual si existía (ej. al hidratarFormulario)
+          const currentVal = selCC.value;
+          const currentFilterVal = advFilterCC?.value;
+
+          selCC.innerHTML = optionsHtml;
+          if (advFilterCC) advFilterCC.innerHTML = filterHtml;
+
+          if (currentVal && currentVal !== '') selCC.value = currentVal;
+          if (advFilterCC && currentFilterVal && currentFilterVal !== '') advFilterCC.value = currentFilterVal;
+          
+          // Auto-asignar comunidad si es vocero
+          let matched = false;
+          let matchedValue = '';
+          if (u.rol === 'vocero') {
+            const cid = u.id_comunidad_asignada || u.id_comunidad;
+            if (cid) {
+              for (let option of selCC.options) {
+                if (option.value === String(cid)) {
+                  selCC.value = option.value;
+                  matchedValue = option.value;
+                  matched = true;
+                  break;
+                }
+              }
+            }
+
+            if (matched) {
+              selCC.setAttribute('disabled', 'true');
+              selCC.style.backgroundColor = 'var(--gray1)';
+              selCC.style.fontWeight = '700';
+              selCC.style.color = 'var(--vp)';
+              selCC.removeAttribute('required');
+
+              const formWizard = document.getElementById('formWizard') || document.getElementById('formVivienda');
+              if (formWizard) {
+                formWizard.addEventListener('reset', () => {
+                  setTimeout(() => {
+                    selCC.value = matchedValue;
+                    p2CCNombre.textContent = `C.C. ${selCC.options[selCC.selectedIndex]?.text || matchedValue}`;
+                  }, 0);
+                });
+              }
+            }
+          } // Fin de if vocero
+          
+          // Sync después de cargar
+          const syncCC = () => {
+            if (!selCC.value) {
+              p2CCNombre.textContent = '— (seleccione en Sección I)';
+            } else {
+              p2CCNombre.textContent = `C.C. ${selCC.options[selCC.selectedIndex]?.text}`;
+            }
+          };
+          selCC.addEventListener('change', syncCC);
+          syncCC();
         })();
       }
 
