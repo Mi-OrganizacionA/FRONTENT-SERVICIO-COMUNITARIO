@@ -4253,7 +4253,7 @@
       setVal('jefEmail',              raw.email_jefe || raw.jef_email || jefe.email);
       setVal('jefIncapacitado',       boolToSiNo(raw.jef_incapacitado || jefe.incapacitado));
       if (boolToSiNo(raw.jef_incapacitado || jefe.incapacitado) === 'Si') { document.getElementById('jefTipoIncapacidad').disabled = false; }
-      setVal('jefTipoIncapacidad',    raw.jef_tipo_incapacidad);
+      setVal('jefTipoIncapacidad',    raw.jef_tipo_incapacidad || jefe.discapacidad_tipo);
       setVal('jefPensionado',         boolToSiNo(raw.jef_pensionado || jefe.pensionado));
       if (boolToSiNo(raw.jef_pensionado || jefe.pensionado) === 'Si') { document.getElementById('jefPensionadoInstitucion').disabled = false; }
       setVal('jefPensionadoInstitucion', raw.jef_pensionado_institucion || jefe.pensionado_institucion);
@@ -4309,7 +4309,7 @@
       setVal('condicionesTerreno',  viv.condiciones_terreno);
       setVal('materialParedes',     viv.tipo_paredes);
       setVal('materialTecho',       viv.tipo_techo);
-      setVal('cantidadHabitaciones', viv.cantidad_habitaciones);
+      setVal('numCuartos',          viv.cantidad_habitaciones);
       setVal('numBanos',            viv.cantidad_banos);
       setVal('ambientesVivienda',   viv.ambientes_vivienda);
       setVal('requiereAyuda',       boolToSiNo(viv.requiere_ayuda_mejora));
@@ -4345,6 +4345,10 @@
       setVal('bombillosNecesita', serv.bombillos_ahorradores_necesita);
       setVal('mecanismosInformacion', serv.mecanismos_informacion);
       setVal('serviciosComunales', serv.servicios_comunales);
+      
+      setVal('tieneTanque',      serv.tiene_tanque_litros);
+      setVal('tieneMedidorAgua', boolToSiNo(serv.tiene_medidor_agua));
+      setVal('tieneMedidorLuz',  boolToSiNo(serv.tiene_medidor_luz));
 
       setVal('cantidadCilindrosGas', serv.cantidad_cilindros_gas);
       // ── Cilindros gas (Opciones Multiples) ──
@@ -4354,7 +4358,8 @@
       // ── PANEL 8: Salud ──
       const salud = getSafe(raw.salud);
       const enfermedades = (salud.enfermedades_lista || '').split(',').map(s => s.trim()).filter(Boolean);
-      const opcionesEnf = (raw.opciones || []).filter(o => o.categoria === 'enfermedades').map(o => o.valor);
+      const opcionesMulSalud = raw.opciones_multiples || raw.opciones || [];
+      const opcionesEnf = opcionesMulSalud.filter(o => o.categoria === 'enfermedades').map(o => o.valor);
       const todasEnf = [...new Set([...enfermedades, ...opcionesEnf])];
       document.querySelectorAll('input[name="enfermedades"]').forEach(cb => {
         cb.checked = todasEnf.includes(cb.value);

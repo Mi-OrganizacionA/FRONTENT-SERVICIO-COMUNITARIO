@@ -59,6 +59,7 @@ function mapFrontendData(datos, paso) {
   if (paso === 5) {
     // ingreso_bs es alias del frontend para ingreso_familiar_rango
     if (mapped.ingreso_bs !== undefined) mapped.ingreso_familiar_rango = mapped.ingreso_bs;
+    if (mapped.actividad_comercial_vivienda !== undefined) mapped.actividad_comercial_vivienda = mapped.actividad_comercial_vivienda === 'Si' || mapped.actividad_comercial_vivienda === true;
     // ventas_de no existe en el modelo, lo ignoramos
   }
 
@@ -71,11 +72,12 @@ function mapFrontendData(datos, paso) {
     if (mapped.cantidad_habitaciones !== undefined) mapped.cantidad_habitaciones    = parseInt(mapped.cantidad_habitaciones) || 0;
     if (mapped.num_banos !== undefined)          mapped.cantidad_banos              = parseInt(mapped.num_banos) || 0;
     if (mapped.cantidad_banos !== undefined)     mapped.cantidad_banos              = parseInt(mapped.cantidad_banos) || 0;
-    if (mapped.inscrita_s_i_v_i_h !== undefined) mapped.inscrita_sivih              = mapped.inscrita_s_i_v_i_h;
-    if (mapped.inscrita_sivih !== undefined)     mapped.inscrita_sivih              = mapped.inscrita_sivih;
+    if (mapped.inscrita_s_i_v_i_h !== undefined) mapped.inscrita_sivih              = mapped.inscrita_s_i_v_i_h === 'Si' || mapped.inscrita_s_i_v_i_h === true;
+    if (mapped.inscrita_sivih !== undefined)     mapped.inscrita_sivih              = mapped.inscrita_sivih === 'Si' || mapped.inscrita_sivih === true;
+    if (mapped.terreno_propio !== undefined)     mapped.terreno_propio              = mapped.terreno_propio === 'Si' || mapped.terreno_propio === true;
     if (mapped.requiere_ayuda !== undefined)     mapped.requiere_ayuda_mejora       = mapped.requiere_ayuda;
-    if (mapped.presencia_insectos !== undefined) mapped.presencia_insectos_roedores = mapped.presencia_insectos;
-    if (mapped.tiene_animales !== undefined)     mapped.tiene_animales_domesticos   = mapped.tiene_animales;
+    if (mapped.presencia_insectos !== undefined) mapped.presencia_insectos_roedores = mapped.presencia_insectos === 'Si' || mapped.presencia_insectos === true;
+    if (mapped.tiene_animales !== undefined)     mapped.tiene_animales_domesticos   = mapped.tiene_animales === 'Si' || mapped.tiene_animales === true;
     delete mapped.cotiza_politica_habitacional;
   }
 
@@ -92,6 +94,8 @@ function mapFrontendData(datos, paso) {
     if (mapped.tiene_tanque !== undefined)       mapped.tiene_tanque_litros         = parseInt(mapped.tiene_tanque) || 0;
     if (mapped.bombillos_necesita !== undefined) mapped.bombillos_ahorradores_necesita = parseInt(mapped.bombillos_necesita) || 0;
     if (mapped.cantidad_cilindros_gas !== undefined) mapped.cantidad_cilindros_gas  = parseInt(mapped.cantidad_cilindros_gas) || 0;
+    if (mapped.tiene_medidor_agua !== undefined) mapped.tiene_medidor_agua = (mapped.tiene_medidor_agua === 'Si' || mapped.tiene_medidor_agua === true);
+    if (mapped.tiene_medidor_luz !== undefined)  mapped.tiene_medidor_luz  = (mapped.tiene_medidor_luz === 'Si' || mapped.tiene_medidor_luz === true);
   }
 
   if (paso === 8) {
@@ -99,6 +103,8 @@ function mapFrontendData(datos, paso) {
     if (mapped.exclusion_discapacitados !== undefined) mapped.exclusion_discapacitados_cant = parseInt(mapped.exclusion_discapacitados) || 0;
     if (mapped.exclusion_tercera_edad !== undefined)  mapped.exclusion_tercera_edad_cant  = parseInt(mapped.exclusion_tercera_edad)  || 0;
     
+    if (mapped.necesita_ayuda_especial !== undefined) mapped.necesita_ayuda_especial = mapped.necesita_ayuda_especial === 'Si' || mapped.necesita_ayuda_especial === true;
+
     // Eliminar obsoletos si vienen en el payload
     delete mapped.exclusion_indigentes;
     delete mapped.exclusion_enfermos_term;
@@ -110,9 +116,20 @@ function mapFrontendData(datos, paso) {
 
   if (paso === 9) {
     // Mapear alias del frontend a columnas reales del modelo CensoParticipacionComunitaria
-    if (mapped.asiste_asambleas !== undefined)  mapped.asiste_asambleas_ciudadanos  = mapped.asiste_asambleas;
-    if (mapped.dispuesto_apoyar !== undefined)  mapped.dispuesto_apoyar_consejo      = mapped.dispuesto_apoyar;
+    if (mapped.asiste_asambleas !== undefined)  mapped.asiste_asambleas_ciudadanos  = mapped.asiste_asambleas === 'Si' || mapped.asiste_asambleas === true;
+    if (mapped.asiste_asambleas_ciudadanos !== undefined) mapped.asiste_asambleas_ciudadanos = mapped.asiste_asambleas_ciudadanos === 'Si' || mapped.asiste_asambleas_ciudadanos === true;
+    
+    if (mapped.dispuesto_apoyar !== undefined)  mapped.dispuesto_apoyar_consejo      = mapped.dispuesto_apoyar === 'Si' || mapped.dispuesto_apoyar === true;
+    if (mapped.dispuesto_apoyar_consejo !== undefined) mapped.dispuesto_apoyar_consejo = mapped.dispuesto_apoyar_consejo === 'Si' || mapped.dispuesto_apoyar_consejo === true;
+
     if (mapped.como_resolver_problemas !== undefined) mapped.como_resolver_problemas_sector = mapped.como_resolver_problemas;
+    
+    if (mapped.existen_org_comunitarias !== undefined) mapped.existen_org_comunitarias = mapped.existen_org_comunitarias === 'Si' || mapped.existen_org_comunitarias === true;
+    if (mapped.participa_usted !== undefined) mapped.participa_usted = mapped.participa_usted === 'Si' || mapped.participa_usted === true;
+    if (mapped.participa_familiar !== undefined) mapped.participa_familiar = mapped.participa_familiar === 'Si' || mapped.participa_familiar === true;
+    if (mapped.cree_pueblo_interviene_decisiones !== undefined) mapped.cree_pueblo_interviene_decisiones = mapped.cree_pueblo_interviene_decisiones === 'Si' || mapped.cree_pueblo_interviene_decisiones === true;
+    if (mapped.acuerdo_pueblo_protagonismo_presupuesto !== undefined) mapped.acuerdo_pueblo_protagonismo_presupuesto = mapped.acuerdo_pueblo_protagonismo_presupuesto === 'Si' || mapped.acuerdo_pueblo_protagonismo_presupuesto === true;
+
     // Las demás columnas (como_apoyaria_proyectos, area_trabajo_interes, etc.) llegarán en snake_case
   }
 
