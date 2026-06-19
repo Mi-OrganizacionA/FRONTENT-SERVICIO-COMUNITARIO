@@ -4682,6 +4682,16 @@
     // ============================================================
     document.addEventListener('DOMContentLoaded', () => {
 
+      // 🔥 FIX ARIA-HIDDEN BLOCKED: Remover foco al cerrar el modal
+      const modalViviendaEl = document.getElementById('modalVivienda');
+      if (modalViviendaEl) {
+        modalViviendaEl.addEventListener('hide.bs.modal', function () {
+          if (document.activeElement && document.activeElement.blur) {
+            document.activeElement.blur();
+          }
+        });
+      }
+
       // 🔥 HOTFIX PROTECCIÓN DE CAMPOS:
       // Se fuerza a que el campo de recolección de basura no sea bloqueado
       // por el autocompletado del navegador (ej. Chrome Autofill) o extensiones.
