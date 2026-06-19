@@ -272,20 +272,8 @@ class PdfGeneradorViviendas {
           <div class="check-field"><div class="check-box">${part.existen_org_comunitarias ? '✓' : ''}</div><label>¿Existen organizaciones comunitarias? → ${val(part.cuales_org_comunitarias)}</label></div>
           <div class="check-field"><div class="check-box">${part.participa_usted ? '✓' : ''}</div><label>¿Participa usted en alguna organización?</label></div>
           <div class="check-field"><div class="check-box">${part.participa_familiar ? '✓' : ''}</div><label>¿Participa un familiar?</label></div>
-          <div class="check-field"><div class="check-box">${part.cree_pueblo_interviene_decisiones ? '✓' : ''}</div><label>¿Cree que el pueblo interviene en decisiones?</label></div>
-          <div class="check-field"><div class="check-box">${part.acuerdo_pueblo_protagonismo_presupuesto ? '✓' : ''}</div><label>¿Acuerdo con protagonismo del pueblo en presupuesto?</label></div>
-          <div class="check-field"><div class="check-box">${part.info_sobre_consejos_comunales ? '✓' : ''}</div><label>¿Tiene información sobre los CC? → ${val(part.como_obtuvo_info_consejos)}</label></div>
           <div class="check-field"><div class="check-box">${part.dispuesto_apoyar_consejo ? '✓' : ''}</div><label>¿Dispuesto a apoyar al CC?</label></div>
           <div class="check-field"><div class="check-box">${part.asiste_asambleas_ciudadanos ? '✓' : ''}</div><label>¿Asiste a Asambleas de Ciudadanos?</label></div>
-        </div>
-        <div>
-          <div class="field"><label>¿Por qué no asiste?</label><span>${val(part.porque_no_asiste)}</span></div>
-          <div class="field"><label>¿Cómo resolver problemas del sector?</label><span>${val(part.como_resolver_problemas_sector)}</span></div>
-          <div class="field"><label>¿Quién debe resolver los problemas?</label><span>${val(part.quien_resolver_problemas)}</span></div>
-          <div class="field"><label>Tipo de proyectos deseados</label><span>${val(part.tipo_proyectos_deseados)}</span></div>
-          <div class="field"><label>¿Cómo apoyaría los proyectos?</label><span>${val(part.como_apoyaria_proyectos)}</span></div>
-          <div class="field"><label>Compromiso con el sector</label><span>${val(part.compromiso_con_sector)}</span></div>
-          <div class="field"><label>Opinión sobre el censo energético</label><span>${val(part.opinion_censo_energetico)}</span></div>
         </div>
       </div>
     </div>
