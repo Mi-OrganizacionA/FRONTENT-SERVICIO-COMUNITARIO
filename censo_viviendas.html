@@ -2608,7 +2608,7 @@
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="recoleccionBasura">Recolección de Basura <span class="req">*</span></label>
-                  <select class="cv-form-control" id="recoleccionBasura" required>
+                  <select class="cv-form-control" id="recoleccionBasura" name="recoleccionBasura" required>
                     <option value="">Seleccione...</option>
                     <option value="Aseo urbano">🗑️ Aseo urbano</option>
                     <option value="Contenedor">📦 Contenedor</option>
@@ -4322,14 +4322,23 @@
       // ── Enseres, Insectos y Animales (Opciones Multiples) ──
       const opcionesMul = raw.opciones_multiples || raw.opciones || [];
       const enseres = opcionesMul.filter(o => o.categoria === 'enseres_vivienda').map(o => o.valor);
-      document.querySelectorAll('input[name="enseres_vivienda"]').forEach(cb => { cb.checked = enseres.includes(cb.value); });
+      document.querySelectorAll('input[name="enseres_vivienda"]').forEach(cb => { 
+        cb.checked = enseres.includes(cb.value); 
+        cb.dispatchEvent(new Event('change')); 
+      });
       
       const insectos = opcionesMul.filter(o => o.categoria === 'insectos_tipos').map(o => o.valor);
-      document.querySelectorAll('input[name="insectos_tipos"]').forEach(cb => { cb.checked = insectos.includes(cb.value); });
+      document.querySelectorAll('input[name="insectos_tipos"]').forEach(cb => { 
+        cb.checked = insectos.includes(cb.value); 
+        cb.dispatchEvent(new Event('change')); 
+      });
       if (insectos.length > 0) { const g = document.getElementById('insectosTiposGroup'); if (g) g.style.display = 'block'; }
       
       const animales = opcionesMul.filter(o => o.categoria === 'animales_tipos').map(o => o.valor);
-      document.querySelectorAll('input[name="animales_tipos"]').forEach(cb => { cb.checked = animales.includes(cb.value); });
+      document.querySelectorAll('input[name="animales_tipos"]').forEach(cb => { 
+        cb.checked = animales.includes(cb.value); 
+        cb.dispatchEvent(new Event('change')); 
+      });
       if (animales.length > 0) { const g = document.getElementById('animalesTiposGroup'); if (g) g.style.display = 'block'; }
 
       // ── PANEL 7: Servicios Básicos ──
@@ -4353,7 +4362,10 @@
       setVal('cantidadCilindrosGas', serv.cantidad_cilindros_gas);
       // ── Cilindros gas (Opciones Multiples) ──
       const gasCilindros = (raw.opciones_multiples || raw.opciones || []).filter(o => o.categoria === 'gas_cilindros').map(o => o.valor);
-      document.querySelectorAll('input[name="gas_cilindros"]').forEach(cb => { cb.checked = gasCilindros.includes(cb.value); });
+      document.querySelectorAll('input[name="gas_cilindros"]').forEach(cb => { 
+        cb.checked = gasCilindros.includes(cb.value); 
+        cb.dispatchEvent(new Event('change')); 
+      });
 
       // ── PANEL 8: Salud ──
       const salud = getSafe(raw.salud);
@@ -4363,6 +4375,7 @@
       const todasEnf = [...new Set([...enfermedades, ...opcionesEnf])];
       document.querySelectorAll('input[name="enfermedades"]').forEach(cb => {
         cb.checked = todasEnf.includes(cb.value);
+        cb.dispatchEvent(new Event('change'));
       });
       setVal('necesitaAyudaEspecial', boolToSiNo(salud.necesita_ayuda_especial));
       setVal('cualAyudaEspecial',     salud.cual_ayuda_especial);
@@ -4390,7 +4403,10 @@
       
       // ── Misiones (Opciones Multiples) ──
       const misiones = (raw.opciones_multiples || raw.opciones || []).filter(o => o.categoria === 'misiones').map(o => o.valor);
-      document.querySelectorAll('input[name="misiones"]').forEach(cb => { cb.checked = misiones.includes(cb.value); });
+      document.querySelectorAll('input[name="misiones"]').forEach(cb => { 
+        cb.checked = misiones.includes(cb.value); 
+        cb.dispatchEvent(new Event('change')); 
+      });
 
       // ── PANEL 10: Diagnóstico ──
       const com = getSafe(raw.situacion_comunidad);

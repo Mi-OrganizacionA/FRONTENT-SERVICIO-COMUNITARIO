@@ -35,6 +35,7 @@ function mapFrontendData(datos, paso) {
         if (nf.jef_email) nf.email_familiar = nf.jef_email;
         if (nf.jef_estado_civil !== undefined) nf.estado_civil = nf.jef_estado_civil;
         if (nf.jef_tiempo_comunidad !== undefined) nf.tiempo_comunidad = nf.jef_tiempo_comunidad;
+        if (nf.jef_incapacitado !== undefined) nf.incapacitado = nf.jef_incapacitado === 'Si' || nf.jef_incapacitado === true;
         if (nf.jef_tipo_incapacidad !== undefined) nf.discapacidad_tipo = nf.jef_tipo_incapacidad;
         if (nf.jef_pensionado_institucion !== undefined) nf.pensionado_institucion = nf.jef_pensionado_institucion;
         if (nf.clasificacion_ingreso !== undefined) nf.clasificacion_ingreso_familiar = nf.clasificacion_ingreso;
