@@ -9,8 +9,6 @@ module.exports = (sequelize) => {
     participa_familiar: { type: DataTypes.BOOLEAN, defaultValue: false },
     cree_pueblo_interviene_decisiones: { type: DataTypes.BOOLEAN, defaultValue: false },
     acuerdo_pueblo_protagonismo_presupuesto: { type: DataTypes.BOOLEAN, defaultValue: false },
-    info_sobre_consejos_comunales: { type: DataTypes.BOOLEAN, defaultValue: false },
-    como_obtuvo_info_consejos: DataTypes.STRING(200),
     dispuesto_apoyar_consejo: { type: DataTypes.BOOLEAN, defaultValue: false },
     asiste_asambleas_ciudadanos: { type: DataTypes.BOOLEAN, defaultValue: false },
     porque_no_asiste: DataTypes.TEXT,

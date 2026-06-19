@@ -2223,7 +2223,7 @@
             <!-- ═══════════════════════════════════════
                  PANEL 5: Situación Económica
             ═══════════════════════════════════════ -->
-            <div class="cv-panel" id="panel5" data-required="trabaja">
+            <div class="cv-panel" id="panel5" data-required="trabaja,ingresoFamiliarRango">
               <div class="cv-panel-title">
                 <i class="fas fa-sack-dollar"></i>
                 Sección V — Situación Económica del Hogar
@@ -2252,6 +2252,23 @@
                 </div>
               </div>
 
+              <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
+                <div class="cv-form-group">
+                  <label for="ingresoFamiliarRango">Rango de Ingreso Familiar <span class="req">*</span></label>
+                  <select class="cv-form-control" id="ingresoFamiliarRango" required>
+                    <option value="">Seleccione rango...</option>
+                    <option value="Menos de 1 salario">Menos de 1 salario mínimo</option>
+                    <option value="1-2 salarios">1 a 2 salarios mínimos</option>
+                    <option value="2-5 salarios">2 a 5 salarios mínimos</option>
+                    <option value="Más de 5 salarios">Más de 5 salarios mínimos</option>
+                    <option value="Sin ingresos">Sin ingresos</option>
+                  </select>
+                </div>
+                <div class="cv-form-group">
+                  <label for="ingresoBs">Ingreso mensual aprox. (Bs.)</label>
+                  <input type="number" class="cv-form-control" id="ingresoBs" min="0" placeholder="Ej. 500">
+                </div>
+              </div>
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
@@ -2678,14 +2695,6 @@
               </div>
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
-                <div class="cv-form-group">
-                  <label for="informacionConsejos">¿Tiene información sobre Consejos Comunales?</label>
-                  <select class="cv-form-control" id="informacionConsejos">
-                    <option value="">Seleccione...</option>
-                    <option value="No">No</option>
-                    <option value="Si">Sí</option>
-                  </select>
-                </div>
                 <div class="cv-form-group">
                   <label for="dispuestoApoyar">¿Dispuesto a apoyar el Consejo Comunal?</label>
                   <select class="cv-form-control" id="dispuestoApoyar">
@@ -4107,6 +4116,7 @@
       const eco = getSafe(raw.situacion_economica);
       setVal('trabaja',                     boolToSiNo(eco.trabaja));
       setVal('dondeTrabaja',                eco.donde_trabaja);
+      setVal('ingresoFamiliarRango',        eco.ingreso_familiar_rango);
       // ingresoBs no persiste en BD: setVal('ingresoBs', eco.ingreso_bs);
       setVal('actividadComercialVivienda',  boolToSiNo(eco.actividad_comercial_vivienda));
       // ventasDe no persiste en BD: setVal('ventasDe', eco.ventas_de);
@@ -4155,7 +4165,6 @@
       setVal('participaUsted',           boolToSiNo(part.participa_usted));
       setVal('participaFamiliar',        boolToSiNo(part.participa_familiar));
       setVal('asisteAsambleas',          boolToSiNo(part.asiste_asambleas_ciudadanos));
-      setVal('informacionConsejos',      boolToSiNo(part.info_sobre_consejos_comunales));
       setVal('dispuestoApoyar',          boolToSiNo(part.dispuesto_apoyar_consejo));
       setVal('misiones',                 part.misiones);
       setVal('areaTrabajoInteres',       part.area_trabajo_interes);
@@ -4354,6 +4363,7 @@
         condicion: gv('condicionGeneral'),
         // Economía
         trabaja: gv('trabaja'),
+        ingreso: gv('ingresoFamiliarRango'),
         // Vivienda
         tipo: gv('tipoVivienda'),
         tenencia: gv('tenencia'),

@@ -40,6 +40,8 @@ function mapFrontendData(datos, paso) {
   }
 
   if (paso === 5) {
+    // ingreso_bs es alias del frontend para ingreso_familiar_rango
+    if (mapped.ingreso_bs !== undefined) mapped.ingreso_familiar_rango = mapped.ingreso_bs;
     // ventas_de no existe en el modelo, lo ignoramos
   }
 
@@ -83,7 +85,6 @@ function mapFrontendData(datos, paso) {
   if (paso === 9) {
     // Mapear alias del frontend a columnas reales del modelo CensoParticipacionComunitaria
     if (mapped.asiste_asambleas !== undefined)  mapped.asiste_asambleas_ciudadanos  = mapped.asiste_asambleas;
-    if (mapped.informacion_consejos !== undefined) mapped.info_sobre_consejos_comunales = mapped.informacion_consejos;
     if (mapped.dispuesto_apoyar !== undefined)  mapped.dispuesto_apoyar_consejo      = mapped.dispuesto_apoyar;
     // misiones, area_trabajo_interes no existen en el modelo: safeData los filtrará
   }
