@@ -7,8 +7,18 @@ module.exports = (sequelize) => {
     cuales_org_comunitarias: DataTypes.STRING(255),
     participa_usted: { type: DataTypes.BOOLEAN, defaultValue: false },
     participa_familiar: { type: DataTypes.BOOLEAN, defaultValue: false },
+    cree_pueblo_interviene_decisiones: { type: DataTypes.BOOLEAN, defaultValue: false },
+    acuerdo_pueblo_protagonismo_presupuesto: { type: DataTypes.BOOLEAN, defaultValue: false },
     dispuesto_apoyar_consejo: { type: DataTypes.BOOLEAN, defaultValue: false },
-    asiste_asambleas_ciudadanos: { type: DataTypes.BOOLEAN, defaultValue: false }
+    asiste_asambleas_ciudadanos: { type: DataTypes.BOOLEAN, defaultValue: false },
+    porque_no_asiste: DataTypes.TEXT,
+    como_resolver_problemas_sector: DataTypes.TEXT,
+    quien_resolver_problemas: DataTypes.STRING(200),
+    tipo_proyectos_deseados: DataTypes.TEXT,
+    como_apoyaria_proyectos: DataTypes.TEXT,
+    compromiso_con_sector: DataTypes.TEXT,
+    opinion_censo_energetico: DataTypes.TEXT,
+    area_trabajo_interes: DataTypes.STRING(255)
   }, { tableName: 'censo_participacion_comunitaria', timestamps: false });
 
   return CensoParticipacionComunitaria;

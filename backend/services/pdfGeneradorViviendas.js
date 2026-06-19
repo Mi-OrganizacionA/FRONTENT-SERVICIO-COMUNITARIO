@@ -50,7 +50,7 @@ class PdfGeneradorViviendas {
     const part = estudio.participacion_comunitaria || {};
     const com = estudio.situacion_comunidad || {};
     const comunidad = estudio.consejo?.nombre_comunidad || estudio.nombre_comunidad || '—';
-    
+
     const direccionFull = [estudio.calle_avenida, estudio.numero_casa, estudio.referencia_ubicacion]
       .filter(Boolean).join(', ') || estudio.direccion_comunidad || estudio.direccion || '—';
 
@@ -149,7 +149,7 @@ class PdfGeneradorViviendas {
         <div class="field"><label>Grado de Instrucción</label><span>${val(jefe.grado_instruccion)}</span></div>
         <div class="field"><label>Profesión/Oficio</label><span>${val(jefe.profesion)}</span></div>
         <div class="field"><label>Inscrito CNE</label><span>${boolStr(jefe.inscrito_cne)}</span></div>
-        <div class="field"><label>Pensionado</label><span>${boolStr(jefe.pensionado)}</span></div>
+        <div class="field"><label>Pensionado</label><span>${boolStr(jefe.pensionado)} ${jefe.pensionado_institucion ? '- ' + jefe.pensionado_institucion : ''}</span></div>
         <div class="field"><label>Ingreso Mensual Bs.</label><span>${val(jefe.ingreso_mensual_bs)}</span></div>
       </div>
     </div>
@@ -230,6 +230,8 @@ class PdfGeneradorViviendas {
         <div class="field"><label>Recolección de Basura</label><span>${val(ser.recoleccion_basura_tipo)}</span></div>
         <div class="field"><label>Telefonía</label><span>${val(ser.telefonia_tipo)}</span></div>
         <div class="field"><label>Transporte</label><span>${val(ser.transporte_tipo)}</span></div>
+        <div class="field" style="grid-column: span 2;"><label>Mecanismos Información</label><span>${val(ser.mecanismos_informacion)}</span></div>
+        <div class="field" style="grid-column: span 2;"><label>Servicios Comunales</label><span>${val(ser.servicios_comunales)}</span></div>
       </div>
     </div>
 
@@ -259,6 +261,7 @@ class PdfGeneradorViviendas {
         <div class="field"><label>¿Dónde Trabaja?</label><span>${val(eco.donde_trabaja)}</span></div>
         <div class="field"><label>Ingreso Familiar</label><span>${val(eco.ingreso_familiar_rango)}</span></div>
         <div class="field"><label>Actividad Comercial en Vivienda</label><span>${boolStr(eco.actividad_comercial_vivienda)}</span></div>
+        <div class="field" style="grid-column: span 2;"><label>Ventas De</label><span>${val(eco.ventas_de)}</span></div>
       </div>
     </div>
   </div>
@@ -272,8 +275,21 @@ class PdfGeneradorViviendas {
           <div class="check-field"><div class="check-box">${part.existen_org_comunitarias ? '✓' : ''}</div><label>¿Existen organizaciones comunitarias? → ${val(part.cuales_org_comunitarias)}</label></div>
           <div class="check-field"><div class="check-box">${part.participa_usted ? '✓' : ''}</div><label>¿Participa usted en alguna organización?</label></div>
           <div class="check-field"><div class="check-box">${part.participa_familiar ? '✓' : ''}</div><label>¿Participa un familiar?</label></div>
+          <div class="check-field"><div class="check-box">${part.cree_pueblo_interviene_decisiones ? '✓' : ''}</div><label>¿Cree que el pueblo interviene en decisiones?</label></div>
+          <div class="check-field"><div class="check-box">${part.acuerdo_pueblo_protagonismo_presupuesto ? '✓' : ''}</div><label>¿Acuerdo con protagonismo del pueblo en presupuesto?</label></div>
+          <div class="check-field"><div class="check-box">${part.info_sobre_consejos_comunales ? '✓' : ''}</div><label>¿Tiene información sobre los CC? → ${val(part.como_obtuvo_info_consejos)}</label></div>
           <div class="check-field"><div class="check-box">${part.dispuesto_apoyar_consejo ? '✓' : ''}</div><label>¿Dispuesto a apoyar al CC?</label></div>
           <div class="check-field"><div class="check-box">${part.asiste_asambleas_ciudadanos ? '✓' : ''}</div><label>¿Asiste a Asambleas de Ciudadanos?</label></div>
+          <div class="field" style="margin-top: 10px;"><label>Área de trabajo de interés</label><span>${val(part.area_trabajo_interes)}</span></div>
+        </div>
+        <div>
+          <div class="field"><label>¿Por qué no asiste?</label><span>${val(part.porque_no_asiste)}</span></div>
+          <div class="field"><label>¿Cómo resolver problemas del sector?</label><span>${val(part.como_resolver_problemas_sector)}</span></div>
+          <div class="field"><label>¿Quién debe resolver los problemas?</label><span>${val(part.quien_resolver_problemas)}</span></div>
+          <div class="field"><label>Tipo de proyectos deseados</label><span>${val(part.tipo_proyectos_deseados)}</span></div>
+          <div class="field"><label>¿Cómo apoyaría los proyectos?</label><span>${val(part.como_apoyaria_proyectos)}</span></div>
+          <div class="field"><label>Compromiso con el sector</label><span>${val(part.compromiso_con_sector)}</span></div>
+          <div class="field"><label>Opinión sobre el censo energético</label><span>${val(part.opinion_censo_energetico)}</span></div>
         </div>
       </div>
     </div>

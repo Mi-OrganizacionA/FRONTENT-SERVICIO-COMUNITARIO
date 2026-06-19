@@ -6,7 +6,8 @@ module.exports = (sequelize) => {
     trabaja: { type: DataTypes.BOOLEAN, defaultValue: false },
     donde_trabaja: DataTypes.STRING(200),
     ingreso_familiar_rango: DataTypes.STRING(100),
-    actividad_comercial_vivienda: { type: DataTypes.BOOLEAN, defaultValue: false }
+    actividad_comercial_vivienda: { type: DataTypes.BOOLEAN, defaultValue: false },
+    ventas_de: DataTypes.STRING(255)
   }, { tableName: 'censo_situacion_economica', timestamps: false });
 
   return CensoSituacionEconomica;

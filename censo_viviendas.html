@@ -2117,6 +2117,25 @@
                     disabled>
                 </div>
               </div>
+
+              <div class="cv-form-row cv-grid-3" style="margin-top:1rem">
+                <div class="cv-form-group">
+                  <label for="jefPensionado">¿Es Pensionado?</label>
+                  <select class="cv-form-control" id="jefPensionado">
+                    <option value="">Seleccione...</option>
+                    <option value="Si">Sí</option>
+                    <option value="No">No</option>
+                  </select>
+                </div>
+                <div class="cv-form-group">
+                  <label for="jefPensionadoInstitucion">Institución Pensión</label>
+                  <input type="text" class="cv-form-control" id="jefPensionadoInstitucion" placeholder="Ej. IVSS" disabled>
+                </div>
+                <div class="cv-form-group">
+                  <label for="jefIngresoMensualBs">Ingreso Mensual Bs.</label>
+                  <input type="number" step="0.01" class="cv-form-control" id="jefIngresoMensualBs" placeholder="0.00">
+                </div>
+              </div>
             </div>
 
             <!-- ═══════════════════════════════════════
@@ -2209,6 +2228,12 @@
                         <option value="No">No</option>
                         <option value="Si">Sí</option>
                       </select>
+                    </div>
+                    <div class="cv-form-group">
+                      <label>Embarazo Temprano</label>
+                      <div style="margin-top:0.5rem">
+                        <input type="checkbox" class="fam-embarazo" style="transform: scale(1.2)"> Sí
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2560,6 +2585,17 @@
                 <input type="number" class="cv-form-control" id="bombillosNecesita" min="0" placeholder="Ej. 4"
                   style="max-width:200px">
               </div>
+
+              <div class="cv-form-row cv-grid-2" style="margin-top:1rem">
+                <div class="cv-form-group">
+                  <label for="mecanismosInformacion">Mecanismos de Información</label>
+                  <input type="text" class="cv-form-control" id="mecanismosInformacion" placeholder="TV, Radio, Prensa, Internet, Otros">
+                </div>
+                <div class="cv-form-group">
+                  <label for="serviciosComunales">Servicios Comunales Disponibles</label>
+                  <input type="text" class="cv-form-control" id="serviciosComunales" placeholder="Mercado, Farmacia, Escuela, Liceo...">
+                </div>
+              </div>
             </div>
 
             <!-- ═══════════════════════════════════════
@@ -2703,6 +2739,22 @@
                     <option value="Si">Sí</option>
                   </select>
                 </div>
+                <div class="cv-form-group">
+                  <label for="creePuebloIntervieneDecisiones">¿Cree que el pueblo interviene en decisiones?</label>
+                  <select class="cv-form-control" id="creePuebloIntervieneDecisiones">
+                    <option value="">Seleccione...</option>
+                    <option value="No">No</option>
+                    <option value="Si">Sí</option>
+                  </select>
+                </div>
+                <div class="cv-form-group">
+                  <label for="acuerdoPuebloProtagonismoPresupuesto">¿De acuerdo con protagonismo en presupuesto?</label>
+                  <select class="cv-form-control" id="acuerdoPuebloProtagonismoPresupuesto">
+                    <option value="">Seleccione...</option>
+                    <option value="No">No</option>
+                    <option value="Si">Sí</option>
+                  </select>
+                </div>
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
@@ -2711,10 +2763,35 @@
                   placeholder="Ej. Barrio Adentro, Mercal, CLAP, Madres del Barrio...">
               </div>
 
-              <div class="cv-form-group">
+              <div class="cv-form-group" style="margin-bottom:1rem">
                 <label for="areaTrabajoInteres">Área de trabajo de interés comunitario (máx. 3)</label>
                 <input type="text" class="cv-form-control" id="areaTrabajoInteres"
                   placeholder="Ej. Salud, Educación, Infraestructura...">
+              </div>
+
+              <div class="cv-form-group" style="margin-bottom:1rem">
+                <label for="porqueNoAsiste">Si no asiste a asambleas, ¿Por qué?</label>
+                <textarea class="cv-form-control" id="porqueNoAsiste" rows="2" placeholder="Explique brevemente..."></textarea>
+              </div>
+
+              <div class="cv-form-group" style="margin-bottom:1rem">
+                <label for="quienResolverProblemas">¿Quién cree que debe resolver los problemas de la comunidad?</label>
+                <input type="text" class="cv-form-control" id="quienResolverProblemas" placeholder="Ej. El gobierno, la alcaldía, el consejo comunal...">
+              </div>
+
+              <div class="cv-form-group" style="margin-bottom:1rem">
+                <label for="comoApoyariaProyectos">¿Cómo apoyaría los proyectos de la comunidad?</label>
+                <textarea class="cv-form-control" id="comoApoyariaProyectos" rows="2" placeholder="Ej. Con mano de obra, ideas, donaciones..."></textarea>
+              </div>
+
+              <div class="cv-form-group" style="margin-bottom:1rem">
+                <label for="compromisoConSector">Compromiso personal con el sector</label>
+                <textarea class="cv-form-control" id="compromisoConSector" rows="2" placeholder="Escriba su compromiso..."></textarea>
+              </div>
+
+              <div class="cv-form-group">
+                <label for="opinionCensoEnergetico">Opinión sobre el Censo Energético</label>
+                <textarea class="cv-form-control" id="opinionCensoEnergetico" rows="2" placeholder="Dé su opinión..."></textarea>
               </div>
             </div>
 
@@ -3231,6 +3308,10 @@
           const parentesco = row.querySelector('.fam-parentesco')?.value;
           const fechaNac = row.querySelector('.fam-fechanac')?.value;
           const sexo = row.querySelector('.fam-sexo')?.value;
+          const instruccion = row.querySelector('.fam-instruccion')?.value;
+          const pensionado = row.querySelector('.fam-pensionado')?.value;
+          const embarazo = row.querySelector('.fam-embarazo')?.checked;
+
           if (cedula || nombres) {
             familiares.push({
               cedula_identidad: cedula,
@@ -3238,6 +3319,9 @@
               parentesco: parentesco,
               fecha_nacimiento: fechaNac,
               genero: sexo,
+              nivel_educativo: instruccion,
+              pensionado: pensionado === 'Si',
+              embarazo_temprano: embarazo || false,
               es_jefe_familia: false
             });
           }
@@ -4080,6 +4164,9 @@
       setVal('jefEmail',              raw.email_jefe || raw.jef_email || jefe.email);
       setVal('jefIncapacitado',       boolToSiNo(raw.jef_incapacitado || jefe.incapacitado));
       setVal('jefTipoIncapacidad',    raw.jef_tipo_incapacidad);
+      setVal('jefPensionado',         boolToSiNo(raw.jef_pensionado || jefe.pensionado));
+      setVal('jefPensionadoInstitucion', raw.jef_pensionado_institucion || jefe.pensionado_institucion);
+      setVal('jefIngresoMensualBs',   raw.jef_ingreso_mensual_bs || jefe.ingreso_mensual_bs);
 
       // ── PANEL 4: Características del Grupo Familiar ──
       const otrosFamiliares = famArr.filter(f => f.parentesco !== 'Jefe(a) de Familia' && !f.es_jefe_familia);
@@ -4110,6 +4197,9 @@
         set('.fam-fechanac',  fam.fecha_nacimiento ? fam.fecha_nacimiento.split('T')[0] : '');
         set('.fam-sexo',      fam.sexo || fam.genero);
         set('.fam-instruccion', fam.grado_instruccion || fam.nivel_educativo);
+        set('.fam-pensionado', boolToSiNo(fam.pensionado));
+        const emb = row.querySelector('.fam-embarazo');
+        if (emb) emb.checked = fam.embarazo_temprano === true;
       });
 
       // ── PANEL 5: Situación Económica ──
@@ -4119,7 +4209,7 @@
       setVal('ingresoFamiliarRango',        eco.ingreso_familiar_rango);
       // ingresoBs no persiste en BD: setVal('ingresoBs', eco.ingreso_bs);
       setVal('actividadComercialVivienda',  boolToSiNo(eco.actividad_comercial_vivienda));
-      // ventasDe no persiste en BD: setVal('ventasDe', eco.ventas_de);
+      setVal('ventasDe', eco.ventas_de);
 
       // ── PANEL 6: Situación de la Vivienda (Estructura) ──
       const viv = getSafe(raw.situacion_vivienda);
@@ -4143,6 +4233,8 @@
       setVal('telefoniaServicio', serv.telefonia_tipo);
       setVal('transporte',       serv.transporte_tipo);
       setVal('bombillosNecesita', serv.bombillos_ahorradores_necesita);
+      setVal('mecanismosInformacion', serv.mecanismos_informacion);
+      setVal('serviciosComunales', serv.servicios_comunales);
 
       // ── PANEL 8: Salud ──
       const salud = getSafe(raw.salud);
@@ -4166,8 +4258,15 @@
       setVal('participaFamiliar',        boolToSiNo(part.participa_familiar));
       setVal('asisteAsambleas',          boolToSiNo(part.asiste_asambleas_ciudadanos));
       setVal('dispuestoApoyar',          boolToSiNo(part.dispuesto_apoyar_consejo));
+      setVal('creePuebloIntervieneDecisiones', boolToSiNo(part.cree_pueblo_interviene_decisiones));
+      setVal('acuerdoPuebloProtagonismoPresupuesto', boolToSiNo(part.acuerdo_pueblo_protagonismo_presupuesto));
       setVal('misiones',                 part.misiones);
       setVal('areaTrabajoInteres',       part.area_trabajo_interes);
+      setVal('porqueNoAsiste',           part.porque_no_asiste);
+      setVal('quienResolverProblemas',   part.quien_resolver_problemas);
+      setVal('comoApoyariaProyectos',    part.como_apoyaria_proyectos);
+      setVal('compromisoConSector',      part.compromiso_con_sector);
+      setVal('opinionCensoEnergetico',   part.opinion_censo_energetico);
 
       // ── PANEL 10: Diagnóstico ──
       const com = getSafe(raw.situacion_comunidad);

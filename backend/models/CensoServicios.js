@@ -16,7 +16,9 @@ module.exports = (sequelize) => {
     bombillos_ahorradores_necesita: { type: DataTypes.INTEGER, defaultValue: 0 },
     recoleccion_basura_tipo: DataTypes.STRING(100),
     telefonia_tipo: DataTypes.STRING(100),
-    transporte_tipo: DataTypes.STRING(100)
+    transporte_tipo: DataTypes.STRING(100),
+    mecanismos_informacion: DataTypes.STRING(300),
+    servicios_comunales: DataTypes.STRING(500)
   }, { tableName: 'censo_servicios', timestamps: false });
 
   return CensoServicios;

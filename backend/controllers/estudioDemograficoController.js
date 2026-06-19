@@ -86,7 +86,7 @@ function mapFrontendData(datos, paso) {
     // Mapear alias del frontend a columnas reales del modelo CensoParticipacionComunitaria
     if (mapped.asiste_asambleas !== undefined)  mapped.asiste_asambleas_ciudadanos  = mapped.asiste_asambleas;
     if (mapped.dispuesto_apoyar !== undefined)  mapped.dispuesto_apoyar_consejo      = mapped.dispuesto_apoyar;
-    // misiones, area_trabajo_interes no existen en el modelo: safeData los filtrará
+    // Las demás columnas (como_apoyaria_proyectos, area_trabajo_interes, etc.) llegarán en snake_case
   }
 
   if (paso === 10) {
