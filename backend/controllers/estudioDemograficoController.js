@@ -40,8 +40,6 @@ function mapFrontendData(datos, paso) {
   }
 
   if (paso === 5) {
-    // ingreso_bs es alias del frontend para ingreso_familiar_rango
-    if (mapped.ingreso_bs !== undefined) mapped.ingreso_familiar_rango = mapped.ingreso_bs;
     // ventas_de no existe en el modelo, lo ignoramos
   }
 
