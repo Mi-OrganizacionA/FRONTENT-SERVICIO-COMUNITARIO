@@ -2705,7 +2705,7 @@
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="necesitaAyudaEspecial">¿Necesita ayuda especial?</label>
-                  <select class="cv-form-control" id="necesitaAyudaEspecial">
+                  <select class="cv-form-control" id="necesitaAyudaEspecial" name="necesita_ayuda_especial">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2713,7 +2713,7 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="cualAyudaEspecial">¿Cuál ayuda especial?</label>
-                  <input type="text" class="cv-form-control" id="cualAyudaEspecial"
+                  <input type="text" class="cv-form-control" id="cualAyudaEspecial" name="cual_ayuda_especial"
                     placeholder="Silla de ruedas, prótesis, medicamentos..." disabled>
                 </div>
               </div>
@@ -2724,15 +2724,15 @@
               <div class="cv-form-row cv-grid-3">
                 <div class="cv-form-group">
                   <label for="exclusionNinosCalle">Niños en situación de calle</label>
-                  <input type="number" class="cv-form-control" id="exclusionNinosCalle" min="0" placeholder="0">
+                  <input type="number" class="cv-form-control" id="exclusionNinosCalle" name="exclusion_ninos_calle" min="0" placeholder="0">
                 </div>
                 <div class="cv-form-group">
                   <label for="exclusionDiscapacitados">Con discapacidad</label>
-                  <input type="number" class="cv-form-control" id="exclusionDiscapacitados" min="0" placeholder="0">
+                  <input type="number" class="cv-form-control" id="exclusionDiscapacitados" name="exclusion_discapacitados" min="0" placeholder="0">
                 </div>
                 <div class="cv-form-group">
                   <label for="exclusionTerceraEdad">Tercera edad (60+)</label>
-                  <input type="number" class="cv-form-control" id="exclusionTerceraEdad" min="0" placeholder="0">
+                  <input type="number" class="cv-form-control" id="exclusionTerceraEdad" name="exclusion_tercera_edad" min="0" placeholder="0">
                 </div>
               </div>
             </div>
@@ -2749,7 +2749,7 @@
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="existenOrgComunitarias">¿Existen organizaciones comunitarias en el sector?</label>
-                  <select class="cv-form-control" id="existenOrgComunitarias">
+                  <select class="cv-form-control" id="existenOrgComunitarias" name="existenOrgComunitarias">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2757,7 +2757,7 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="cualesOrgComunitarias">¿Cuáles organizaciones?</label>
-                  <input type="text" class="cv-form-control" id="cualesOrgComunitarias"
+                  <input type="text" class="cv-form-control" id="cualesOrgComunitarias" name="cualesOrgComunitarias"
                     placeholder="Ej. Comité de salud, Misiones..." disabled>
                 </div>
               </div>
@@ -2765,7 +2765,7 @@
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="participaUsted">¿Participa usted?</label>
-                  <select class="cv-form-control" id="participaUsted">
+                  <select class="cv-form-control" id="participaUsted" name="participaUsted">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2773,7 +2773,7 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="participaFamiliar">¿Participa algún familiar?</label>
-                  <select class="cv-form-control" id="participaFamiliar">
+                  <select class="cv-form-control" id="participaFamiliar" name="participaFamiliar">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2781,7 +2781,7 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="asisteAsambleas">¿Asiste a asambleas de ciudadanos?</label>
-                  <select class="cv-form-control" id="asisteAsambleas">
+                  <select class="cv-form-control" id="asisteAsambleas" name="asisteAsambleas">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2792,7 +2792,7 @@
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="dispuestoApoyar">¿Dispuesto a apoyar el Consejo Comunal?</label>
-                  <select class="cv-form-control" id="dispuestoApoyar">
+                  <select class="cv-form-control" id="dispuestoApoyar" name="dispuestoApoyar">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2800,7 +2800,7 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="creePuebloIntervieneDecisiones">¿Cree que el pueblo interviene en decisiones?</label>
-                  <select class="cv-form-control" id="creePuebloIntervieneDecisiones">
+                  <select class="cv-form-control" id="creePuebloIntervieneDecisiones" name="creePuebloIntervieneDecisiones">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2808,7 +2808,7 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="acuerdoPuebloProtagonismoPresupuesto">¿De acuerdo con protagonismo en presupuesto?</label>
-                  <select class="cv-form-control" id="acuerdoPuebloProtagonismoPresupuesto">
+                  <select class="cv-form-control" id="acuerdoPuebloProtagonismoPresupuesto" name="acuerdoPuebloProtagonismoPresupuesto">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2834,18 +2834,18 @@
 
               <div class="cv-form-group" style="margin-bottom:1rem">
                 <label for="areaTrabajoInteres">Área de trabajo de interés comunitario (máx. 3)</label>
-                <input type="text" class="cv-form-control" id="areaTrabajoInteres"
+                <input type="text" class="cv-form-control" id="areaTrabajoInteres" name="area_trabajo_interes"
                   placeholder="Ej. Salud, Educación, Infraestructura...">
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
                 <label for="porqueNoAsiste">Si no asiste a asambleas, ¿Por qué?</label>
-                <textarea class="cv-form-control" id="porqueNoAsiste" rows="2" placeholder="Explique brevemente..."></textarea>
+                <textarea class="cv-form-control" id="porqueNoAsiste" name="porque_no_asiste" rows="2" placeholder="Explique brevemente..."></textarea>
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
                 <label for="quienResolverProblemas">¿Quién cree que debe resolver los problemas de la comunidad?</label>
-                <input type="text" class="cv-form-control" id="quienResolverProblemas" placeholder="Ej. El gobierno, la alcaldía, el consejo comunal...">
+                <input type="text" class="cv-form-control" id="quienResolverProblemas" name="quien_resolver_problemas" placeholder="Ej. El gobierno, la alcaldía, el consejo comunal...">
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
@@ -4201,7 +4201,7 @@
     }
 
     function hidratarFormulario(raw) {
-      const boolToSiNo = (val) => val === true ? 'Si' : val === false ? 'No' : (val ?? '');
+      const boolToSiNo = (val) => (val === true || val === 1 || val === '1' || val === 'true') ? 'Si' : (val === false || val === 0 || val === '0' || val === 'false') ? 'No' : (val ?? '');
       const getSafe = (obj) => Array.isArray(obj) ? (obj[0] || {}) : (obj || {});
       const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined && val !== null) el.value = val; };
 
