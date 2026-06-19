@@ -32,7 +32,7 @@ class CensoReportesService {
     
     if (filtros.salud) {
       if (filtros.salud === 'discapacidad') {
-         where.discapacidad_tipo = { [Op.ne]: null, [Op.not]: '' };
+         where.discapacidad_tipo = { [Op.and]: [{ [Op.ne]: null }, { [Op.ne]: '' }] };
       } else if (filtros.salud === 'encamado') {
          where.discapacidad_tipo = { [Op.iLike]: '%encamado%' };
       } else {
@@ -178,7 +178,7 @@ class CensoReportesService {
 
     // 2. Discapacidad
     const discNuevos = await CensoCaracteristicaFamiliar.count({
-      where: { ...whereFamiliar, discapacidad_tipo: { [Op.ne]: null, [Op.not]: '' } },
+      where: { ...whereFamiliar, discapacidad_tipo: { [Op.and]: [{ [Op.ne]: null }, { [Op.ne]: '' }] } },
       include: [includeEstudio]
     });
     const discViejos = await Habitante.count({
@@ -325,7 +325,7 @@ class CensoReportesService {
         title = 'Personas con Discapacidad';
         headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Tipo Incapacidad', 'Consejo Comunal'];
         
-        wf.discapacidad_tipo = { [Op.ne]: null, [Op.not]: '' };
+        wf.discapacidad_tipo = { [Op.and]: [{ [Op.ne]: null }, { [Op.ne]: '' }] };
         wh.condicion_salud = { [Op.notIn]: ['Ninguna', 'Buena', ''] };
         
         rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });

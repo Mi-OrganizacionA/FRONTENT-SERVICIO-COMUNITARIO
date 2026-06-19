@@ -75,7 +75,8 @@ class ReportesController {
     const filtroHasta = document.getElementById('filtroHasta');
     if (filtroDesde && filtroHasta) {
       const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
-      fetch(`${baseUrl}/censo-reportes/fecha-minima`)
+      const headers = window.auth ? { 'Authorization': `Bearer ${window.auth.getToken()}` } : {};
+      fetch(`${baseUrl}/censo-reportes/fecha-minima`, { headers })
         .then(res => res.json())
         .then(data => {
           if (data.fecha_minima) filtroDesde.value = data.fecha_minima;
@@ -204,7 +205,8 @@ class ReportesController {
 
       // La instrucción del usuario es que los KPIs generales y las gráficas visuales NO se filtren,
       // siempre deben mostrar el padrón completo sin importar lo que haya en el Modal (a menos que sea vocero).
-      const res = await fetch(`${baseUrl}/censo-reportes/kpis${paramConsejo}`);
+      const headers = window.auth ? { 'Authorization': `Bearer ${window.auth.getToken()}` } : {};
+      const res = await fetch(`${baseUrl}/censo-reportes/kpis${paramConsejo}`, { headers });
       if (!res.ok) throw new Error('Error al cargar KPIs');
       const kpis = await res.json();
       
@@ -265,7 +267,8 @@ class ReportesController {
       const paramConsejo = isVocero ? `?consejo_id=${user.id_comunidad_asignada}` : '';
 
       // La tabla inferior también debe mostrar SIEMPRE el resumen completo, ignorando los filtros del modal (a menos que sea vocero).
-      const res = await fetch(`${baseUrl}/censo-reportes/resumen${paramConsejo}`);
+      const headers = window.auth ? { 'Authorization': `Bearer ${window.auth.getToken()}` } : {};
+      const res = await fetch(`${baseUrl}/censo-reportes/resumen${paramConsejo}`, { headers });
       if (!res.ok) throw new Error('Error al cargar resumen');
       
       const datos = await res.json();
@@ -347,8 +350,9 @@ class ReportesController {
     // Obtener filtros
     const urlParams = this.getFiltrosUrl();
     const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
+    const tokenParams = window.auth ? `&token=${window.auth.getToken()}` : '';
     
-    const downloadUrl = `${baseUrl}/censo-reportes/exportar?tipo=${tipo}&format=${formato}&action=${action}&${urlParams}`;
+    const downloadUrl = `${baseUrl}/censo-reportes/exportar?tipo=${tipo}&format=${formato}&action=${action}&${urlParams}${tokenParams}`;
     
     window.open(downloadUrl, '_blank');
 
