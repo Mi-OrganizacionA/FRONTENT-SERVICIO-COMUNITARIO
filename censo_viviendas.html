@@ -3295,7 +3295,7 @@
               ocupacion: document.getElementById('jefProfesion')?.value,
               pensionado: document.getElementById('jefPensionado')?.value === 'Si',
               pensionado_institucion: document.getElementById('jefPensionadoInstitucion')?.value,
-              ingreso_mensual_bs: document.getElementById('jefIngresoMensualBs')?.value
+              ingreso_mensual_bs: document.getElementById('jefIngresoMensualBs')?.value || null
             });
           }
         }
@@ -4605,8 +4605,8 @@
           let consejos = [];
           try {
             const apiBase = window.api?.baseURL || 'http://localhost:3000/api';
-            const headers = window.api?._getHeaders?.() || { 'Authorization': `Bearer ${window.auth?.getToken?.()}` };
-            const res = await fetch(`${apiBase}/system/consejos`, { headers });
+            const fetchOptions = window.api?._getHeaders?.() || { headers: { 'Authorization': `Bearer ${window.auth?.getToken?.()}` } };
+            const res = await fetch(`${apiBase}/system/consejos`, fetchOptions);
             if (res.ok) {
               consejos = await res.json();
             } else {
