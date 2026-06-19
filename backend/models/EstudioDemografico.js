@@ -30,6 +30,7 @@ module.exports = (sequelize) => {
     direccion: DataTypes.TEXT,
     cantidad_habitantes: { type: DataTypes.INTEGER, defaultValue: 1 },
     condicion_general: DataTypes.STRING(50),
+    observacion: DataTypes.TEXT,
     fecha_creacion: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     activo: { type: DataTypes.BOOLEAN, defaultValue: true }
   }, { tableName: 'estudios_demograficos', timestamps: false });

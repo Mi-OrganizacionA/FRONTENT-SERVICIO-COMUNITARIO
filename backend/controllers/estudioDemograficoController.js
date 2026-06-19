@@ -30,10 +30,26 @@ function mapFrontendData(datos, paso) {
         if (nf.genero) nf.sexo = nf.genero;
         if (nf.nivel_educativo) nf.grado_instruccion = nf.nivel_educativo;
         if (nf.ocupacion) nf.profesion = nf.ocupacion;
+        if (nf.jef_telf_cel) nf.telefono_celular = nf.jef_telf_cel;
+        if (nf.jef_telf_hab) nf.telefono_habitacion = nf.jef_telf_hab;
+        if (nf.jef_email) nf.email_familiar = nf.jef_email;
+        if (nf.jef_estado_civil !== undefined) nf.estado_civil = nf.jef_estado_civil;
+        if (nf.jef_tiempo_comunidad !== undefined) nf.tiempo_comunidad = nf.jef_tiempo_comunidad;
+        if (nf.jef_incapacitado !== undefined) nf.incapacitado = nf.jef_incapacitado;
+        if (nf.jef_pensionado_institucion !== undefined) nf.pensionado_institucion = nf.jef_pensionado_institucion;
+        if (nf.clasificacion_ingreso !== undefined) nf.clasificacion_ingreso_familiar = nf.clasificacion_ingreso;
         delete nf.genero;
         delete nf.nivel_educativo;
         delete nf.ocupacion;
         delete nf.es_jefe_familia; // Esta columna no existe en BD, usamos parentesco
+        delete nf.jef_telf_cel;
+        delete nf.jef_telf_hab;
+        delete nf.jef_email;
+        delete nf.jef_estado_civil;
+        delete nf.jef_tiempo_comunidad;
+        delete nf.jef_incapacitado;
+        delete nf.jef_pensionado_institucion;
+        delete nf.clasificacion_ingreso;
         return nf;
       });
     }
@@ -70,7 +86,7 @@ function mapFrontendData(datos, paso) {
     if (mapped.transporte !== undefined)         mapped.transporte_tipo             = mapped.transporte;
     if (mapped.tiene_tanque !== undefined)       mapped.tiene_tanque_litros         = parseInt(mapped.tiene_tanque) || 0;
     if (mapped.bombillos_necesita !== undefined) mapped.bombillos_ahorradores_necesita = parseInt(mapped.bombillos_necesita) || 0;
-    // cantidad_cilindros_gas no existe en el modelo: safeData lo filtrará
+    // cantidad_cilindros_gas no existe en el modelo: safeData los filtrará
   }
 
   if (paso === 8) {
@@ -86,6 +102,7 @@ function mapFrontendData(datos, paso) {
     // Mapear alias del frontend a columnas reales del modelo CensoParticipacionComunitaria
     if (mapped.asiste_asambleas !== undefined)  mapped.asiste_asambleas_ciudadanos  = mapped.asiste_asambleas;
     if (mapped.dispuesto_apoyar !== undefined)  mapped.dispuesto_apoyar_consejo      = mapped.dispuesto_apoyar;
+    if (mapped.como_resolver_problemas !== undefined) mapped.como_resolver_problemas_sector = mapped.como_resolver_problemas;
     // Las demás columnas (como_apoyaria_proyectos, area_trabajo_interes, etc.) llegarán en snake_case
   }
 
@@ -234,28 +251,45 @@ class EstudioDemograficoController {
       if (req.body.familiares && req.body.familiares.length > 0) {
         const mappedFam = mapFrontendData(req.body, 3).familiares;
         if (mappedFam) {
-          const fams = mappedFam.map(f => ({ ...f, id_estudio: data.id }));
+          const colsFam = Object.keys(db.CensoCaracteristicaFamiliar.getAttributes());
+          const fams = mappedFam.map(f => {
+            const safeFam = {};
+            colsFam.forEach(col => { if (col in f) safeFam[col] = f[col]; });
+            return { ...safeFam, id_estudio: data.id };
+          });
           await db.CensoCaracteristicaFamiliar.bulkCreate(fams, { transaction: t });
         }
       }
 
       const mappedEco = mapFrontendData(req.body, 5);
-      await db.CensoSituacionEconomica.create({ ...mappedEco, id_estudio: data.id }, { transaction: t });
+      const colsEco = Object.keys(db.CensoSituacionEconomica.getAttributes());
+      const safeEco = Object.fromEntries(colsEco.filter(c => c in mappedEco).map(c => [c, mappedEco[c]]));
+      await db.CensoSituacionEconomica.create({ ...safeEco, id_estudio: data.id }, { transaction: t });
 
       const mappedViv = mapFrontendData(req.body, 6);
-      await db.CensoSituacionVivienda.create({ ...mappedViv, id_estudio: data.id }, { transaction: t });
+      const colsViv = Object.keys(db.CensoSituacionVivienda.getAttributes());
+      const safeViv = Object.fromEntries(colsViv.filter(c => c in mappedViv).map(c => [c, mappedViv[c]]));
+      await db.CensoSituacionVivienda.create({ ...safeViv, id_estudio: data.id }, { transaction: t });
 
       const mappedSer = mapFrontendData(req.body, 7);
-      await db.CensoServicios.create({ ...mappedSer, id_estudio: data.id }, { transaction: t });
+      const colsSer = Object.keys(db.CensoServicios.getAttributes());
+      const safeSer = Object.fromEntries(colsSer.filter(c => c in mappedSer).map(c => [c, mappedSer[c]]));
+      await db.CensoServicios.create({ ...safeSer, id_estudio: data.id }, { transaction: t });
 
       const mappedSal = mapFrontendData(req.body, 8);
-      await db.CensoSalud.create({ ...mappedSal, id_estudio: data.id }, { transaction: t });
+      const colsSal = Object.keys(db.CensoSalud.getAttributes());
+      const safeSal = Object.fromEntries(colsSal.filter(c => c in mappedSal).map(c => [c, mappedSal[c]]));
+      await db.CensoSalud.create({ ...safeSal, id_estudio: data.id }, { transaction: t });
 
       const mappedPar = mapFrontendData(req.body, 9);
-      await db.CensoParticipacionComunitaria.create({ ...mappedPar, id_estudio: data.id }, { transaction: t });
+      const colsPar = Object.keys(db.CensoParticipacionComunitaria.getAttributes());
+      const safePar = Object.fromEntries(colsPar.filter(c => c in mappedPar).map(c => [c, mappedPar[c]]));
+      await db.CensoParticipacionComunitaria.create({ ...safePar, id_estudio: data.id }, { transaction: t });
 
       const mappedCom = mapFrontendData(req.body, 10);
-      await db.CensoSituacionComunidad.create({ ...mappedCom, id_estudio: data.id }, { transaction: t });
+      const colsCom = Object.keys(db.CensoSituacionComunidad.getAttributes());
+      const safeCom = Object.fromEntries(colsCom.filter(c => c in mappedCom).map(c => [c, mappedCom[c]]));
+      await db.CensoSituacionComunidad.create({ ...safeCom, id_estudio: data.id }, { transaction: t });
 
       // 9. Crear Opciones Multiples (Checkboxes separados)
       if (opciones && opciones.length > 0) {
@@ -529,7 +563,8 @@ class EstudioDemograficoController {
           { model: db.CensoParticipacionComunitaria, as: 'participacion_comunitaria' },
           { model: db.CensoSituacionEconomica,       as: 'situacion_economica' },
           { model: db.CensoSituacionComunidad,       as: 'situacion_comunidad' },
-          { model: db.ConsejoComunal,                as: 'consejo'       }
+          { model: db.ConsejoComunal,                as: 'consejo'       },
+          { model: db.CensoOpcionMultiple,           as: 'opciones_multiples' }
         ]
       });
 

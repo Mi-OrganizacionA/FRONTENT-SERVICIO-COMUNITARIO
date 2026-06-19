@@ -54,6 +54,12 @@ class PdfGeneradorViviendas {
     const direccionFull = [estudio.calle_avenida, estudio.numero_casa, estudio.referencia_ubicacion]
       .filter(Boolean).join(', ') || estudio.direccion_comunidad || estudio.direccion || '—';
 
+    const opciones = Array.isArray(estudio.opciones_multiples) ? estudio.opciones_multiples : [];
+    const getOpciones = (cat) => {
+      const arr = opciones.filter(o => o.categoria === cat).map(o => o.valor);
+      return arr.length > 0 ? arr.join(', ') : 'Ninguno';
+    };
+
     const html = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -145,11 +151,15 @@ class PdfGeneradorViviendas {
         <div class="field"><label>Sexo</label><span>${val(jefe.sexo)}</span></div>
         <div class="field"><label>Fecha de Nacimiento</label><span>${formatDate(jefe.fecha_nacimiento)}</span></div>
         <div class="field"><label>Edad</label><span>${calcAge(jefe.fecha_nacimiento)}</span></div>
+        <div class="field"><label>Estado Civil</label><span>${val(jefe.estado_civil)}</span></div>
         <div class="field"><label>Parentesco</label><span>${val(jefe.parentesco)}</span></div>
         <div class="field"><label>Grado de Instrucción</label><span>${val(jefe.grado_instruccion)}</span></div>
         <div class="field"><label>Profesión/Oficio</label><span>${val(jefe.profesion)}</span></div>
         <div class="field"><label>Inscrito CNE</label><span>${boolStr(jefe.inscrito_cne)}</span></div>
-        <div class="field"><label>Pensionado</label><span>${boolStr(jefe.pensionado)} ${jefe.pensionado_institucion ? '- ' + jefe.pensionado_institucion : ''}</span></div>
+        <div class="field"><label>Tiempo en Comunidad</label><span>${val(jefe.tiempo_comunidad)}</span></div>
+        <div class="field"><label>Teléfono Celular</label><span>${val(jefe.telefono_celular)}</span></div>
+        <div class="field"><label>Correo Electrónico</label><span>${val(jefe.email_familiar)}</span></div>
+        <div class="field" style="grid-column: span 2;"><label>Pensionado</label><span>${boolStr(jefe.pensionado)} ${jefe.pensionado_institucion ? '- ' + jefe.pensionado_institucion : ''}</span></div>
         <div class="field"><label>Ingreso Mensual Bs.</label><span>${val(jefe.ingreso_mensual_bs)}</span></div>
       </div>
     </div>
@@ -206,8 +216,9 @@ class PdfGeneradorViviendas {
         <div class="field"><label>Inscrita en SIVIH</label><span>${boolStr(sv.inscrita_sivih)}</span></div>
         <div class="field"><label>Cotiza Pol. Habitacional</label><span>${boolStr(sv.cotiza_politica_habitacional)}</span></div>
         <div class="field"><label>Requiere Ayuda de Mejora</label><span>${val(sv.requiere_ayuda_mejora)}</span></div>
-        <div class="field"><label>Insectos / Roedores</label><span>${boolStr(sv.presencia_insectos_roedores)}</span></div>
-        <div class="field"><label>Animales Domésticos</label><span>${boolStr(sv.tiene_animales_domesticos)}</span></div>
+        <div class="field" style="grid-column: span 2;"><label>Enseres</label><span>${getOpciones('enseres_vivienda')}</span></div>
+        <div class="field"><label>Insectos / Roedores</label><span>${boolStr(sv.presencia_insectos_roedores)} (${getOpciones('insectos_tipos')})</span></div>
+        <div class="field"><label>Animales Domésticos</label><span>${boolStr(sv.tiene_animales_domesticos)} (${getOpciones('animales_tipos')})</span></div>
         <div class="field"><label>Condiciones Salubridad</label><span>${val(sv.condiciones_salubridad)}</span></div>
       </div>
     </div>
@@ -222,6 +233,7 @@ class PdfGeneradorViviendas {
         <div class="field"><label>Medidor de Agua</label><span>${boolStr(ser.tiene_medidor_agua)}</span></div>
         <div class="field"><label>Aguas Servidas</label><span>${val(ser.aguas_servidas_tipo)}</span></div>
         <div class="field"><label>Gas (tipo)</label><span>${val(ser.gas_tipo)}</span></div>
+        <div class="field"><label>Cilindros</label><span>${getOpciones('gas_cilindros')}</span></div>
         <div class="field"><label>Empresa de Gas</label><span>${val(ser.gas_empresa_suministra)}</span></div>
         <div class="field"><label>Duración / Precio Gas</label><span>${val(ser.gas_duracion_y_precio)}</span></div>
         <div class="field"><label>Sistema Eléctrico</label><span>${val(ser.sistema_electrico_tipo)}</span></div>
@@ -280,7 +292,8 @@ class PdfGeneradorViviendas {
           <div class="check-field"><div class="check-box">${part.info_sobre_consejos_comunales ? '✓' : ''}</div><label>¿Tiene información sobre los CC? → ${val(part.como_obtuvo_info_consejos)}</label></div>
           <div class="check-field"><div class="check-box">${part.dispuesto_apoyar_consejo ? '✓' : ''}</div><label>¿Dispuesto a apoyar al CC?</label></div>
           <div class="check-field"><div class="check-box">${part.asiste_asambleas_ciudadanos ? '✓' : ''}</div><label>¿Asiste a Asambleas de Ciudadanos?</label></div>
-          <div class="field" style="margin-top: 10px;"><label>Área de trabajo de interés</label><span>${val(part.area_trabajo_interes)}</span></div>
+          <div class="field" style="margin-top: 10px;"><label>Misiones Implementadas</label><span>${getOpciones('misiones')}</span></div>
+          <div class="field"><label>Área de trabajo de interés</label><span>${val(part.area_trabajo_interes)}</span></div>
         </div>
         <div>
           <div class="field"><label>¿Por qué no asiste?</label><span>${val(part.porque_no_asiste)}</span></div>
@@ -302,7 +315,10 @@ class PdfGeneradorViviendas {
       <div class="grid-2">
         <div class="field"><label>Principales Potencialidades y Ventajas</label><span style="min-height:30px;">${val(com.principales_potencialidades_ventajas)}</span></div>
         <div class="field"><label>Principales Problemas y Debilidades</label><span style="min-height:30px;">${val(com.principales_problemas_debilidades)}</span></div>
+        <div class="field"><label>¿Cómo propone resolver los problemas?</label><span style="min-height:30px;">${val(com.como_resolver_problemas)}</span></div>
+        <div class="field"><label>Tipos de Proyectos Deseados</label><span style="min-height:30px;">${val(com.tipo_proyectos_deseados)}</span></div>
       </div>
+      <div class="field" style="margin-top: 8px;"><label>Observaciones Adicionales</label><span style="min-height:30px;">${val(com.observaciones || estudio.observacion)}</span></div>
     </div>
   </div>
 

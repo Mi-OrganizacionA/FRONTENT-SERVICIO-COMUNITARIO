@@ -2091,10 +2091,14 @@
                 </div>
               </div>
 
-              <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
+              <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="jefTelfCel">Teléfono Celular</label>
                   <input type="tel" class="cv-form-control" id="jefTelfCel" placeholder="Ej. 0414-1234567">
+                </div>
+                <div class="cv-form-group">
+                  <label for="jefTelfHab">Teléfono Habitación</label>
+                  <input type="tel" class="cv-form-control" id="jefTelfHab" placeholder="Ej. 0254-1234567">
                 </div>
                 <div class="cv-form-group">
                   <label for="jefEmail">Correo Electrónico</label>
@@ -2438,7 +2442,7 @@
               <div class="cv-form-row cv-grid-2">
                 <div class="cv-form-group">
                   <label for="presenciaInsectos">¿Presencia de insectos o roedores?</label>
-                  <select class="cv-form-control" id="presenciaInsectos">
+                  <select class="cv-form-control" id="presenciaInsectos" onchange="document.getElementById('insectosTiposGroup').style.display = this.value === 'Si' ? 'block' : 'none'">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2446,11 +2450,57 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="tieneAnimales">¿Tiene animales domésticos?</label>
-                  <select class="cv-form-control" id="tieneAnimales">
+                  <select class="cv-form-control" id="tieneAnimales" onchange="document.getElementById('animalesTiposGroup').style.display = this.value === 'Si' ? 'block' : 'none'">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
-                    <option value="Si">Sí, perros/gatos/aves</option>
+                    <option value="Si">Sí</option>
                   </select>
+                </div>
+              </div>
+
+              <!-- Tipos de Insectos y Animales (Checkboxes) -->
+              <div class="cv-form-row cv-grid-2">
+                <div class="cv-form-group" id="insectosTiposGroup" style="display:none; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+                  <label style="margin-bottom:8px; display:block;">Tipos de Insectos/Roedores:</label>
+                  <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                    <label><input type="checkbox" name="insectos_tipos" value="Hormigas"> Hormigas</label>
+                    <label><input type="checkbox" name="insectos_tipos" value="Cucarachas"> Cucarachas</label>
+                    <label><input type="checkbox" name="insectos_tipos" value="Roedores"> Roedores</label>
+                    <label><input type="checkbox" name="insectos_tipos" value="Moscas"> Moscas</label>
+                    <label><input type="checkbox" name="insectos_tipos" value="Mosquitos"> Mosquitos</label>
+                    <label><input type="checkbox" name="insectos_tipos" value="Chinches"> Chinches</label>
+                    <label><input type="checkbox" name="insectos_tipos" value="Arañas"> Arañas</label>
+                  </div>
+                </div>
+                <div class="cv-form-group" id="animalesTiposGroup" style="display:none; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+                  <label style="margin-bottom:8px; display:block;">Tipos de Animales:</label>
+                  <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                    <label><input type="checkbox" name="animales_tipos" value="Perros"> Perros</label>
+                    <label><input type="checkbox" name="animales_tipos" value="Gatos"> Gatos</label>
+                    <label><input type="checkbox" name="animales_tipos" value="Aves"> Aves</label>
+                    <label><input type="checkbox" name="animales_tipos" value="Peces"> Peces</label>
+                    <label><input type="checkbox" name="animales_tipos" value="Aves de Corral"> Aves de Corral</label>
+                    <label><input type="checkbox" name="animales_tipos" value="Porcinos"> Porcinos</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Enseres Vivienda -->
+              <div class="cv-form-row">
+                <div class="cv-form-group" style="background:rgba(255,255,255,0.05); padding:15px; border-radius:8px; margin-top:10px;">
+                  <label style="margin-bottom:10px; display:block; font-weight:bold;">Enseres de la Vivienda (Seleccione los que posee):</label>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:10px;">
+                    <label><input type="checkbox" name="enseres_vivienda" value="Televisor"> Televisor</label>
+                    <label><input type="checkbox" name="enseres_vivienda" value="Nevera"> Nevera</label>
+                    <label><input type="checkbox" name="enseres_vivienda" value="Cocina"> Cocina</label>
+                    <label><input type="checkbox" name="enseres_vivienda" value="Lavadora"> Lavadora</label>
+                    <label><input type="checkbox" name="enseres_vivienda" value="Aire Acondicionado"> Aire Acond.</label>
+                    <label><input type="checkbox" name="enseres_vivienda" value="Computadora"> Computadora</label>
+                    <label><input type="checkbox" name="enseres_vivienda" value="Ventilador"> Ventilador</label>
+                    <label><input type="checkbox" name="enseres_vivienda" value="Cama"> Cama</label>
+                    <label><input type="checkbox" name="enseres_vivienda" value="Muebles"> Muebles</label>
+                    <label><input type="checkbox" name="enseres_vivienda" value="Comedor"> Comedor</label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2539,6 +2589,19 @@
                   <label for="gasEmpresa">Empresa que suministra</label>
                   <input type="text" class="cv-form-control" id="gasEmpresa"
                     placeholder="Ej. PDVSA Gas, Distribuidor...">
+                </div>
+              </div>
+              
+              <!-- Capacidades Cilindros -->
+              <div class="cv-form-row cv-grid-1" id="cilindrosCapacidadGroup" style="margin-bottom:1rem; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+                <div class="cv-form-group">
+                  <label style="margin-bottom:8px; display:block;">Capacidad de Cilindros que posee:</label>
+                  <div style="display:flex; flex-wrap:wrap; gap:15px;">
+                    <label><input type="checkbox" name="gas_cilindros" value="10kg"> 10 kg</label>
+                    <label><input type="checkbox" name="gas_cilindros" value="18kg"> 18 kg</label>
+                    <label><input type="checkbox" name="gas_cilindros" value="27kg"> 27 kg</label>
+                    <label><input type="checkbox" name="gas_cilindros" value="43kg"> 43 kg</label>
+                  </div>
                 </div>
               </div>
 
@@ -2753,10 +2816,20 @@
                 </div>
               </div>
 
-              <div class="cv-form-group" style="margin-bottom:1rem">
-                <label for="misiones">Misiones implementadas en el sector</label>
-                <input type="text" class="cv-form-control" id="misiones"
-                  placeholder="Ej. Barrio Adentro, Mercal, CLAP, Madres del Barrio...">
+              <div class="cv-form-group" style="margin-bottom:1rem; background:rgba(255,255,255,0.05); padding:15px; border-radius:8px;">
+                <label style="margin-bottom:10px; display:block; font-weight:bold;">Misiones implementadas en el sector</label>
+                <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:10px;">
+                  <label><input type="checkbox" name="misiones" value="Barrio Adentro"> Barrio Adentro</label>
+                  <label><input type="checkbox" name="misiones" value="Mercal / PDVAL"> Mercal / PDVAL</label>
+                  <label><input type="checkbox" name="misiones" value="CLAP"> CLAP</label>
+                  <label><input type="checkbox" name="misiones" value="Ribas / Sucre / Robinson"> Ribas/Sucre/Robinson</label>
+                  <label><input type="checkbox" name="misiones" value="Vivienda Venezuela"> Gran Misión Vivienda</label>
+                  <label><input type="checkbox" name="misiones" value="Amor Mayor"> Amor Mayor</label>
+                  <label><input type="checkbox" name="misiones" value="Madres del Barrio"> Madres del Barrio</label>
+                  <label><input type="checkbox" name="misiones" value="Parto Humanizado"> Parto Humanizado</label>
+                  <label><input type="checkbox" name="misiones" value="Hogares de la Patria"> Hogares de la Patria</label>
+                  <label><input type="checkbox" name="misiones" value="Barrio Nuevo Barrio Tricolor"> Barrio Tricolor</label>
+                </div>
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
@@ -3294,8 +3367,17 @@
               nivel_educativo: document.getElementById('jefNivelInstruccion')?.value,
               ocupacion: document.getElementById('jefProfesion')?.value,
               pensionado: document.getElementById('jefPensionado')?.value === 'Si',
-              pensionado_institucion: document.getElementById('jefPensionadoInstitucion')?.value,
-              ingreso_mensual_bs: document.getElementById('jefIngresoMensualBs')?.value || null
+              // Nuevos campos
+              tiempo_comunidad: document.getElementById('jefTiempoComunidad')?.value || null,
+              incapacitado: document.getElementById('jefIncapacitado')?.value === 'Si',
+              discapacidad_tipo: document.getElementById('jefTipoIncapacidad')?.value || null,
+              pensionado_institucion: document.getElementById('jefPensionadoInstitucion')?.value || null,
+              ingreso_mensual_bs: document.getElementById('jefIngresoMensualBs')?.value || null,
+              telefono_celular: document.getElementById('jefTelfCel')?.value || null,
+              telefono_habitacion: document.getElementById('jefTelfHab')?.value || null,
+              email_familiar: document.getElementById('jefEmail')?.value || null,
+              estado_civil: document.getElementById('jefEstadoCivil')?.value || null,
+              inscrito_cne: document.getElementById('jefInscritoCNE')?.value === 'Si'
             });
           }
         }
@@ -3334,7 +3416,15 @@
 
       // Si es paso 1, enviamos id_comunidad (asumiendo que la cabecera lo necesita)
       if (paso === 1) {
-        datos.id_comunidad = 1; // Consejo por defecto
+        const selCC = document.getElementById('consejoComunalCab');
+        const mapNameId = {
+          'Jobito I': 1, 'Jobito II': 2, 'Brisas del Yurubí': 3, 'Andrés Eloy Blanco': 4,
+          'Las Mercedes I': 5, 'Las Mercedes II': 6, 'Santa Cruz de las Mercedes': 7,
+          'Fortaleza del Corozo': 8, 'Vencedores del Corozo': 9
+        };
+        const u = window.auth?.getUser?.() || {};
+        const selVal = selCC?.value?.trim() || '';
+        datos.id_comunidad = parseInt(selVal) || mapNameId[selVal] || u?.id_comunidad_asignada || 1;
       }
 
       // Si es paso 8 (Salud), asegurar que "enfermedades" tenga al menos "Ninguna" si no se seleccionó nada
@@ -4221,6 +4311,19 @@
       setVal('requiereAyuda',       boolToSiNo(viv.requiere_ayuda_mejora));
       setVal('condicionesSalubridad', viv.condiciones_salubridad);
 
+      // ── Enseres, Insectos y Animales (Opciones Multiples) ──
+      const opcionesMul = raw.opciones_multiples || raw.opciones || [];
+      const enseres = opcionesMul.filter(o => o.categoria === 'enseres_vivienda').map(o => o.valor);
+      document.querySelectorAll('input[name="enseres_vivienda"]').forEach(cb => { cb.checked = enseres.includes(cb.value); });
+      
+      const insectos = opcionesMul.filter(o => o.categoria === 'insectos_tipos').map(o => o.valor);
+      document.querySelectorAll('input[name="insectos_tipos"]').forEach(cb => { cb.checked = insectos.includes(cb.value); });
+      if (insectos.length > 0) { const g = document.getElementById('insectosTiposGroup'); if (g) g.style.display = 'block'; }
+      
+      const animales = opcionesMul.filter(o => o.categoria === 'animales_tipos').map(o => o.valor);
+      document.querySelectorAll('input[name="animales_tipos"]').forEach(cb => { cb.checked = animales.includes(cb.value); });
+      if (animales.length > 0) { const g = document.getElementById('animalesTiposGroup'); if (g) g.style.display = 'block'; }
+
       // ── PANEL 7: Servicios Básicos ──
       const serv = getSafe(raw.servicios);
       setVal('aguasBlancas',     serv.aguas_blancas_tipo);
@@ -4234,6 +4337,10 @@
       setVal('bombillosNecesita', serv.bombillos_ahorradores_necesita);
       setVal('mecanismosInformacion', serv.mecanismos_informacion);
       setVal('serviciosComunales', serv.servicios_comunales);
+
+      // ── Cilindros gas (Opciones Multiples) ──
+      const gasCilindros = (raw.opciones_multiples || raw.opciones || []).filter(o => o.categoria === 'gas_cilindros').map(o => o.valor);
+      document.querySelectorAll('input[name="gas_cilindros"]').forEach(cb => { cb.checked = gasCilindros.includes(cb.value); });
 
       // ── PANEL 8: Salud ──
       const salud = getSafe(raw.salud);
@@ -4266,6 +4373,10 @@
       setVal('comoApoyariaProyectos',    part.como_apoyaria_proyectos);
       setVal('compromisoConSector',      part.compromiso_con_sector);
       setVal('opinionCensoEnergetico',   part.opinion_censo_energetico);
+      
+      // ── Misiones (Opciones Multiples) ──
+      const misiones = (raw.opciones_multiples || raw.opciones || []).filter(o => o.categoria === 'misiones').map(o => o.valor);
+      document.querySelectorAll('input[name="misiones"]').forEach(cb => { cb.checked = misiones.includes(cb.value); });
 
       // ── PANEL 10: Diagnóstico ──
       const com = getSafe(raw.situacion_comunidad);
@@ -4273,7 +4384,7 @@
       setVal('problemasComunidad',       com.principales_problemas_debilidades);
       setVal('comoResolverProblemas',    com.como_resolver_problemas);
       setVal('tipoProyectosDeseados',    com.tipo_proyectos_deseados);
-      setVal('observaciones',            com.observaciones);
+      setVal('observaciones',            com.observaciones || raw.observacion);
 
       // Marcar todos los steps como "done" en modo edicion para mostrar el progreso
       document.querySelectorAll('.cv-step').forEach((s, i) => {

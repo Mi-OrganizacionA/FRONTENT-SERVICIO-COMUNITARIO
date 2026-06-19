@@ -18,7 +18,9 @@ module.exports = (sequelize) => {
     como_apoyaria_proyectos: DataTypes.TEXT,
     compromiso_con_sector: DataTypes.TEXT,
     opinion_censo_energetico: DataTypes.TEXT,
-    area_trabajo_interes: DataTypes.STRING(255)
+    area_trabajo_interes: DataTypes.STRING(255),
+    tiene_info_consejos_comunales: { type: DataTypes.BOOLEAN, defaultValue: false },
+    como_obtuvo_info_consejo: DataTypes.TEXT
   }, { tableName: 'censo_participacion_comunitaria', timestamps: false });
 
   return CensoParticipacionComunitaria;
