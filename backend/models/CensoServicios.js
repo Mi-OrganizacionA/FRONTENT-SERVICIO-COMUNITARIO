@@ -9,6 +9,7 @@ module.exports = (sequelize) => {
     tiene_medidor_agua: { type: DataTypes.BOOLEAN, defaultValue: false },
     aguas_servidas_tipo: DataTypes.STRING(100),
     gas_tipo: DataTypes.STRING(100),
+    cantidad_cilindros_gas: { type: DataTypes.INTEGER, defaultValue: 0 },
     gas_empresa_suministra: DataTypes.STRING(100),
     gas_duracion_y_precio: DataTypes.STRING(200),
     sistema_electrico_tipo: DataTypes.STRING(100),

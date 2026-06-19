@@ -7,6 +7,8 @@ module.exports = (sequelize) => {
     forma_tenencia: DataTypes.STRING(100),
     tipo_vivienda: DataTypes.STRING(100),
     cantidad_habitaciones: { type: DataTypes.INTEGER, defaultValue: 0 },
+    cantidad_banos: { type: DataTypes.INTEGER, defaultValue: 0 },
+    ambientes_vivienda: DataTypes.STRING(300),
     pertenece_ocv: { type: DataTypes.BOOLEAN, defaultValue: false },
     terreno_propio: { type: DataTypes.BOOLEAN, defaultValue: false },
     tipo_paredes: DataTypes.STRING(100),

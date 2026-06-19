@@ -1960,17 +1960,7 @@
                 Sección II — Dirección Exacta de la Vivienda
               </div>
 
-              <!-- Resumen del CC seleccionado en Sección I -->
-              <div id="p2InfoCC"
-                style="background:var(--gray1);border:1.5px dashed var(--vp);border-radius:10px;padding:.85rem 1.1rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.7rem;">
-                <i class="fas fa-map-pin" style="color:var(--vp);font-size:1.1rem;"></i>
-                <div>
-                  <div
-                    style="font-size:.78rem;color:var(--gray5);font-weight:600;text-transform:uppercase;letter-spacing:.04em;">
-                    Consejo Comunal (Sección I)</div>
-                  <div id="p2CCNombre" style="font-size:1rem;font-weight:700;color:var(--vd);">—</div>
-                </div>
-              </div>
+
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
@@ -2129,7 +2119,8 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="jefPensionadoInstitucion">Institución Pensión</label>
-                  <input type="text" class="cv-form-control" id="jefPensionadoInstitucion" placeholder="Ej. IVSS" disabled>
+                  <input type="text" class="cv-form-control" id="jefPensionadoInstitucion" placeholder="Ej. IVSS"
+                    disabled>
                 </div>
                 <div class="cv-form-group">
                   <label for="jefIngresoMensualBs">Ingreso Mensual Bs.</label>
@@ -2149,7 +2140,8 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="cantidadHabitantes">Cantidad de Integrantes Extra (Sin contar al Jefe) <span class="req">*</span></label>
+                  <label for="cantidadHabitantes">Cantidad de Integrantes Extra (Sin contar al Jefe) <span
+                      class="req">*</span></label>
                   <input type="number" class="cv-form-control" id="cantidadHabitantes" min="0" max="30"
                     placeholder="Ej. 2" required>
                 </div>
@@ -2386,8 +2378,8 @@
                   <input type="number" class="cv-form-control" id="numCuartos" min="0" placeholder="Ej. 3">
                 </div>
                 <div class="cv-form-group">
-                  <label for="numBanos">N° de Baños</label>
-                  <input type="number" class="cv-form-control" id="numBanos" min="0" placeholder="Ej. 1">
+                  <label for="cantidadBanos">N° de Baños</label>
+                  <input type="number" class="cv-form-control" id="cantidadBanos" min="0" placeholder="Ej. 1">
                 </div>
                 <div class="cv-form-group">
                   <label for="ambientesVivienda">Ambientes disponibles</label>
@@ -2406,8 +2398,8 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="inscritaSIVIH">¿Inscrita en SIVIH?</label>
-                  <select class="cv-form-control" id="inscritaSIVIH">
+                  <label for="inscritaSivih">¿Inscrita en SIVIH?</label>
+                  <select class="cv-form-control" id="inscritaSivih">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2417,15 +2409,16 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="requiereAyuda">¿Requiere ayuda de mejora?</label>
-                  <select class="cv-form-control" id="requiereAyuda">
+                  <label for="requiereAyudaMejora">¿Requiere ayuda de mejora?</label>
+                  <select class="cv-form-control" id="requiereAyudaMejora">
                     <option value="Ninguna">Ninguna</option>
                     <option value="Rehabilitación">Rehabilitación</option>
                     <option value="Sustitución">Sustitución completa</option>
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="condicionesSalubridad">Condiciones de Salubridad <span class="text-danger">*</span></label>
+                  <label for="condicionesSalubridad">Condiciones de Salubridad <span
+                      class="text-danger">*</span></label>
                   <select class="cv-form-control" id="condicionesSalubridad" required>
                     <option value="">Seleccione...</option>
                     <option value="Buenas">✅ Buenas</option>
@@ -2437,8 +2430,8 @@
 
               <div class="cv-form-row cv-grid-2">
                 <div class="cv-form-group">
-                  <label for="presenciaInsectos">¿Presencia de insectos o roedores?</label>
-                  <select class="cv-form-control" id="presenciaInsectos">
+                  <label for="presenciaInsectosRoedores">¿Presencia de insectos o roedores?</label>
+                  <select class="cv-form-control" id="presenciaInsectosRoedores">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2477,8 +2470,8 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="tieneTanque">¿Tiene tanque? (litros)</label>
-                  <input type="number" class="cv-form-control" id="tieneTanque" min="0" placeholder="0 = No tiene">
+                  <label for="tieneTanqueLitros">¿Tiene tanque? (litros)</label>
+                  <input type="number" class="cv-form-control" id="tieneTanqueLitros" min="0" placeholder="0 = No tiene">
                 </div>
                 <div class="cv-form-group">
                   <label for="tieneMedidorAgua">¿Tiene medidor de agua?</label>
@@ -2536,8 +2529,8 @@
                     disabled>
                 </div>
                 <div class="cv-form-group">
-                  <label for="gasEmpresa">Empresa que suministra</label>
-                  <input type="text" class="cv-form-control" id="gasEmpresa"
+                  <label for="gasEmpresaSuministra">Empresa que suministra</label>
+                  <input type="text" class="cv-form-control" id="gasEmpresaSuministra"
                     placeholder="Ej. PDVSA Gas, Distribuidor...">
                 </div>
               </div>
@@ -2577,19 +2570,21 @@
               </div>
 
               <div class="cv-form-group">
-                <label for="bombillosNecesita">Bombillos ahorradores que necesita (cantidad)</label>
-                <input type="number" class="cv-form-control" id="bombillosNecesita" min="0" placeholder="Ej. 4"
+                <label for="bombillosAhorradoresNecesita">Bombillos ahorradores que necesita (cantidad)</label>
+                <input type="number" class="cv-form-control" id="bombillosAhorradoresNecesita" min="0" placeholder="Ej. 4"
                   style="max-width:200px">
               </div>
 
               <div class="cv-form-row cv-grid-2" style="margin-top:1rem">
                 <div class="cv-form-group">
                   <label for="mecanismosInformacion">Mecanismos de Información</label>
-                  <input type="text" class="cv-form-control" id="mecanismosInformacion" placeholder="TV, Radio, Prensa, Internet, Otros">
+                  <input type="text" class="cv-form-control" id="mecanismosInformacion"
+                    placeholder="TV, Radio, Prensa, Internet, Otros">
                 </div>
                 <div class="cv-form-group">
                   <label for="serviciosComunales">Servicios Comunales Disponibles</label>
-                  <input type="text" class="cv-form-control" id="serviciosComunales" placeholder="Mercado, Farmacia, Escuela, Liceo...">
+                  <input type="text" class="cv-form-control" id="serviciosComunales"
+                    placeholder="Mercado, Farmacia, Escuela, Liceo...">
                 </div>
               </div>
             </div>
@@ -2660,16 +2655,16 @@
               </div>
               <div class="cv-form-row cv-grid-3">
                 <div class="cv-form-group">
-                  <label for="exclusionNinosCalle">Niños en situación de calle</label>
-                  <input type="number" class="cv-form-control" id="exclusionNinosCalle" min="0" placeholder="0">
+                  <label for="exclusionNinosCalleCant">Niños en situación de calle</label>
+                  <input type="number" class="cv-form-control" id="exclusionNinosCalleCant" min="0" placeholder="0">
                 </div>
                 <div class="cv-form-group">
-                  <label for="exclusionDiscapacitados">Con discapacidad</label>
-                  <input type="number" class="cv-form-control" id="exclusionDiscapacitados" min="0" placeholder="0">
+                  <label for="exclusionDiscapacitadosCant">Con discapacidad</label>
+                  <input type="number" class="cv-form-control" id="exclusionDiscapacitadosCant" min="0" placeholder="0">
                 </div>
                 <div class="cv-form-group">
-                  <label for="exclusionTerceraEdad">Tercera edad (60+)</label>
-                  <input type="number" class="cv-form-control" id="exclusionTerceraEdad" min="0" placeholder="0">
+                  <label for="exclusionTerceraEdadCant">Tercera edad (60+)</label>
+                  <input type="number" class="cv-form-control" id="exclusionTerceraEdadCant" min="0" placeholder="0">
                 </div>
               </div>
             </div>
@@ -2685,40 +2680,40 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="existenOrgComunitarias">¿Existen organizaciones comunitarias en el sector?</label>
-                  <select class="cv-form-control" id="existenOrgComunitarias">
+                  <label for="existen_org_comunitarias">¿Existen organizaciones comunitarias en el sector?</label>
+                  <select class="cv-form-control" id="existen_org_comunitarias">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="cualesOrgComunitarias">¿Cuáles organizaciones?</label>
-                  <input type="text" class="cv-form-control" id="cualesOrgComunitarias"
+                  <label for="cuales_org_comunitarias">¿Cuáles organizaciones?</label>
+                  <input type="text" class="cv-form-control" id="cuales_org_comunitarias"
                     placeholder="Ej. Comité de salud, Misiones..." disabled>
                 </div>
               </div>
 
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="participaUsted">¿Participa usted?</label>
-                  <select class="cv-form-control" id="participaUsted">
+                  <label for="participa_usted">¿Participa usted?</label>
+                  <select class="cv-form-control" id="participa_usted">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="participaFamiliar">¿Participa algún familiar?</label>
-                  <select class="cv-form-control" id="participaFamiliar">
+                  <label for="participa_familiar">¿Participa algún familiar?</label>
+                  <select class="cv-form-control" id="participa_familiar">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="asisteAsambleas">¿Asiste a asambleas de ciudadanos?</label>
-                  <select class="cv-form-control" id="asisteAsambleas">
+                  <label for="asiste_asambleas">¿Asiste a asambleas de ciudadanos?</label>
+                  <select class="cv-form-control" id="asiste_asambleas">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2728,24 +2723,24 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="dispuestoApoyar">¿Dispuesto a apoyar el Consejo Comunal?</label>
-                  <select class="cv-form-control" id="dispuestoApoyar">
+                  <label for="dispuesto_apoyar_consejo">¿Está dispuesto a apoyar trabajos de la comunidad?</label>
+                  <select class="cv-form-control" id="dispuesto_apoyar_consejo">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="creePuebloIntervieneDecisiones">¿Cree que el pueblo interviene en decisiones?</label>
-                  <select class="cv-form-control" id="creePuebloIntervieneDecisiones">
+                  <label for="cree_pueblo_interviene_decisiones">¿Cree que el pueblo interviene en decisiones?</label>
+                  <select class="cv-form-control" id="cree_pueblo_interviene_decisiones">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="acuerdoPuebloProtagonismoPresupuesto">¿De acuerdo con protagonismo en presupuesto?</label>
-                  <select class="cv-form-control" id="acuerdoPuebloProtagonismoPresupuesto">
+                  <label for="acuerdo_pueblo_protagonismo_presupuesto">¿De acuerdo con protagonismo en presupuesto?</label>
+                  <select class="cv-form-control" id="acuerdo_pueblo_protagonismo_presupuesto">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2760,34 +2755,39 @@
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
-                <label for="areaTrabajoInteres">Área de trabajo de interés comunitario (máx. 3)</label>
-                <input type="text" class="cv-form-control" id="areaTrabajoInteres"
+                <label for="area_trabajo_interes">Área de trabajo de interés comunitario (máx. 3)</label>
+                <input type="text" class="cv-form-control" id="area_trabajo_interes"
                   placeholder="Ej. Salud, Educación, Infraestructura...">
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
-                <label for="porqueNoAsiste">Si no asiste a asambleas, ¿Por qué?</label>
-                <textarea class="cv-form-control" id="porqueNoAsiste" rows="2" placeholder="Explique brevemente..."></textarea>
+                <label for="porque_no_asiste">Si no asiste a asambleas, ¿Por qué?</label>
+                <textarea class="cv-form-control" id="porque_no_asiste" rows="2"
+                  placeholder="Explique brevemente..."></textarea>
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
-                <label for="quienResolverProblemas">¿Quién cree que debe resolver los problemas de la comunidad?</label>
-                <input type="text" class="cv-form-control" id="quienResolverProblemas" placeholder="Ej. El gobierno, la alcaldía, el consejo comunal...">
+                <label for="quien_resolver_problemas">¿Quién cree que debe resolver los problemas de la comunidad?</label>
+                <input type="text" class="cv-form-control" id="quien_resolver_problemas"
+                  placeholder="Ej. El gobierno, la alcaldía, el consejo comunal...">
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
-                <label for="comoApoyariaProyectos">¿Cómo apoyaría los proyectos de la comunidad?</label>
-                <textarea class="cv-form-control" id="comoApoyariaProyectos" rows="2" placeholder="Ej. Con mano de obra, ideas, donaciones..."></textarea>
+                <label for="como_apoyaria_proyectos">¿Cómo apoyaría los proyectos de la comunidad?</label>
+                <textarea class="cv-form-control" id="como_apoyaria_proyectos" rows="2"
+                  placeholder="Ej. Con mano de obra, ideas, donaciones..."></textarea>
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
-                <label for="compromisoConSector">Compromiso personal con el sector</label>
-                <textarea class="cv-form-control" id="compromisoConSector" rows="2" placeholder="Escriba su compromiso..."></textarea>
+                <label for="compromiso_con_sector">Compromiso personal con el sector</label>
+                <textarea class="cv-form-control" id="compromiso_con_sector" rows="2"
+                  placeholder="Escriba su compromiso..."></textarea>
               </div>
 
               <div class="cv-form-group">
                 <label for="opinionCensoEnergetico">Opinión sobre el Censo Energético</label>
-                <textarea class="cv-form-control" id="opinionCensoEnergetico" rows="2" placeholder="Dé su opinión..."></textarea>
+                <textarea class="cv-form-control" id="opinionCensoEnergetico" rows="2"
+                  placeholder="Dé su opinión..."></textarea>
               </div>
             </div>
 
@@ -3701,31 +3701,32 @@
             const cedulaReal = jefe ? jefe.cedula_identidad : (v.encuestado_cedula || '—');
 
             return {
-            id: v.id,
-            // Cédula y Nombre reales del jefe
-            cedula: cedulaReal,
-            nombres: nombreReal,
-            // Nombre de la comunidad (del paso 2: ubicación geográfica)
-            sector: v.consejo?.nombre_comunidad || v.nombre_comunidad || v.sector || '—',
-            // Cantidad de habitantes (basado en la relación familiares)
-            habitantes: (v.familiares && v.familiares.length) ? v.familiares.length : '—',
-            // Condición general (del paso 6: situación de vivienda)
-            condicion: v.situacion_vivienda?.condiciones_salubridad || v.condicion_general || '—',
-            // Tipo de vivienda (del paso 6)
-            tipo: v.situacion_vivienda?.tipo_vivienda || '—',
-            // Tenencia (del paso 6)
-            tenencia: v.situacion_vivienda?.forma_tenencia || v.tenencia || '—',
-            // Materiales (del paso 6)
-            paredes: v.situacion_vivienda?.tipo_paredes || v.material_paredes || '—',
-            techo: v.situacion_vivienda?.tipo_techo || v.material_techo || '—',
-            // Servicios (del paso 7)
-            agua: v.servicios?.aguas_blancas_tipo || v.aguas_blancas || '—',
-            gas: v.servicios?.gas_tipo || v.gas_domestico || '—',
-            // Dirección (del paso 2)
-            direccion: v.direccion || [v.calle_avenida, v.numero_casa, v.referencia_ubicacion].filter(Boolean).join(', ') || v.direccion_comunidad || '—',
-            fechaCenso: v.fecha_censo || v.fecha_creacion,
-            raw: v
-          };}) : [];
+              id: v.id,
+              // Cédula y Nombre reales del jefe
+              cedula: cedulaReal,
+              nombres: nombreReal,
+              // Nombre de la comunidad (del paso 2: ubicación geográfica)
+              sector: v.consejo?.nombre_comunidad || v.nombre_comunidad || v.sector || '—',
+              // Cantidad de habitantes (basado en la relación familiares)
+              habitantes: (v.familiares && v.familiares.length) ? v.familiares.length : '—',
+              // Condición general (del paso 6: situación de vivienda)
+              condicion: v.situacion_vivienda?.condiciones_salubridad || v.condicion_general || '—',
+              // Tipo de vivienda (del paso 6)
+              tipo: v.situacion_vivienda?.tipo_vivienda || '—',
+              // Tenencia (del paso 6)
+              tenencia: v.situacion_vivienda?.forma_tenencia || v.tenencia || '—',
+              // Materiales (del paso 6)
+              paredes: v.situacion_vivienda?.tipo_paredes || v.material_paredes || '—',
+              techo: v.situacion_vivienda?.tipo_techo || v.material_techo || '—',
+              // Servicios (del paso 7)
+              agua: v.servicios?.aguas_blancas_tipo || v.aguas_blancas || '—',
+              gas: v.servicios?.gas_tipo || v.gas_domestico || '—',
+              // Dirección (del paso 2)
+              direccion: v.direccion || [v.calle_avenida, v.numero_casa, v.referencia_ubicacion].filter(Boolean).join(', ') || v.direccion_comunidad || '—',
+              fechaCenso: v.fecha_censo || v.fecha_creacion,
+              raw: v
+            };
+          }) : [];
         }
         renderTable();
       } catch (err) {
@@ -3797,7 +3798,7 @@
       }
       empty.style.display = 'none';
       document.getElementById('cvPagination').style.display = 'flex';
-      
+
       body.innerHTML = paginated.map((v, i) => `
         <tr>
           <td>${(currentPage - 1) * PAGE_SIZE + i + 1}</td>
@@ -3836,43 +3837,43 @@
     function renderPagination(totalPages, totalRecords) {
       const pagBtns = document.getElementById('cvPagBtns');
       let html = '';
-      
+
       // Botón Anterior
       html += `<button class="cv-pag-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="currentPage--; renderTable()"><i class="fas fa-chevron-left"></i></button>`;
-      
+
       // Lógica de truncado de páginas
       let startPage = Math.max(1, currentPage - 2);
       let endPage = Math.min(totalPages, currentPage + 2);
-      
+
       if (startPage > 1) {
         html += `<button class="cv-pag-btn" onclick="currentPage=1; renderTable()">1</button>`;
         if (startPage > 2) {
           html += `<span class="cv-pag-btn" style="pointer-events: none; border: none; background: transparent; color: var(--gray4);">...</span>`;
         }
       }
-      
+
       for (let i = startPage; i <= endPage; i++) {
         html += `<button class="cv-pag-btn ${i === currentPage ? 'active' : ''}" onclick="currentPage=${i}; renderTable()">${i}</button>`;
       }
-      
+
       if (endPage < totalPages) {
         if (endPage < totalPages - 1) {
           html += `<span class="cv-pag-btn" style="pointer-events: none; border: none; background: transparent; color: var(--gray4);">...</span>`;
         }
         html += `<button class="cv-pag-btn" onclick="currentPage=${totalPages}; renderTable()">${totalPages}</button>`;
       }
-      
+
       // Botón Siguiente
       html += `<button class="cv-pag-btn" ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''} onclick="currentPage++; renderTable()"><i class="fas fa-chevron-right"></i></button>`;
-      
+
       if (pagBtns) pagBtns.innerHTML = html;
-      
+
       // Actualizar info en lugar de eliminarla
       const info = document.getElementById('cvPagInfo');
       if (info) {
-          const startRecord = totalRecords === 0 ? 0 : ((currentPage - 1) * PAGE_SIZE) + 1;
-          const endRecord = Math.min(currentPage * PAGE_SIZE, totalRecords);
-          info.innerHTML = `Mostrando ${startRecord} - ${endRecord} de ${totalRecords} registros`;
+        const startRecord = totalRecords === 0 ? 0 : ((currentPage - 1) * PAGE_SIZE) + 1;
+        const endRecord = Math.min(currentPage * PAGE_SIZE, totalRecords);
+        info.innerHTML = `Mostrando ${startRecord} - ${endRecord} de ${totalRecords} registros`;
       }
     }
 
@@ -3883,8 +3884,8 @@
 
     function previsualizarCenso(id) {
       const v = viviendas.find(x => x.id == id || x._id == id);
-      if(!v) return;
-      
+      if (!v) return;
+
       const raw = v.raw || {};
       const jefeNombre = v.nombres || 'No registrado';
       const jefeCedula = v.cedula || 'No registrada';
@@ -4050,7 +4051,7 @@
       </head><body>
       <h2>Reporte de Viviendas Censadas</h2>
       <table><thead><tr><th>N°</th><th>Cédula</th><th>Sector</th><th>Habitantes</th><th>Tipo</th><th>Condición</th><th>Gas</th><th>Agua</th></tr></thead><tbody>
-      ${data.map((v, i) => `<tr><td>${i+1}</td><td>${v.cedula||'-'}</td><td>${v.sector||'-'}</td><td>${v.habitantes||'-'}</td><td>${v.tipo||'-'}</td><td>${v.condicion||'-'}</td><td>${v.gas||'-'}</td><td>${v.agua||'-'}</td></tr>`).join('')}
+      ${data.map((v, i) => `<tr><td>${i + 1}</td><td>${v.cedula || '-'}</td><td>${v.sector || '-'}</td><td>${v.habitantes || '-'}</td><td>${v.tipo || '-'}</td><td>${v.condicion || '-'}</td><td>${v.gas || '-'}</td><td>${v.agua || '-'}</td></tr>`).join('')}
       </tbody></table>
       <script>window.onload=function(){window.print();}<\/script></body></html>`;
 
@@ -4081,7 +4082,7 @@
 
     async function intentarEditar(id, index) {
       if (!id || id === 'undefined') { showToast('ID no válido.', 'error'); return; }
-      
+
       const v = viviendas.find(x => x.id == id || x._id == id);
       if (!v) { showToast('No se encontró el censo localmente.', 'error'); return; }
       if (!v.raw) { showToast('Datos del censo no disponibles.', 'error'); return; }
@@ -4099,7 +4100,7 @@
 
       // Ir al paso 1 y abrir el modal
       goToStep(1);
-      
+
       // Cerrar modal de vista si estaba abierto
       const activeModal = document.querySelector('.modal.show');
       if (activeModal && activeModal.id !== 'modalVivienda') {
@@ -4122,26 +4123,26 @@
       const chkFechaAuto = document.getElementById('chkFechaAuto');
       if (chkFechaAuto) { chkFechaAuto.checked = false; chkFechaAuto.dispatchEvent(new Event('change')); }
 
-      setVal('planillaNro',        raw.planilla_nro || raw.planillaNro);
-      
+      setVal('planillaNro', raw.planilla_nro || raw.planillaNro);
+
       const rawFechaCenso = raw.fecha_censo || raw.fechaCenso;
-      setVal('fechaCenso',         rawFechaCenso ? rawFechaCenso.split('T')[0] : '');
-      
-      setVal('consejoComunalCab',  raw.id_comunidad || raw.consejo_comunal_cab || raw.sector);
-      setVal('encuestadorNombre',  raw.encuestador_nombre || raw.encuestador);
-      setVal('encuestadorCedula',  raw.encuestador_cedula);
-      setVal('encuestadoNombre',   raw.encuestado_nombre);
-      setVal('encuestadoCedula',   raw.encuestado_cedula);
+      setVal('fechaCenso', rawFechaCenso ? rawFechaCenso.split('T')[0] : '');
+
+      setVal('consejoComunalCab', raw.id_comunidad || raw.consejo_comunal_cab || raw.sector);
+      setVal('encuestadorNombre', raw.encuestador_nombre || raw.encuestador);
+      setVal('encuestadorCedula', raw.encuestador_cedula);
+      setVal('encuestadoNombre', raw.encuestado_nombre);
+      setVal('encuestadoCedula', raw.encuestado_cedula);
 
       // ── PANEL 2: Dirección ──
-      setVal('calleAvenida',   raw.calle_avenida);
-      setVal('numeroCasa',     raw.numero_casa);
+      setVal('calleAvenida', raw.calle_avenida);
+      setVal('numeroCasa', raw.numero_casa);
       setVal('direccionExacta', raw.referencia_ubicacion || raw.direccion_exacta);
 
       // ── PANEL 3: Jefe de Familia ──
       const famArr = getSafe(raw.familiares) instanceof Array ? raw.familiares : (Array.isArray(raw.familiares) ? raw.familiares : []);
       const jefe = famArr.find(f => f.parentesco === 'Jefe(a) de Familia' || f.es_jefe_familia) || {};
-      setVal('cedulaJefe',            jefe.cedula_identidad);
+      setVal('cedulaJefe', jefe.cedula_identidad);
 
       // Disparar autocompletado para llenar campos faltantes que solo existen en la tabla Habitantes (Ej. Estado Civil, Teléfono)
       setTimeout(() => {
@@ -4151,50 +4152,50 @@
         }
       }, 500);
 
-      setVal('jefNombres',            jefe.nombres_apellidos);
-      setVal('jefFechaNac',           jefe.fecha_nacimiento ? (jefe.fecha_nacimiento.split('T')[0]) : '');
-      setVal('jefSexo',               jefe.sexo   || jefe.genero);
-      setVal('jefEstadoCivil',        raw.estado_civil_jefe || jefe.estado_civil);
-      setVal('jefNivelInstruccion',   jefe.grado_instruccion || raw.nivel_instruccion_jefe || jefe.nivel_educativo);
-      setVal('jefProfesion',          jefe.profesion || jefe.ocupacion);
-      setVal('jefTiempoComunidad',    raw.tiempo_comunidad || jefe.tiempo_comunidad);
-      setVal('jefInscritoCNE',        boolToSiNo(raw.inscrito_cne || jefe.inscrito_cne));
-      setVal('jefTelfCel',            raw.telefono_celular || raw.jef_telf_cel || jefe.telefono);
-      setVal('jefEmail',              raw.email_jefe || raw.jef_email || jefe.email);
-      setVal('jefIncapacitado',       boolToSiNo(raw.jef_incapacitado || jefe.incapacitado));
-      setVal('jefTipoIncapacidad',    raw.jef_tipo_incapacidad);
-      setVal('jefPensionado',         boolToSiNo(raw.jef_pensionado || jefe.pensionado));
+      setVal('jefNombres', jefe.nombres_apellidos);
+      setVal('jefFechaNac', jefe.fecha_nacimiento ? (jefe.fecha_nacimiento.split('T')[0]) : '');
+      setVal('jefSexo', jefe.sexo || jefe.genero);
+      setVal('jefEstadoCivil', raw.estado_civil_jefe || jefe.estado_civil);
+      setVal('jefNivelInstruccion', jefe.grado_instruccion || raw.nivel_instruccion_jefe || jefe.nivel_educativo);
+      setVal('jefProfesion', jefe.profesion || jefe.ocupacion);
+      setVal('jefTiempoComunidad', raw.tiempo_comunidad || jefe.tiempo_comunidad);
+      setVal('jefInscritoCNE', boolToSiNo(raw.inscrito_cne || jefe.inscrito_cne));
+      setVal('jefTelfCel', raw.telefono_celular || raw.jef_telf_cel || jefe.telefono);
+      setVal('jefEmail', raw.email_jefe || raw.jef_email || jefe.email);
+      setVal('jefIncapacitado', boolToSiNo(raw.jef_incapacitado || jefe.incapacitado));
+      setVal('jefTipoIncapacidad', raw.jef_tipo_incapacidad);
+      setVal('jefPensionado', boolToSiNo(raw.jef_pensionado || jefe.pensionado));
       setVal('jefPensionadoInstitucion', raw.jef_pensionado_institucion || jefe.pensionado_institucion);
-      setVal('jefIngresoMensualBs',   raw.jef_ingreso_mensual_bs || jefe.ingreso_mensual_bs);
+      setVal('jefIngresoMensualBs', raw.jef_ingreso_mensual_bs || jefe.ingreso_mensual_bs);
 
       // ── PANEL 4: Características del Grupo Familiar ──
       const otrosFamiliares = famArr.filter(f => f.parentesco !== 'Jefe(a) de Familia' && !f.es_jefe_familia);
       setVal('cantidadHabitantes', raw.cantidad_habitantes !== undefined ? raw.cantidad_habitantes : otrosFamiliares.length);
-      setVal('condicionGeneral',   raw.condicion_general);
+      setVal('condicionGeneral', raw.condicion_general);
 
       const famContainer = document.getElementById('familiarList');
       if (famContainer) famContainer.innerHTML = '';
-      
+
       // Override familiarCount behavior if necessary by just letting btnAgregarFamiliar work, but wait!
       // btnAgregarFamiliar relies on `familiarCount` variable. Let's just simulate clicks.
       otrosFamiliares.forEach((fam, i) => {
         const addBtn = document.getElementById('btnAgregarFamiliar');
         if (addBtn) addBtn.click();
-        
+
         const rows = document.querySelectorAll('.familiar-row');
         const row = rows[rows.length - 1];
         if (!row) return;
-        
+
         // Fix the label since familiarCount closure might be wrong if we clear the HTML
         const labelDiv = row.querySelector('div[style*="font-size:.75rem"]');
         if (labelDiv) labelDiv.innerHTML = `👤 Integrante #${i + 1}`;
 
         const set = (cls, val) => { const el = row.querySelector(cls); if (el) el.value = val || ''; };
-        set('.fam-cedula',    fam.cedula_identidad);
-        set('.fam-nombres',   fam.nombres_apellidos);
+        set('.fam-cedula', fam.cedula_identidad);
+        set('.fam-nombres', fam.nombres_apellidos);
         set('.fam-parentesco', fam.parentesco);
-        set('.fam-fechanac',  fam.fecha_nacimiento ? fam.fecha_nacimiento.split('T')[0] : '');
-        set('.fam-sexo',      fam.sexo || fam.genero);
+        set('.fam-fechanac', fam.fecha_nacimiento ? fam.fecha_nacimiento.split('T')[0] : '');
+        set('.fam-sexo', fam.sexo || fam.genero);
         set('.fam-instruccion', fam.grado_instruccion || fam.nivel_educativo);
         set('.fam-pensionado', boolToSiNo(fam.pensionado));
         const emb = row.querySelector('.fam-embarazo');
@@ -4203,34 +4204,34 @@
 
       // ── PANEL 5: Situación Económica ──
       const eco = getSafe(raw.situacion_economica);
-      setVal('trabaja',                     boolToSiNo(eco.trabaja));
-      setVal('dondeTrabaja',                eco.donde_trabaja);
-      setVal('ingresoFamiliarRango',        eco.ingreso_familiar_rango);
+      setVal('trabaja', boolToSiNo(eco.trabaja));
+      setVal('dondeTrabaja', eco.donde_trabaja);
+      setVal('ingresoFamiliarRango', eco.ingreso_familiar_rango);
       // ingresoBs no persiste en BD: setVal('ingresoBs', eco.ingreso_bs);
-      setVal('actividadComercialVivienda',  boolToSiNo(eco.actividad_comercial_vivienda));
+      setVal('actividadComercialVivienda', boolToSiNo(eco.actividad_comercial_vivienda));
       setVal('ventasDe', eco.ventas_de);
 
-      // ── PANEL 6: Situación de la Vivienda (Estructura) ──
+      // 🏠 PANEL 6: Situación de la Vivienda (Estructura) 🏠
       const viv = getSafe(raw.situacion_vivienda);
-      setVal('tipoVivienda',        viv.tipo_vivienda);
-      setVal('tenencia',            viv.forma_tenencia);
-      setVal('condicionesTerreno',  viv.condiciones_terreno);
-      setVal('materialParedes',     viv.tipo_paredes);
-      setVal('materialTecho',       viv.tipo_techo);
+      setVal('tipoVivienda', viv.tipo_vivienda);
+      setVal('tenencia', viv.forma_tenencia);
+      setVal('condicionesTerreno', viv.condiciones_terreno);
+      setVal('materialParedes', viv.tipo_paredes);
+      setVal('materialTecho', viv.tipo_techo);
       setVal('cantidadHabitaciones', viv.cantidad_habitaciones);
-      setVal('requiereAyuda',       boolToSiNo(viv.requiere_ayuda_mejora));
+      setVal('requiereAyuda', boolToSiNo(viv.requiere_ayuda_mejora));
       setVal('condicionesSalubridad', viv.condiciones_salubridad);
 
       // ── PANEL 7: Servicios Básicos ──
       const serv = getSafe(raw.servicios);
-      setVal('aguasBlancas',     serv.aguas_blancas_tipo);
-      setVal('aguasServidas',    serv.aguas_servidas_tipo);
+      setVal('aguasBlancas', serv.aguas_blancas_tipo);
+      setVal('aguasServidas', serv.aguas_servidas_tipo);
       setVal('sistemaElectrico', serv.sistema_electrico_tipo);
-      setVal('gasDomestico',     serv.gas_tipo);
-      setVal('gasEmpresa',       serv.gas_empresa_suministra);
+      setVal('gasDomestico', serv.gas_tipo);
+      setVal('gasEmpresa', serv.gas_empresa_suministra);
       setVal('recoleccionBasura', serv.recoleccion_basura_tipo);
       setVal('telefoniaServicio', serv.telefonia_tipo);
-      setVal('transporte',       serv.transporte_tipo);
+      setVal('transporte', serv.transporte_tipo);
       setVal('bombillosNecesita', serv.bombillos_ahorradores_necesita);
       setVal('mecanismosInformacion', serv.mecanismos_informacion);
       setVal('serviciosComunales', serv.servicios_comunales);
@@ -4244,36 +4245,36 @@
         cb.checked = todasEnf.includes(cb.value);
       });
       setVal('necesitaAyudaEspecial', boolToSiNo(salud.necesita_ayuda_especial));
-      setVal('cualAyudaEspecial',     salud.cual_ayuda_especial);
-      setVal('exclusionNinosCalle',   salud.exclusion_ninos_calle_cant);
+      setVal('cualAyudaEspecial', salud.cual_ayuda_especial);
+      setVal('exclusionNinosCalle', salud.exclusion_ninos_calle_cant);
       setVal('exclusionDiscapacitados', salud.exclusion_discapacitados_cant);
-      setVal('exclusionTerceraEdad',  salud.exclusion_tercera_edad_cant);
+      setVal('exclusionTerceraEdad', salud.exclusion_tercera_edad_cant);
 
       // ── PANEL 9: Participación Comunitaria ──
       const part = getSafe(raw.participacion_comunitaria);
-      setVal('existenOrgComunitarias',   boolToSiNo(part.existen_org_comunitarias));
-      setVal('cualesOrgComunitarias',    part.cuales_org_comunitarias);
-      setVal('participaUsted',           boolToSiNo(part.participa_usted));
-      setVal('participaFamiliar',        boolToSiNo(part.participa_familiar));
-      setVal('asisteAsambleas',          boolToSiNo(part.asiste_asambleas_ciudadanos));
-      setVal('dispuestoApoyar',          boolToSiNo(part.dispuesto_apoyar_consejo));
+      setVal('existenOrgComunitarias', boolToSiNo(part.existen_org_comunitarias));
+      setVal('cualesOrgComunitarias', part.cuales_org_comunitarias);
+      setVal('participaUsted', boolToSiNo(part.participa_usted));
+      setVal('participaFamiliar', boolToSiNo(part.participa_familiar));
+      setVal('asisteAsambleas', boolToSiNo(part.asiste_asambleas_ciudadanos));
+      setVal('dispuestoApoyar', boolToSiNo(part.dispuesto_apoyar_consejo));
       setVal('creePuebloIntervieneDecisiones', boolToSiNo(part.cree_pueblo_interviene_decisiones));
       setVal('acuerdoPuebloProtagonismoPresupuesto', boolToSiNo(part.acuerdo_pueblo_protagonismo_presupuesto));
-      setVal('misiones',                 part.misiones);
-      setVal('areaTrabajoInteres',       part.area_trabajo_interes);
-      setVal('porqueNoAsiste',           part.porque_no_asiste);
-      setVal('quienResolverProblemas',   part.quien_resolver_problemas);
-      setVal('comoApoyariaProyectos',    part.como_apoyaria_proyectos);
-      setVal('compromisoConSector',      part.compromiso_con_sector);
-      setVal('opinionCensoEnergetico',   part.opinion_censo_energetico);
+      setVal('misiones', part.misiones);
+      setVal('areaTrabajoInteres', part.area_trabajo_interes);
+      setVal('porqueNoAsiste', part.porque_no_asiste);
+      setVal('quienResolverProblemas', part.quien_resolver_problemas);
+      setVal('comoApoyariaProyectos', part.como_apoyaria_proyectos);
+      setVal('compromisoConSector', part.compromiso_con_sector);
+      setVal('opinionCensoEnergetico', part.opinion_censo_energetico);
 
       // ── PANEL 10: Diagnóstico ──
       const com = getSafe(raw.situacion_comunidad);
       setVal('potencialidadesComunidad', com.principales_potencialidades_ventajas);
-      setVal('problemasComunidad',       com.principales_problemas_debilidades);
-      setVal('comoResolverProblemas',    com.como_resolver_problemas);
-      setVal('tipoProyectosDeseados',    com.tipo_proyectos_deseados);
-      setVal('observaciones',            com.observaciones);
+      setVal('problemasComunidad', com.principales_problemas_debilidades);
+      setVal('comoResolverProblemas', com.como_resolver_problemas);
+      setVal('tipoProyectosDeseados', com.tipo_proyectos_deseados);
+      setVal('observaciones', com.observaciones);
 
       // Marcar todos los steps como "done" en modo edicion para mostrar el progreso
       document.querySelectorAll('.cv-step').forEach((s, i) => {
@@ -4286,7 +4287,7 @@
 
     async function intentarEliminar(id, index) {
       if (!id || id === 'undefined') { showToast('ID de vivienda no válido.', 'error'); return; }
-      
+
       if (!confirm('¿Está seguro que desea enviar la solicitud de eliminación para esta vivienda?')) {
         return;
       }
@@ -4294,7 +4295,7 @@
       try {
         if (window.api && window.api.eliminarEstudioDemografico) {
           const res = await window.api.eliminarEstudioDemografico(id);
-          
+
           if (res && res.validacion) {
             showToast('📋 Solicitud de eliminación enviada al administrador para revisión.', 'info');
           } else {
@@ -4630,7 +4631,7 @@
           // Evitar borrar todo si hay valores ya cargados, mejor armar el html
           let optionsHtml = '<option value="">Seleccione...</option>';
           let filterHtml = '<option value="">Todos</option>';
-          
+
           consejos.forEach(c => {
             if (c.id !== 10) { // Ocultar ID 10
               optionsHtml += `<option value="${c.id}">${c.nombre_comunidad}</option>`;
@@ -4647,7 +4648,7 @@
 
           if (currentVal && currentVal !== '') selCC.value = currentVal;
           if (advFilterCC && currentFilterVal && currentFilterVal !== '') advFilterCC.value = currentFilterVal;
-          
+
           // Auto-asignar comunidad si es vocero
           let matched = false;
           let matchedValue = '';
@@ -4682,7 +4683,7 @@
               }
             }
           } // Fin de if vocero
-          
+
           // Sync después de cargar
           const syncCC = () => {
             if (!selCC.value) {
@@ -4883,7 +4884,8 @@
     <div class="modal-content-sicag" style="max-width: 800px;">
       <div class="modal-header-sicag">
         <h3><i class="fas fa-eye" style="color:var(--vv)"></i> Detalle del Censo de Vivienda</h3>
-        <button type="button" class="modal-close" onclick="cerrarModalPrevisualizar()" aria-label="Cerrar">&times;</button>
+        <button type="button" class="modal-close" onclick="cerrarModalPrevisualizar()"
+          aria-label="Cerrar">&times;</button>
       </div>
       <div class="modal-body-sicag" id="modalPrevisualizarBody">
         Cargando...
