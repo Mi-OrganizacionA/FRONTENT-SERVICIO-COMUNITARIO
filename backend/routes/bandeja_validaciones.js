@@ -20,7 +20,7 @@ router.get('/:id', validate({ params: idParamSchema }), verifyToken, bandejaVali
 // Aprobar validación (admin)
 router.put('/:id/aprobar', validate({ params: idParamSchema }), verifyToken, requireRole(['admin']), bandejaValidacionesController.aprobar);
 
-// Rechazar validación (admin)
-router.put('/:id/rechazar', validate({ params: idParamSchema }), verifyToken, requireRole(['admin']), bandejaValidacionesController.rechazar);
+// Rechazar/Cancelar validación (admin o el propio vocero)
+router.put('/:id/rechazar', validate({ params: idParamSchema }), verifyToken, bandejaValidacionesController.rechazar);
 
 module.exports = router;

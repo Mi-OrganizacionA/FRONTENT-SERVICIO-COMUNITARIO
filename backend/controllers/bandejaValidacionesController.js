@@ -301,11 +301,19 @@ class BandejaValidacionesController {
       if (!motivo) return res.status(400).json({ error: 'Se requiere motivo del rechazo' });
 
       const validacion = await BandejaModel.findByPk(id);
-      if (!validacion) return res.status(404).json({ error: 'ValidaciÃ³n no encontrada' });
+      if (!validacion) return res.status(404).json({ error: 'Validación no encontrada' });
+
+      // Verificación de permisos: Admin puede rechazar cualquiera, Vocero solo las suyas
+      if (req.user.rol !== 'admin' && String(validacion.id_vocero) !== String(req.user.id)) {
+        return res.status(403).json({ error: 'No tienes permisos para cancelar esta solicitud' });
+      }
+
+      const esCancelacion = req.user.rol === 'vocero';
+      const estadoNuevo = esCancelacion ? 'Rechazado' : 'Rechazado';
 
       await validacion.update({
-        estado_tramite: 'Rechazado',
-        id_validador: req.user.id,
+        estado_tramite: estadoNuevo,
+        id_validador: req.user.rol === 'admin' ? req.user.id : null,
         motivo_rechazo: motivo,
         fecha_validacion: new Date()
       });

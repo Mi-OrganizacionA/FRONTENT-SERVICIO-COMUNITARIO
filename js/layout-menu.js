@@ -140,15 +140,33 @@
     const brandTitle = isVocero ? 'SICAG' : 'SICAG';
     const brandSub = isVocero ? 'Módulo Vocero · Censo' : 'Panel Administrativo v2.5';
 
-    /* Etiqueta de rol para el sidebar */
-    const roleBadgeHtml = isVocero
-      ? `<div class="sidebar-role-badge vocero"><i class="fas fa-id-badge"></i> Vocero Comunal</div>`
-      : `<div class="sidebar-role-badge admin"><i class="fas fa-shield-halved"></i> Administrador</div>`;
+    const CONSEJOS_MAP = {
+      1: 'Jobito I',
+      2: 'Jobito II',
+      3: 'Brisas del Yurubí',
+      4: 'Andrés Eloy Blanco',
+      5: 'Las Mercedes I',
+      6: 'Las Mercedes II',
+      7: 'Santa Cruz de las Mercedes',
+      8: 'Fortaleza del Corozo',
+      9: 'Vencedores del Corozo',
+      10: 'Toda la Comuna'
+    };
 
-    /* Info del consejo comunal del vocero */
-    const ccInfoHtml = (isVocero && user && user.consejoComunal)
-      ? `<div class="sidebar-cc-info"><i class="fas fa-map-pin"></i> ${user.consejoComunal}</div>`
-      : '';
+    /* Etiqueta de rol para el sidebar */
+    let userCC = 'Vocero Comunal';
+    if (user && user.consejoComunal) {
+      userCC = user.consejoComunal;
+    } else if (user && user.id_comunidad_asignada && CONSEJOS_MAP[user.id_comunidad_asignada]) {
+      userCC = CONSEJOS_MAP[user.id_comunidad_asignada];
+    }
+
+    const roleBadgeHtml = isVocero
+      ? `<div class="sidebar-role-badge vocero"><i class="fas fa-id-badge"></i> ${userCC}</div>`
+      : `<div class="sidebar-role-badge admin"><i class="fas fa-shield-halved"></i> Toda la Comuna</div>`;
+
+    /* Info del consejo comunal del vocero (removido ya que se muestra en el badge) */
+    const ccInfoHtml = '';
 
     return `
       <div class="sidebar-brand ${isVocero ? 'sidebar-brand-vocero' : ''}">
