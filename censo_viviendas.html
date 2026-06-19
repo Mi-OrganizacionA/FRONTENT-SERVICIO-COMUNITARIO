@@ -4251,13 +4251,15 @@
       setVal('jefInscritoCNE',        boolToSiNo(raw.inscrito_cne || jefe.inscrito_cne));
       setVal('jefTelfCel',            raw.telefono_celular || raw.jef_telf_cel || jefe.telefono);
       setVal('jefEmail',              raw.email_jefe || raw.jef_email || jefe.email);
-      setVal('jefIncapacitado',       boolToSiNo(raw.jef_incapacitado || jefe.incapacitado));
-      if (boolToSiNo(raw.jef_incapacitado || jefe.incapacitado) === 'Si') { document.getElementById('jefTipoIncapacidad').disabled = false; }
-      setVal('jefTipoIncapacidad',    raw.jef_tipo_incapacidad || jefe.discapacidad_tipo);
-      setVal('jefPensionado',         boolToSiNo(raw.jef_pensionado || jefe.pensionado));
-      if (boolToSiNo(raw.jef_pensionado || jefe.pensionado) === 'Si') { document.getElementById('jefPensionadoInstitucion').disabled = false; }
-      setVal('jefPensionadoInstitucion', raw.jef_pensionado_institucion || jefe.pensionado_institucion);
-      setVal('jefIngresoMensualBs',   raw.jef_ingreso_mensual_bs || jefe.ingreso_mensual_bs);
+      const isInc = (jefe.incapacitado !== undefined && jefe.incapacitado !== null) ? jefe.incapacitado : raw.jef_incapacitado;
+      setVal('jefIncapacitado',       boolToSiNo(isInc));
+      if (boolToSiNo(isInc) === 'Si') { document.getElementById('jefTipoIncapacidad').disabled = false; }
+      setVal('jefTipoIncapacidad',    jefe.discapacidad_tipo || raw.jef_tipo_incapacidad);
+      const isPen = (jefe.pensionado !== undefined && jefe.pensionado !== null) ? jefe.pensionado : raw.jef_pensionado;
+      setVal('jefPensionado',         boolToSiNo(isPen));
+      if (boolToSiNo(isPen) === 'Si') { document.getElementById('jefPensionadoInstitucion').disabled = false; }
+      setVal('jefPensionadoInstitucion', jefe.pensionado_institucion || raw.jef_pensionado_institucion);
+      setVal('jefIngresoMensualBs',   jefe.ingreso_mensual_bs || raw.jef_ingreso_mensual_bs);
 
       // ── PANEL 4: Características del Grupo Familiar ──
       const otrosFamiliares = famArr.filter(f => f.parentesco !== 'Jefe(a) de Familia' && !f.es_jefe_familia);
@@ -4348,7 +4350,7 @@
       setVal('sistemaElectrico', serv.sistema_electrico_tipo);
       setVal('gasDomestico',     serv.gas_tipo);
       setVal('gasEmpresa',       serv.gas_empresa_suministra);
-      setVal('recoleccionBasura', serv.recoleccion_basura_tipo);
+      setVal('recoleccionBasura',    serv.recoleccion_basura_tipo || serv.recoleccion_basura);
       setVal('telefoniaServicio', serv.telefonia_tipo);
       setVal('transporte',       serv.transporte_tipo);
       setVal('bombillosNecesita', serv.bombillos_ahorradores_necesita);
