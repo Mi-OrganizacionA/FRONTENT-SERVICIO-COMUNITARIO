@@ -4606,8 +4606,12 @@
             const apiBase = window.api?.baseURL || 'http://localhost:3000/api';
             const headers = window.api?._getHeaders?.() || { 'Authorization': `Bearer ${window.auth?.getToken?.()}` };
             const res = await fetch(`${apiBase}/system/consejos`, { headers });
-            if (res.ok) {
-              const consejos = await res.json();
+              let consejos = [];
+              if (res.ok) {
+                consejos = await res.json();
+              } else {
+                throw new Error("API falló, usando fallback");
+              }
               
               // Evitar borrar todo si hay valores ya cargados, mejor armar el html
               let optionsHtml = '<option value="">Seleccione...</option>';
@@ -4681,10 +4685,26 @@
         };
         selCC.addEventListener('change', syncCC);
         syncCC();
-
-            } // Fin de if (res.ok)
           } catch (e) {
             console.error('Error cargando consejos comunales:', e);
+            // Fallback completo si la API falla
+            const consejosFallback = [
+              { id: 1, nombre_comunidad: "Jobito I" },
+              { id: 2, nombre_comunidad: "Jobito II" },
+              { id: 3, nombre_comunidad: "Brisas del Yurubí" },
+              { id: 4, nombre_comunidad: "Andrés Eloy Blanco" },
+              { id: 5, nombre_comunidad: "Las Mercedes I" },
+              { id: 6, nombre_comunidad: "Las Mercedes II" },
+              { id: 7, nombre_comunidad: "Santa Cruz de las Mercedes" },
+              { id: 8, nombre_comunidad: "Fortaleza del Corozo" },
+              { id: 9, nombre_comunidad: "Vencedores del Corozo" }
+            ];
+            let optionsHtml = '<option value="">Seleccione...</option>';
+            consejosFallback.forEach(c => {
+              optionsHtml += `<option value="${c.id}">${c.nombre_comunidad}</option>`;
+            });
+            selCC.innerHTML = optionsHtml;
+            if (advFilterCC) advFilterCC.innerHTML = '<option value="">Todos</option>' + optionsHtml.replace('<option value="">Seleccione...</option>', '');
           }
         })();
       }
