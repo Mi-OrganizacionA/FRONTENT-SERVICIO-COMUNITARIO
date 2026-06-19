@@ -258,6 +258,7 @@ class PdfGeneradorViviendas {
         <div class="field"><label>Niños en calle (cant.)</label><span>${val(sal.exclusion_ninos_calle_cant)}</span></div>
         <div class="field"><label>Discapacitados (cant.)</label><span>${val(sal.exclusion_discapacitados_cant)}</span></div>
         <div class="field"><label>Tercera Edad (cant.)</label><span>${val(sal.exclusion_tercera_edad_cant)}</span></div>
+        <div class="field" style="grid-column: span 2;"><label>Enfermedades en el núcleo familiar</label><span>${getOpciones('enfermedades')}</span></div>
       </div>
     </div>
 
