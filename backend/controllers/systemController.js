@@ -17,6 +17,22 @@ class SystemController {
     this.models = models;
   }
 
+  static async getConsejos(req, res, next) {
+    try {
+      if (!SystemController.models || !SystemController.models.ConsejoComunal) {
+        return res.json([]);
+      }
+      const consejos = await SystemController.models.ConsejoComunal.findAll({
+        attributes: ['id', 'nombre_comunidad', 'descripcion'],
+        where: { activo: true },
+        order: [['id', 'ASC']]
+      });
+      res.json(consejos);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async getConfig(req, res) {
     try {
       const configs = await ConfiguracionModel.findAll();

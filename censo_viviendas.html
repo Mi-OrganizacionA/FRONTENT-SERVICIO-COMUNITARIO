@@ -4127,7 +4127,7 @@
       const rawFechaCenso = raw.fecha_censo || raw.fechaCenso;
       setVal('fechaCenso',         rawFechaCenso ? rawFechaCenso.split('T')[0] : '');
       
-      setVal('consejoComunalCab',  raw.consejo_comunal_cab || raw.sector);
+      setVal('consejoComunalCab',  raw.id_comunidad || raw.consejo_comunal_cab || raw.sector);
       setVal('encuestadorNombre',  raw.encuestador_nombre || raw.encuestador);
       setVal('encuestadorCedula',  raw.encuestador_cedula);
       setVal('encuestadoNombre',   raw.encuestado_nombre);
@@ -4495,14 +4495,13 @@
           Object.assign(datosCenso, datosDelPaso);
         }
 
-        // Enriquecer con metadatos clave
         const mapNameId = {
           'Jobito I': 1, 'Jobito II': 2, 'Brisas del Yurubí': 3, 'Andrés Eloy Blanco': 4,
           'Las Mercedes I': 5, 'Las Mercedes II': 6, 'Santa Cruz de las Mercedes': 7,
           'Fortaleza del Corozo': 8, 'Vencedores del Corozo': 9
         };
         const u = window.auth?.getUser?.() || {};
-        datosCenso.id_comunidad = mapNameId[datosCenso.consejo_comunal_cab] || u?.id_comunidad_asignada || 1;
+        datosCenso.id_comunidad = parseInt(datosCenso.consejo_comunal_cab) || mapNameId[datosCenso.consejo_comunal_cab] || u?.id_comunidad_asignada || 1;
         datosCenso.nombre_encuestador = datosCenso.encuestador_nombre || u?.nombre || '';
         datosCenso.id_estudio_borrador = window.currentCensoId || null; // ID del borrador progresivo si existe
 
@@ -4589,48 +4588,65 @@
         });
       }, 500);
 
-      // ── 1. Sincronizar nombre del Consejo Comunal al Paso 2 ──
+      // ── 1. Cargar Consejos Comunales Dinámicamente ──
       const selCC = document.getElementById('consejoComunalCab');
+      const advFilterCC = document.getElementById('advFilterCC');
       const p2CCNombre = document.getElementById('p2CCNombre');
       const u = window.auth?.getUser?.() || window.auth?.user || JSON.parse(sessionStorage.getItem('sicag_user') || '{}');
 
       if (u && u.rol === 'vocero') {
-        const filterCCRow = document.getElementById('advFilterCC')?.closest('.cv-form-group');
+        const filterCCRow = advFilterCC?.closest('.cv-form-group');
         if (filterCCRow) filterCCRow.style.display = 'none';
       }
 
-      if (selCC && p2CCNombre) {
-        // Auto-asignar comunidad si es vocero
-        if (u.rol === 'vocero') {
-          const mapCC = {
-            1: 'Jobito I',
-            2: 'Jobito II',
-            3: 'Brisas del Yurubí',
-            4: 'Andrés Eloy Blanco',
-            5: 'Las Mercedes I',
-            6: 'Las Mercedes II',
-            7: 'Santa Cruz de las Mercedes',
-            8: 'Fortaleza del Corozo',
-            9: 'Vencedores del Corozo'
-          };
-          const cid = u.id_comunidad_asignada || u.id_comunidad;
-          const val = mapCC[cid] || u.consejo_comunal || u.consejoComunal;
-          let matched = false;
-          let matchedValue = '';
+      // Cargar opciones desde API
+      if (selCC) {
+        (async () => {
+          try {
+            const apiBase = window.api?.baseURL || 'http://localhost:3000/api';
+            const headers = window.api?._getHeaders?.() || { 'Authorization': `Bearer ${window.auth?.getToken?.()}` };
+            const res = await fetch(`${apiBase}/system/consejos`, { headers });
+            if (res.ok) {
+              const consejos = await res.json();
+              
+              // Evitar borrar todo si hay valores ya cargados, mejor armar el html
+              let optionsHtml = '<option value="">Seleccione...</option>';
+              let filterHtml = '<option value="">Todos</option>';
+              
+              consejos.forEach(c => {
+                if (c.id !== 10) { // Ocultar ID 10
+                  optionsHtml += `<option value="${c.id}">${c.nombre_comunidad}</option>`;
+                  filterHtml += `<option value="${c.id}">${c.nombre_comunidad}</option>`;
+                }
+              });
 
-          if (val && val.toString().trim() !== '') {
-            const valLower = val.toString().toLowerCase().trim();
-            for (let option of selCC.options) {
-              const optValLower = option.value.toLowerCase().trim();
-              const optTextLower = option.text.toLowerCase().trim();
-              if (optValLower === valLower || optTextLower.includes(valLower)) {
-                selCC.value = option.value;
-                matchedValue = option.value;
-                matched = true;
-                break;
-              }
-            }
-          }
+              // Guardar el valor actual si existía (ej. al hidratarFormulario)
+              const currentVal = selCC.value;
+              const currentFilterVal = advFilterCC?.value;
+
+              selCC.innerHTML = optionsHtml;
+              if (advFilterCC) advFilterCC.innerHTML = filterHtml;
+
+              if (currentVal && currentVal !== '') selCC.value = currentVal;
+              if (advFilterCC && currentFilterVal && currentFilterVal !== '') advFilterCC.value = currentFilterVal;
+              
+              // Auto-asignar comunidad si es vocero
+              if (u.rol === 'vocero') {
+                const cid = u.id_comunidad_asignada || u.id_comunidad;
+                let matched = false;
+                let matchedValue = '';
+
+                if (cid) {
+                  for (let option of selCC.options) {
+                    if (option.value === String(cid)) {
+                      selCC.value = option.value;
+                      matchedValue = option.value;
+                      matched = true;
+                      break;
+                    }
+                  }
+                }
+
 
           if (matched) {
             selCC.setAttribute('disabled', 'true');
@@ -4648,18 +4664,29 @@
               formWizard.addEventListener('reset', () => {
                 setTimeout(() => {
                   selCC.value = matchedValue;
-                  p2CCNombre.textContent = `C.C. ${matchedValue}`;
+                  p2CCNombre.textContent = `C.C. ${selCC.options[selCC.selectedIndex]?.text || matchedValue}`;
                 }, 0);
               });
             }
           }
-        }
-
+        } // Fin de if vocero
+        
+        // Sync después de cargar
         const syncCC = () => {
-          p2CCNombre.textContent = selCC.value ? `C.C. ${selCC.value}` : '— (seleccione en Sección I)';
+          if (!selCC.value) {
+            p2CCNombre.textContent = '— (seleccione en Sección I)';
+          } else {
+            p2CCNombre.textContent = `C.C. ${selCC.options[selCC.selectedIndex]?.text}`;
+          }
         };
         selCC.addEventListener('change', syncCC);
         syncCC();
+
+            } // Fin de if (res.ok)
+          } catch (e) {
+            console.error('Error cargando consejos comunales:', e);
+          }
+        })();
       }
 
       // ── 2. Auto-fill del Encuestador (siempre desde sesión) ──

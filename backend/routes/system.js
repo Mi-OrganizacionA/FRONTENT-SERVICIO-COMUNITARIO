@@ -9,6 +9,7 @@ router.get('/config-portal', systemController.getPortalConfig);
 router.post('/config-portal', verifyToken, requireRole(['admin']), systemController.savePortalConfig);
 router.get('/backup', systemController.downloadBackup); 
 router.get('/public-stats', systemController.getPublicStats);
+router.get('/consejos', systemController.getConsejos);
 router.post('/contacto', systemController.enviarContacto);
 
 module.exports = router;
