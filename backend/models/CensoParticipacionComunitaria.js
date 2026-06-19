@@ -18,8 +18,7 @@ module.exports = (sequelize) => {
     como_apoyaria_proyectos: DataTypes.TEXT,
     compromiso_con_sector: DataTypes.TEXT,
     opinion_censo_energetico: DataTypes.TEXT,
-    area_trabajo_interes: DataTypes.STRING(255),
-    misiones: DataTypes.STRING(500)
+    area_trabajo_interes: DataTypes.STRING(255)
   }, { tableName: 'censo_participacion_comunitaria', timestamps: false });
 
   return CensoParticipacionComunitaria;
