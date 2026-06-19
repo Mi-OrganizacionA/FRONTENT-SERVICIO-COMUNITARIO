@@ -159,7 +159,8 @@ class PdfGeneradorViviendas {
         <div class="field"><label>Tiempo en Comunidad</label><span>${val(jefe.tiempo_comunidad)}</span></div>
         <div class="field"><label>Teléfono Celular</label><span>${val(jefe.telefono_celular)}</span></div>
         <div class="field"><label>Correo Electrónico</label><span>${val(jefe.email_familiar)}</span></div>
-        <div class="field" style="grid-column: span 2;"><label>Pensionado</label><span>${boolStr(jefe.pensionado)} ${jefe.pensionado_institucion ? '- ' + jefe.pensionado_institucion : ''}</span></div>
+        <div class="field" style="grid-column: span 2;"><label>Pensionado</label><span>${boolStr(jefe.pensionado)} ${jefe.pensionado_institucion ? '- ' + val(jefe.pensionado_institucion) : ''}</span></div>
+        <div class="field"><label>Incapacidad</label><span>${boolStr(jefe.incapacitado)} ${jefe.discapacidad_tipo ? '- ' + val(jefe.discapacidad_tipo) : ''}</span></div>
         <div class="field"><label>Ingreso Mensual Bs.</label><span>${val(jefe.ingreso_mensual_bs)}</span></div>
       </div>
     </div>
@@ -211,10 +212,10 @@ class PdfGeneradorViviendas {
         <div class="field"><label>N° Habitaciones</label><span>${val(sv.cantidad_habitaciones)}</span></div>
         <div class="field"><label>Tipo de Paredes</label><span>${val(sv.tipo_paredes)}</span></div>
         <div class="field"><label>Tipo de Techo</label><span>${val(sv.tipo_techo)}</span></div>
-        <div class="field"><label>Pertenece a OCV</label><span>${boolStr(sv.pertenece_ocv)}</span></div>
+        <div class="field"><label>N° Baños</label><span>${val(sv.cantidad_banos)}</span></div>
+        <div class="field"><label>Ambientes Disponibles</label><span>${val(sv.ambientes_vivienda)}</span></div>
         <div class="field"><label>Terreno Propio</label><span>${boolStr(sv.terreno_propio)}</span></div>
         <div class="field"><label>Inscrita en SIVIH</label><span>${boolStr(sv.inscrita_sivih)}</span></div>
-        <div class="field"><label>Cotiza Pol. Habitacional</label><span>${boolStr(sv.cotiza_politica_habitacional)}</span></div>
         <div class="field"><label>Requiere Ayuda de Mejora</label><span>${val(sv.requiere_ayuda_mejora)}</span></div>
         <div class="field" style="grid-column: span 2;"><label>Enseres</label><span>${getOpciones('enseres_vivienda')}</span></div>
         <div class="field"><label>Insectos / Roedores</label><span>${boolStr(sv.presencia_insectos_roedores)} (${getOpciones('insectos_tipos')})</span></div>
@@ -233,6 +234,7 @@ class PdfGeneradorViviendas {
         <div class="field"><label>Medidor de Agua</label><span>${boolStr(ser.tiene_medidor_agua)}</span></div>
         <div class="field"><label>Aguas Servidas</label><span>${val(ser.aguas_servidas_tipo)}</span></div>
         <div class="field"><label>Gas (tipo)</label><span>${val(ser.gas_tipo)}</span></div>
+        <div class="field"><label>N° Cilindros</label><span>${val(ser.cantidad_cilindros_gas)}</span></div>
         <div class="field"><label>Cilindros</label><span>${getOpciones('gas_cilindros')}</span></div>
         <div class="field"><label>Empresa de Gas</label><span>${val(ser.gas_empresa_suministra)}</span></div>
         <div class="field"><label>Duración / Precio Gas</label><span>${val(ser.gas_duracion_y_precio)}</span></div>
@@ -254,11 +256,8 @@ class PdfGeneradorViviendas {
         <div class="field"><label>Necesita Ayuda Especial</label><span>${boolStr(sal.necesita_ayuda_especial)}</span></div>
         <div class="field"><label>¿Cuál Ayuda?</label><span>${val(sal.cual_ayuda_especial)}</span></div>
         <div class="field"><label>Niños en calle (cant.)</label><span>${val(sal.exclusion_ninos_calle_cant)}</span></div>
-        <div class="field"><label>Indigentes (cant.)</label><span>${val(sal.exclusion_indigentes_cant)}</span></div>
-        <div class="field"><label>Enfermos terminales</label><span>${val(sal.exclusion_enfermos_term_cant)}</span></div>
-        <div class="field"><label>Discapacitados</label><span>${val(sal.exclusion_discapacitados_cant)}</span></div>
-        <div class="field"><label>Tercera Edad</label><span>${val(sal.exclusion_tercera_edad_cant)}</span></div>
-        <div class="field"><label>Otros</label><span>${val(sal.exclusion_otros)}</span></div>
+        <div class="field"><label>Discapacitados (cant.)</label><span>${val(sal.exclusion_discapacitados_cant)}</span></div>
+        <div class="field"><label>Tercera Edad (cant.)</label><span>${val(sal.exclusion_tercera_edad_cant)}</span></div>
       </div>
     </div>
 

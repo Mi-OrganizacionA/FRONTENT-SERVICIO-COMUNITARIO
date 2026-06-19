@@ -2109,7 +2109,7 @@
               <div class="cv-form-row cv-grid-2">
                 <div class="cv-form-group">
                   <label for="jefIncapacitado">¿Tiene Incapacidad?</label>
-                  <select class="cv-form-control" id="jefIncapacitado">
+                  <select class="cv-form-control" id="jefIncapacitado" onchange="document.getElementById('jefTipoIncapacidad').disabled = this.value !== 'Si'; if(this.value !== 'Si') document.getElementById('jefTipoIncapacidad').value = '';">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2125,7 +2125,7 @@
               <div class="cv-form-row cv-grid-3" style="margin-top:1rem">
                 <div class="cv-form-group">
                   <label for="jefPensionado">¿Es Pensionado?</label>
-                  <select class="cv-form-control" id="jefPensionado">
+                  <select class="cv-form-control" id="jefPensionado" onchange="document.getElementById('jefPensionadoInstitucion').disabled = this.value !== 'Si'; if(this.value !== 'Si') document.getElementById('jefPensionadoInstitucion').value = '';">
                     <option value="">Seleccione...</option>
                     <option value="Si">Sí</option>
                     <option value="No">No</option>
@@ -2402,16 +2402,16 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="terrenoPropio">¿Terreno Propio?</label>
-                  <select class="cv-form-control" id="terrenoPropio">
+                  <label for="terrenoPropio">¿Terreno Propio? <span class="req">*</span></label>
+                  <select class="cv-form-control" id="terrenoPropio" required>
                     <option value="">Seleccione...</option>
                     <option value="Si">Sí</option>
                     <option value="No">No</option>
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="inscritaSIVIH">¿Inscrita en SIVIH?</label>
-                  <select class="cv-form-control" id="inscritaSIVIH">
+                  <label for="inscritaSIVIH">¿Inscrita en SIVIH? <span class="req">*</span></label>
+                  <select class="cv-form-control" id="inscritaSIVIH" required>
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2441,16 +2441,16 @@
 
               <div class="cv-form-row cv-grid-2">
                 <div class="cv-form-group">
-                  <label for="presenciaInsectos">¿Presencia de insectos o roedores?</label>
-                  <select class="cv-form-control" id="presenciaInsectos" onchange="document.getElementById('insectosTiposGroup').style.display = this.value === 'Si' ? 'block' : 'none'">
+                  <label for="presenciaInsectos">¿Presencia de insectos o roedores? <span class="req">*</span></label>
+                  <select class="cv-form-control" id="presenciaInsectos" required onchange="document.getElementById('insectosTiposGroup').style.display = this.value === 'Si' ? 'block' : 'none'">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="tieneAnimales">¿Tiene animales domésticos?</label>
-                  <select class="cv-form-control" id="tieneAnimales" onchange="document.getElementById('animalesTiposGroup').style.display = this.value === 'Si' ? 'block' : 'none'">
+                  <label for="tieneAnimales">¿Tiene animales domésticos? <span class="req">*</span></label>
+                  <select class="cv-form-control" id="tieneAnimales" required onchange="document.getElementById('animalesTiposGroup').style.display = this.value === 'Si' ? 'block' : 'none'">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2573,7 +2573,7 @@
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="gasDomestico">Gas Doméstico <span class="req">*</span></label>
-                  <select class="cv-form-control" id="gasDomestico" required>
+                  <select class="cv-form-control" id="gasDomestico" required onchange="const b = this.value === 'Bombona'; const c = document.getElementById('cantidadCilindrosGas'); c.disabled = !b; c.required = b; if(!b) c.value = '';">
                     <option value="">Seleccione...</option>
                     <option value="Bombona">🔴 Bombona</option>
                     <option value="Tubería">🟢 Tubería</option>
@@ -4252,8 +4252,10 @@
       setVal('jefTelfCel',            raw.telefono_celular || raw.jef_telf_cel || jefe.telefono);
       setVal('jefEmail',              raw.email_jefe || raw.jef_email || jefe.email);
       setVal('jefIncapacitado',       boolToSiNo(raw.jef_incapacitado || jefe.incapacitado));
+      if (boolToSiNo(raw.jef_incapacitado || jefe.incapacitado) === 'Si') { document.getElementById('jefTipoIncapacidad').disabled = false; }
       setVal('jefTipoIncapacidad',    raw.jef_tipo_incapacidad);
       setVal('jefPensionado',         boolToSiNo(raw.jef_pensionado || jefe.pensionado));
+      if (boolToSiNo(raw.jef_pensionado || jefe.pensionado) === 'Si') { document.getElementById('jefPensionadoInstitucion').disabled = false; }
       setVal('jefPensionadoInstitucion', raw.jef_pensionado_institucion || jefe.pensionado_institucion);
       setVal('jefIngresoMensualBs',   raw.jef_ingreso_mensual_bs || jefe.ingreso_mensual_bs);
 
@@ -4308,8 +4310,14 @@
       setVal('materialParedes',     viv.tipo_paredes);
       setVal('materialTecho',       viv.tipo_techo);
       setVal('cantidadHabitaciones', viv.cantidad_habitaciones);
+      setVal('numBanos',            viv.cantidad_banos);
+      setVal('ambientesVivienda',   viv.ambientes_vivienda);
       setVal('requiereAyuda',       boolToSiNo(viv.requiere_ayuda_mejora));
       setVal('condicionesSalubridad', viv.condiciones_salubridad);
+      setVal('terrenoPropio',       boolToSiNo(viv.terreno_propio));
+      setVal('inscritaSIVIH',       boolToSiNo(viv.inscrita_sivih));
+      setVal('presenciaInsectos',   boolToSiNo(viv.presencia_insectos_roedores));
+      setVal('tieneAnimales',       boolToSiNo(viv.tiene_animales_domesticos));
 
       // ── Enseres, Insectos y Animales (Opciones Multiples) ──
       const opcionesMul = raw.opciones_multiples || raw.opciones || [];
@@ -4338,6 +4346,7 @@
       setVal('mecanismosInformacion', serv.mecanismos_informacion);
       setVal('serviciosComunales', serv.servicios_comunales);
 
+      setVal('cantidadCilindrosGas', serv.cantidad_cilindros_gas);
       // ── Cilindros gas (Opciones Multiples) ──
       const gasCilindros = (raw.opciones_multiples || raw.opciones || []).filter(o => o.categoria === 'gas_cilindros').map(o => o.valor);
       document.querySelectorAll('input[name="gas_cilindros"]').forEach(cb => { cb.checked = gasCilindros.includes(cb.value); });

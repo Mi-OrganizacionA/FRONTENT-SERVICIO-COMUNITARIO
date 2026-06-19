@@ -35,19 +35,20 @@ function mapFrontendData(datos, paso) {
         if (nf.jef_email) nf.email_familiar = nf.jef_email;
         if (nf.jef_estado_civil !== undefined) nf.estado_civil = nf.jef_estado_civil;
         if (nf.jef_tiempo_comunidad !== undefined) nf.tiempo_comunidad = nf.jef_tiempo_comunidad;
-        if (nf.jef_incapacitado !== undefined) nf.incapacitado = nf.jef_incapacitado;
+        if (nf.jef_tipo_incapacidad !== undefined) nf.discapacidad_tipo = nf.jef_tipo_incapacidad;
         if (nf.jef_pensionado_institucion !== undefined) nf.pensionado_institucion = nf.jef_pensionado_institucion;
         if (nf.clasificacion_ingreso !== undefined) nf.clasificacion_ingreso_familiar = nf.clasificacion_ingreso;
         delete nf.genero;
         delete nf.nivel_educativo;
         delete nf.ocupacion;
-        delete nf.es_jefe_familia; // Esta columna no existe en BD, usamos parentesco
+        delete nf.es_jefe_familia;
         delete nf.jef_telf_cel;
         delete nf.jef_telf_hab;
         delete nf.jef_email;
         delete nf.jef_estado_civil;
         delete nf.jef_tiempo_comunidad;
         delete nf.jef_incapacitado;
+        delete nf.jef_tipo_incapacidad;
         delete nf.jef_pensionado_institucion;
         delete nf.clasificacion_ingreso;
         return nf;
@@ -67,11 +68,15 @@ function mapFrontendData(datos, paso) {
     if (mapped.material_paredes !== undefined)   mapped.tipo_paredes                = mapped.material_paredes;
     if (mapped.material_techo !== undefined)     mapped.tipo_techo                  = mapped.material_techo;
     if (mapped.num_cuartos !== undefined)        mapped.cantidad_habitaciones       = parseInt(mapped.num_cuartos) || 0;
+    if (mapped.cantidad_habitaciones !== undefined) mapped.cantidad_habitaciones    = parseInt(mapped.cantidad_habitaciones) || 0;
+    if (mapped.num_banos !== undefined)          mapped.cantidad_banos              = parseInt(mapped.num_banos) || 0;
+    if (mapped.cantidad_banos !== undefined)     mapped.cantidad_banos              = parseInt(mapped.cantidad_banos) || 0;
     if (mapped.inscrita_s_i_v_i_h !== undefined) mapped.inscrita_sivih              = mapped.inscrita_s_i_v_i_h;
+    if (mapped.inscrita_sivih !== undefined)     mapped.inscrita_sivih              = mapped.inscrita_sivih;
     if (mapped.requiere_ayuda !== undefined)     mapped.requiere_ayuda_mejora       = mapped.requiere_ayuda;
     if (mapped.presencia_insectos !== undefined) mapped.presencia_insectos_roedores = mapped.presencia_insectos;
     if (mapped.tiene_animales !== undefined)     mapped.tiene_animales_domesticos   = mapped.tiene_animales;
-    // num_banos, ambientes_vivienda no existen en el modelo: safeData los filtrará
+    delete mapped.cotiza_politica_habitacional;
   }
 
   if (paso === 7) {
@@ -86,15 +91,20 @@ function mapFrontendData(datos, paso) {
     if (mapped.transporte !== undefined)         mapped.transporte_tipo             = mapped.transporte;
     if (mapped.tiene_tanque !== undefined)       mapped.tiene_tanque_litros         = parseInt(mapped.tiene_tanque) || 0;
     if (mapped.bombillos_necesita !== undefined) mapped.bombillos_ahorradores_necesita = parseInt(mapped.bombillos_necesita) || 0;
-    // cantidad_cilindros_gas no existe en el modelo: safeData los filtrará
+    if (mapped.cantidad_cilindros_gas !== undefined) mapped.cantidad_cilindros_gas  = parseInt(mapped.cantidad_cilindros_gas) || 0;
   }
 
   if (paso === 8) {
     if (mapped.exclusion_ninos_calle !== undefined)   mapped.exclusion_ninos_calle_cant   = parseInt(mapped.exclusion_ninos_calle)   || 0;
-    if (mapped.exclusion_indigentes !== undefined)    mapped.exclusion_indigentes_cant    = parseInt(mapped.exclusion_indigentes)    || 0;
-    if (mapped.exclusion_enfermos_term !== undefined) mapped.exclusion_enfermos_term_cant = parseInt(mapped.exclusion_enfermos_term) || 0;
     if (mapped.exclusion_discapacitados !== undefined) mapped.exclusion_discapacitados_cant = parseInt(mapped.exclusion_discapacitados) || 0;
     if (mapped.exclusion_tercera_edad !== undefined)  mapped.exclusion_tercera_edad_cant  = parseInt(mapped.exclusion_tercera_edad)  || 0;
+    
+    // Eliminar obsoletos si vienen en el payload
+    delete mapped.exclusion_indigentes;
+    delete mapped.exclusion_enfermos_term;
+    delete mapped.exclusion_indigentes_cant;
+    delete mapped.exclusion_enfermos_term_cant;
+    delete mapped.exclusion_otros;
     // opciones (checkboxes) se manejan aparte en el controlador
   }
 

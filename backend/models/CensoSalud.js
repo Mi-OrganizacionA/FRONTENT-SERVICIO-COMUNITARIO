@@ -6,11 +6,8 @@ module.exports = (sequelize) => {
     necesita_ayuda_especial: { type: DataTypes.BOOLEAN, defaultValue: false },
     cual_ayuda_especial: DataTypes.TEXT,
     exclusion_ninos_calle_cant: { type: DataTypes.INTEGER, defaultValue: 0 },
-    exclusion_indigentes_cant: { type: DataTypes.INTEGER, defaultValue: 0 },
-    exclusion_enfermos_term_cant: { type: DataTypes.INTEGER, defaultValue: 0 },
     exclusion_discapacitados_cant: { type: DataTypes.INTEGER, defaultValue: 0 },
-    exclusion_tercera_edad_cant: { type: DataTypes.INTEGER, defaultValue: 0 },
-    exclusion_otros: DataTypes.TEXT
+    exclusion_tercera_edad_cant: { type: DataTypes.INTEGER, defaultValue: 0 }
   }, { tableName: 'censo_salud', timestamps: false });
 
   return CensoSalud;
