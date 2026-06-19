@@ -290,7 +290,7 @@ ul {
   cursor: pointer;
   transition: background .25s ease, transform .25s ease;
 }
-}
+
 
 .pub-hero-overlay {
   position: absolute;
