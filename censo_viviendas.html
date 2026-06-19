@@ -2277,7 +2277,7 @@
                 </div>
               </div>
 
-              <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
+              <div class="cv-form-row cv-grid-1" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="ingresoFamiliarRango">Rango de Ingreso Familiar <span class="req">*</span></label>
                   <select class="cv-form-control" id="ingresoFamiliarRango" required>
@@ -2288,10 +2288,6 @@
                     <option value="Más de 5 salarios">Más de 5 salarios mínimos</option>
                     <option value="Sin ingresos">Sin ingresos</option>
                   </select>
-                </div>
-                <div class="cv-form-group">
-                  <label for="ingresoBs">Ingreso mensual aprox. (Bs.)</label>
-                  <input type="number" class="cv-form-control" id="ingresoBs" min="0" placeholder="Ej. 500">
                 </div>
               </div>
 
@@ -3296,7 +3292,10 @@
               genero: document.getElementById('jefSexo')?.value,
               es_jefe_familia: true,
               nivel_educativo: document.getElementById('jefNivelInstruccion')?.value,
-              ocupacion: document.getElementById('jefProfesion')?.value
+              ocupacion: document.getElementById('jefProfesion')?.value,
+              pensionado: document.getElementById('jefPensionado')?.value === 'Si',
+              pensionado_institucion: document.getElementById('jefPensionadoInstitucion')?.value,
+              ingreso_mensual_bs: document.getElementById('jefIngresoMensualBs')?.value
             });
           }
         }
