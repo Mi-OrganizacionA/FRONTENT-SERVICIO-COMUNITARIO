@@ -44,7 +44,7 @@ class CensoReportesService {
       where.inscrito_cne = filtros.cne === '1';
     }
     if (filtros.trabajo !== undefined && filtros.trabajo !== null && filtros.trabajo !== '') {
-      where.profesion = (filtros.trabajo === '1') ? { [Op.ne]: null, [Op.not]: '' } : { [Op.or]: [null, ''] }; 
+      where.profesion = (filtros.trabajo === '1') ? { [Op.and]: [{ [Op.ne]: null }, { [Op.ne]: '' }] } : { [Op.or]: [null, ''] }; 
     }
     return where;
   }
@@ -107,11 +107,9 @@ class CensoReportesService {
     
     if (filtros.salud) {
       if (filtros.salud === 'discapacidad') {
-         where.condicion_salud = { [Op.notIn]: ['Ninguna', 'Buena', ''] };
-      } else if (filtros.salud === 'encamado') {
-         where.condicion_salud = { [Op.iLike]: '%encamado%' };
+         where.condicion_salud = { [Op.notIn]: ['saludable'] };
       } else {
-         where.condicion_salud = { [Op.iLike]: `%${filtros.salud}%` };
+         where.condicion_salud = filtros.salud;
       }
     }
     
@@ -182,7 +180,7 @@ class CensoReportesService {
       include: [includeEstudio]
     });
     const discViejos = await Habitante.count({
-      where: { ...whereHabLegacy, condicion_salud: { [Op.notIn]: ['Ninguna', 'Buena', ''] } }
+      where: { ...whereHabLegacy, condicion_salud: { [Op.notIn]: ['saludable'] } }
     });
     const conDiscapacidad = discNuevos + discViejos;
 
@@ -326,7 +324,7 @@ class CensoReportesService {
         headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Tipo Incapacidad', 'Consejo Comunal'];
         
         wf.discapacidad_tipo = { [Op.and]: [{ [Op.ne]: null }, { [Op.ne]: '' }] };
-        wh.condicion_salud = { [Op.notIn]: ['Ninguna', 'Buena', ''] };
+        wh.condicion_salud = { [Op.notIn]: ['saludable'] };
         
         rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });
         rowsViejos = await Habitante.findAll({ where: wh, include: incConsejoLegacy });
