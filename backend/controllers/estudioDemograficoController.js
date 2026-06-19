@@ -432,13 +432,23 @@ class EstudioDemograficoController {
             throw new Error("Paso no reconocido");
         }
 
-        // Manejar opciones múltiples independientemente del paso (ya que varios pasos tienen opciones)
-        if (dbDatos.opciones && dbDatos.opciones.length > 0) {
-          const categoriasEnPaso = [...new Set(dbDatos.opciones.map(o => o.categoria))];
+        // Destruir categorías específicas del paso para manejar el caso donde se desmarcan todas
+        const categoriasDelPaso = {
+          6: ['enseres_vivienda', 'insectos_tipos', 'animales_tipos'],
+          7: ['gas_cilindros'],
+          8: ['enfermedades'],
+          9: ['misiones']
+        };
+
+        if (categoriasDelPaso[paso]) {
           await db.CensoOpcionMultiple.destroy({ 
-            where: { id_estudio, categoria: categoriasEnPaso }, 
+            where: { id_estudio, categoria: categoriasDelPaso[paso] }, 
             transaction: t 
           });
+        }
+
+        // Manejar opciones múltiples enviadas
+        if (dbDatos.opciones && dbDatos.opciones.length > 0) {
           const ops = dbDatos.opciones.map(o => ({ ...o, id_estudio }));
           await db.CensoOpcionMultiple.bulkCreate(ops, { transaction: t });
         }
