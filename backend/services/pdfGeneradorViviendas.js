@@ -147,7 +147,7 @@ class PdfGeneradorViviendas {
     <div class="section-body">
       <div class="grid-4">
         <div class="field" style="grid-column: span 2;"><label>Nombres y Apellidos</label><span>${val(jefe.nombres_apellidos)}</span></div>
-        <div class="field"><label>C.I.</label><span>${val(jefe.cedula_identidad)}</span></div>
+        <div class="field"><label>C.I.</label><span>${jefe.cedula_identidad && String(jefe.cedula_identidad).startsWith('SC-') ? 'Sin Cédula' : val(jefe.cedula_identidad)}</span></div>
         <div class="field"><label>Sexo</label><span>${val(jefe.sexo)}</span></div>
         <div class="field"><label>Fecha de Nacimiento</label><span>${formatDate(jefe.fecha_nacimiento)}</span></div>
         <div class="field"><label>Edad</label><span>${calcAge(jefe.fecha_nacimiento)}</span></div>
@@ -174,7 +174,7 @@ class PdfGeneradorViviendas {
         <thead>
           <tr>
             <th>N°</th><th>Nombres y Apellidos</th><th>Sexo</th><th>C.I.</th>
-            <th>F. Nacimiento</th><th>Edad</th><th>Discapacidad</th><th>Parentesco</th>
+            <th>F. Nac. (Edad)</th><th>Estado Civil</th><th>Discapacidad</th><th>Parentesco</th>
             <th>Instrucción</th><th>CNE</th><th>Profesión</th><th>Pensionado</th>
           </tr>
         </thead>
@@ -184,9 +184,9 @@ class PdfGeneradorViviendas {
             <td>${i + 1}</td>
             <td>${val(f.nombres_apellidos)}</td>
             <td>${val(f.sexo)}</td>
-            <td>${val(f.cedula_identidad)}</td>
-            <td>${formatDate(f.fecha_nacimiento)}</td>
-            <td>${calcAge(f.fecha_nacimiento)}</td>
+            <td>${f.cedula_identidad && String(f.cedula_identidad).startsWith('SC-') ? 'Sin Cédula' : val(f.cedula_identidad)}</td>
+            <td>${formatDate(f.fecha_nacimiento)} (${calcAge(f.fecha_nacimiento)}a)</td>
+            <td>${val(f.estado_civil)}</td>
             <td>${val(f.discapacidad_tipo)}</td>
             <td>${val(f.parentesco)}</td>
             <td>${val(f.grado_instruccion)}</td>

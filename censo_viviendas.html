@@ -1631,6 +1631,83 @@
           <span id="cvPagInfo">Mostrando 0 de 0</span>
           <div class="cv-pag-btns" id="cvPagBtns"></div>
         </div>
+
+        <!-- GRÁFICAS DE VIVIENDAS -->
+        <div style="margin-top: 2rem;">
+          <h2 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;"><i class="fas fa-chart-pie" style="color: #2E7D32;"></i> Gráficas Estadísticas de Censos y Viviendas</h2>
+          
+          <div class="charts-grid fade-in-up">
+            
+            <!-- INFRAESTRUCTURA -->
+            <div class="chart-wrapper">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
+                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-hammer"></i> Tipo de Paredes</div>
+                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartParedes', 'Tipo de Paredes')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              </div>
+              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartParedes"></canvas></div>
+            </div>
+
+            <div class="chart-wrapper">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
+                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-house-chimney"></i> Tipo de Techo</div>
+                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartTecho', 'Tipo de Techo')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              </div>
+              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartTecho"></canvas></div>
+            </div>
+
+            <!-- SERVICIOS -->
+            <div class="chart-wrapper">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
+                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-faucet-drip"></i> Aguas Blancas</div>
+                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartAgua', 'Aguas Blancas')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              </div>
+              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartAgua"></canvas></div>
+            </div>
+
+            <div class="chart-wrapper">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
+                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-fire-burner"></i> Tipo de Gas</div>
+                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartGas', 'Tipo de Gas')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              </div>
+              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartGas"></canvas></div>
+            </div>
+
+            <div class="chart-wrapper">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
+                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-lightbulb"></i> Sistema Eléctrico</div>
+                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartLuz', 'Sistema Eléctrico')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              </div>
+              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartLuz"></canvas></div>
+            </div>
+
+            <!-- SALUBRIDAD Y ANIMALES -->
+            <div class="chart-wrapper">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
+                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-bug"></i> Salubridad (Insectos/Roedores)</div>
+                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartInsectos', 'Presencia de Insectos/Roedores')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              </div>
+              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartInsectos"></canvas></div>
+            </div>
+
+            <div class="chart-wrapper">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
+                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-paw"></i> Animales Domésticos</div>
+                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartAnimales', 'Animales Domésticos')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              </div>
+              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartAnimales"></canvas></div>
+            </div>
+
+            <!-- TENENCIA -->
+            <div class="chart-wrapper">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
+                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-key"></i> Forma de Tenencia</div>
+                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartTenencia', 'Forma de Tenencia')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              </div>
+              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartTenencia"></canvas></div>
+            </div>
+
+          </div>
+        </div>
       </div>
 
     </div><!-- /cv-content -->
@@ -3426,14 +3503,22 @@
 
         // Otros familiares
         panel.querySelectorAll('.familiar-row').forEach(row => {
-          const cedula = row.querySelector('.fam-cedula')?.value;
+          let cedula = row.querySelector('.fam-cedula')?.value;
+          if (cedula === 'Sin Cédula (Menor)' && row.querySelector('.fam-cedula')?.dataset.realCedula) {
+            cedula = row.querySelector('.fam-cedula').dataset.realCedula;
+          }
           const nombres = row.querySelector('.fam-nombres')?.value;
           const parentesco = row.querySelector('.fam-parentesco')?.value;
           const fechaNac = row.querySelector('.fam-fechanac')?.value;
           const sexo = row.querySelector('.fam-sexo')?.value;
           const instruccion = row.querySelector('.fam-instruccion')?.value;
-          const pensionado = row.querySelector('.fam-pensionado')?.value;
+          const pension = row.querySelector('.fam-pension')?.value;
           const embarazo = row.querySelector('.fam-embarazo')?.checked;
+          const estadoCivil = row.querySelector('.fam-estadocivil')?.value;
+          const ocupacion = row.querySelector('.fam-ocupacion')?.value;
+          const cne = row.querySelector('.fam-cne')?.value;
+          const salud = row.querySelector('.fam-salud')?.value;
+          const incapacidad = row.querySelector('.fam-incapacidad')?.value;
           const idHabitante = row.querySelector('.fam-habitante-id')?.value;
           const datosNuevos = row._datos_nuevos_habitante;
 
@@ -3447,8 +3532,14 @@
               fecha_nacimiento: fechaNac,
               genero: sexo,
               nivel_educativo: instruccion,
-              pensionado: pensionado === 'Si',
+              pensionado: pensionado === 'Si' || pensionado === 'true',
               embarazo_temprano: embarazo || false,
+              estado_civil: estadoCivil,
+              profesion: ocupacion,
+              inscrito_cne: cne === 'Si' || cne === 'true',
+              condicion_salud: salud,
+              discapacidad_tipo: incapacidad,
+              ingreso_mensual_bs: ingreso ? parseFloat(ingreso) : null,
               es_jefe_familia: false
             });
           }
@@ -3731,10 +3822,14 @@
         
         <div class="cv-form-row cv-grid-2">
           <div class="cv-form-group">
-            <label>Cédula / Fecha Nacimiento</label>
+            <label class="lbl-fam-cedula">Cédula / Fecha Nacimiento</label>
             <div class="cv-input-group">
               <input type="text" class="cv-form-control fam-cedula" placeholder="V-XX.XXX.XXX">
               <button type="button" class="cv-btn-validate btn-validar-fam"><i class="fas fa-magnifying-glass"></i></button>
+            </div>
+            <div style="margin-top: 5px; display: flex; align-items: center; gap: 5px;">
+              <input type="checkbox" class="chk-buscar-nombre" onchange="window.toggleBusquedaNombre(this)">
+              <label style="font-size: 0.85rem; margin: 0; color: var(--text-muted, #666);">Buscar por nombre</label>
             </div>
           </div>
           <div class="cv-form-group">
@@ -3826,22 +3921,43 @@
       if (typeof window.adjuntarAutocompletadoFamiliar === 'function') {
         window.adjuntarAutocompletadoFamiliar(row);
       } else if (window.HabitanteAutocomplete) {
-        // Fallback si la función aún no está definida
+        // Fallback robusto si la función aún no está definida globalmente por alguna razón
         const newCedulaInput = row.querySelector('.fam-cedula');
         HabitanteAutocomplete.attachTo(newCedulaInput, (datos) => {
-          const nombreInput = row.querySelector('.fam-nombres');
-          if (nombreInput) nombreInput.value = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
-          const sexoSel = row.querySelector('.fam-sexo');
-          if (datos.genero && sexoSel) {
-            sexoSel.value = datos.genero;
+          const isNombre = row.querySelector('.chk-buscar-nombre')?.checked;
+          if (!isNombre) {
+            const nombreInput = row.querySelector('.fam-nombres');
+            if (nombreInput) nombreInput.value = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
+            const sexoSel = row.querySelector('.fam-sexo');
+            if (datos.genero && sexoSel) {
+              sexoSel.value = datos.genero;
+            }
           }
         }, {
           debounce: 600, onNotFound: () => {
-            showToast('⚠️ Esta cédula no está registrada como habitante. Debe registrarlo primero.', 'error');
+            const isNombre = row.querySelector('.chk-buscar-nombre')?.checked;
+            if (!isNombre) showToast('⚠️ Esta cédula no está registrada como habitante. Debe registrarlo primero.', 'error');
           }
         });
+        
+        // Interceptar Enter para nombre
+        newCedulaInput.addEventListener('keydown', (e) => {
+          const isNombre = row.querySelector('.chk-buscar-nombre')?.checked;
+          if (e.key === 'Enter' && isNombre) {
+            e.preventDefault(); e.stopPropagation();
+            if (window.ejecutarBusquedaFamiliar) window.ejecutarBusquedaFamiliar(newCedulaInput, row);
+          }
+        }, true);
+        
         const btnLupa = row.querySelector('.btn-validar-fam');
-        if (btnLupa) btnLupa.addEventListener('click', () => { if (newCedulaInput.forceSearch) newCedulaInput.forceSearch(); });
+        if (btnLupa) btnLupa.addEventListener('click', () => { 
+          const isNombre = row.querySelector('.chk-buscar-nombre')?.checked;
+          if (isNombre && window.ejecutarBusquedaFamiliar) {
+            window.ejecutarBusquedaFamiliar(newCedulaInput, row);
+          } else if (newCedulaInput.forceSearch) {
+            newCedulaInput.forceSearch(); 
+          }
+        });
       }
     });
 
@@ -4005,6 +4121,7 @@
 
       renderPagination(totalPages, data.length);
       updateKPIs();
+      if(typeof renderChartsViviendas === 'function') renderChartsViviendas(data);
     }
 
     function renderPagination(totalPages, totalRecords) {
@@ -4316,11 +4433,12 @@
       const famArr = getSafe(raw.familiares) instanceof Array ? raw.familiares : (Array.isArray(raw.familiares) ? raw.familiares : []);
       const jefe = famArr.find(f => f.parentesco === 'Jefe(a) de Familia' || f.es_jefe_familia) || {};
       setVal('cedulaJefe',            jefe.cedula_identidad);
+      setVal('jefeHabitanteId',       jefe.id_habitante);
 
       // Disparar autocompletado para llenar campos faltantes que solo existen en la tabla Habitantes (Ej. Estado Civil, Teléfono)
       setTimeout(() => {
         const inputCedula = document.getElementById('cedulaJefe');
-        if (inputCedula && inputCedula.forceSearch && inputCedula.value) {
+        if (inputCedula && inputCedula.forceSearch && inputCedula.value && !String(inputCedula.value).startsWith('SC-')) {
           inputCedula.forceSearch();
         }
       }, 500);
@@ -4353,8 +4471,6 @@
       const famContainer = document.getElementById('familiarList');
       if (famContainer) famContainer.innerHTML = '';
       
-      // Override familiarCount behavior if necessary by just letting btnAgregarFamiliar work, but wait!
-      // btnAgregarFamiliar relies on `familiarCount` variable. Let's just simulate clicks.
       otrosFamiliares.forEach((fam, i) => {
         const addBtn = document.getElementById('btnAgregarFamiliar');
         if (addBtn) addBtn.click();
@@ -4363,18 +4479,27 @@
         const row = rows[rows.length - 1];
         if (!row) return;
         
-        // Fix the label since familiarCount closure might be wrong if we clear the HTML
         const labelDiv = row.querySelector('div[style*="font-size:.75rem"]');
         if (labelDiv) labelDiv.innerHTML = `👤 Integrante #${i + 1}`;
 
         const set = (cls, val) => { const el = row.querySelector(cls); if (el) el.value = val || ''; };
-        set('.fam-cedula',    fam.cedula_identidad);
+        const cedToShow = (fam.cedula_identidad && String(fam.cedula_identidad).startsWith('SC-')) ? 'Sin Cédula (Menor)' : fam.cedula_identidad;
+        set('.fam-cedula', cedToShow);
+        const cedInput = row.querySelector('.fam-cedula');
+        if (cedInput) cedInput.dataset.realCedula = fam.cedula_identidad;
+        
         set('.fam-nombres',   fam.nombres_apellidos);
         set('.fam-parentesco', fam.parentesco);
         set('.fam-fechanac',  fam.fecha_nacimiento ? fam.fecha_nacimiento.split('T')[0] : '');
         set('.fam-sexo',      fam.sexo || fam.genero);
         set('.fam-instruccion', fam.grado_instruccion || fam.nivel_educativo);
-        set('.fam-pensionado', boolToSiNo(fam.pensionado));
+        set('.fam-estadocivil', fam.estado_civil);
+        set('.fam-ocupacion', fam.profesion || fam.ocupacion);
+        set('.fam-cne', boolToSiNo(fam.inscrito_cne));
+        set('.fam-salud', fam.condicion_salud || (fam.incapacitado ? 'discapacidad' : fam.discapacidad_tipo));
+        set('.fam-incapacidad', fam.discapacidad_tipo);
+        set('.fam-pension', boolToSiNo(fam.pensionado));
+        set('.fam-habitante-id', fam.id_habitante);
         const emb = row.querySelector('.fam-embarazo');
         if (emb) emb.checked = fam.embarazo_temprano === true;
       });
@@ -4787,6 +4912,144 @@
       showToast('Datos actualizados.');
     });
 
+    /* ── Render Charts ── */
+    function renderChartsViviendas(data) {
+      if (typeof Chart === 'undefined') return;
+
+      const buildChart = (id, type, labels, dataArr, colors) => {
+        const ctx = document.getElementById(id);
+        if (!ctx) return;
+        if (window[`_chart_inst_${id}`]) { window[`_chart_inst_${id}`].destroy(); }
+        window[`_chart_inst_${id}`] = new Chart(ctx, {
+          type: type,
+          data: {
+            labels: labels,
+            datasets: [{ data: dataArr, backgroundColor: colors, borderWidth: 1 }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+          }
+        });
+      };
+
+      const colors = ['#2E7D32', '#1565C0', '#f39c12', '#c62828', '#8e44ad', '#16a085', '#d35400', '#27ae60', '#2980b9'];
+
+      const countProp = (arr, path) => {
+        const counts = {};
+        arr.forEach(d => {
+          let val = path.split('.').reduce((o, i) => o ? o[i] : null, d.raw);
+          if (!val || val.trim() === '') val = 'No Especificado';
+          counts[val] = (counts[val] || 0) + 1;
+        });
+        return counts;
+      };
+
+      // 1. Paredes
+      const paredes = countProp(data, 'situacion_vivienda.tipo_paredes');
+      buildChart('chartParedes', 'pie', Object.keys(paredes), Object.values(paredes), colors);
+
+      // 2. Techo
+      const techo = countProp(data, 'situacion_vivienda.tipo_techo');
+      buildChart('chartTecho', 'pie', Object.keys(techo), Object.values(techo), colors);
+
+      // 3. Agua
+      const agua = countProp(data, 'servicios.aguas_blancas_tipo');
+      buildChart('chartAgua', 'pie', Object.keys(agua), Object.values(agua), colors);
+
+      // 4. Gas
+      const gas = countProp(data, 'servicios.gas_tipo');
+      buildChart('chartGas', 'pie', Object.keys(gas), Object.values(gas), colors);
+
+      // 5. Luz
+      const luz = countProp(data, 'servicios.sistema_electrico_tipo');
+      buildChart('chartLuz', 'pie', Object.keys(luz), Object.values(luz), colors);
+
+      // 6. Tenencia
+      const tenencia = countProp(data, 'situacion_vivienda.forma_tenencia');
+      buildChart('chartTenencia', 'pie', Object.keys(tenencia), Object.values(tenencia), colors);
+
+      // 7. Insectos
+      const insectos = { 'Sin Presencia': 0 };
+      data.forEach(d => {
+        if (d.raw.situacion_vivienda?.presencia_insectos_roedores === 'Si') {
+          try {
+            const arr = JSON.parse(d.raw.situacion_vivienda.insectos_roedores_tipos || '[]');
+            if (arr.length === 0) insectos['Sí (No especificado)'] = (insectos['Sí (No especificado)'] || 0) + 1;
+            arr.forEach(a => insectos[a] = (insectos[a] || 0) + 1);
+          } catch(e) { insectos['Sí (Error parseo)'] = (insectos['Sí (Error parseo)'] || 0) + 1; }
+        } else {
+          insectos['Sin Presencia']++;
+        }
+      });
+      buildChart('chartInsectos', 'bar', Object.keys(insectos), Object.values(insectos), colors);
+
+      // 8. Animales
+      const animales = { 'Sin Animales': 0 };
+      data.forEach(d => {
+        if (d.raw.situacion_vivienda?.tiene_animales_domesticos === 'Si') {
+          try {
+            const arr = JSON.parse(d.raw.situacion_vivienda.animales_domesticos_tipos || '[]');
+            if (arr.length === 0) animales['Sí (No especificado)'] = (animales['Sí (No especificado)'] || 0) + 1;
+            arr.forEach(a => animales[a] = (animales[a] || 0) + 1);
+          } catch(e) { animales['Sí (Error parseo)'] = (animales['Sí (Error parseo)'] || 0) + 1; }
+        } else {
+          animales['Sin Animales']++;
+        }
+      });
+      buildChart('chartAnimales', 'bar', Object.keys(animales), Object.values(animales), colors);
+    }
+
+    window.exportarGrafica = async function(btn, canvasId, title) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+
+      const origHtml = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      btn.disabled = true;
+
+      try {
+        const imageBase64 = canvas.toDataURL('image/png', 1.0);
+        const token = localStorage.getItem('sicag_token');
+        const ccVal = document.getElementById('advFilterCC') ? document.getElementById('advFilterCC').value : '';
+        const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
+
+        const response = await fetch(`${baseUrl}/censo-reportes/exportar-grafica-pdf`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            titulo: title,
+            imagenBase64: imageBase64,
+            filtros: { consejo_id: ccVal }
+          })
+        });
+
+        if (!response.ok) throw new Error('Error al generar PDF');
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `grafica_${canvasId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+        
+        if (typeof showToast === 'function') showToast('PDF descargado', 'success');
+      } catch (error) {
+        console.error(error);
+        if (typeof showToast === 'function') showToast('Error exportando gráfica', 'error');
+      } finally {
+        btn.innerHTML = origHtml;
+        btn.disabled = false;
+      }
+    };
+
     /* ── Init ── */
     loadViviendasData();
   </script>
@@ -5091,7 +5354,7 @@
           const cedulaInput = row.querySelector('.fam-cedula');
           if (!cedulaInput) return;
 
-          HabitanteAutocomplete.attachTo(cedulaInput, (datos) => {
+          row._onHabitanteFill = (datos) => {
             const idInput = row.querySelector('.fam-habitante-id');
             const nombreInput = row.querySelector('.fam-nombres');
             const sexoSel = row.querySelector('.fam-sexo');
@@ -5143,36 +5406,63 @@
             }
             const btnReg = row.querySelector('.fam-registrar-btn');
             if (btnReg) btnReg.style.display = 'none';
+          };
 
+          row._onHabitanteNotFound = (termino) => {
+            const idInput = row.querySelector('.fam-habitante-id');
+            const nombreInput = row.querySelector('.fam-nombres');
+            
+            if (idInput) idInput.value = '';
+            if (nombreInput) nombreInput.value = '';
+            
+            const readonlyDiv = row.querySelector('.fam-datos-readonly');
+            if (readonlyDiv) readonlyDiv.style.display = 'none';
+
+            const banner = row.querySelector('.fam-status-banner');
+            if (banner) {
+              banner.style.display = 'block';
+              banner.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+              banner.style.color = 'var(--danger)';
+              banner.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Habitante no registrado. Por favor regístrelo como nuevo habitante.`;
+            }
+            const btnReg = row.querySelector('.fam-registrar-btn');
+            if (btnReg) btnReg.style.display = 'flex';
+
+            showToast('⚠️ Este registro no fue encontrado.', 'error');
+          };
+
+          HabitanteAutocomplete.attachTo(cedulaInput, (datos) => {
+            const isNombre = row.querySelector('.chk-buscar-nombre')?.checked;
+            if (!isNombre) row._onHabitanteFill(datos);
           }, {
             onNotFound: () => {
-              const idInput = row.querySelector('.fam-habitante-id');
-              const nombreInput = row.querySelector('.fam-nombres');
-              
-              if (idInput) idInput.value = '';
-              if (nombreInput) nombreInput.value = '';
-              
-              const readonlyDiv = row.querySelector('.fam-datos-readonly');
-              if (readonlyDiv) readonlyDiv.style.display = 'none';
-
-              const banner = row.querySelector('.fam-status-banner');
-              if (banner) {
-                banner.style.display = 'block';
-                banner.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
-                banner.style.color = 'var(--danger)';
-                banner.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Cédula no registrada. Por favor regístrelo como nuevo habitante.`;
-              }
-              const btnReg = row.querySelector('.fam-registrar-btn');
-              if (btnReg) btnReg.style.display = 'flex';
-
-              showToast('⚠️ Esta cédula no está registrada como habitante.', 'error');
+              const isNombre = row.querySelector('.chk-buscar-nombre')?.checked;
+              if (!isNombre) row._onHabitanteNotFound();
             }, debounce: 600
           });
 
+          // Interceptar Enter para búsqueda por nombre
+          cedulaInput.addEventListener('keydown', (e) => {
+            const isNombre = row.querySelector('.chk-buscar-nombre')?.checked;
+            if (e.key === 'Enter' && isNombre) {
+              e.preventDefault();
+              e.stopPropagation();
+              window.ejecutarBusquedaFamiliar(cedulaInput, row);
+            }
+          }, true); // Use capture to intercept before HabitanteAutocomplete
+
           const btnLupa = row.querySelector('.btn-validar-fam');
           if (btnLupa) {
-            btnLupa.addEventListener('click', () => {
-              if (cedulaInput.forceSearch) cedulaInput.forceSearch();
+            // Eliminar listeners viejos si existe
+            const newBtnLupa = btnLupa.cloneNode(true);
+            btnLupa.parentNode.replaceChild(newBtnLupa, btnLupa);
+            newBtnLupa.addEventListener('click', () => {
+              const isNombre = row.querySelector('.chk-buscar-nombre')?.checked;
+              if (isNombre) {
+                window.ejecutarBusquedaFamiliar(cedulaInput, row);
+              } else if (cedulaInput.forceSearch) {
+                cedulaInput.forceSearch();
+              }
             });
           }
         };
@@ -5245,6 +5535,10 @@
                 <option value="E">E-</option>
               </select>
               <input type="text" class="cv-form-control" id="rh_cedula" readonly style="flex: 1; border-top-left-radius:0; border-bottom-left-radius:0; background:var(--gray2);">
+            </div>
+            <div id="wrapper_rh_sin_cedula" style="margin-top: 5px; display: flex; align-items: center; gap: 5px;">
+              <input type="checkbox" id="rh_sin_cedula" onchange="window.toggleSinCedulaFamiliar()">
+              <label for="rh_sin_cedula" style="font-size: 0.85rem; margin: 0; color: var(--text-muted, #666);">Familiar sin Cédula (Menor)</label>
             </div>
           </div>
           <div class="cv-form-group">
@@ -5344,7 +5638,35 @@
     </div>
   </div>
 
+  <!-- Modal para Seleccionar Habitante por Nombre -->
+  <div class="modal-overlay" id="modalSeleccionarHabitante" role="dialog" aria-modal="true" style="display:none; z-index:10000;">
+    <div class="modal-content-sicag" style="max-width:600px; width:90%;">
+      <div class="modal-header-sicag">
+        <h3><i class="fas fa-users" style="color:var(--vp)"></i> Seleccionar Integrante</h3>
+        <button type="button" class="modal-close" onclick="cerrarModalSeleccionarHabitante()" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body-sicag" style="max-height: 60vh; overflow-y: auto;">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Se encontraron múltiples coincidencias. Por favor, seleccione la persona correcta de la lista:
+        </p>
+        <div id="listaHabitantesEncontrados" style="display: flex; flex-direction: column; gap: 0.5rem;">
+          <!-- Items inyectados por JS -->
+        </div>
+      </div>
+      <div class="modal-footer-sicag">
+        <button type="button" class="btn-sicag btn-outline-gris" onclick="cerrarModalSeleccionarHabitante()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    function cerrarModalSeleccionarHabitante() {
+      const m = document.getElementById('modalSeleccionarHabitante');
+      if (m) m.style.display = 'none';
+      if (window._focusTrapHomonyms) {
+        document.removeEventListener('focusin', window._focusTrapHomonyms, true);
+      }
+    }
     function autocompletarDireccionRapida(silent = false) {
       const calleAvenida = document.getElementById('calleAvenida')?.value || '';
       const numeroCasa = document.getElementById('numeroCasa')?.value || '';
@@ -5363,6 +5685,152 @@
       }
     }
 
+    window.toggleSinCedulaFamiliar = function() {
+      const chk = document.getElementById('rh_sin_cedula');
+      const cedulaInput = document.getElementById('rh_cedula');
+      if (chk && chk.checked) {
+        cedulaInput.value = 'SC-AUTO';
+      } else {
+        cedulaInput.value = '';
+      }
+    };
+
+    window.toggleBusquedaNombre = function(checkbox) {
+      const row = checkbox.closest('.familiar-row');
+      if (!row) return;
+      const input = row.querySelector('.fam-cedula');
+      const label = row.querySelector('.lbl-fam-cedula');
+      
+      if (checkbox.checked) {
+        input.placeholder = "Ej. Juan Pérez";
+        label.innerHTML = 'Nombres del Familiar';
+      } else {
+        input.placeholder = "V-XX.XXX.XXX";
+        label.innerHTML = 'Cédula / Fecha Nacimiento';
+      }
+    };
+
+    window.ejecutarBusquedaFamiliar = async function(input, row) {
+      const checkbox = row.querySelector('.chk-buscar-nombre');
+      const isNombre = checkbox && checkbox.checked;
+      const termino = input.value.trim();
+      
+      if (!termino) {
+        showToast('Ingrese un valor para buscar.', 'warning');
+        return;
+      }
+
+      if (!isNombre) {
+        // Modo clásico (cédula) - ya manejado por HabitanteAutocomplete
+        return;
+      }
+
+      // Buscar por nombre
+      const searchBtn = row.querySelector('.btn-validar-fam');
+      const originalHtml = searchBtn.innerHTML;
+      searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      searchBtn.disabled = true;
+
+      try {
+        const baseURL = window.api?.baseURL || 'https://sicag-api.onrender.com/api';
+        const token = window.auth?.getToken() || '';
+        const res = await fetch(`${baseURL}/habitantes/buscar/rapido?q=${encodeURIComponent(termino)}`, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          credentials: 'include'
+        });
+        
+        if (!res.ok) throw new Error('Error al buscar habitante por nombre');
+        const json = await res.json();
+        const resultados = Array.isArray(json) ? json : (json.habitantes || json.data || []);
+
+        if (resultados.length === 0) {
+          showToast('No se encontraron habitantes con ese nombre.', 'error');
+          // Forzar NotFound del row
+          if (row._onHabitanteNotFound) row._onHabitanteNotFound(termino);
+        } else if (resultados.length === 1) {
+          showToast(`Habitante encontrado: ${resultados[0].nombres}`, 'success');
+          if (row._onHabitanteFill) {
+            row._onHabitanteFill(resultados[0]);
+            // Put the cedula in the input so it looks consistent
+            if (input) {
+              input.value = (resultados[0].cedula && String(resultados[0].cedula).startsWith('SC-')) ? 'Sin Cédula (Menor)' : resultados[0].cedula;
+            }
+            // Uncheck the checkbox
+            if (checkbox && checkbox.checked) {
+              checkbox.checked = false;
+              window.toggleBusquedaNombre(checkbox);
+            }
+          }
+        } else {
+          // Mostrar Modal
+          window._currentRowForHomonyms = row;
+          const container = document.getElementById('listaHabitantesEncontrados');
+          container.innerHTML = '';
+          
+          resultados.forEach(h => {
+            const card = document.createElement('div');
+            card.style.cssText = 'border:1px solid var(--gray3); padding:0.8rem; border-radius:var(--r-md); display:flex; justify-content:space-between; align-items:center; background:var(--gray1);';
+            
+            const edadStr = h.fecha_nacimiento ? `${window.HabitantesService?.calcularEdad ? window.HabitantesService.calcularEdad(h.fecha_nacimiento) : 'Calculando...'} años` : 'Edad N/A';
+            const cedStr = (h.cedula && String(h.cedula).startsWith('SC-')) ? 'Sin Cédula (Menor)' : h.cedula;
+            
+            const infoDiv = document.createElement('div');
+            infoDiv.innerHTML = `
+              <strong style="display:block; color:var(--text-color);">${h.nombres} ${h.apellidos || ''}</strong>
+              <span style="font-size:0.8rem; color:var(--text-muted);">C.I: ${cedStr} | ${edadStr}</span>
+            `;
+            
+            const btn = document.createElement('button');
+            btn.className = 'btn-sicag btn-sm btn-outline-verde';
+            btn.style.cssText = 'padding:0.3rem 0.6rem; font-size:0.75rem;';
+            btn.innerHTML = 'Seleccionar';
+            btn.onclick = () => window.seleccionarHomocigoto(h);
+            
+            card.appendChild(infoDiv);
+            card.appendChild(btn);
+            container.appendChild(card);
+          });
+          
+          const modal = document.getElementById('modalSeleccionarHabitante');
+          modal.style.display = 'flex';
+          
+          window._focusTrapHomonyms = function(e) {
+            if (modal.contains(e.target)) {
+              e.stopPropagation();
+              e.stopImmediatePropagation();
+            }
+          };
+          document.addEventListener('focusin', window._focusTrapHomonyms, true);
+        }
+      } catch (err) {
+        console.error('Error buscando por nombre:', err);
+        showToast('Error al realizar la búsqueda', 'error');
+      } finally {
+        searchBtn.innerHTML = originalHtml;
+        searchBtn.disabled = false;
+      }
+    };
+
+    window.seleccionarHomocigoto = function(habitante) {
+      cerrarModalSeleccionarHabitante();
+      const row = window._currentRowForHomonyms;
+      if (row && row._onHabitanteFill) {
+        showToast(`Habitante seleccionado: ${habitante.nombres}`, 'success');
+        row._onHabitanteFill(habitante);
+        // Put the cedula in the input so it looks consistent
+        const input = row.querySelector('.fam-cedula');
+        if (input) {
+          input.value = (habitante.cedula && String(habitante.cedula).startsWith('SC-')) ? 'Sin Cédula (Menor)' : habitante.cedula;
+        }
+        // Uncheck the checkbox
+        const checkbox = row.querySelector('.chk-buscar-nombre');
+        if (checkbox && checkbox.checked) {
+          checkbox.checked = false;
+          window.toggleBusquedaNombre(checkbox);
+        }
+      }
+    };
+
     function abrirModalRegistrarHabitanteRapido(tipo) {
       try {
         window._registrandoTipo = tipo; // 'jefe' o 'familiar'
@@ -5370,12 +5838,27 @@
         if (tipo === 'jefe') {
           cedula = document.getElementById('cedulaJefe')?.value || '';
         } else if (tipo === 'familiar' && window._registrandoFilaFamiliar) {
-          cedula = window._registrandoFilaFamiliar.querySelector('.fam-cedula')?.value || '';
+          const isNombre = window._registrandoFilaFamiliar.querySelector('.chk-buscar-nombre')?.checked;
+          cedula = isNombre ? '' : (window._registrandoFilaFamiliar.querySelector('.fam-cedula')?.value || '');
         }
         
-        if (!cedula) {
-          showToast('Debe ingresar la cédula antes de registrar al habitante.', 'error');
+        const wrapperSinCedula = document.getElementById('wrapper_rh_sin_cedula');
+        if (wrapperSinCedula) {
+          wrapperSinCedula.style.display = tipo === 'jefe' ? 'none' : 'flex';
+        }
+        
+        const chkSinCedula = document.getElementById('rh_sin_cedula');
+        if (chkSinCedula) {
+          chkSinCedula.checked = false; // Reset always on open
+        }
+
+        if (!cedula && tipo === 'jefe') {
+          showToast('Debe ingresar la cédula antes de registrar al jefe.', 'error');
           return;
+        } else if (!cedula && tipo === 'familiar' && (!chkSinCedula || !chkSinCedula.checked)) {
+          // If cedula is empty and checkbox is not checked, we should theoretically block it unless they check it in the modal.
+          // Since they might open it without typing a cedula to register a child, we'll allow it but cedula is required.
+          cedula = '';
         }
 
         const setIfExist = (id, val) => {
@@ -5402,11 +5885,17 @@
         
         const modal = document.getElementById('modalRegistrarHabitanteRapido');
         if (modal) {
-          // Desactivar el Focus Trap del modal principal de Bootstrap para poder escribir
-          const mainModal = document.getElementById('modalVivienda');
-          if (mainModal) mainModal.removeAttribute('tabindex');
-          
           modal.style.display = 'flex';
+          
+          // Hack para evitar que el Focus Trap de Bootstrap nos robe el foco
+          // cuando el usuario intenta escribir en este modal.
+          window._focusTrapBypass = function(e) {
+            if (modal.contains(e.target)) {
+              e.stopPropagation();
+              e.stopImmediatePropagation();
+            }
+          };
+          document.addEventListener('focusin', window._focusTrapBypass, true);
         } else {
           showToast('Error: No se encontró el modal en el documento.', 'error');
         }
@@ -5417,10 +5906,10 @@
     }
 
     function cerrarModalRegistrarHabitanteRapido() {
-      // Restaurar el Focus Trap del modal principal
-      const mainModal = document.getElementById('modalVivienda');
-      if (mainModal) mainModal.setAttribute('tabindex', '-1');
-      
+      if (window._focusTrapBypass) {
+        document.removeEventListener('focusin', window._focusTrapBypass, true);
+        window._focusTrapBypass = null;
+      }
       document.getElementById('modalRegistrarHabitanteRapido').style.display = 'none';
       window._registrandoTipo = null;
     }
@@ -5439,9 +5928,22 @@
         return;
       }
 
+      const partesNombre = nombres.trim().split(' ');
+      let nombreC = nombres.trim();
+      let apellidoC = '';
+      if (partesNombre.length > 1) {
+        const mitad = Math.ceil(partesNombre.length / 2);
+        nombreC = partesNombre.slice(0, mitad).join(' ');
+        apellidoC = partesNombre.slice(mitad).join(' ');
+      }
+
+      const txtIncapacidad = gv('rh_incapacidad_tipo').trim();
+      const txtPension = gv('rh_pensionado_institucion').trim();
+
       const datosNuevos = {
         cedula: cedula,
-        nombres: nombres,
+        nombres: nombreC,
+        apellidos: apellidoC || '.',
         fecha_nacimiento: fecha_nacimiento,
         genero: genero,
         direccion: direccion,
@@ -5451,9 +5953,11 @@
         ocupacion: gv('rh_ocupacion'),
         inscrito_cne: gv('rh_inscrito_cne') === 'true',
         condicion_salud: gv('rh_condicion_salud'),
-        incapacidad_tipo: gv('rh_incapacidad_tipo'),
-        pensionado_institucion: gv('rh_pensionado_institucion'),
-        consejo_comunal_id: 1 // Por ahora manejado en BD
+        incapacitado: txtIncapacidad !== '',
+        incapacitado_tipo: txtIncapacidad,
+        pensionado: txtPension !== '',
+        pensionado_institucion: txtPension,
+        consejo_comunal_id: (document.getElementById('consejoComunal') && document.getElementById('consejoComunal').value) ? parseInt(document.getElementById('consejoComunal').value, 10) : null
       };
 
       const idTemp = 'tmp_' + Date.now();
@@ -5475,8 +5979,17 @@
         const jInstruccion = document.getElementById('jefNivelInstruccion'); if(jInstruccion) jInstruccion.value = datosNuevos.nivel_educativo;
         const jOcupacion = document.getElementById('jefProfesion'); if(jOcupacion) jOcupacion.value = datosNuevos.ocupacion;
         const jCne = document.getElementById('jefCNE'); if(jCne) jCne.value = datosNuevos.inscrito_cne ? 'true' : 'false';
-        const jIncapacidad = document.getElementById('jefTieneIncapacidad'); if(jIncapacidad) jIncapacidad.value = datosNuevos.condicion_salud === 'discapacidad' || datosNuevos.condicion_salud === 'encamado' ? 'Si' : 'No';
-        const jTipoIncapacidad = document.getElementById('jefTipoIncapacidad'); if(jTipoIncapacidad) jTipoIncapacidad.value = datosNuevos.incapacidad_tipo;
+        const jIncapacidad = document.getElementById('jefTieneIncapacidad');
+        if(jIncapacidad) jIncapacidad.value = (datosNuevos.incapacitado_tipo && datosNuevos.incapacitado_tipo.trim() !== '') ? 'Si' : 'No';
+        
+        const jTipoIncapacidad = document.getElementById('jefTipoIncapacidad'); 
+        if(jTipoIncapacidad) jTipoIncapacidad.value = datosNuevos.incapacitado_tipo;
+        
+        const jPensionado = document.getElementById('jefPensionado');
+        if(jPensionado) jPensionado.value = (datosNuevos.pensionado_institucion && datosNuevos.pensionado_institucion.trim() !== '') ? 'Si' : 'No';
+        
+        const jInstPension = document.getElementById('jefPensionadoInstitucion');
+        if(jInstPension) jInstPension.value = datosNuevos.pensionado_institucion;
         
         window._datos_nuevos_jefe = payload.datos_nuevos_habitante;
         
@@ -5498,6 +6011,14 @@
         setR('.fam-nombres', nombres);
         setR('.fam-fechanac', fecha_nacimiento);
         setR('.fam-sexo', genero);
+        setR('.fam-cedula', document.getElementById('rh_sin_cedula')?.checked ? 'Sin Cédula (Menor)' : cedula);
+        
+        // Uncheck "Buscar por nombre" if it was checked
+        const checkbox = row.querySelector('.chk-buscar-nombre');
+        if (checkbox && checkbox.checked) {
+          checkbox.checked = false;
+          window.toggleBusquedaNombre(checkbox);
+        }
         
         row._datos_nuevos_habitante = payload.datos_nuevos_habitante;
         
@@ -5519,5 +6040,7 @@
       showToast('Habitante registrado y vinculado temporalmente. Se guardará definitivamente al aprobar el censo.', 'success');
     }
   </script>
+  <!-- CHART JS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </body>
 </html>

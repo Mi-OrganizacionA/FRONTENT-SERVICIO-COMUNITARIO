@@ -265,6 +265,68 @@
       <button type="button" class="page-btn active">1</button>
       <button type="button" class="page-btn" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
     </div>
+
+    <!-- GRÁFICAS DE HABITANTES -->
+    <div style="margin-top: 2rem;">
+      <h2 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;"><i class="fas fa-chart-pie" style="color: #2E7D32;"></i> Gráficas Estadísticas de Habitantes</h2>
+      
+      <div class="charts-grid fade-in-up">
+        <!-- Gráfica: Género -->
+        <div class="chart-wrapper">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
+            <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-venus-mars"></i> Género</div>
+            <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartGenero', 'Distribución por Género')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+          </div>
+          <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartGenero"></canvas></div>
+        </div>
+
+        <!-- Gráfica: Grupos Etarios -->
+        <div class="chart-wrapper">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
+            <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-users"></i> Grupos Etarios</div>
+            <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartEdades', 'Grupos Etarios')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+          </div>
+          <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartEdades"></canvas></div>
+        </div>
+
+        <!-- Gráfica: Cédula -->
+        <div class="chart-wrapper">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
+            <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-id-card"></i> Estatus de Cédula</div>
+            <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartCedula', 'Estatus de Cédula')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+          </div>
+          <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartCedula"></canvas></div>
+        </div>
+
+        <!-- Gráfica: Salud -->
+        <div class="chart-wrapper">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
+            <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-heartbeat"></i> Condición de Salud</div>
+            <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartSalud', 'Condición de Salud')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+          </div>
+          <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartSalud"></canvas></div>
+        </div>
+
+        <!-- Gráfica: Trabajo -->
+        <div class="chart-wrapper">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
+            <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-briefcase"></i> Estatus Laboral</div>
+            <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartTrabajo', 'Estatus Laboral')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+          </div>
+          <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartTrabajo"></canvas></div>
+        </div>
+
+        <!-- Gráfica: CNE -->
+        <div class="chart-wrapper">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
+            <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-vote-yea"></i> Inscritos en el CNE</div>
+            <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartCne', 'Estatus CNE')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+          </div>
+          <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartCne"></canvas></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- MODAL REGISTRO -->
@@ -308,7 +370,10 @@
                     </select>
                     <input type="text" class="cv-form-control" id="habCedula" data-mask="cedula" name="cedula" placeholder="12345678" required style="flex: 1; border-top-left-radius:0; border-bottom-left-radius:0;">
                   </div>
-                  <span class="cv-form-hint">Llave única para consultas.</span>
+                  <div style="margin-top: 5px; display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" id="habSinCedula" onchange="window.toggleSinCedulaCenso()">
+                    <label for="habSinCedula" style="font-size: 0.85rem; margin: 0; color: var(--text-muted, #666);">Menor sin Cédula</label>
+                  </div>
                 </div>
                 <div class="cv-form-group">
                   <label for="habNombre">Nombres y Apellidos <span class="req">*</span></label>
@@ -563,6 +628,19 @@
 <script src="js/layout-menu.js"></script>
 
 <script>
+  window.toggleSinCedulaCenso = function() {
+    const chk = document.getElementById('habSinCedula');
+    const cedulaInput = document.getElementById('habCedula');
+    if (chk && chk.checked) {
+      cedulaInput.value = 'SC-AUTO';
+      cedulaInput.disabled = true;
+      cedulaInput.dataset.invalidCedula = 'false';
+    } else {
+      cedulaInput.value = '';
+      cedulaInput.disabled = false;
+    }
+  };
+
 (function () {
   var TOTAL = 4;
   var current = 1;
@@ -720,7 +798,8 @@
     else if (age <= 11) clasificacion = 'niño';
     else if (age >= 60) clasificacion = 'adulto_mayor';
 
-    var cedulaVal = document.getElementById('habCedula').value.trim().replace(/[.\s-]/g, '').replace(/^[VE]/i, '');
+    var rawCed = document.getElementById('habCedula').value.trim();
+    var cedulaVal = rawCed.startsWith('SC-') ? rawCed : rawCed.replace(/[.\s-]/g, '').replace(/^[VE]/i, '');
     var nacionalidadVal = document.getElementById('habNacionalidad') ? document.getElementById('habNacionalidad').value : 'V';
     var data = {
       nacionalidad: nacionalidadVal,
@@ -1158,6 +1237,8 @@
       </div>
     </div>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </body>
 </html>
 

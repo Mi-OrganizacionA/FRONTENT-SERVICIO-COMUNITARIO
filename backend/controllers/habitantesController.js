@@ -159,8 +159,13 @@ class HabitantesController {
    */
   static async create(req, res) {
     try {
-      const { cedula, nombres, apellidos, consejo_comunal_id, ...data } = req.body;
+      let { cedula, nombres, apellidos, consejo_comunal_id, ...data } = req.body;
       
+      if (cedula === 'SC-AUTO' || cedula === 'SC-GENERATE') {
+        cedula = 'SC-' + Date.now() + Math.floor(Math.random() * 100);
+        req.body.cedula = cedula; // propagate to Validation Tray if needed
+      }
+
       // Verificar que cédula sea única
       const existe = await HabitanteModel.findOne({ where: { cedula } });
       if (existe && existe.activo) return res.status(409).json({ error: 'Cédula ya registrada' });

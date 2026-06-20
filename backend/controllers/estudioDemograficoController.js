@@ -41,6 +41,17 @@ function mapFrontendData(datos, paso) {
         if (nf.jef_tipo_incapacidad !== undefined) nf.discapacidad_tipo = nf.jef_tipo_incapacidad;
         if (nf.jef_pensionado_institucion !== undefined) nf.pensionado_institucion = nf.jef_pensionado_institucion;
         if (nf.clasificacion_ingreso !== undefined) nf.clasificacion_ingreso_familiar = nf.clasificacion_ingreso;
+        
+        // Ensure salud condition is stored in discapacidad_tipo for the report filtering to work properly
+        if (nf.condicion_salud) {
+          if (nf.condicion_salud === 'discapacidad' || nf.condicion_salud === 'encamado') {
+             nf.discapacidad_tipo = nf.discapacidad_tipo ? nf.discapacidad_tipo : nf.condicion_salud;
+             nf.incapacitado = true;
+          } else {
+             nf.discapacidad_tipo = nf.condicion_salud;
+          }
+        }
+
         delete nf.genero;
         delete nf.nivel_educativo;
         delete nf.ocupacion;
@@ -54,6 +65,7 @@ function mapFrontendData(datos, paso) {
         delete nf.jef_tipo_incapacidad;
         delete nf.jef_pensionado_institucion;
         delete nf.clasificacion_ingreso;
+        delete nf.condicion_salud; // Deleted since we mapped it to discapacidad_tipo
         // datos_nuevos_habitante se maneja en la bandeja de validaciones al aprobar
         delete nf.datos_nuevos_habitante;
         return nf;
@@ -267,6 +279,38 @@ class EstudioDemograficoController {
 
       if (!id_comunidad && !cabecera?.id_comunidad) {
         throw new Error("id_comunidad es requerido");
+      }
+
+      // PASO PREVIO 1: Crear Jefe si es nuevo
+      if (req.body.datos_nuevos_jefe && req.body.jefe_habitante_id != null && String(req.body.jefe_habitante_id).startsWith('tmp_')) {
+        if (req.body.datos_nuevos_jefe.cedula === 'SC-AUTO' || req.body.datos_nuevos_jefe.cedula === 'SC-GENERATE') {
+          req.body.datos_nuevos_jefe.cedula = 'SC-' + Date.now() + Math.floor(Math.random() * 100);
+        }
+        const nuevoJefe = await models.Habitante.create({
+          ...req.body.datos_nuevos_jefe,
+          activo: true,
+          fecha_registro: new Date()
+        }, { transaction: t });
+        req.body.jefe_habitante_id = nuevoJefe.id;
+        if (cabecera) cabecera.jefe_habitante_id = nuevoJefe.id;
+      }
+
+      // PASO PREVIO 2: Crear familiares nuevos
+      if (req.body.familiares && req.body.familiares.length > 0) {
+        req.body.familiares = await Promise.all(req.body.familiares.map(async (fam) => {
+          if (fam.datos_nuevos_habitante && fam.id_habitante != null && String(fam.id_habitante).startsWith('tmp_')) {
+            if (fam.datos_nuevos_habitante.cedula === 'SC-AUTO' || fam.datos_nuevos_habitante.cedula === 'SC-GENERATE') {
+              fam.datos_nuevos_habitante.cedula = 'SC-' + Date.now() + Math.floor(Math.random() * 100);
+            }
+            const nuevoHab = await models.Habitante.create({
+              ...fam.datos_nuevos_habitante,
+              activo: true,
+              fecha_registro: new Date()
+            }, { transaction: t });
+            fam.id_habitante = nuevoHab.id;
+          }
+          return fam;
+        }));
       }
 
       // 1. Crear Cabecera (EstudioDemografico)
@@ -498,6 +542,31 @@ class EstudioDemograficoController {
 
       const datosAntiguos = estudio.toJSON();
       const body = req.body;
+
+      // PASO PREVIO 1: Crear Jefe si es nuevo
+      if (body.datos_nuevos_jefe && body.jefe_habitante_id != null && String(body.jefe_habitante_id).startsWith('tmp_')) {
+        const nuevoJefe = await models.Habitante.create({
+          ...body.datos_nuevos_jefe,
+          activo: true,
+          fecha_registro: new Date()
+        }, { transaction: t });
+        body.jefe_habitante_id = nuevoJefe.id;
+      }
+
+      // PASO PREVIO 2: Crear familiares nuevos
+      if (body.familiares && body.familiares.length > 0) {
+        body.familiares = await Promise.all(body.familiares.map(async (fam) => {
+          if (fam.datos_nuevos_habitante && fam.id_habitante != null && String(fam.id_habitante).startsWith('tmp_')) {
+            const nuevoHab = await models.Habitante.create({
+              ...fam.datos_nuevos_habitante,
+              activo: true,
+              fecha_registro: new Date()
+            }, { transaction: t });
+            fam.id_habitante = nuevoHab.id;
+          }
+          return fam;
+        }));
+      }
 
       // 1. Actualizar cabecera principal
       await estudio.update(mapFrontendData(body, 2), { transaction: t });

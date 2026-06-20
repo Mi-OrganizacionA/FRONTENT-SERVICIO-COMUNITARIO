@@ -156,6 +156,63 @@ class ExportGeneratorService {
       </html>
     `;
   }
+
+  static generateChartPDF(title, base64Image, filtrosText = '') {
+    return new Promise((resolve, reject) => {
+      try {
+        // Landscape or portrait? For a single chart, landscape is usually better.
+        const doc = new PDFDocument({ margin: 30, size: 'A4', layout: 'landscape' });
+        const chunks = [];
+
+        doc.on('data', chunk => chunks.push(chunk));
+        doc.on('end', () => resolve(Buffer.concat(chunks)));
+
+        // Agregar el Logo
+        const fs = require('fs');
+        const path = require('path');
+        const logoPath = path.join(__dirname, '../../assets/img/logo_comuna_fondoremovido.png');
+        
+        if (fs.existsSync(logoPath)) {
+          doc.image(logoPath, 40, 25, { width: 50 });
+        }
+
+        // Encabezado
+        doc.moveDown(0.5);
+        doc.fontSize(20).fillColor('#2E7D32').text('SICAG', { align: 'center' });
+        doc.moveDown(0.3);
+        doc.fontSize(14).fillColor('#333333').text(title, { align: 'center' });
+        
+        if (filtrosText) {
+          doc.moveDown(0.3);
+          doc.fontSize(10).fillColor('#666666').text(filtrosText, { align: 'center' });
+        }
+        
+        doc.moveDown(2);
+
+        // Renderizar la imagen Base64
+        if (base64Image) {
+          try {
+            // El formato Base64 suele ser 'data:image/png;base64,iVBORw0KGgo...'
+            const base64Data = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+            const imgBuffer = Buffer.from(base64Data, 'base64');
+            
+            // La centramos y ajustamos al ancho de la hoja si es muy grande
+            doc.image(imgBuffer, {
+              fit: [doc.page.width - 60, doc.page.height - 200],
+              align: 'center',
+              valign: 'center'
+            });
+          } catch (e) {
+            doc.fontSize(12).fillColor('red').text('Error al procesar la imagen de la gráfica.', { align: 'center' });
+          }
+        }
+
+        doc.end();
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
 }
 
 module.exports = ExportGeneratorService;

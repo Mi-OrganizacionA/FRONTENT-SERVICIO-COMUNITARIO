@@ -20,4 +20,7 @@ router.get('/resumen', verifyToken, CensoReportesController.getResumen);
 // Exportar reportes (PDF / Excel)
 router.get('/exportar', verifyToken, CensoReportesController.exportarReporte);
 
+// Exportar gráfica individual (PDF)
+router.post('/exportar-grafica-pdf', verifyToken, CensoReportesController.exportarGraficaPdf);
+
 module.exports = router;

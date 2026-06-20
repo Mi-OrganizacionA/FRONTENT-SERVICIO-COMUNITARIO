@@ -156,6 +156,45 @@ class CensoReportesController {
       res.status(500).json({ error: 'Error generando el archivo de exportación: ' + error.message });
     }
   }
+
+  /**
+   * Exporta una gráfica individual en formato PDF
+   */
+  static async exportarGraficaPdf(req, res) {
+    try {
+      const { titulo, imagenBase64, filtros } = req.body;
+      let consejo_id = filtros?.consejo_id;
+
+      if (!titulo || !imagenBase64) {
+        return res.status(400).json({ error: 'Falta el título o la imagen base64 de la gráfica.' });
+      }
+
+      if (req.user && req.user.rol === 'vocero') {
+        consejo_id = req.user.consejo_comunal_id || req.user.id_comunidad_asignada;
+      }
+
+      if (!CensoReportesController.dbModels) throw new Error('Modelos de base de datos no inyectados en CensoReportesController');
+
+      let filtrosText = '';
+      const filtrosArr = [];
+      if (consejo_id) {
+        const consejo = await CensoReportesController.dbModels.ConsejoComunal.findByPk(consejo_id);
+        if (consejo) filtrosArr.push(`Consejo Comunal: ${consejo.nombre_comunidad}`);
+      } else {
+        filtrosArr.push('Toda la Comuna');
+      }
+      if (filtrosArr.length > 0) filtrosText = 'Filtros aplicados - ' + filtrosArr.join(' | ');
+
+      const pdfBuffer = await ExportGeneratorService.generateChartPDF(titulo, imagenBase64, filtrosText);
+      
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=grafica_${Date.now()}.pdf`);
+      return res.send(pdfBuffer);
+    } catch (error) {
+      logger.error('Error exportando gráfica a PDF:', error);
+      res.status(500).json({ error: 'Error generando el archivo PDF de la gráfica.' });
+    }
+  }
 }
 
 module.exports = CensoReportesController;

@@ -124,7 +124,22 @@ class BandejaValidacionesController {
 
       // Manejo especial para estudios_demograficos (múltiples tablas hijas)
       if (tabla === 'estudios_demograficos' && (validacion.tipo_accion === 'CREATE' || validacion.tipo_accion === 'INSERT')) {
-        // PASO PREVIO: Crear habitantes nuevos registrados al vuelo (sin ID en la BD todavía)
+        // PASO PREVIO 1: Crear habitante nuevo para Jefe de Familia si aplica
+        if (datos.datos_nuevos_jefe && datos.jefe_habitante_id != null && String(datos.jefe_habitante_id).startsWith('tmp_')) {
+          try {
+            const nuevoJefe = await models.Habitante.create({
+              ...datos.datos_nuevos_jefe,
+              activo: true,
+              fecha_registro: new Date()
+            });
+            datos.jefe_habitante_id = nuevoJefe.id;
+          } catch (habErr) {
+            logger.error('Error creando Jefe de Familia al aprobar censo:', habErr);
+            throw new Error('No se pudo crear el nuevo Jefe de Familia. ' + habErr.message);
+          }
+        }
+
+        // PASO PREVIO 2: Crear habitantes nuevos registrados al vuelo (sin ID en la BD todavía) para familiares
         if (datos.familiares && Array.isArray(datos.familiares)) {
           datos.familiares = await Promise.all(datos.familiares.map(async (fam) => {
             // Si ya tiene id_habitante real, no hacer nada
@@ -186,7 +201,22 @@ class BandejaValidacionesController {
         const idCenso = datos.id || validacion.registro_id;
         if (!idCenso) throw new Error('No se encontró el ID del estudio demográfico a actualizar');
 
-        // PASO PREVIO: Crear habitantes nuevos registrados al vuelo (sin ID en la BD todavía)
+        // PASO PREVIO 1: Crear habitante nuevo para Jefe de Familia si aplica (Update)
+        if (datos.datos_nuevos_jefe && datos.jefe_habitante_id != null && String(datos.jefe_habitante_id).startsWith('tmp_')) {
+          try {
+            const nuevoJefe = await models.Habitante.create({
+              ...datos.datos_nuevos_jefe,
+              activo: true,
+              fecha_registro: new Date()
+            });
+            datos.jefe_habitante_id = nuevoJefe.id;
+          } catch (habErr) {
+            logger.error('Error creando Jefe de Familia al actualizar censo:', habErr);
+            throw new Error('No se pudo crear el nuevo Jefe de Familia. ' + habErr.message);
+          }
+        }
+
+        // PASO PREVIO 2: Crear habitantes nuevos registrados al vuelo (sin ID en la BD todavía) para familiares
         if (datos.familiares && Array.isArray(datos.familiares)) {
           datos.familiares = await Promise.all(datos.familiares.map(async (fam) => {
             // Si ya tiene id_habitante real, no hacer nada

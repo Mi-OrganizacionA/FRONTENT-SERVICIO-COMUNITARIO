@@ -34,6 +34,6 @@ router.post('/', validate({ body: habitanteCreateSchema }), verifyToken, require
 router.put('/:id', validate({ params: idParamSchema }), validate({ body: habitanteUpdateSchema }), verifyToken, requireRole(['vocero', 'admin']), habitantesController.update);
 
 // Eliminar habitante (soft delete)
-router.delete('/:id', validate({ params: idParamSchema }), verifyToken, requireRole(['admin']), habitantesController.delete);
+router.delete('/:id', validate({ params: idParamSchema }), verifyToken, requireRole(['vocero', 'admin']), habitantesController.delete);
 
 module.exports = router;

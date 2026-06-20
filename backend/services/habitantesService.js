@@ -157,7 +157,11 @@ class HabitantesService {
             { cedula: { [Op.like]: `%${cedulaNorm}%` } },
             { cedula: { [Op.like]: `%${termino}%` } },
             { nombres: { [Op.like]: `%${termino}%` } },
-            { apellidos: { [Op.like]: `%${termino}%` } }
+            { apellidos: { [Op.like]: `%${termino}%` } },
+            habitanteModel.sequelize.where(
+              habitanteModel.sequelize.fn('lower', habitanteModel.sequelize.fn('concat', habitanteModel.sequelize.col('nombres'), ' ', habitanteModel.sequelize.col('apellidos'))),
+              { [Op.like]: `%${termino.toLowerCase()}%` }
+            )
           ]
         },
         include: [{

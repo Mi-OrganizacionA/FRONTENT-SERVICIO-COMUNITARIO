@@ -185,9 +185,12 @@ class CensoController {
       return;
     }
 
-    tbody.innerHTML = filtrados.map((h, idx) => `
+    tbody.innerHTML = filtrados.map((h, idx) => {
+      const isSC = h.cedula && String(h.cedula).startsWith('SC-');
+      const cedLabel = isSC ? 'Sin Cédula (Menor)' : `V-${h.cedula}`;
+      return `
       <tr data-hab-id="${h.id}" class="${highlightId && String(h.id) === String(highlightId) ? 'row-highlight' : ''}">
-        <td><span class="cv-cedula">V-${h.cedula}</span></td>
+        <td><span class="cv-cedula">${cedLabel}</span></td>
         <td>
           <div style="display:flex;align-items:center;gap:10px;">
             <div class="user-avatar-sm">${(h.nombre||'?').charAt(0).toUpperCase()}${(h.apellido||'').charAt(0).toUpperCase()}</div>
@@ -207,7 +210,8 @@ class CensoController {
           </div>
         </td>
       </tr>
-    `).join('');
+      `;
+    }).join('');
 
     if (highlightId) {
       const row = tbody.querySelector(`tr[data-hab-id="${highlightId}"]`);
@@ -216,6 +220,9 @@ class CensoController {
         setTimeout(() => row.classList.remove('row-highlight'), 4000);
       }
     }
+
+    // Renderizar gráficas con la data filtrada
+    this.renderChartsHabitantes(filtrados);
   }
 
   async editarHabitante(id) {
@@ -382,7 +389,24 @@ class CensoController {
     };
     
     setVal('habNacionalidad', h.nacionalidad || 'V');
-    setVal('habCedula', h.cedula);
+    
+    // Si la cédula es generada automáticamente (empieza con SC-)
+    const chkSinCedula = document.getElementById('habSinCedula');
+    if (h.cedula && String(h.cedula).startsWith('SC-')) {
+      if (chkSinCedula) chkSinCedula.checked = true;
+      setVal('habCedula', 'SC-AUTO');
+      const cedulaInput = document.getElementById('habCedula');
+      if (cedulaInput) {
+        cedulaInput.disabled = true;
+        cedulaInput.dataset.invalidCedula = 'false';
+      }
+    } else {
+      if (chkSinCedula) chkSinCedula.checked = false;
+      setVal('habCedula', h.cedula);
+      const cedulaInput = document.getElementById('habCedula');
+      if (cedulaInput) cedulaInput.disabled = false;
+    }
+
     setVal('habNombre', `${h.nombres || ''} ${h.apellidos || ''}`.trim());
     setVal('habFechaNac', h.fecha_nacimiento ? h.fecha_nacimiento.split('T')[0] : '');
     setVal('habGenero', h.genero);
@@ -471,6 +495,87 @@ class CensoController {
   _formatClasificacion(clasif) {
     const map = { 'adulto_mayor': 'Adulto Mayor', 'niño': 'Niño/a', 'adulto': 'Adulto' };
     return map[clasif] || clasif;
+  }
+
+  renderChartsHabitantes(data) {
+    if (typeof Chart === 'undefined') return;
+
+    const buildChart = (id, type, labels, dataArr, colors) => {
+      const ctx = document.getElementById(id);
+      if (!ctx) return;
+      if (window[`_chart_inst_${id}`]) { window[`_chart_inst_${id}`].destroy(); }
+      window[`_chart_inst_${id}`] = new Chart(ctx, {
+        type: type,
+        data: {
+          labels: labels,
+          datasets: [{ data: dataArr, backgroundColor: colors, borderWidth: 1 }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+    };
+
+    const colors = ['#2E7D32', '#1565C0', '#f39c12', '#c62828', '#8e44ad', '#16a085'];
+
+    // 1. Género
+    const gen = { 'Masculino': 0, 'Femenino': 0, 'Otro': 0 };
+    data.forEach(d => { if (d.genero) gen[d.genero] = (gen[d.genero]||0)+1; });
+    buildChart('chartGenero', 'pie', Object.keys(gen), Object.values(gen), colors);
+
+    // 2. Etarios
+    const edades = { 'Niños (0-12)':0, 'Adolescentes (13-17)':0, 'Adultos (18-59)':0, 'Adultos Mayores (60+)':0 };
+    data.forEach(d => {
+      if (d.edad <= 12) edades['Niños (0-12)']++;
+      else if (d.edad <= 17) edades['Adolescentes (13-17)']++;
+      else if (d.edad <= 59) edades['Adultos (18-59)']++;
+      else edades['Adultos Mayores (60+)']++;
+    });
+    buildChart('chartEdades', 'pie', Object.keys(edades), Object.values(edades), colors);
+
+    // 3. Cédula
+    const ced = { 'Con Cédula':0, 'Niños sin Cédula (SC)':0 };
+    data.forEach(d => {
+      if (String(d.cedula).startsWith('SC-')) ced['Niños sin Cédula (SC)']++;
+      else ced['Con Cédula']++;
+    });
+    buildChart('chartCedula', 'pie', Object.keys(ced), Object.values(ced), colors);
+
+    // 4. Salud
+    const sal = { 'Saludable':0, 'Enfermedad Crónica':0, 'Discapacidad':0, 'Embarazo':0 };
+    data.forEach(d => {
+      if (d.condicion_salud) {
+        if (d.condicion_salud.toLowerCase().includes('crónica') || d.condicion_salud.toLowerCase().includes('cronica')) sal['Enfermedad Crónica']++;
+        else if (d.condicion_salud.toLowerCase().includes('discapacidad')) sal['Discapacidad']++;
+        else if (d.condicion_salud.toLowerCase().includes('embarazo')) sal['Embarazo']++;
+        else sal['Saludable']++;
+      } else {
+        sal['Saludable']++;
+      }
+    });
+    buildChart('chartSalud', 'bar', Object.keys(sal), Object.values(sal), colors);
+
+    // 5. Trabajo
+    const trab = { 'Trabaja':0, 'No Trabaja':0 };
+    data.forEach(d => {
+      if (d.edad >= 18) {
+        if (d.trabaja_actualmente && d.trabaja_actualmente !== false) trab['Trabaja']++;
+        else trab['No Trabaja']++;
+      }
+    });
+    buildChart('chartTrabajo', 'pie', Object.keys(trab), Object.values(trab), colors);
+
+    // 6. CNE
+    const cne = { 'Inscrito':0, 'No Inscrito':0 };
+    data.forEach(d => {
+      if (d.edad >= 18) {
+        if (d.inscrito_cne && d.inscrito_cne !== false) cne['Inscrito']++;
+        else cne['No Inscrito']++;
+      }
+    });
+    buildChart('chartCne', 'pie', Object.keys(cne), Object.values(cne), colors);
   }
 }
 
@@ -566,8 +671,9 @@ function _ejecutarRequestExportacionAvanzada(formato, btn, orig, action) {
 
   const desde = getVal('filtroDesde');
   const hasta = getVal('filtroHasta');
-  if (desde) params.append('fecha_desde', desde);
-  if (hasta) params.append('fecha_hasta', hasta);
+  // Usar los nombres de parámetros correctos que espera el backend
+  if (desde) params.append('desde', desde);
+  if (hasta) params.append('hasta', hasta);
 
   const cc = getVal('filtroConsejoExport');
   if (cc) params.append('consejo_id', cc);
@@ -576,8 +682,9 @@ function _ejecutarRequestExportacionAvanzada(formato, btn, orig, action) {
   if (usarNac) {
     const fnMin = getVal('filtroNacMin');
     const fnMax = getVal('filtroNacMax');
-    if (fnMin) params.append('fecha_nac_min', fnMin);
-    if (fnMax) params.append('fecha_nac_max', fnMax);
+    // Parámetros correctos del backend: nac_min / nac_max
+    if (fnMin) params.append('nac_min', fnMin);
+    if (fnMax) params.append('nac_max', fnMax);
   } else {
     const edMin = getVal('filtroEdadMin');
     const edMax = getVal('filtroEdadMax');
@@ -591,11 +698,12 @@ function _ejecutarRequestExportacionAvanzada(formato, btn, orig, action) {
   const salud = getVal('filtroSalud');
   if (salud) params.append('salud', salud);
 
+  // Parámetros correctos del backend: cne / trabajo
   const cne = getVal('filtroCne');
-  if (cne) params.append('inscrito_cne', cne);
+  if (cne) params.append('cne', cne);
 
   const trabajo = getVal('filtroTrabajo');
-  if (trabajo) params.append('trabaja', trabajo);
+  if (trabajo) params.append('trabajo', trabajo);
 
   const extras = Array.from(document.querySelectorAll('.chk-extra:checked')).map(c => c.value);
   if (extras.length > 0) params.append('extras', extras.join(','));
@@ -616,3 +724,55 @@ function _ejecutarRequestExportacionAvanzada(formato, btn, orig, action) {
     }, 2000);
   }, 1500);
 }
+
+window.exportarGrafica = async function(btn, canvasId, title) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  btn.disabled = true;
+
+  try {
+    const imageBase64 = canvas.toDataURL('image/png', 1.0);
+    const token = localStorage.getItem('sicag_token');
+    
+    // Obtener filtros actuales
+    const selectCC = document.getElementById('filterCC');
+    const ccVal = selectCC ? selectCC.value : '';
+
+    const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
+    const response = await fetch(`${baseUrl}/censo-reportes/exportar-grafica-pdf`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        titulo: title,
+        imagenBase64: imageBase64,
+        filtros: { consejo_id: ccVal }
+      })
+    });
+
+    if (!response.ok) throw new Error('Error al generar PDF');
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `grafica_${canvasId}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+    
+    if (window.Components) Components.showToast('PDF descargado', 'success');
+  } catch (error) {
+    console.error(error);
+    if (window.Components) Components.showToast('Error exportando gráfica', 'error');
+  } finally {
+    btn.innerHTML = origHtml;
+    btn.disabled = false;
+  }
+};

@@ -6,3 +6,5 @@ database.sqlite
 .DS_Store
 *.log
 .firebase/
+# Cache de Puppeteer (Chrome binarios > 100MB)
+backend/.cache/

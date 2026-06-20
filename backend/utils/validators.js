@@ -8,7 +8,7 @@ const authLoginSchema = Joi.object({
 }).or('identifier', 'email', 'telefono');
 
 const habitanteCreateSchema = Joi.object({
-  cedula: Joi.string().min(6).max(12).required(),
+  cedula: Joi.string().min(6).max(20).required(),
   nombres: Joi.string().min(2).max(100).required(),
   apellidos: Joi.string().min(2).max(100).required(),
   genero: Joi.string().valid('M', 'F', 'Otro').required(),
@@ -28,7 +28,7 @@ const habitanteCreateSchema = Joi.object({
 }).unknown(true);
 
 const habitanteUpdateSchema = Joi.object({
-  cedula: Joi.string().min(6).max(12),
+  cedula: Joi.string().min(6).max(20),
   nombres: Joi.string().min(2).max(100),
   apellidos: Joi.string().min(2).max(100),
   genero: Joi.string().valid('M', 'F', 'Otro'),

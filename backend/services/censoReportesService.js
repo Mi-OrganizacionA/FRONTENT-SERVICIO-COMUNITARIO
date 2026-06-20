@@ -32,11 +32,12 @@ class CensoReportesService {
     
     if (filtros.salud) {
       if (filtros.salud === 'discapacidad') {
-         where.discapacidad_tipo = { [Op.and]: [{ [Op.ne]: null }, { [Op.ne]: '' }] };
+         // Ya que ahora discapacidad_tipo puede almacenar "saludable" u "enfermedad_cronica", usamos incapacitado
+         where.incapacitado = true;
       } else if (filtros.salud === 'encamado') {
-         where.discapacidad_tipo = { [Op.iLike]: '%encamado%' };
+         where.discapacidad_tipo = { [Op.like]: '%encamado%' };
       } else {
-         where.discapacidad_tipo = { [Op.iLike]: `%${filtros.salud}%` };
+         where.discapacidad_tipo = { [Op.like]: `%${filtros.salud}%` };
       }
     }
     
@@ -450,8 +451,8 @@ class CensoReportesService {
       case 'encamados':
         title = 'Personas Encamadas o con Limitaciones Severas';
         headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Tipo Incapacidad', 'Consejo Comunal'];
-        wf.discapacidad_tipo = { [Op.iLike]: '%encamado%' };
-        wh.condicion_salud = { [Op.iLike]: '%encamado%' };
+        wf.discapacidad_tipo = { [Op.like]: '%encamado%' };
+        wh.condicion_salud = { [Op.like]: '%encamado%' };
         rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });
         { const ced = new Set(rowsNuevos.map(r => (r.cedula_identidad||'').replace(/[^0-9]/g,'')).filter(Boolean)); CensoReportesService._aplicarDeduplicacion(wh, ced, Op); }
         rowsViejos = await Habitante.findAll({ where: wh, include: incConsejoLegacy });
@@ -502,7 +503,10 @@ class CensoReportesService {
        ]));
     } else {
        const mapPersona = (item, isNew) => {
-         const cedula = isNew ? item.cedula_identidad : item.cedula;
+         let cedula = isNew ? item.cedula_identidad : item.cedula;
+         if (cedula && String(cedula).startsWith('SC-')) {
+           cedula = 'Sin Cédula';
+         }
          const nombre = isNew ? item.nombres_apellidos : `${item.nombres || ''} ${item.apellidos || ''}`.trim();
          const fnac = item.fecha_nacimiento ? new Date(item.fecha_nacimiento).toISOString().split('T')[0] : 'N/A';
          const edad = calcEdad(item.fecha_nacimiento);
