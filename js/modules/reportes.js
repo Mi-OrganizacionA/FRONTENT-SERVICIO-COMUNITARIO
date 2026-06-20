@@ -248,9 +248,6 @@ class ReportesController {
         trAdultos.innerHTML = `<i class="fas fa-circle" style="font-size:.5rem;"></i> ${((kpis.adultosMayores / kpis.totalPersonas) * 100).toFixed(1)}% del censo`;
       }
 
-      // Actualizar gráficos
-      this.renderGraficos(kpis);
-
     } catch (error) {
       console.warn('Backend API de KPIs no disponible, mostrando guiones.', error);
     }
@@ -364,76 +361,6 @@ class ReportesController {
         btn.disabled = false; 
       }, 2000);
     }, 1500);
-  }
-
-  renderGraficos(kpis) {
-    if (typeof Chart === 'undefined') return;
-
-    const ctxClasif = document.getElementById('chartClasif');
-    if (ctxClasif) {
-      // Destruir gráfico previo si existe
-      if (window.chartClasifInstance) window.chartClasifInstance.destroy();
-
-      // Preparar datos reales: Adultos Mayores, Niños. El resto lo ponemos como "Adultos/Otros"
-      let ninos = kpis ? kpis.ninos : 62;
-      let adultosMayores = kpis ? kpis.adultosMayores : 39;
-      let discapacidad = kpis ? kpis.conDiscapacidad : 12;
-      let total = kpis ? kpis.totalPersonas : 347;
-      let resto = total - (ninos + adultosMayores + discapacidad);
-      if (resto < 0) resto = 0;
-
-      window.chartClasifInstance = new Chart(ctxClasif.getContext('2d'), {
-        type: 'doughnut',
-        data: {
-          labels: ['Adultos', 'Niños (0-17)', 'Adultos Mayores (60+)', 'Con Discapacidad'],
-          datasets: [{ data: [resto, ninos, adultosMayores, discapacidad],
-            backgroundColor: ['#2E7D32','#F9A825','#C62828','#1565C0'],
-            borderWidth: 3, borderColor: '#fff', hoverOffset: 8 }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false, cutout: '50%',
-          plugins: {
-            legend: { position: 'bottom', labels: { padding: 10, font: { family: 'Poppins', size: 10 }, usePointStyle: true, pointStyleWidth: 8 } },
-            tooltip: { backgroundColor: '#1A2E1A', padding: 12, cornerRadius: 8,
-              callbacks: { label: ctx => { const t = ctx.dataset.data.reduce((a,b)=>a+b,0); return ` ${ctx.label}: ${ctx.raw} (${((ctx.raw/t)*100).toFixed(1)}%)`; } } }
-          }
-        }
-      });
-    }
-
-    const ctxCC = document.getElementById('chartCC');
-    if (ctxCC) {
-      if (window.chartCCInstance) window.chartCCInstance.destroy();
-      // Como no trajimos el conteo por consejo desde el endpoint principal,
-      // usaremos el total actual como una sola barra representativa si hay filtros
-      // o datos dummy si no hay nada
-      let val = kpis ? kpis.totalPersonas : 52;
-      
-      const ddlConsejo = document.getElementById('filtroConsejo');
-      let lbl = (ddlConsejo && ddlConsejo.value) ? ddlConsejo.options[ddlConsejo.selectedIndex].text : 'Toda la Comunidad';
-
-      window.chartCCInstance = new Chart(ctxCC.getContext('2d'), {
-        type: 'bar',
-        data: {
-          labels: [lbl],
-          datasets: [{
-            label: 'Habitantes',
-            data: [val],
-            backgroundColor: 'rgba(46,125,50,.8)',
-            borderColor: '#2E7D32',
-            borderWidth: 2, borderRadius: 6, borderSkipped: false
-          }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1A2E1A', padding: 12, cornerRadius: 8 } },
-          scales: {
-            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,.05)' }, ticks: { callback: v => v+' hab.' } },
-            x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 0 } }
-          }
-        }
-      });
-    }
   }
 }
 
