@@ -27,6 +27,8 @@ function mapFrontendData(datos, paso) {
     if (mapped.familiares) {
       mapped.familiares = mapped.familiares.map(f => {
         const nf = { ...f };
+        // Preservar id_habitante si ya fue resuelto desde la tabla habitantes
+        if (nf.id_habitante) nf.id_habitante = parseInt(nf.id_habitante) || null;
         if (nf.genero) nf.sexo = nf.genero;
         if (nf.nivel_educativo) nf.grado_instruccion = nf.nivel_educativo;
         if (nf.ocupacion) nf.profesion = nf.ocupacion;
@@ -52,6 +54,8 @@ function mapFrontendData(datos, paso) {
         delete nf.jef_tipo_incapacidad;
         delete nf.jef_pensionado_institucion;
         delete nf.clasificacion_ingreso;
+        // datos_nuevos_habitante se maneja en la bandeja de validaciones al aprobar
+        delete nf.datos_nuevos_habitante;
         return nf;
       });
     }

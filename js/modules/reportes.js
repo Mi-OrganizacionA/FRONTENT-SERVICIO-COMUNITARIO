@@ -59,8 +59,14 @@ class ReportesController {
     const isVocero = user && user.rol && user.rol.toLowerCase() === 'vocero';
     
     if (isVocero) {
-      const formGroupConsejo = document.getElementById('filtroConsejo')?.closest('.form-group') || document.getElementById('filtroConsejo')?.parentElement;
-      if (formGroupConsejo) formGroupConsejo.style.display = 'none';
+      const filtroCC = document.getElementById('filtroConsejo');
+      if (filtroCC) {
+        filtroCC.value = user.id_comunidad_asignada || '';
+        if (filtroCC.parentElement) filtroCC.parentElement.style.display = 'none';
+      }
+      // Mostrar etiqueta con la comunidad del vocero
+      const subtitulo = document.getElementById('reportes-subtitulo');
+      if (subtitulo) subtitulo.textContent = `Reportes de: ${user.nombre_comunidad || 'Tu Comunidad'}`;
     }
 
     if (btnOpenFilters && modalFiltros) {
@@ -340,27 +346,56 @@ class ReportesController {
     }
   }
 
-  _ejecutarRequestExportacion(tipo, formato, btn, orig, action) {
+  async _ejecutarRequestExportacion(tipo, formato, btn, orig, action) {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
     btn.disabled = true;
 
-    // Obtener filtros
-    const urlParams = this.getFiltrosUrl();
-    const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
-    const tokenParams = window.auth ? `&token=${window.auth.getToken()}` : '';
+    const overlay = document.getElementById('reporteLoadingOverlay');
+    const msg = document.getElementById('reporteLoadingMsg');
     
-    const downloadUrl = `${baseUrl}/censo-reportes/exportar?tipo=${tipo}&format=${formato}&action=${action}&${urlParams}${tokenParams}`;
-    
-    window.open(downloadUrl, '_blank');
+    try {
+      if (overlay) overlay.style.display = 'flex';
+      if (msg) msg.textContent = 'Consultando base de datos...';
 
-    setTimeout(() => {
+      // Obtener filtros
+      const urlParams = this.getFiltrosUrl();
+      const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
+      
+      const downloadUrl = `${baseUrl}/censo-reportes/exportar?tipo=${tipo}&format=${formato}&action=${action}&${urlParams}`;
+      
+      if (msg) msg.textContent = 'Preparando archivo...';
+      const headers = window.auth ? { 'Authorization': `Bearer ${window.auth.getToken()}` } : {};
+      const response = await fetch(downloadUrl, { headers });
+
+      if (!response.ok) throw new Error(`Error ${response.status}`);
+      
+      const blob = await response.blob();
+      const objUrl = URL.createObjectURL(blob);
+      
+      if (action === 'view' && formato === 'pdf') {
+        window.open(objUrl, '_blank');
+      } else {
+        const a = document.createElement('a');
+        a.href = objUrl;
+        a.download = `reporte_${tipo}_${Date.now()}.${formato === 'pdf' ? 'pdf' : 'xlsx'}`;
+        a.click();
+      }
+      
       btn.innerHTML = '<i class="fas fa-check"></i> ¡Listo!';
       if (window.Components) Components.showToast('Reporte generado exitosamente.', 'success');
+      
       setTimeout(() => { 
         btn.innerHTML = orig; 
         btn.disabled = false; 
       }, 2000);
-    }, 1500);
+      
+    } catch(err) {
+      if (window.Components) Components.showToast('Error al generar el reporte: ' + err.message, 'error');
+      btn.innerHTML = orig; 
+      btn.disabled = false; 
+    } finally {
+      if (overlay) overlay.style.display = 'none';
+    }
   }
 }
 

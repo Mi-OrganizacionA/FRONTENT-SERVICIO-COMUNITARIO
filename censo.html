@@ -301,7 +301,13 @@
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="habCedula">Cédula de Identidad <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="habCedula" data-mask="cedula" name="cedula" placeholder="12345678" required>
+                  <div class="cv-input-group" style="display:flex;">
+                    <select class="cv-form-control" id="habNacionalidad" style="flex: 0 0 70px; padding-left:0.5rem; padding-right:0.5rem; border-right:none; border-top-right-radius:0; border-bottom-right-radius:0;">
+                      <option value="V">V-</option>
+                      <option value="E">E-</option>
+                    </select>
+                    <input type="text" class="cv-form-control" id="habCedula" data-mask="cedula" name="cedula" placeholder="12345678" required style="flex: 1; border-top-left-radius:0; border-bottom-left-radius:0;">
+                  </div>
                   <span class="cv-form-hint">Llave única para consultas.</span>
                 </div>
                 <div class="cv-form-group">
@@ -715,7 +721,9 @@
     else if (age >= 60) clasificacion = 'adulto_mayor';
 
     var cedulaVal = document.getElementById('habCedula').value.trim().replace(/[.\s-]/g, '').replace(/^[VE]/i, '');
+    var nacionalidadVal = document.getElementById('habNacionalidad') ? document.getElementById('habNacionalidad').value : 'V';
     var data = {
+      nacionalidad: nacionalidadVal,
       cedula: cedulaVal,
       nombres: nombres,
       apellidos: apellidos,

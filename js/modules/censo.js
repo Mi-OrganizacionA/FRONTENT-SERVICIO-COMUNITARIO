@@ -381,6 +381,7 @@ class CensoController {
       if (el) el.value = val ?? '';
     };
     
+    setVal('habNacionalidad', h.nacionalidad || 'V');
     setVal('habCedula', h.cedula);
     setVal('habNombre', `${h.nombres || ''} ${h.apellidos || ''}`.trim());
     setVal('habFechaNac', h.fecha_nacimiento ? h.fecha_nacimiento.split('T')[0] : '');

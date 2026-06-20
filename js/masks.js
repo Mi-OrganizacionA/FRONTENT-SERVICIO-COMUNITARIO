@@ -21,20 +21,22 @@
    * Formato: V-00.000.000
    */
   function aplicarMascaraCedula(input) {
-    input.setAttribute('maxlength', '13'); // V-123.456.789 = 13 caracteres max
-    input.setAttribute('placeholder', input.placeholder || 'V-12.345.678');
+    input.setAttribute('maxlength', '12'); // 12.345.678 = 10 caracteres max (sin V-)
+    input.setAttribute('placeholder', input.placeholder || '12.345.678');
     input.setAttribute('autocomplete', 'off');
-    input.setAttribute('inputmode', 'text');
+    input.setAttribute('inputmode', 'numeric');
 
     input.addEventListener('input', function () {
       let v = this.value.toUpperCase().replace(/[^VEve0-9]/g, '');
       let prefix = '';
       let nums = '';
+      
+      // Si el usuario insiste en tipear V o E, lo dejamos (por retrocompatibilidad)
       if (v.startsWith('V') || v.startsWith('E')) {
         prefix = v[0] + '-';
-        nums = v.slice(1).replace(/\D/g, '').slice(0, 9); // Max 9 digitos
+        nums = v.slice(1).replace(/\D/g, '').slice(0, 9);
       } else {
-        prefix = 'V-';
+        // Solo números
         nums = v.replace(/\D/g, '').slice(0, 9);
       }
       
@@ -54,7 +56,8 @@
     input.addEventListener('keydown', function (e) {
       const permitidos = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
       if (permitidos.includes(e.key)) return;
-      if (/^[VvEe0-9]$/.test(e.key)) return;
+      if (/^[0-9]$/.test(e.key)) return;
+      if (this.value.length === 0 && /^[VvEe]$/.test(e.key)) return; // Solo permitir al inicio
       e.preventDefault();
     });
 

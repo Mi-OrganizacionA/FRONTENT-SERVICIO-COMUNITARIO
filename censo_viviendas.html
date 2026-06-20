@@ -2004,6 +2004,10 @@
                 <i class="fas fa-user-tie"></i>
                 Sección III — Datos del Jefe del Grupo Familiar
               </div>
+              
+              <!-- Banner de estado del habitante y campo oculto -->
+              <input type="hidden" id="jefeHabitanteId" name="id_habitante_jefe">
+              <div id="jefeStatusBanner" style="display:none; padding:.6rem 1rem; border-radius:8px; font-size:.82rem; margin-bottom:1rem;"></div>
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
@@ -2015,28 +2019,31 @@
                         class="fas fa-magnifying-glass"></i></button>
                   </div>
                   <span class="cv-form-hint">Una cédula = una vivienda</span>
+                  <button type="button" id="btnRegistrarJefe" style="display:none; margin-top:0.5rem;" class="cv-btn cv-btn-ghost" onclick="abrirModalRegistrarHabitanteRapido('jefe')">
+                    <i class="fas fa-user-plus"></i> Registrar como nuevo habitante
+                  </button>
                 </div>
                 <div class="cv-form-group">
                   <label for="jefNombres">Nombres y Apellidos <span class="req">*</span></label>
-                  <input type="text" class="cv-form-control" id="jefNombres" placeholder="Nombre completo" required>
+                  <input type="text" class="cv-form-control" id="jefNombres" placeholder="Nombre completo" required readonly>
                 </div>
               </div>
 
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="jefNacionalidad">Nacionalidad</label>
-                  <select class="cv-form-control" id="jefNacionalidad">
+                  <select class="cv-form-control" id="jefNacionalidad" disabled>
                     <option value="V">Venezolano (V)</option>
                     <option value="E">Extranjero (E)</option>
                   </select>
                 </div>
                 <div class="cv-form-group">
                   <label for="jefFechaNac">Fecha de Nacimiento <span class="req">*</span></label>
-                  <input type="date" class="cv-form-control" id="jefFechaNac" required>
+                  <input type="date" class="cv-form-control" id="jefFechaNac" required readonly>
                 </div>
                 <div class="cv-form-group">
                   <label for="jefSexo">Sexo <span class="req">*</span></label>
-                  <select class="cv-form-control" id="jefSexo" required>
+                  <select class="cv-form-control" id="jefSexo" required disabled>
                     <option value="">Seleccione...</option>
                     <option value="M">Masculino</option>
                     <option value="F">Femenino</option>
@@ -2048,7 +2055,7 @@
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="jefEstadoCivil">Estado Civil <span class="req">*</span></label>
-                  <select class="cv-form-control" id="jefEstadoCivil" required>
+                  <select class="cv-form-control" id="jefEstadoCivil" required disabled>
                     <option value="">Seleccione...</option>
                     <option value="Soltero/a">Soltero(a)</option>
                     <option value="Casado/a">Casado(a)</option>
@@ -2059,7 +2066,7 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="jefNivelInstruccion">Nivel de Instrucción <span class="req">*</span></label>
-                  <select class="cv-form-control" id="jefNivelInstruccion" required>
+                  <select class="cv-form-control" id="jefNivelInstruccion" required disabled>
                     <option value="">Seleccione...</option>
                     <option value="Primaria">Primaria</option>
                     <option value="Bachiller">Bachiller</option>
@@ -2075,15 +2082,15 @@
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="jefProfesion">Profesión / Oficio</label>
-                  <input type="text" class="cv-form-control" id="jefProfesion" placeholder="Ej. Albañil, Maestra...">
+                  <input type="text" class="cv-form-control" id="jefProfesion" placeholder="Ej. Albañil, Maestra..." readonly>
                 </div>
                 <div class="cv-form-group">
                   <label for="jefTiempoComunidad">Tiempo en la Comunidad</label>
-                  <input type="text" class="cv-form-control" id="jefTiempoComunidad" placeholder="Ej. 10 años">
+                  <input type="text" class="cv-form-control" id="jefTiempoComunidad" placeholder="Ej. 10 años" readonly>
                 </div>
                 <div class="cv-form-group">
                   <label for="jefInscritoCNE">¿Inscrito en el CNE?</label>
-                  <select class="cv-form-control" id="jefInscritoCNE">
+                  <select class="cv-form-control" id="jefInscritoCNE" disabled>
                     <option value="">Seleccione...</option>
                     <option value="Si">Sí</option>
                     <option value="No">No</option>
@@ -2094,22 +2101,22 @@
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <label for="jefTelfCel">Teléfono Celular</label>
-                  <input type="tel" class="cv-form-control" id="jefTelfCel" placeholder="Ej. 0414-1234567">
+                  <input type="tel" class="cv-form-control" id="jefTelfCel" placeholder="Ej. 0414-1234567" readonly>
                 </div>
                 <div class="cv-form-group">
                   <label for="jefTelfHab">Teléfono Habitación</label>
-                  <input type="tel" class="cv-form-control" id="jefTelfHab" placeholder="Ej. 0254-1234567">
+                  <input type="tel" class="cv-form-control" id="jefTelfHab" placeholder="Ej. 0254-1234567" readonly>
                 </div>
                 <div class="cv-form-group">
                   <label for="jefEmail">Correo Electrónico</label>
-                  <input type="email" class="cv-form-control" id="jefEmail" placeholder="correo@ejemplo.com">
+                  <input type="email" class="cv-form-control" id="jefEmail" placeholder="correo@ejemplo.com" readonly>
                 </div>
               </div>
 
               <div class="cv-form-row cv-grid-2">
                 <div class="cv-form-group">
                   <label for="jefIncapacitado">¿Tiene Incapacidad?</label>
-                  <select class="cv-form-control" id="jefIncapacitado" onchange="document.getElementById('jefTipoIncapacidad').disabled = this.value !== 'Si'; if(this.value !== 'Si') document.getElementById('jefTipoIncapacidad').value = '';">
+                  <select class="cv-form-control" id="jefIncapacitado" disabled>
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
                     <option value="Si">Sí</option>
@@ -2118,14 +2125,14 @@
                 <div class="cv-form-group">
                   <label for="jefTipoIncapacidad">Tipo de Incapacidad</label>
                   <input type="text" class="cv-form-control" id="jefTipoIncapacidad" placeholder="Especifique si aplica"
-                    disabled>
+                    readonly>
                 </div>
               </div>
 
               <div class="cv-form-row cv-grid-3" style="margin-top:1rem">
                 <div class="cv-form-group">
                   <label for="jefPensionado">¿Es Pensionado?</label>
-                  <select class="cv-form-control" id="jefPensionado" onchange="document.getElementById('jefPensionadoInstitucion').disabled = this.value !== 'Si'; if(this.value !== 'Si') document.getElementById('jefPensionadoInstitucion').value = '';">
+                  <select class="cv-form-control" id="jefPensionado" disabled>
                     <option value="">Seleccione...</option>
                     <option value="Si">Sí</option>
                     <option value="No">No</option>
@@ -2133,7 +2140,7 @@
                 </div>
                 <div class="cv-form-group">
                   <label for="jefPensionadoInstitucion">Institución Pensión</label>
-                  <input type="text" class="cv-form-control" id="jefPensionadoInstitucion" placeholder="Ej. IVSS" disabled>
+                  <input type="text" class="cv-form-control" id="jefPensionadoInstitucion" placeholder="Ej. IVSS" readonly>
                 </div>
                 <div class="cv-form-group">
                   <label for="jefIngresoMensualBs">Ingreso Mensual Bs.</label>
@@ -2175,22 +2182,21 @@
 
               <div id="familiarList" style="display:flex;flex-direction:column;gap:.75rem">
                 <!-- Familiar 1 -->
-                <div class="familiar-row"
-                  style="background:var(--gray1);border:1.5px solid var(--gray3);border-radius:var(--r-md);padding:1rem">
-                  <div style="font-size:.75rem;font-weight:700;color:var(--vp);margin-bottom:.6rem">👤 Integrante #1
+                <div class="familiar-row" style="background:var(--gray1);border:1.5px solid var(--gray3);border-radius:var(--r-md);padding:1rem">
+                  <div class="fam-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.6rem">
+                    <span class="fam-label" style="font-size:.75rem;font-weight:700;color:var(--vp);">👤 Integrante #1</span>
+                    <button type="button" class="fam-remove-btn cv-btn-validate" style="width:24px; height:24px; background:transparent; border:none; color:var(--danger); cursor:pointer;" onclick="this.closest('.familiar-row').remove(); window.renumerarFamiliares && window.renumerarFamiliares();">
+                      <i class="fas fa-times"></i>
+                    </button>
                   </div>
-                  <div class="cv-form-row cv-grid-3">
+                  
+                  <div class="cv-form-row cv-grid-2">
                     <div class="cv-form-group">
                       <label>Cédula / Fecha Nacimiento</label>
                       <div class="cv-input-group">
                         <input type="text" class="cv-form-control fam-cedula" placeholder="V-XX.XXX.XXX">
-                        <button type="button" class="cv-btn-validate btn-validar-fam"><i
-                            class="fas fa-magnifying-glass"></i></button>
+                        <button type="button" class="cv-btn-validate btn-validar-fam"><i class="fas fa-magnifying-glass"></i></button>
                       </div>
-                    </div>
-                    <div class="cv-form-group">
-                      <label>Nombres y Apellidos</label>
-                      <input type="text" class="cv-form-control fam-nombres" placeholder="Nombres y apellidos">
                     </div>
                     <div class="cv-form-group">
                       <label>Parentesco</label>
@@ -2206,37 +2212,71 @@
                       </select>
                     </div>
                   </div>
-                  <div class="cv-form-row cv-grid-3" style="margin-top:.5rem">
-                    <div class="cv-form-group">
-                      <label>Sexo</label>
-                      <select class="cv-form-control fam-sexo">
-                        <option value="">Seleccione...</option>
-                        <option value="M">Masculino</option>
-                        <option value="F">Femenino</option>
-                      </select>
+
+                  <!-- Banner de estado del integrante -->
+                  <div class="fam-status-banner" style="display:none; padding:.6rem 1rem; border-radius:8px; font-size:.82rem; margin-top:.5rem;"></div>
+                  
+                  <!-- Botón registrar si no existe -->
+                  <button type="button" class="fam-registrar-btn cv-btn cv-btn-ghost" style="display:none; margin-top:0.5rem;" onclick="window._registrandoFilaFamiliar = this.closest('.familiar-row'); abrirModalRegistrarHabitanteRapido('familiar')">
+                    <i class="fas fa-user-plus"></i> Registrar como nuevo habitante
+                  </button>
+
+                  <!-- Campo oculto para ID -->
+                  <input type="hidden" class="fam-habitante-id">
+
+                  <!-- Campos de solo lectura (colapsables / visibles al encontrar) -->
+                  <div class="fam-datos-readonly" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px dashed var(--gray3);">
+                    <div class="cv-form-row cv-grid-3" style="margin-bottom:.5rem;">
+                      <div class="cv-form-group">
+                        <label>Nombres y Apellidos</label>
+                        <input type="text" class="cv-form-control fam-nombres" readonly>
+                      </div>
+                      <div class="cv-form-group">
+                        <label>Fecha Nac.</label>
+                        <input type="date" class="cv-form-control fam-fechanac" readonly>
+                      </div>
+                      <div class="cv-form-group">
+                        <label>Sexo</label>
+                        <select class="cv-form-control fam-sexo" disabled>
+                          <option value="">...</option>
+                          <option value="M">Masculino</option>
+                          <option value="F">Femenino</option>
+                          <option value="Otro">Otro</option>
+                        </select>
+                      </div>
                     </div>
-                    <div class="cv-form-group">
-                      <label>Grado de Instrucción</label>
-                      <select class="cv-form-control fam-instruccion">
-                        <option value="">Seleccione...</option>
-                        <option value="Sin instrucción">Sin instrucción</option>
-                        <option value="Primaria">Primaria</option>
-                        <option value="Secundaria">Secundaria</option>
-                        <option value="Técnico">Técnico</option>
-                        <option value="Universitario">Universitario</option>
-                      </select>
+                    
+                    <div class="cv-form-row cv-grid-4" style="margin-bottom:.5rem;">
+                      <div class="cv-form-group">
+                        <label>Estado Civil</label>
+                        <input type="text" class="cv-form-control fam-estadocivil" readonly>
+                      </div>
+                      <div class="cv-form-group">
+                        <label>Instrucción</label>
+                        <input type="text" class="cv-form-control fam-instruccion" readonly>
+                      </div>
+                      <div class="cv-form-group">
+                        <label>Ocupación</label>
+                        <input type="text" class="cv-form-control fam-ocupacion" readonly>
+                      </div>
+                      <div class="cv-form-group">
+                        <label>Inscrito CNE</label>
+                        <input type="text" class="cv-form-control fam-cne" readonly>
+                      </div>
                     </div>
-                    <div class="cv-form-group">
-                      <label>Pensionado</label>
-                      <select class="cv-form-control fam-pensionado">
-                        <option value="No">No</option>
-                        <option value="Si">Sí</option>
-                      </select>
-                    </div>
-                    <div class="cv-form-group">
-                      <label>Embarazo Temprano</label>
-                      <div style="margin-top:0.5rem">
-                        <input type="checkbox" class="fam-embarazo" style="transform: scale(1.2)"> Sí
+
+                    <div class="cv-form-row cv-grid-3">
+                      <div class="cv-form-group">
+                        <label>Cond. Salud</label>
+                        <input type="text" class="cv-form-control fam-salud" readonly>
+                      </div>
+                      <div class="cv-form-group">
+                        <label>Incapacidad</label>
+                        <input type="text" class="cv-form-control fam-incapacidad" readonly>
+                      </div>
+                      <div class="cv-form-group">
+                        <label>Pensión</label>
+                        <input type="text" class="cv-form-control fam-pension" readonly>
                       </div>
                     </div>
                   </div>
@@ -3358,6 +3398,8 @@
           const apellidos = document.getElementById('jefApellidos')?.value;
           if (cedula || nombres) {
             familiares.push({
+              id_habitante: document.getElementById('jefeHabitanteId')?.value || null,
+              datos_nuevos_habitante: window._datos_nuevos_jefe || null,
               cedula_identidad: cedula,
               nombres_apellidos: (nombres + ' ' + (apellidos || '')).trim(),
               parentesco: 'Jefe(a) de Familia',
@@ -3392,9 +3434,13 @@
           const instruccion = row.querySelector('.fam-instruccion')?.value;
           const pensionado = row.querySelector('.fam-pensionado')?.value;
           const embarazo = row.querySelector('.fam-embarazo')?.checked;
+          const idHabitante = row.querySelector('.fam-habitante-id')?.value;
+          const datosNuevos = row._datos_nuevos_habitante;
 
           if (cedula || nombres) {
             familiares.push({
+              id_habitante: idHabitante || null,
+              datos_nuevos_habitante: datosNuevos || null,
               cedula_identidad: cedula,
               nombres_apellidos: nombres,
               parentesco: parentesco,
@@ -3676,22 +3722,20 @@
       row.className = 'familiar-row';
       row.style.cssText = 'background:var(--gray1);border:1.5px solid var(--gray3);border-radius:var(--r-md);padding:1rem;position:relative';
       row.innerHTML = `
-        <div style="font-size:.75rem;font-weight:700;color:var(--vp);margin-bottom:.6rem">👤 Integrante #${familiarCount}</div>
-        <button type="button" onclick="this.closest('.familiar-row').remove()" 
-          style="position:absolute;top:.5rem;right:.5rem;background:#FFEBEE;color:#C62828;border:none;border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:.75rem">
-          <i class="fas fa-times"></i>
-        </button>
-        <div class="cv-form-row cv-grid-3">
+        <div class="fam-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.6rem">
+          <span class="fam-label" style="font-size:.75rem;font-weight:700;color:var(--vp);">👤 Integrante #${familiarCount}</span>
+          <button type="button" class="fam-remove-btn cv-btn-validate" style="width:24px; height:24px; background:transparent; border:none; color:var(--danger); cursor:pointer;" onclick="this.closest('.familiar-row').remove(); window.renumerarFamiliares && window.renumerarFamiliares();">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="cv-form-row cv-grid-2">
           <div class="cv-form-group">
             <label>Cédula / Fecha Nacimiento</label>
             <div class="cv-input-group">
               <input type="text" class="cv-form-control fam-cedula" placeholder="V-XX.XXX.XXX">
               <button type="button" class="cv-btn-validate btn-validar-fam"><i class="fas fa-magnifying-glass"></i></button>
             </div>
-          </div>
-          <div class="cv-form-group">
-            <label>Nombres y Apellidos</label>
-            <input type="text" class="cv-form-control fam-nombres" placeholder="Nombres y apellidos">
           </div>
           <div class="cv-form-group">
             <label>Parentesco</label>
@@ -3707,32 +3751,72 @@
             </select>
           </div>
         </div>
-        <div class="cv-form-row cv-grid-3" style="margin-top:.5rem">
-          <div class="cv-form-group">
-            <label>Sexo</label>
-            <select class="cv-form-control fam-sexo">
-              <option value="">Seleccione...</option>
-              <option value="M">Masculino</option>
-              <option value="F">Femenino</option>
-            </select>
+
+        <!-- Banner de estado del integrante -->
+        <div class="fam-status-banner" style="display:none; padding:.6rem 1rem; border-radius:8px; font-size:.82rem; margin-top:.5rem;"></div>
+        
+        <!-- Botón registrar si no existe -->
+        <button type="button" class="fam-registrar-btn cv-btn cv-btn-ghost" style="display:none; margin-top:0.5rem;" onclick="window._registrandoFilaFamiliar = this.closest('.familiar-row'); abrirModalRegistrarHabitanteRapido('familiar')">
+          <i class="fas fa-user-plus"></i> Registrar como nuevo habitante
+        </button>
+
+        <!-- Campo oculto para ID -->
+        <input type="hidden" class="fam-habitante-id">
+
+        <!-- Campos de solo lectura (colapsables / visibles al encontrar) -->
+        <div class="fam-datos-readonly" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px dashed var(--gray3);">
+          <div class="cv-form-row cv-grid-3" style="margin-bottom:.5rem;">
+            <div class="cv-form-group">
+              <label>Nombres y Apellidos</label>
+              <input type="text" class="cv-form-control fam-nombres" readonly>
+            </div>
+            <div class="cv-form-group">
+              <label>Fecha Nac.</label>
+              <input type="date" class="cv-form-control fam-fechanac" readonly>
+            </div>
+            <div class="cv-form-group">
+              <label>Sexo</label>
+              <select class="cv-form-control fam-sexo" disabled>
+                <option value="">...</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
           </div>
-          <div class="cv-form-group">
-            <label>Grado de Instrucción</label>
-            <select class="cv-form-control fam-instruccion">
-              <option value="">Seleccione...</option>
-              <option value="Sin instrucción">Sin instrucción</option>
-              <option value="Primaria">Primaria</option>
-              <option value="Secundaria">Secundaria</option>
-              <option value="Técnico">Técnico</option>
-              <option value="Universitario">Universitario</option>
-            </select>
+          
+          <div class="cv-form-row cv-grid-4" style="margin-bottom:.5rem;">
+            <div class="cv-form-group">
+              <label>Estado Civil</label>
+              <input type="text" class="cv-form-control fam-estadocivil" readonly>
+            </div>
+            <div class="cv-form-group">
+              <label>Instrucción</label>
+              <input type="text" class="cv-form-control fam-instruccion" readonly>
+            </div>
+            <div class="cv-form-group">
+              <label>Ocupación</label>
+              <input type="text" class="cv-form-control fam-ocupacion" readonly>
+            </div>
+            <div class="cv-form-group">
+              <label>Inscrito CNE</label>
+              <input type="text" class="cv-form-control fam-cne" readonly>
+            </div>
           </div>
-          <div class="cv-form-group">
-            <label>Pensionado</label>
-            <select class="cv-form-control fam-pensionado">
-              <option value="No">No</option>
-              <option value="Si">Sí</option>
-            </select>
+
+          <div class="cv-form-row cv-grid-3">
+            <div class="cv-form-group">
+              <label>Cond. Salud</label>
+              <input type="text" class="cv-form-control fam-salud" readonly>
+            </div>
+            <div class="cv-form-group">
+              <label>Incapacidad</label>
+              <input type="text" class="cv-form-control fam-incapacidad" readonly>
+            </div>
+            <div class="cv-form-group">
+              <label>Pensión</label>
+              <input type="text" class="cv-form-control fam-pension" readonly>
+            </div>
           </div>
         </div>
       `;
@@ -4889,7 +4973,9 @@
         });
 
         HabitanteAutocomplete.attachTo('cedulaJefe', (datos) => {
+          document.getElementById('jefeHabitanteId').value = datos.id;
           window.currentJefeFamiliaId = datos.id;
+          
           // Limpiar estilo y rellenar
           camposJefe.forEach(id => {
             const el = document.getElementById(id);
@@ -4927,9 +5013,24 @@
             selCNE.value = datos.inscrito_cne === true || datos.inscrito_cne === 'true' ? 'Si' : 'No';
           }
 
+          // Incapacidad
           const selIncap = document.getElementById('jefIncapacitado');
           if (selIncap && datos.incapacitado !== undefined && datos.incapacitado !== null) {
             selIncap.value = datos.incapacitado === true || datos.incapacitado === 'true' ? 'Si' : 'No';
+          }
+          const tipoIncap = document.getElementById('jefTipoIncapacidad');
+          if (tipoIncap) {
+            tipoIncap.value = datos.incapacidad_tipo || datos.incapacitado_tipo || '';
+          }
+
+          // Pensión
+          const selPen = document.getElementById('jefPensionado');
+          if (selPen && datos.pensionado !== undefined && datos.pensionado !== null) {
+            selPen.value = datos.pensionado === true || datos.pensionado === 'true' ? 'Si' : 'No';
+          }
+          const instPen = document.getElementById('jefPensionadoInstitucion');
+          if (instPen) {
+            instPen.value = datos.pensionado_institucion || '';
           }
 
           // También sincronizar encuestado si el checkbox está marcado
@@ -4939,16 +5040,43 @@
             document.getElementById('encuestadoCedula').value = document.getElementById('cedulaJefe').value;
           }
 
+          // Mostrar banner de éxito y ocultar botón de registro
+          const banner = document.getElementById('jefeStatusBanner');
+          if (banner) {
+            banner.style.display = 'block';
+            banner.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+            banner.style.color = 'var(--success)';
+            banner.innerHTML = `<i class="fas fa-check-circle"></i> Habitante encontrado: ${datos.nombres} ${datos.apellidos || ''}`;
+          }
+          document.getElementById('btnRegistrarJefe').style.display = 'none';
+
           showToast(`✅ Jefe de familia cargado: ${datos.nombres} ${datos.apellidos || ''}`, 'success');
         }, {
           onNotFound: () => {
-            // Limpiar campos y mostrar advertencia
+            // Limpiar campos y mostrar botón de registro
             camposJefe.forEach(id => {
               const el = document.getElementById(id);
               if (el) { el.value = ''; el.style.borderColor = '#EF5350'; }
             });
+            const camposExtra = ['jefTipoIncapacidad', 'jefPensionado', 'jefPensionadoInstitucion'];
+            camposExtra.forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.value = '';
+            });
+
+            document.getElementById('jefeHabitanteId').value = '';
             window.currentJefeFamiliaId = null;
-            showToast('⚠️ Esta cédula no está registrada como habitante. Por favor regístrelo primero en "Habitantes".', 'error');
+
+            const banner = document.getElementById('jefeStatusBanner');
+            if (banner) {
+              banner.style.display = 'block';
+              banner.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+              banner.style.color = 'var(--danger)';
+              banner.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Cédula no registrada. Por favor regístrelo como nuevo habitante.`;
+            }
+            document.getElementById('btnRegistrarJefe').style.display = 'flex';
+
+            showToast('⚠️ Esta cédula no está registrada como habitante.', 'error');
           }
         });
 
@@ -4964,17 +5092,24 @@
           if (!cedulaInput) return;
 
           HabitanteAutocomplete.attachTo(cedulaInput, (datos) => {
+            const idInput = row.querySelector('.fam-habitante-id');
             const nombreInput = row.querySelector('.fam-nombres');
             const sexoSel = row.querySelector('.fam-sexo');
-            const instrSel = row.querySelector('.fam-instruccion');
             const fechaInput = row.querySelector('.fam-fechanac');
-
+            
+            const estadocivilInput = row.querySelector('.fam-estadocivil');
+            const instruccionInput = row.querySelector('.fam-instruccion');
+            const ocupacionInput = row.querySelector('.fam-ocupacion');
+            const cneInput = row.querySelector('.fam-cne');
+            
+            const saludInput = row.querySelector('.fam-salud');
+            const incapacidadInput = row.querySelector('.fam-incapacidad');
+            const pensionInput = row.querySelector('.fam-pension');
+            
+            if (idInput) idInput.value = datos.id;
             if (nombreInput) nombreInput.value = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
             if (datos.genero && sexoSel) {
               sexoSel.value = datos.genero;
-            }
-            if (datos.nivel_educativo && instrSel) {
-              instrSel.value = datos.nivel_educativo;
             }
             if (datos.fecha_nacimiento && fechaInput) {
               try {
@@ -4982,11 +5117,55 @@
                 fechaInput.value = d.toISOString().split('T')[0];
               } catch (_) { }
             }
+            
+            if (estadocivilInput) estadocivilInput.value = datos.estado_civil || '';
+            if (instruccionInput) instruccionInput.value = datos.nivel_educativo || '';
+            if (ocupacionInput) ocupacionInput.value = datos.ocupacion || '';
+            if (cneInput) cneInput.value = (datos.inscrito_cne === true || datos.inscrito_cne === 'true') ? 'Sí' : 'No';
+            
+            if (saludInput) saludInput.value = datos.condicion_salud || 'saludable';
+            if (incapacidadInput) {
+              incapacidadInput.value = datos.incapacitado_tipo || datos.incapacidad_tipo || (datos.incapacitado ? 'Sí (no especificado)' : 'Ninguna');
+            }
+            if (pensionInput) {
+              pensionInput.value = (datos.pensionado === true || datos.pensionado === 'true') ? (datos.pensionado_institucion || 'Sí') : 'No';
+            }
+
+            const readonlyDiv = row.querySelector('.fam-datos-readonly');
+            if (readonlyDiv) readonlyDiv.style.display = 'block';
+
+            const banner = row.querySelector('.fam-status-banner');
+            if (banner) {
+              banner.style.display = 'block';
+              banner.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+              banner.style.color = 'var(--success)';
+              banner.innerHTML = `<i class="fas fa-check-circle"></i> Habitante encontrado: ${datos.nombres}`;
+            }
+            const btnReg = row.querySelector('.fam-registrar-btn');
+            if (btnReg) btnReg.style.display = 'none';
+
           }, {
             onNotFound: () => {
-              showToast('⚠️ Esta cédula no está registrada como habitante en el sistema. Debe registrarlo primero.', 'error');
+              const idInput = row.querySelector('.fam-habitante-id');
               const nombreInput = row.querySelector('.fam-nombres');
-              if (nombreInput) { nombreInput.value = ''; nombreInput.style.borderColor = '#EF5350'; }
+              
+              if (idInput) idInput.value = '';
+              if (nombreInput) nombreInput.value = '';
+              
+              const readonlyDiv = row.querySelector('.fam-datos-readonly');
+              if (readonlyDiv) readonlyDiv.style.display = 'none';
+
+              const banner = row.querySelector('.fam-status-banner');
+              if (banner) {
+                banner.style.display = 'block';
+                banner.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                banner.style.color = 'var(--danger)';
+                banner.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Cédula no registrada. Por favor regístrelo como nuevo habitante.`;
+              }
+              const btnReg = row.querySelector('.fam-registrar-btn');
+              if (btnReg) btnReg.style.display = 'flex';
+
+              showToast('⚠️ Esta cédula no está registrada como habitante.', 'error');
             }, debounce: 600
           });
 
@@ -5045,7 +5224,230 @@
         <button type="button" class="btn-sicag btn-outline-verde" onclick="cerrarModalPrevisualizar()">Cerrar</button>
       </div>
     </div>
-  </div>
-</body>
+  <!-- ════════════════════════════════════════
+       MODAL: Registrar Habitante Rápido
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modalRegistrarHabitanteRapido" role="dialog" aria-modal="true" style="display:none; z-index:9999;">
+    <div class="modal-content-sicag" style="max-width:560px;">
+      <div class="modal-header-sicag">
+        <h3><i class="fas fa-user-plus" style="color:var(--vv)"></i> Registrar Nuevo Habitante</h3>
+        <button onclick="cerrarModalRegistrarHabitanteRapido()">&times;</button>
+      </div>
+      <div class="modal-body-sicag" style="max-height: 65vh; overflow-y: auto;">
+        <div class="cv-form-row cv-grid-2">
+          <div class="cv-form-group">
+            <label>Cédula</label>
+            <div class="cv-input-group" style="display:flex;">
+              <select class="cv-form-control" id="rh_nacionalidad" style="flex: 0 0 70px; padding-left:0.5rem; padding-right:0.5rem; border-right:none; border-top-right-radius:0; border-bottom-right-radius:0;">
+                <option value="V">V-</option>
+                <option value="E">E-</option>
+              </select>
+              <input type="text" class="cv-form-control" id="rh_cedula" readonly style="flex: 1; border-top-left-radius:0; border-bottom-left-radius:0; background:var(--gray2);">
+            </div>
+          </div>
+          <div class="cv-form-group">
+            <label>Nombres y Apellidos</label>
+            <input type="text" class="cv-form-control" id="rh_nombres" placeholder="Nombres completos" required>
+          </div>
+        </div>
+        <div class="cv-form-row cv-grid-3" style="margin-top:1rem;">
+          <div class="cv-form-group">
+            <label>Fecha de Nacimiento</label>
+            <input type="date" class="cv-form-control" id="rh_fecha_nacimiento" required>
+          </div>
+          <div class="cv-form-group">
+            <label>Género</label>
+            <select class="cv-form-control" id="rh_genero" required>
+              <option value="">Seleccione...</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+            </select>
+          </div>
+          <div class="cv-form-group">
+            <label>Estado Civil</label>
+            <select class="cv-form-control" id="rh_estado_civil">
+              <option value="">Seleccionar...</option>
+              <option value="Soltero/a">Soltero/a</option>
+              <option value="Casado/a">Casado/a</option>
+              <option value="Viudo/a">Viudo/a</option>
+              <option value="Divorciado/a">Divorciado/a</option>
+              <option value="Concubino/a">Concubino/a</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="cv-form-row cv-grid-3" style="margin-top:1rem;">
+          <div class="cv-form-group">
+            <label>Nivel Educativo</label>
+            <select class="cv-form-control" id="rh_nivel_educativo">
+              <option value="">Seleccionar...</option>
+              <option value="Primaria">Primaria</option>
+              <option value="Bachiller">Bachiller</option>
+              <option value="Tecnico Medio">Técnico Medio</option>
+              <option value="Tecnico Superior">Técnico Superior (TSU)</option>
+              <option value="Universitario">Universitario</option>
+              <option value="Postgrado">Postgrado / Maestría</option>
+              <option value="Ninguno">Ninguno</option>
+            </select>
+          </div>
+          <div class="cv-form-group">
+            <label>Ocupación</label>
+            <input type="text" class="cv-form-control" id="rh_ocupacion" placeholder="Estudiante, Albañil...">
+          </div>
+          <div class="cv-form-group">
+            <label>Inscrito en el CNE</label>
+            <select class="cv-form-control" id="rh_inscrito_cne">
+              <option value="false">No</option>
+              <option value="true">Sí</option>
+            </select>
+          </div>
+        </div>
 
+        <div class="cv-form-row cv-grid-3" style="margin-top:1rem;">
+          <div class="cv-form-group">
+            <label>Condición de Salud</label>
+            <select class="cv-form-control" id="rh_condicion_salud" required>
+              <option value="saludable">Saludable</option>
+              <option value="enfermedad_cronica">Enfermedad Crónica</option>
+              <option value="discapacidad">Discapacidad</option>
+              <option value="encamado">Encamado</option>
+            </select>
+          </div>
+          <div class="cv-form-group">
+            <label>Incapacitado (Tipo)</label>
+            <input type="text" class="cv-form-control" id="rh_incapacidad_tipo" placeholder="Ninguna o Especifique">
+          </div>
+          <div class="cv-form-group">
+            <label>Pensionado (Inst.)</label>
+            <input type="text" class="cv-form-control" id="rh_pensionado_institucion" placeholder="Ej: IVSS">
+          </div>
+        </div>
+
+        <div class="cv-form-group" style="margin-top:1rem;">
+          <label>Dirección</label>
+          <textarea class="cv-form-control" id="rh_direccion" rows="2" required></textarea>
+        </div>
+      </div>
+      <div class="modal-footer-sicag">
+        <button type="button" class="btn-sicag btn-outline-gris" onclick="cerrarModalRegistrarHabitanteRapido()">Cancelar</button>
+        <button type="button" class="btn-sicag btn-outline-verde" onclick="guardarHabitanteRapido()">
+          <i class="fas fa-save"></i> Guardar y Vincular
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function abrirModalRegistrarHabitanteRapido(tipo) {
+      window._registrandoTipo = tipo; // 'jefe' o 'familiar'
+      let cedula = '';
+      if (tipo === 'jefe') {
+        cedula = document.getElementById('cedulaJefe').value;
+      } else if (tipo === 'familiar' && window._registrandoFilaFamiliar) {
+        cedula = window._registrandoFilaFamiliar.querySelector('.fam-cedula').value;
+      }
+      
+      if (!cedula) {
+        showToast('Debe ingresar la cédula antes de registrar al habitante.', 'error');
+        return;
+      }
+
+      document.getElementById('rh_cedula').value = cedula;
+      document.getElementById('rh_nombres').value = '';
+      document.getElementById('rh_fecha_nacimiento').value = '';
+      document.getElementById('rh_genero').value = '';
+      document.getElementById('rh_nacionalidad').value = 'V';
+      document.getElementById('rh_estado_civil').value = '';
+      document.getElementById('rh_nivel_educativo').value = '';
+      document.getElementById('rh_ocupacion').value = '';
+      document.getElementById('rh_inscrito_cne').value = 'false';
+      document.getElementById('rh_condicion_salud').value = 'saludable';
+      document.getElementById('rh_incapacidad_tipo').value = '';
+      document.getElementById('rh_pensionado_institucion').value = '';
+      document.getElementById('rh_direccion').value = document.getElementById('direccionExacta').value || '';
+      
+      document.getElementById('modalRegistrarHabitanteRapido').style.display = 'flex';
+    }
+
+    function cerrarModalRegistrarHabitanteRapido() {
+      document.getElementById('modalRegistrarHabitanteRapido').style.display = 'none';
+      window._registrandoTipo = null;
+    }
+
+    async function guardarHabitanteRapido() {
+      const cedula = document.getElementById('rh_cedula').value;
+      const nombres = document.getElementById('rh_nombres').value;
+      const fecha_nacimiento = document.getElementById('rh_fecha_nacimiento').value;
+      const genero = document.getElementById('rh_genero').value;
+      const direccion = document.getElementById('rh_direccion').value;
+
+      if (!nombres || !fecha_nacimiento || !genero) {
+        showToast('Por favor complete los campos obligatorios.', 'error');
+        return;
+      }
+
+      const datosNuevos = {
+        cedula: cedula,
+        nombres: nombres,
+        fecha_nacimiento: fecha_nacimiento,
+        genero: genero,
+        direccion: direccion,
+        // Usar un ID de consejo si está disponible, por ahora será manejado en BD
+        consejo_comunal_id: 1 
+      };
+
+      // Como los censo_viviendas se manejan en bandeja, guardaremos esto como temporal en el form
+      // Simularemos la respuesta para vincularlo localmente:
+      const idTemp = 'tmp_' + Date.now();
+      const payload = { ...datosNuevos, id: idTemp, datos_nuevos_habitante: datosNuevos };
+
+      if (window._registrandoTipo === 'jefe') {
+        document.getElementById('jefeHabitanteId').value = idTemp;
+        window.currentJefeFamiliaId = idTemp;
+        
+        // Autocompletar la UI del jefe
+        document.getElementById('jefNombres').value = nombres;
+        document.getElementById('jefFechaNac').value = fecha_nacimiento;
+        document.getElementById('jefSexo').value = genero;
+        
+        // Guardar el payload para enviarlo en el submit
+        window._datos_nuevos_jefe = payload.datos_nuevos_habitante;
+        
+        const banner = document.getElementById('jefeStatusBanner');
+        if (banner) {
+          banner.style.display = 'block';
+          banner.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+          banner.style.color = 'var(--success)';
+          banner.innerHTML = `<i class="fas fa-check-circle"></i> Nuevo habitante pre-registrado: ${nombres}`;
+        }
+        document.getElementById('btnRegistrarJefe').style.display = 'none';
+        
+      } else if (window._registrandoTipo === 'familiar' && window._registrandoFilaFamiliar) {
+        const row = window._registrandoFilaFamiliar;
+        row.querySelector('.fam-habitante-id').value = idTemp;
+        row.querySelector('.fam-nombres').value = nombres;
+        row.querySelector('.fam-fechanac').value = fecha_nacimiento;
+        row.querySelector('.fam-sexo').value = genero;
+        
+        row._datos_nuevos_habitante = payload.datos_nuevos_habitante;
+        
+        const readonlyDiv = row.querySelector('.fam-datos-readonly');
+        if (readonlyDiv) readonlyDiv.style.display = 'block';
+
+        const banner = row.querySelector('.fam-status-banner');
+        if (banner) {
+          banner.style.display = 'block';
+          banner.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+          banner.style.color = 'var(--success)';
+          banner.innerHTML = `<i class="fas fa-check-circle"></i> Nuevo habitante pre-registrado: ${nombres}`;
+        }
+        const btnReg = row.querySelector('.fam-registrar-btn');
+        if (btnReg) btnReg.style.display = 'none';
+      }
+
+      cerrarModalRegistrarHabitanteRapido();
+      showToast('Habitante registrado y vinculado temporalmente. Se guardará definitivamente al aprobar el censo.', 'success');
+    }
+  </script>
+</body>
 </html>

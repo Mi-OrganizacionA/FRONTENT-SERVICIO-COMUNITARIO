@@ -134,6 +134,43 @@ class CensoReportesService {
   }
 
   /**
+   * Obtiene el conjunto de cédulas ya presentes en CensoCaracteristicaFamiliar
+   * para excluirlas de la consulta de Habitante (evitar duplicados).
+   */
+  static async _getCedulasEnCensoNuevo(CensoCaracteristicaFamiliar, whereFamiliar, includeEstudio) {
+    const registros = await CensoCaracteristicaFamiliar.findAll({
+      where: whereFamiliar,
+      attributes: ['cedula_identidad'],
+      include: [includeEstudio]
+    });
+    
+    // Extraemos solo los números para generar luego todas las variaciones posibles
+    return new Set(
+      registros.map(r => (r.cedula_identidad || '').replace(/[^0-9]/g, '')).filter(Boolean)
+    );
+  }
+
+  /**
+   * Agrega filtro de exclusión de cédulas al where de Habitante para evitar duplicados.
+   */
+  static _aplicarDeduplicacion(whereHab, cedulasEnCenso, Op) {
+    if (cedulasEnCenso.size > 0) {
+      const cedulasArray = Array.from(cedulasEnCenso);
+      // Generar todas las variaciones posibles ("V-123", "V123", "123", "E-123", "E123")
+      const variations = [];
+      cedulasArray.forEach(num => {
+        variations.push(num);
+        variations.push(`V-${num}`);
+        variations.push(`V${num}`);
+        variations.push(`E-${num}`);
+        variations.push(`E${num}`);
+      });
+      whereHab.cedula = { [Op.notIn]: variations };
+    }
+    return whereHab;
+  }
+
+  /**
    * Obtiene la fecha del primer estudio registrado en el sistema
    */
   static async getFechaMinima(models) {
@@ -156,31 +193,39 @@ class CensoReportesService {
   }
 
   /**
-   * Obtiene los KPIs generales del censo
+   * Obtiene los KPIs generales del censo.
+   * Aplica deduplicación por cédula para evitar contar personas que existen en ambas tablas.
    */
   static async getKpis(models, filtros = {}) {
     const { CensoCaracteristicaFamiliar, EstudioDemografico, Habitante, Vivienda } = models;
     
     const whereFamiliar = CensoReportesService._buildFiltrosFamiliar(filtros, Op);
     const whereEstudio = CensoReportesService._buildFiltrosEstudio(filtros, Op);
-    
-    const whereHabLegacy = CensoReportesService._buildFiltrosHabitanteLegacy(filtros, Op);
     const whereVivLegacy = CensoReportesService._buildFiltrosViviendaLegacy(filtros, Op);
 
     const includeEstudio = { model: EstudioDemografico, where: whereEstudio, required: true };
 
-    // 1. Total Personas
+    // Obtener cédulas del censo nuevo para deduplicar en habitantes
+    const cedulasEnCensoNuevo = await CensoReportesService._getCedulasEnCensoNuevo(
+      CensoCaracteristicaFamiliar, whereFamiliar, { model: EstudioDemografico, where: whereEstudio, required: true, attributes: [] }
+    );
+    const whereHabLegacy = CensoReportesService._aplicarDeduplicacion(
+      CensoReportesService._buildFiltrosHabitanteLegacy(filtros, Op),
+      cedulasEnCensoNuevo, Op
+    );
+
+    // 1. Total Personas (sin duplicados)
     const tpNuevos = await CensoCaracteristicaFamiliar.count({ where: whereFamiliar, include: [includeEstudio] });
     const tpViejos = await Habitante.count({ where: whereHabLegacy });
     const totalPersonas = tpNuevos + tpViejos;
 
-    // 2. Discapacidad
+    // 2. Discapacidad: en censo nuevo = discapacidad_tipo no vacío; en legacy = incapacitado=true
     const discNuevos = await CensoCaracteristicaFamiliar.count({
       where: { ...whereFamiliar, discapacidad_tipo: { [Op.and]: [{ [Op.ne]: null }, { [Op.ne]: '' }] } },
       include: [includeEstudio]
     });
     const discViejos = await Habitante.count({
-      where: { ...whereHabLegacy, condicion_salud: { [Op.notIn]: ['saludable'] } }
+      where: { ...whereHabLegacy, incapacitado: true }
     });
     const conDiscapacidad = discNuevos + discViejos;
 
@@ -219,6 +264,7 @@ class CensoReportesService {
    */
   static async getResumenPorConsejo(models, filtros = {}) {
     const { ConsejoComunal, CensoCaracteristicaFamiliar, EstudioDemografico, Habitante, Vivienda } = models;
+    const { Op } = require('sequelize');
     const consejos = await ConsejoComunal.findAll({ attributes: ['id', 'nombre_comunidad'] });
     const resumen = [];
     
@@ -229,26 +275,53 @@ class CensoReportesService {
     const wh = CensoReportesService._buildFiltrosHabitanteLegacy(fClon, Op);
     const wv = CensoReportesService._buildFiltrosViviendaLegacy(fClon, Op);
 
+    // Apply consejo_id filter globally if present
+    if (filtros.consejo_id) {
+      we.id_comunidad = filtros.consejo_id;
+      wh.consejo_comunal_id = filtros.consejo_id;
+      wv.id_comunidad = filtros.consejo_id;
+    }
+
     const hace18 = new Date(); hace18.setFullYear(hace18.getFullYear() - 18);
     const hace60 = new Date(); hace60.setFullYear(hace60.getFullYear() - 60);
+
+    // Fetch ALL records first to avoid N+1 queries loop
+    const habsN_all = await CensoCaracteristicaFamiliar.findAll({ 
+      where: wf, attributes: ['fecha_nacimiento', 'discapacidad_tipo', 'cedula_identidad'],
+      include: [{ model: EstudioDemografico, where: we, required: true, attributes: ['id_comunidad'] }]
+    });
+    const vivsN_all = await EstudioDemografico.findAll({ where: we, attributes: ['id_comunidad'] });
+
+    // Deduplicate logic
+    const cedulasEnNuevo = new Set(
+      habsN_all.map(h => (h.cedula_identidad || '').replace(/[^0-9]/g, '')).filter(Boolean)
+    );
+    if (cedulasEnNuevo.size > 0) {
+      const cedulasArray = Array.from(cedulasEnNuevo);
+      const variations = [];
+      cedulasArray.forEach(num => {
+        variations.push(num, `V-${num}`, `V${num}`, `E-${num}`, `E${num}`);
+      });
+      wh.cedula = { [Op.notIn]: variations };
+    }
+
+    const habsV_all = await Habitante.findAll({
+      where: wh, attributes: ['fecha_nacimiento', 'incapacitado', 'cedula', 'consejo_comunal_id']
+    });
+    const vivsV_all = await Vivienda.findAll({ where: wv, attributes: ['id_comunidad'] });
 
     let [tHab, tElec, tNinos, tMayores, tDisc, tViv] = [0,0,0,0,0,0];
 
     for (let c of consejos) {
       if (filtros.consejo_id && filtros.consejo_id.toString() !== c.id.toString()) continue;
-
-      // Nuevos
-      const habsN = await CensoCaracteristicaFamiliar.findAll({ 
-        where: wf, attributes: ['fecha_nacimiento', 'discapacidad_tipo'],
-        include: [{ model: EstudioDemografico, where: { ...we, id_comunidad: c.id }, required: true }]
-      });
-      const vivsN = await EstudioDemografico.count({ where: { ...we, id_comunidad: c.id } });
-
-      // Viejos
-      const habsV = await Habitante.findAll({
-        where: { ...wh, consejo_comunal_id: c.id }, attributes: ['fecha_nacimiento', 'condicion_salud']
-      });
-      const vivsV = await Vivienda.count({ where: { ...wv, id_comunidad: c.id } });
+      
+      const cIdStr = c.id.toString();
+      
+      // Filter in memory for current consejo
+      const habsN = habsN_all.filter(h => h.EstudioDemografico && h.EstudioDemografico.id_comunidad && h.EstudioDemografico.id_comunidad.toString() === cIdStr);
+      const vivsN = vivsN_all.filter(v => v.id_comunidad && v.id_comunidad.toString() === cIdStr).length;
+      const habsV = habsV_all.filter(h => h.consejo_comunal_id && h.consejo_comunal_id.toString() === cIdStr);
+      const vivsV = vivsV_all.filter(v => v.id_comunidad && v.id_comunidad.toString() === cIdStr).length;
 
       let electores = 0, ninos = 0, mayores = 0, disc = 0;
       
@@ -260,9 +333,11 @@ class CensoReportesService {
           if (fn <= hace60) mayores++;
         }
         if (isNew) {
+          // Censo nuevo: discapacidad_tipo no vacío
           if (h.discapacidad_tipo && h.discapacidad_tipo.trim() !== '') disc++;
         } else {
-          if (h.condicion_salud && h.condicion_salud !== 'saludable') disc++;
+          // Censo legacy: campo boolean incapacitado
+          if (h.incapacitado === true) disc++;
         }
       };
 
@@ -299,6 +374,7 @@ class CensoReportesService {
 
     const wf = CensoReportesService._buildFiltrosFamiliar(filtros, Op);
     const we = CensoReportesService._buildFiltrosEstudio(filtros, Op);
+    // Nota: wh se construye con deduplicación después de obtener rowsNuevos
     const wh = CensoReportesService._buildFiltrosHabitanteLegacy(filtros, Op);
     const wv = CensoReportesService._buildFiltrosViviendaLegacy(filtros, Op);
 
@@ -314,19 +390,18 @@ class CensoReportesService {
       case 'total-personas':
         title = 'Listado Total de Personas';
         headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Género', 'Consejo Comunal'];
-        
         rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });
+        { const ced = new Set(rowsNuevos.map(r => (r.cedula_identidad||'').replace(/[^0-9]/g,'')).filter(Boolean)); CensoReportesService._aplicarDeduplicacion(wh, ced, Op); }
         rowsViejos = await Habitante.findAll({ where: wh, include: incConsejoLegacy });
         break;
 
       case 'discapacidad':
         title = 'Personas con Discapacidad';
         headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Tipo Incapacidad', 'Consejo Comunal'];
-        
         wf.discapacidad_tipo = { [Op.and]: [{ [Op.ne]: null }, { [Op.ne]: '' }] };
-        wh.condicion_salud = { [Op.notIn]: ['saludable'] };
-        
+        wh.incapacitado = true; // Campo booleano correcto en tabla habitantes
         rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });
+        { const ced = new Set(rowsNuevos.map(r => (r.cedula_identidad||'').replace(/[^0-9]/g,'')).filter(Boolean)); CensoReportesService._aplicarDeduplicacion(wh, ced, Op); }
         rowsViejos = await Habitante.findAll({ where: wh, include: incConsejoLegacy });
         break;
 
@@ -357,6 +432,7 @@ class CensoReportesService {
         
         headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Género', 'Consejo Comunal'];
         rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });
+        { const ced = new Set(rowsNuevos.map(r => (r.cedula_identidad||'').replace(/[^0-9]/g,'')).filter(Boolean)); CensoReportesService._aplicarDeduplicacion(wh, ced, Op); }
         rowsViejos = await Habitante.findAll({ where: wh, include: incConsejoLegacy });
         break;
 
@@ -367,6 +443,7 @@ class CensoReportesService {
         wf.sexo = { [Op.in]: ['F', 'Femenino'] };
         wh.genero = { [Op.in]: ['F', 'Femenino'] };
         rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });
+        { const ced = new Set(rowsNuevos.map(r => (r.cedula_identidad||'').replace(/[^0-9]/g,'')).filter(Boolean)); CensoReportesService._aplicarDeduplicacion(wh, ced, Op); }
         rowsViejos = await Habitante.findAll({ where: wh, include: incConsejoLegacy });
         break;
 
@@ -376,6 +453,7 @@ class CensoReportesService {
         wf.discapacidad_tipo = { [Op.iLike]: '%encamado%' };
         wh.condicion_salud = { [Op.iLike]: '%encamado%' };
         rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });
+        { const ced = new Set(rowsNuevos.map(r => (r.cedula_identidad||'').replace(/[^0-9]/g,'')).filter(Boolean)); CensoReportesService._aplicarDeduplicacion(wh, ced, Op); }
         rowsViejos = await Habitante.findAll({ where: wh, include: incConsejoLegacy });
         break;
 
@@ -384,6 +462,7 @@ class CensoReportesService {
         title = tipo === 'genero' ? 'Padrón Ordenado por Género' : 'Padrón Ordenado por Consejo Comunal';
         headers = ['Cédula', 'Nombres y Apellidos', 'Fecha Nac.', 'Edad', 'Género', 'Consejo Comunal'];
         rowsNuevos = await CensoCaracteristicaFamiliar.findAll({ where: wf, include: [incEstudio] });
+        { const ced = new Set(rowsNuevos.map(r => (r.cedula_identidad||'').replace(/[^0-9]/g,'')).filter(Boolean)); CensoReportesService._aplicarDeduplicacion(wh, ced, Op); }
         rowsViejos = await Habitante.findAll({ where: wh, include: incConsejoLegacy });
         break;
 
@@ -428,7 +507,7 @@ class CensoReportesService {
          const fnac = item.fecha_nacimiento ? new Date(item.fecha_nacimiento).toISOString().split('T')[0] : 'N/A';
          const edad = calcEdad(item.fecha_nacimiento);
          const genero = isNew ? item.sexo : item.genero;
-         const saludStr = isNew ? item.discapacidad_tipo : item.condicion_salud;
+         const saludStr = isNew ? item.discapacidad_tipo : item.incapacitado_tipo; // usar campo correcto del habitante legacy
          const consejo = isNew 
             ? (item.EstudioDemografico && item.EstudioDemografico.consejo ? item.EstudioDemografico.consejo.nombre_comunidad : 'N/A')
             : (item.consejo ? item.consejo.nombre_comunidad : 'N/A');

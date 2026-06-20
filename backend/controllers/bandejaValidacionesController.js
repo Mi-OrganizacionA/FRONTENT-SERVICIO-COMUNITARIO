@@ -114,7 +114,7 @@ class BandejaValidacionesController {
       const { comentarios } = req.body;
 
       const validacion = await BandejaModel.findByPk(id);
-      if (!validacion) return res.status(404).json({ error: 'ValidaciÃ³n no encontrada' });
+      if (!validacion) return res.status(404).json({ error: 'Validación no encontrada' });
       if (validacion.estado_tramite !== 'Pendiente') return res.status(400).json({ error: 'La solicitud ya fue procesada' });
 
       const models = BandejaModel.sequelize.models;
@@ -124,6 +124,30 @@ class BandejaValidacionesController {
 
       // Manejo especial para estudios_demograficos (múltiples tablas hijas)
       if (tabla === 'estudios_demograficos' && (validacion.tipo_accion === 'CREATE' || validacion.tipo_accion === 'INSERT')) {
+        // PASO PREVIO: Crear habitantes nuevos registrados al vuelo (sin ID en la BD todavía)
+        if (datos.familiares && Array.isArray(datos.familiares)) {
+          datos.familiares = await Promise.all(datos.familiares.map(async (fam) => {
+            // Si ya tiene id_habitante real, no hacer nada
+            if (fam.id_habitante && !String(fam.id_habitante).startsWith('tmp_')) return fam;
+            // Si tiene datos_nuevos_habitante, crear el habitante primero
+            if (fam.datos_nuevos_habitante) {
+              try {
+                const nuevoHab = await models.Habitante.create({
+                  ...fam.datos_nuevos_habitante,
+                  activo: true,
+                  fecha_registro: new Date()
+                });
+                return { ...fam, id_habitante: nuevoHab.id };
+              } catch (habErr) {
+                logger.error('Error creando habitante al aprobar censo:', habErr);
+                // Si falla (ej: cédula duplicada), continuar sin el id
+                return { ...fam, id_habitante: null };
+              }
+            }
+            return fam;
+          }));
+        }
+
         // Reutilizar la lógica del controller de EstudioDemografico
         const estudioDemograficoController = require('./estudioDemograficoController');
         
@@ -161,6 +185,30 @@ class BandejaValidacionesController {
         const estudioDemograficoController = require('./estudioDemograficoController');
         const idCenso = datos.id || validacion.registro_id;
         if (!idCenso) throw new Error('No se encontró el ID del estudio demográfico a actualizar');
+
+        // PASO PREVIO: Crear habitantes nuevos registrados al vuelo (sin ID en la BD todavía)
+        if (datos.familiares && Array.isArray(datos.familiares)) {
+          datos.familiares = await Promise.all(datos.familiares.map(async (fam) => {
+            // Si ya tiene id_habitante real, no hacer nada
+            if (fam.id_habitante && !String(fam.id_habitante).startsWith('tmp_')) return fam;
+            // Si tiene datos_nuevos_habitante, crear el habitante primero
+            if (fam.datos_nuevos_habitante) {
+              try {
+                const nuevoHab = await models.Habitante.create({
+                  ...fam.datos_nuevos_habitante,
+                  activo: true,
+                  fecha_registro: new Date()
+                });
+                return { ...fam, id_habitante: nuevoHab.id };
+              } catch (habErr) {
+                logger.error('Error creando habitante al actualizar censo:', habErr);
+                // Si falla (ej: cédula duplicada), continuar sin el id
+                return { ...fam, id_habitante: null };
+              }
+            }
+            return fam;
+          }));
+        }
 
         // Crear req/res simulados para reutilizar el método actualizar (que ya maneja transacción completa)
         const mockReq = {

@@ -4,6 +4,13 @@ module.exports = (sequelize) => {
   const CensoCaracteristicaFamiliar = sequelize.define('CensoCaracteristicaFamiliar', {
     id_familiar: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     id_estudio: { type: DataTypes.INTEGER, references: { model: 'estudios_demograficos', key: 'id' }, allowNull: false, onDelete: 'CASCADE' },
+    // FK hacia la tabla habitantes — permite vincular sin duplicar datos personales
+    id_habitante: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: { model: 'habitantes', key: 'id' },
+      comment: 'FK opcional a habitantes. Si existe, los datos personales se leen desde esa tabla.'
+    },
     nombres_apellidos: DataTypes.STRING(200),
     sexo: DataTypes.STRING(20),
     cedula_identidad: DataTypes.STRING(20),
