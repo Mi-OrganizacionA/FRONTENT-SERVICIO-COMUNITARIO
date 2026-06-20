@@ -1053,6 +1053,12 @@
 
   // Indicador de borrador en el footer del modal
   document.addEventListener('DOMContentLoaded', function() {
+    // Restringir todas las fechas para que no se puedan elegir fechas futuras
+    const hoy = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('input[type="date"]').forEach(input => {
+      input.setAttribute('max', hoy);
+    });
+
     var footer = document.querySelector('.cv-footer-left');
     if (footer) {
       var indicador = document.createElement('span');

@@ -23,6 +23,8 @@ class CensoController {
   _setupUI() {
     const fechaNacInput = document.getElementById('habFechaNac');
     if (fechaNacInput) {
+      const hoy = new Date().toISOString().split('T')[0];
+      fechaNacInput.setAttribute('max', hoy);
       fechaNacInput.addEventListener('change', () => this.calcularDatosNacimiento(fechaNacInput.value));
     }
 
@@ -454,6 +456,13 @@ class CensoController {
       if (edad) edad.value = '';
       if (t4) t4.value = '';
       if (elec) elec.value = '';
+      return;
+    }
+
+    if (birthDate > today) {
+      if (window.Components) window.Components.showToast('La fecha de nacimiento no puede estar en el futuro', 'error');
+      const fechaNacInput = document.getElementById('habFechaNac');
+      if (fechaNacInput) fechaNacInput.value = '';
       return;
     }
 

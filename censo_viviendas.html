@@ -1631,9 +1631,10 @@
           <span id="cvPagInfo">Mostrando 0 de 0</span>
           <div class="cv-pag-btns" id="cvPagBtns"></div>
         </div>
+      </div> <!-- /cv-table-card -->
 
-        <!-- GRÁFICAS DE VIVIENDAS -->
-        <div style="margin-top: 3rem;">
+      <!-- GRÁFICAS DE VIVIENDAS -->
+      <div style="margin-top: 3rem;">
           <h2 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;"><i class="fas fa-chart-pie" style="color: #2E7D32;"></i> Gráficas Estadísticas de Viviendas</h2>
           
           <div class="charts-grid fade-in-up">
@@ -1700,7 +1701,6 @@
 
           </div>
         </div>
-      </div>
 
     </div><!-- /cv-content -->
   </main>
@@ -5109,6 +5109,11 @@
     // ============================================================
     document.addEventListener('DOMContentLoaded', () => {
 
+      // Restringir todas las fechas para que no se puedan elegir fechas futuras
+      const hoy = new Date().toISOString().split('T')[0];
+      document.querySelectorAll('input[type="date"]').forEach(input => {
+        input.setAttribute('max', hoy);
+      });
       // 🔥 FIX ARIA-HIDDEN BLOCKED: Remover foco al cerrar el modal
       const modalViviendaEl = document.getElementById('modalVivienda');
       if (modalViviendaEl) {
@@ -5973,6 +5978,15 @@
       
       if (!nombres || !fecha_nacimiento || !genero) {
         showToast('Por favor complete los campos obligatorios.', 'error');
+        return;
+      }
+
+      const birthDate = new Date(fecha_nacimiento);
+      const hoy = new Date();
+      if (birthDate > hoy) {
+        showToast('La fecha de nacimiento no puede estar en el futuro.', 'error');
+        const fnInput = document.getElementById('rh_fecha_nacimiento');
+        if (fnInput) fnInput.value = '';
         return;
       }
 

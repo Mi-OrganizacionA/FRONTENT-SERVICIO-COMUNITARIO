@@ -49,6 +49,15 @@ class HabitantesService {
    */
   static async crear(habitanteModel, data) {
     try {
+      if (data.fecha_nacimiento) {
+        const bd = new Date(data.fecha_nacimiento);
+        const hoy = new Date();
+        if (bd > hoy) {
+          const error = new Error('La fecha de nacimiento no puede estar en el futuro.');
+          error.status = 400;
+          throw error;
+        }
+      }
       // Buscar si ya existe la cédula (incluso si está inactivo)
       if (data.cedula) {
         const existente = await habitanteModel.findOne({ where: { cedula: data.cedula } });
@@ -240,6 +249,15 @@ class HabitantesService {
    */
   static async update(habitanteModel, id, data) {
     try {
+      if (data.fecha_nacimiento) {
+        const bd = new Date(data.fecha_nacimiento);
+        const hoy = new Date();
+        if (bd > hoy) {
+          const error = new Error('La fecha de nacimiento no puede estar en el futuro.');
+          error.status = 400;
+          throw error;
+        }
+      }
       const h = await habitanteModel.findByPk(id);
       if (!h) return null;
       await h.update(data);
