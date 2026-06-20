@@ -508,12 +508,12 @@ class CensoController {
         type: type,
         data: {
           labels: labels,
-          datasets: [{ data: dataArr, backgroundColor: colors, borderWidth: 1 }]
+          datasets: [{ label: 'Total', data: dataArr, backgroundColor: colors, borderWidth: 1 }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { position: 'bottom' } }
+          plugins: { legend: { display: type !== 'bar', position: 'bottom' } }
         }
       });
     };
@@ -522,7 +522,12 @@ class CensoController {
 
     // 1. Género
     const gen = { 'Masculino': 0, 'Femenino': 0, 'Otro': 0 };
-    data.forEach(d => { if (d.genero) gen[d.genero] = (gen[d.genero]||0)+1; });
+    data.forEach(d => { 
+      if (d.genero) {
+        let g = d.genero === 'M' ? 'Masculino' : d.genero === 'F' ? 'Femenino' : 'Otro';
+        gen[g] = (gen[g]||0)+1; 
+      }
+    });
     buildChart('chartGenero', 'pie', Object.keys(gen), Object.values(gen), colors);
 
     // 2. Etarios
@@ -734,43 +739,90 @@ window.exportarGrafica = async function(btn, canvasId, title) {
   btn.disabled = true;
 
   try {
-    const imageBase64 = canvas.toDataURL('image/png', 1.0);
-    const token = localStorage.getItem('sicag_token');
+    const { jsPDF } = window.jspdf;
+    if (!jsPDF) throw new Error("La librería jsPDF no está cargada.");
+
+    // PDF en vertical (portrait) para que quepa la tabla abajo
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    // Poner fondo blanco a la imagen del canvas (por defecto es transparente)
+    const newCanvas = document.createElement('canvas');
+    newCanvas.width = canvas.width;
+    newCanvas.height = canvas.height;
+    const ctx = newCanvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+    ctx.drawImage(canvas, 0, 0);
+
+    const imageBase64 = newCanvas.toDataURL('image/png', 1.0);
+
+    // Encabezado SICAG
+    doc.setFontSize(22);
+    doc.setTextColor(46, 125, 50); // Verde SICAG
+    doc.text('SICAG', 105, 20, { align: 'center' });
+
+    doc.setFontSize(14);
+    doc.setTextColor(40, 40, 40);
+    doc.text(title || 'Gráfica Estadística', 105, 30, { align: 'center' });
+
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generado: ${new Date().toLocaleString()}`, 105, 36, { align: 'center' });
+
+    // Imagen de la Gráfica
+    const pdfWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
     
-    // Obtener filtros actuales
-    const selectCC = document.getElementById('filterCC');
-    const ccVal = selectCC ? selectCC.value : '';
+    // Ancho máximo para la imagen
+    let finalWidth = pdfWidth - (margin * 2);
+    let finalHeight = (canvas.height * finalWidth) / canvas.width;
 
-    const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
-    const response = await fetch(`${baseUrl}/censo-reportes/exportar-grafica-pdf`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        titulo: title,
-        imagenBase64: imageBase64,
-        filtros: { consejo_id: ccVal }
-      })
-    });
+    // Limitar la altura de la gráfica para que quepa la tabla bien
+    if (finalHeight > 100) {
+      finalHeight = 100;
+      finalWidth = (canvas.width * finalHeight) / canvas.height;
+    }
 
-    if (!response.ok) throw new Error('Error al generar PDF');
+    const xOffset = (pdfWidth - finalWidth) / 2;
+    doc.addImage(imageBase64, 'PNG', xOffset, 45, finalWidth, finalHeight);
 
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `grafica_${canvasId}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    a.remove();
+    // Extraer datos para la tabla
+    const chartInstance = Chart.getChart(canvasId);
+    let tableHead = [['Categoría', 'Cantidad']];
+    let tableBody = [];
+    let total = 0;
+
+    if (chartInstance && chartInstance.data) {
+      const labels = chartInstance.data.labels || [];
+      const data = chartInstance.data.datasets[0].data || [];
+      for(let i = 0; i < labels.length; i++){
+        tableBody.push([labels[i], data[i]]);
+        total += Number(data[i]) || 0;
+      }
+      tableBody.push([{ content: 'Total', styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } }, { content: total, styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } }]);
+    }
+
+    // Dibujar la tabla debajo de la gráfica
+    if (doc.autoTable) {
+      doc.autoTable({
+        startY: 45 + finalHeight + 10,
+        head: tableHead,
+        body: tableBody,
+        theme: 'striped',
+        headStyles: { fillColor: [46, 125, 50] },
+        styles: { fontSize: 11, halign: 'center' },
+        margin: { left: margin, right: margin }
+      });
+    }
     
-    if (window.Components) Components.showToast('PDF descargado', 'success');
-  } catch (error) {
-    console.error(error);
-    if (window.Components) Components.showToast('Error exportando gráfica', 'error');
+    const safeTitle = (title || canvasId).toLowerCase().replace(/\s+/g, '_');
+    doc.save(`grafica_${safeTitle}.pdf`);
+
+    if (window.Components) Components.showToast('PDF generado correctamente.', 'success');
+  } catch (err) {
+    console.error('Error al generar PDF:', err);
+    if (window.Components) Components.showToast('Error al generar PDF en el navegador.', 'error');
+    else alert('Error al generar PDF en el navegador.');
   } finally {
     btn.innerHTML = origHtml;
     btn.disabled = false;

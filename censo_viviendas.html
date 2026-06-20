@@ -1633,77 +1633,69 @@
         </div>
 
         <!-- GRÁFICAS DE VIVIENDAS -->
-        <div style="margin-top: 2rem;">
-          <h2 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;"><i class="fas fa-chart-pie" style="color: #2E7D32;"></i> Gráficas Estadísticas de Censos y Viviendas</h2>
+        <div style="margin-top: 3rem;">
+          <h2 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;"><i class="fas fa-chart-pie" style="color: #2E7D32;"></i> Gráficas Estadísticas de Viviendas</h2>
           
           <div class="charts-grid fade-in-up">
             
             <!-- INFRAESTRUCTURA -->
             <div class="chart-wrapper">
-              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
-                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-hammer"></i> Tipo de Paredes</div>
-                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartParedes', 'Tipo de Paredes')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              <div class="chart-header"><div class="chart-title"><i class="fas fa-hammer"></i> Tipo de Paredes</div>
+                <button class="chart-pdf-btn" title="Exportar PDF" onclick="exportarGrafica(this, 'chartParedes', 'Tipo de Paredes')"><i class="fas fa-file-pdf"></i></button>
               </div>
-              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartParedes"></canvas></div>
+              <div class="chart-canvas-container"><canvas id="chartParedes"></canvas></div>
             </div>
 
             <div class="chart-wrapper">
-              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
-                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-house-chimney"></i> Tipo de Techo</div>
-                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartTecho', 'Tipo de Techo')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              <div class="chart-header"><div class="chart-title"><i class="fas fa-house-chimney"></i> Tipo de Techo</div>
+                <button class="chart-pdf-btn" title="Exportar PDF" onclick="exportarGrafica(this, 'chartTecho', 'Tipo de Techo')"><i class="fas fa-file-pdf"></i></button>
               </div>
-              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartTecho"></canvas></div>
+              <div class="chart-canvas-container"><canvas id="chartTecho"></canvas></div>
             </div>
 
             <!-- SERVICIOS -->
             <div class="chart-wrapper">
-              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
-                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-faucet-drip"></i> Aguas Blancas</div>
-                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartAgua', 'Aguas Blancas')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              <div class="chart-header"><div class="chart-title"><i class="fas fa-faucet-drip"></i> Aguas Blancas</div>
+                <button class="chart-pdf-btn" title="Exportar PDF" onclick="exportarGrafica(this, 'chartAgua', 'Aguas Blancas')"><i class="fas fa-file-pdf"></i></button>
               </div>
-              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartAgua"></canvas></div>
+              <div class="chart-canvas-container"><canvas id="chartAgua"></canvas></div>
             </div>
 
             <div class="chart-wrapper">
-              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
-                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-fire-burner"></i> Tipo de Gas</div>
-                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartGas', 'Tipo de Gas')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              <div class="chart-header"><div class="chart-title"><i class="fas fa-fire-burner"></i> Tipo de Gas</div>
+                <button class="chart-pdf-btn" title="Exportar PDF" onclick="exportarGrafica(this, 'chartGas', 'Tipo de Gas')"><i class="fas fa-file-pdf"></i></button>
               </div>
-              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartGas"></canvas></div>
+              <div class="chart-canvas-container"><canvas id="chartGas"></canvas></div>
             </div>
 
             <div class="chart-wrapper">
-              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
-                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-lightbulb"></i> Sistema Eléctrico</div>
-                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartLuz', 'Sistema Eléctrico')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              <div class="chart-header"><div class="chart-title"><i class="fas fa-lightbulb"></i> Sistema Eléctrico</div>
+                <button class="chart-pdf-btn" title="Exportar PDF" onclick="exportarGrafica(this, 'chartLuz', 'Sistema Eléctrico')"><i class="fas fa-file-pdf"></i></button>
               </div>
-              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartLuz"></canvas></div>
+              <div class="chart-canvas-container"><canvas id="chartLuz"></canvas></div>
             </div>
 
             <!-- SALUBRIDAD Y ANIMALES -->
             <div class="chart-wrapper">
-              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
-                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-bug"></i> Salubridad (Insectos/Roedores)</div>
-                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartInsectos', 'Presencia de Insectos/Roedores')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              <div class="chart-header"><div class="chart-title"><i class="fas fa-bug"></i> Salubridad (Insectos/Roedores)</div>
+                <button class="chart-pdf-btn" title="Exportar PDF" onclick="exportarGrafica(this, 'chartInsectos', 'Presencia de Insectos/Roedores')"><i class="fas fa-file-pdf"></i></button>
               </div>
-              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartInsectos"></canvas></div>
+              <div class="chart-canvas-container"><canvas id="chartInsectos"></canvas></div>
             </div>
 
             <div class="chart-wrapper">
-              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
-                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-paw"></i> Animales Domésticos</div>
-                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartAnimales', 'Animales Domésticos')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              <div class="chart-header"><div class="chart-title"><i class="fas fa-paw"></i> Animales Domésticos</div>
+                <button class="chart-pdf-btn" title="Exportar PDF" onclick="exportarGrafica(this, 'chartAnimales', 'Animales Domésticos')"><i class="fas fa-file-pdf"></i></button>
               </div>
-              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartAnimales"></canvas></div>
+              <div class="chart-canvas-container"><canvas id="chartAnimales"></canvas></div>
             </div>
 
             <!-- TENENCIA -->
             <div class="chart-wrapper">
-              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding:1rem; background:rgba(0,0,0,0.02);">
-                <div class="chart-title" style="border:none; padding:0; margin:0;"><i class="fas fa-key"></i> Forma de Tenencia</div>
-                <button class="cv-act-btn view" title="Exportar PDF" onclick="exportarGrafica(this, 'chartTenencia', 'Forma de Tenencia')"><i class="fas fa-file-pdf" style="color:#c62828;"></i></button>
+              <div class="chart-header"><div class="chart-title"><i class="fas fa-key"></i> Forma de Tenencia</div>
+                <button class="chart-pdf-btn" title="Exportar PDF" onclick="exportarGrafica(this, 'chartTenencia', 'Forma de Tenencia')"><i class="fas fa-file-pdf"></i></button>
               </div>
-              <div class="chart-canvas-container" style="padding:1rem;"><canvas id="chartTenencia"></canvas></div>
+              <div class="chart-canvas-container"><canvas id="chartTenencia"></canvas></div>
             </div>
 
           </div>
@@ -4025,6 +4017,12 @@
     }
 
     function getBadgeCondicion(c) {
+      const val = c ? c.trim().toLowerCase() : '';
+      let key = 'Regular';
+      if (val.includes('buen')) key = 'Buena';
+      else if (val.includes('mala')) key = 'Mala';
+      else if (val.includes('alto riesgo')) key = 'Alto Riesgo';
+
       const map = {
         'Buena': 'buena',
         'Regular': 'regular',
@@ -4037,7 +4035,7 @@
         'Mala': 'fa-circle-exclamation',
         'Alto Riesgo': 'fa-triangle-exclamation'
       };
-      return `<span class="cv-badge ${map[c] || 'regular'}"><i class="fas ${icons[c] || 'fa-circle-minus'}"></i>${c || '—'}</span>`;
+      return `<span class="cv-badge ${map[key] || 'regular'}"><i class="fas ${icons[key] || 'fa-circle-minus'}"></i>${c || '—'}</span>`;
     }
 
     function getBadgeGas(g) {
@@ -4102,10 +4100,10 @@
           </span></td>
           <td>
             <div style="display:flex;gap:.3rem">
-              <button type="button" class="cv-act-btn view" title="Previsualizar" onclick="previsualizarCenso('${v.id || v._id}')" aria-label="Ver detalles">
+              <button type="button" class="chart-pdf-btn" title="Previsualizar" onclick="previsualizarCenso('${v.id || v._id}')" aria-label="Ver detalles">
                 <i class="fas fa-eye"></i>
               </button>
-              <button type="button" class="cv-act-btn view" title="Imprimir PDF" onclick="imprimirPdfVivienda('${v.id || v._id}')" aria-label="Imprimir PDF">
+              <button type="button" class="chart-pdf-btn" title="Imprimir PDF" onclick="imprimirPdfVivienda('${v.id || v._id}')" aria-label="Imprimir PDF">
                 <i class="fas fa-file-pdf" style="color: #C62828;"></i>
               </button>
               <button type="button" class="cv-act-btn edit" title="Editar" onclick="intentarEditar('${v.id || v._id}', ${i})" aria-label="Editar">
@@ -4352,9 +4350,9 @@
 
     function updateKPIs() {
       document.getElementById('kpi-total').textContent = viviendas.length;
-      document.getElementById('kpi-riesgo').textContent = viviendas.filter(v => v.condicion === 'Alto Riesgo').length;
-      document.getElementById('kpi-sin-gas').textContent = viviendas.filter(v => v.gas === 'No posee').length;
-      document.getElementById('kpi-sin-agua').textContent = viviendas.filter(v => v.agua === 'No tiene' || !v.agua).length;
+      document.getElementById('kpi-riesgo').textContent = viviendas.filter(v => v.condicion && v.condicion.toLowerCase().includes('alto riesgo')).length;
+      document.getElementById('kpi-sin-gas').textContent = viviendas.filter(v => !v.gas || v.gas.toLowerCase().includes('no posee') || v.gas.toLowerCase().includes('sin ')).length;
+      document.getElementById('kpi-sin-agua').textContent = viviendas.filter(v => !v.agua || v.agua.toLowerCase().includes('no tiene') || v.agua.toLowerCase().includes('sin ')).length;
     }
 
     let pendingAction = null;
@@ -4912,6 +4910,105 @@
       showToast('Datos actualizados.');
     });
 
+    window.exportarGrafica = async function(btn, canvasId, title) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+
+      const origHtml = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      btn.disabled = true;
+
+      try {
+        const { jsPDF } = window.jspdf;
+        if (!jsPDF) throw new Error("La librería jsPDF no está cargada.");
+
+        // PDF en vertical (portrait) para que quepa la tabla abajo
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+        // Poner fondo blanco a la imagen del canvas (por defecto es transparente)
+        const newCanvas = document.createElement('canvas');
+        newCanvas.width = canvas.width;
+        newCanvas.height = canvas.height;
+        const ctx = newCanvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+        ctx.drawImage(canvas, 0, 0);
+
+        const imageBase64 = newCanvas.toDataURL('image/png', 1.0);
+
+        // Encabezado SICAG
+        doc.setFontSize(22);
+        doc.setTextColor(46, 125, 50); // Verde SICAG
+        doc.text('SICAG', 105, 20, { align: 'center' });
+
+        doc.setFontSize(14);
+        doc.setTextColor(40, 40, 40);
+        doc.text(title || 'Gráfica Estadística', 105, 30, { align: 'center' });
+
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Generado: ${new Date().toLocaleString()}`, 105, 36, { align: 'center' });
+
+        // Imagen de la Gráfica
+        const pdfWidth = doc.internal.pageSize.getWidth();
+        const margin = 20;
+        
+        // Ancho máximo para la imagen
+        let finalWidth = pdfWidth - (margin * 2);
+        let finalHeight = (canvas.height * finalWidth) / canvas.width;
+
+        // Limitar la altura de la gráfica para que quepa la tabla bien
+        if (finalHeight > 100) {
+          finalHeight = 100;
+          finalWidth = (canvas.width * finalHeight) / canvas.height;
+        }
+
+        const xOffset = (pdfWidth - finalWidth) / 2;
+        doc.addImage(imageBase64, 'PNG', xOffset, 45, finalWidth, finalHeight);
+
+        // Extraer datos para la tabla
+        const chartInstance = Chart.getChart(canvasId);
+        let tableHead = [['Categoría', 'Cantidad']];
+        let tableBody = [];
+        let total = 0;
+
+        if (chartInstance && chartInstance.data) {
+          const labels = chartInstance.data.labels || [];
+          const data = chartInstance.data.datasets[0].data || [];
+          for(let i = 0; i < labels.length; i++){
+            tableBody.push([labels[i], data[i]]);
+            total += Number(data[i]) || 0;
+          }
+          tableBody.push([{ content: 'Total', styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } }, { content: total, styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } }]);
+        }
+
+        // Dibujar la tabla debajo de la gráfica
+        if (doc.autoTable) {
+          doc.autoTable({
+            startY: 45 + finalHeight + 10,
+            head: tableHead,
+            body: tableBody,
+            theme: 'striped',
+            headStyles: { fillColor: [46, 125, 50] },
+            styles: { fontSize: 11, halign: 'center' },
+            margin: { left: margin, right: margin }
+          });
+        }
+        
+        const safeTitle = (title || canvasId).toLowerCase().replace(/\s+/g, '_');
+        doc.save(`grafica_${safeTitle}.pdf`);
+
+        if (window.Components) Components.showToast('PDF generado correctamente.', 'success');
+      } catch (err) {
+        console.error('Error al generar PDF:', err);
+        if (window.Components) Components.showToast('Error al generar PDF en el navegador.', 'error');
+        else alert('Error al generar PDF en el navegador.');
+      } finally {
+        btn.innerHTML = origHtml;
+        btn.disabled = false;
+      }
+    };
+
     /* ── Render Charts ── */
     function renderChartsViviendas(data) {
       if (typeof Chart === 'undefined') return;
@@ -4924,12 +5021,12 @@
           type: type,
           data: {
             labels: labels,
-            datasets: [{ data: dataArr, backgroundColor: colors, borderWidth: 1 }]
+            datasets: [{ label: 'Total', data: dataArr, backgroundColor: colors, borderWidth: 1 }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
+            plugins: { legend: { display: type !== 'bar', position: 'bottom' } }
           }
         });
       };
@@ -5000,55 +5097,6 @@
       });
       buildChart('chartAnimales', 'bar', Object.keys(animales), Object.values(animales), colors);
     }
-
-    window.exportarGrafica = async function(btn, canvasId, title) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return;
-
-      const origHtml = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      btn.disabled = true;
-
-      try {
-        const imageBase64 = canvas.toDataURL('image/png', 1.0);
-        const token = localStorage.getItem('sicag_token');
-        const ccVal = document.getElementById('advFilterCC') ? document.getElementById('advFilterCC').value : '';
-        const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
-
-        const response = await fetch(`${baseUrl}/censo-reportes/exportar-grafica-pdf`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            titulo: title,
-            imagenBase64: imageBase64,
-            filtros: { consejo_id: ccVal }
-          })
-        });
-
-        if (!response.ok) throw new Error('Error al generar PDF');
-
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `grafica_${canvasId}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        a.remove();
-        
-        if (typeof showToast === 'function') showToast('PDF descargado', 'success');
-      } catch (error) {
-        console.error(error);
-        if (typeof showToast === 'function') showToast('Error exportando gráfica', 'error');
-      } finally {
-        btn.innerHTML = origHtml;
-        btn.disabled = false;
-      }
-    };
 
     /* ── Init ── */
     loadViviendasData();
@@ -6042,5 +6090,8 @@
   </script>
   <!-- CHART JS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </body>
 </html>
+
