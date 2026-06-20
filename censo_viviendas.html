@@ -5224,6 +5224,8 @@
         <button type="button" class="btn-sicag btn-outline-verde" onclick="cerrarModalPrevisualizar()">Cerrar</button>
       </div>
     </div>
+  </div> <!-- ESTE DIV CERRABA EL MODAL PREVISUALIZAR -->
+
   <!-- ════════════════════════════════════════
        MODAL: Registrar Habitante Rápido
   ════════════════════════════════════════ -->
@@ -5231,7 +5233,7 @@
     <div class="modal-content-sicag" style="max-width:560px;">
       <div class="modal-header-sicag">
         <h3><i class="fas fa-user-plus" style="color:var(--vv)"></i> Registrar Nuevo Habitante</h3>
-        <button onclick="cerrarModalRegistrarHabitanteRapido()">&times;</button>
+        <button type="button" class="modal-close" onclick="cerrarModalRegistrarHabitanteRapido()" aria-label="Cerrar">&times;</button>
       </div>
       <div class="modal-body-sicag" style="max-height: 65vh; overflow-y: auto;">
         <div class="cv-form-row cv-grid-2">
@@ -5324,7 +5326,12 @@
         </div>
 
         <div class="cv-form-group" style="margin-top:1rem;">
-          <label>Dirección</label>
+          <label style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Dirección</span>
+            <button type="button" class="btn-sicag btn-sm btn-outline-verde" onclick="autocompletarDireccionRapida(false)" style="padding: 0.2rem 0.6rem; font-size: 0.7rem; border-radius: 4px;">
+              <i class="fas fa-map-marker-alt"></i> Autocompletar (Sec. II)
+            </button>
+          </label>
           <textarea class="cv-form-control" id="rh_direccion" rows="2" required></textarea>
         </div>
       </div>
@@ -5338,49 +5345,95 @@
   </div>
 
   <script>
-    function abrirModalRegistrarHabitanteRapido(tipo) {
-      window._registrandoTipo = tipo; // 'jefe' o 'familiar'
-      let cedula = '';
-      if (tipo === 'jefe') {
-        cedula = document.getElementById('cedulaJefe').value;
-      } else if (tipo === 'familiar' && window._registrandoFilaFamiliar) {
-        cedula = window._registrandoFilaFamiliar.querySelector('.fam-cedula').value;
-      }
+    function autocompletarDireccionRapida(silent = false) {
+      const calleAvenida = document.getElementById('calleAvenida')?.value || '';
+      const numeroCasa = document.getElementById('numeroCasa')?.value || '';
+      const dirExacta = document.getElementById('direccionExacta')?.value || '';
       
-      if (!cedula) {
-        showToast('Debe ingresar la cédula antes de registrar al habitante.', 'error');
-        return;
+      const direccionConcatenada = `${calleAvenida} ${numeroCasa} ${dirExacta}`.trim().replace(/\s+/g, ' ');
+      
+      const dirInput = document.getElementById('rh_direccion');
+      if (dirInput) {
+        dirInput.value = direccionConcatenada;
+        if (!silent && direccionConcatenada) {
+          showToast('Dirección autocompletada desde la Sección II.', 'info');
+        } else if (!silent && !direccionConcatenada) {
+          showToast('Los campos de dirección de la Sección II están vacíos.', 'warning');
+        }
       }
+    }
 
-      document.getElementById('rh_cedula').value = cedula;
-      document.getElementById('rh_nombres').value = '';
-      document.getElementById('rh_fecha_nacimiento').value = '';
-      document.getElementById('rh_genero').value = '';
-      document.getElementById('rh_nacionalidad').value = 'V';
-      document.getElementById('rh_estado_civil').value = '';
-      document.getElementById('rh_nivel_educativo').value = '';
-      document.getElementById('rh_ocupacion').value = '';
-      document.getElementById('rh_inscrito_cne').value = 'false';
-      document.getElementById('rh_condicion_salud').value = 'saludable';
-      document.getElementById('rh_incapacidad_tipo').value = '';
-      document.getElementById('rh_pensionado_institucion').value = '';
-      document.getElementById('rh_direccion').value = document.getElementById('direccionExacta').value || '';
-      
-      document.getElementById('modalRegistrarHabitanteRapido').style.display = 'flex';
+    function abrirModalRegistrarHabitanteRapido(tipo) {
+      try {
+        window._registrandoTipo = tipo; // 'jefe' o 'familiar'
+        let cedula = '';
+        if (tipo === 'jefe') {
+          cedula = document.getElementById('cedulaJefe')?.value || '';
+        } else if (tipo === 'familiar' && window._registrandoFilaFamiliar) {
+          cedula = window._registrandoFilaFamiliar.querySelector('.fam-cedula')?.value || '';
+        }
+        
+        if (!cedula) {
+          showToast('Debe ingresar la cédula antes de registrar al habitante.', 'error');
+          return;
+        }
+
+        const setIfExist = (id, val) => {
+          const el = document.getElementById(id);
+          if (el) el.value = val;
+          else console.warn(`Elemento ${id} no encontrado en el modal`);
+        };
+
+        setIfExist('rh_cedula', cedula);
+        setIfExist('rh_nombres', '');
+        setIfExist('rh_fecha_nacimiento', '');
+        setIfExist('rh_genero', '');
+        setIfExist('rh_nacionalidad', 'V');
+        setIfExist('rh_estado_civil', '');
+        setIfExist('rh_nivel_educativo', '');
+        setIfExist('rh_ocupacion', '');
+        setIfExist('rh_inscrito_cne', 'false');
+        setIfExist('rh_condicion_salud', 'saludable');
+        setIfExist('rh_incapacidad_tipo', '');
+        setIfExist('rh_pensionado_institucion', '');
+        
+        // Autocompletar dirección desde la Sección II
+        autocompletarDireccionRapida(true);
+        
+        const modal = document.getElementById('modalRegistrarHabitanteRapido');
+        if (modal) {
+          // Desactivar el Focus Trap del modal principal de Bootstrap para poder escribir
+          const mainModal = document.getElementById('modalVivienda');
+          if (mainModal) mainModal.removeAttribute('tabindex');
+          
+          modal.style.display = 'flex';
+        } else {
+          showToast('Error: No se encontró el modal en el documento.', 'error');
+        }
+      } catch (err) {
+        console.error('Error abriendo modal:', err);
+        showToast('Error interno al abrir el modal. Revise la consola.', 'error');
+      }
     }
 
     function cerrarModalRegistrarHabitanteRapido() {
+      // Restaurar el Focus Trap del modal principal
+      const mainModal = document.getElementById('modalVivienda');
+      if (mainModal) mainModal.setAttribute('tabindex', '-1');
+      
       document.getElementById('modalRegistrarHabitanteRapido').style.display = 'none';
       window._registrandoTipo = null;
     }
 
     async function guardarHabitanteRapido() {
-      const cedula = document.getElementById('rh_cedula').value;
-      const nombres = document.getElementById('rh_nombres').value;
-      const fecha_nacimiento = document.getElementById('rh_fecha_nacimiento').value;
-      const genero = document.getElementById('rh_genero').value;
-      const direccion = document.getElementById('rh_direccion').value;
-
+      const gv = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+      
+      const cedula = gv('rh_cedula');
+      const nombres = gv('rh_nombres');
+      const fecha_nacimiento = gv('rh_fecha_nacimiento');
+      const genero = gv('rh_genero');
+      const direccion = gv('rh_direccion');
+      
       if (!nombres || !fecha_nacimiento || !genero) {
         showToast('Por favor complete los campos obligatorios.', 'error');
         return;
@@ -5392,25 +5445,39 @@
         fecha_nacimiento: fecha_nacimiento,
         genero: genero,
         direccion: direccion,
-        // Usar un ID de consejo si está disponible, por ahora será manejado en BD
-        consejo_comunal_id: 1 
+        nacionalidad: gv('rh_nacionalidad') || 'V',
+        estado_civil: gv('rh_estado_civil'),
+        nivel_educativo: gv('rh_nivel_educativo'),
+        ocupacion: gv('rh_ocupacion'),
+        inscrito_cne: gv('rh_inscrito_cne') === 'true',
+        condicion_salud: gv('rh_condicion_salud'),
+        incapacidad_tipo: gv('rh_incapacidad_tipo'),
+        pensionado_institucion: gv('rh_pensionado_institucion'),
+        consejo_comunal_id: 1 // Por ahora manejado en BD
       };
 
-      // Como los censo_viviendas se manejan en bandeja, guardaremos esto como temporal en el form
-      // Simularemos la respuesta para vincularlo localmente:
       const idTemp = 'tmp_' + Date.now();
       const payload = { ...datosNuevos, id: idTemp, datos_nuevos_habitante: datosNuevos };
 
       if (window._registrandoTipo === 'jefe') {
-        document.getElementById('jefeHabitanteId').value = idTemp;
+        const hId = document.getElementById('jefeHabitanteId');
+        if(hId) hId.value = idTemp;
         window.currentJefeFamiliaId = idTemp;
         
         // Autocompletar la UI del jefe
-        document.getElementById('jefNombres').value = nombres;
-        document.getElementById('jefFechaNac').value = fecha_nacimiento;
-        document.getElementById('jefSexo').value = genero;
+        const jNombres = document.getElementById('jefNombres'); if(jNombres) jNombres.value = nombres;
+        const jFecha = document.getElementById('jefFechaNac'); if(jFecha) jFecha.value = fecha_nacimiento;
+        const jSexo = document.getElementById('jefSexo'); if(jSexo) jSexo.value = genero;
         
-        // Guardar el payload para enviarlo en el submit
+        // Autocompletar los campos ampliados en la UI del jefe si existen
+        const jNacionalidad = document.getElementById('jefNacionalidad'); if(jNacionalidad) jNacionalidad.value = datosNuevos.nacionalidad;
+        const jEstadoCivil = document.getElementById('jefEstadoCivil'); if(jEstadoCivil) jEstadoCivil.value = datosNuevos.estado_civil;
+        const jInstruccion = document.getElementById('jefNivelInstruccion'); if(jInstruccion) jInstruccion.value = datosNuevos.nivel_educativo;
+        const jOcupacion = document.getElementById('jefProfesion'); if(jOcupacion) jOcupacion.value = datosNuevos.ocupacion;
+        const jCne = document.getElementById('jefCNE'); if(jCne) jCne.value = datosNuevos.inscrito_cne ? 'true' : 'false';
+        const jIncapacidad = document.getElementById('jefTieneIncapacidad'); if(jIncapacidad) jIncapacidad.value = datosNuevos.condicion_salud === 'discapacidad' || datosNuevos.condicion_salud === 'encamado' ? 'Si' : 'No';
+        const jTipoIncapacidad = document.getElementById('jefTipoIncapacidad'); if(jTipoIncapacidad) jTipoIncapacidad.value = datosNuevos.incapacidad_tipo;
+        
         window._datos_nuevos_jefe = payload.datos_nuevos_habitante;
         
         const banner = document.getElementById('jefeStatusBanner');
@@ -5420,14 +5487,17 @@
           banner.style.color = 'var(--success)';
           banner.innerHTML = `<i class="fas fa-check-circle"></i> Nuevo habitante pre-registrado: ${nombres}`;
         }
-        document.getElementById('btnRegistrarJefe').style.display = 'none';
+        const btnReg = document.getElementById('btnRegistrarJefe');
+        if(btnReg) btnReg.style.display = 'none';
         
       } else if (window._registrandoTipo === 'familiar' && window._registrandoFilaFamiliar) {
         const row = window._registrandoFilaFamiliar;
-        row.querySelector('.fam-habitante-id').value = idTemp;
-        row.querySelector('.fam-nombres').value = nombres;
-        row.querySelector('.fam-fechanac').value = fecha_nacimiento;
-        row.querySelector('.fam-sexo').value = genero;
+        const setR = (sel, val) => { const e = row.querySelector(sel); if(e) e.value = val; };
+        
+        setR('.fam-habitante-id', idTemp);
+        setR('.fam-nombres', nombres);
+        setR('.fam-fechanac', fecha_nacimiento);
+        setR('.fam-sexo', genero);
         
         row._datos_nuevos_habitante = payload.datos_nuevos_habitante;
         
