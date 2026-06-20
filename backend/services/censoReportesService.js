@@ -100,9 +100,9 @@ class CensoReportesService {
     }
 
     if (filtros.genero) {
-      // El viejo Habitante usa 'M' y 'F' o 'Masculino'/'Femenino'
+      // El viejo Habitante usa ENUM('M', 'F', 'Otro')
       const isM = ['M', 'Masculino', 'MASCULINO'].includes(filtros.genero);
-      where.genero = isM ? { [Op.in]: ['M', 'Masculino'] } : { [Op.in]: ['F', 'Femenino'] };
+      where.genero = isM ? 'M' : 'F';
     }
     
     if (filtros.salud) {
@@ -262,7 +262,7 @@ class CensoReportesService {
         if (isNew) {
           if (h.discapacidad_tipo && h.discapacidad_tipo.trim() !== '') disc++;
         } else {
-          if (h.condicion_salud && !['Ninguna', 'Buena', ''].includes(h.condicion_salud)) disc++;
+          if (h.condicion_salud && h.condicion_salud !== 'saludable') disc++;
         }
       };
 
