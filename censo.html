@@ -1066,6 +1066,16 @@
       indicador.style.cssText = 'font-size:.75rem;color:var(--gray4);margin-left:.75rem;transition:color .3s;';
       footer.appendChild(indicador);
     }
+
+    // FIX ARIA-HIDDEN BLOCKED: Remover foco al cerrar el modal
+    var modalCensoEl = document.getElementById('modalCenso');
+    if (modalCensoEl) {
+      modalCensoEl.addEventListener('hide.bs.modal', function () {
+        if (document.activeElement && document.activeElement.blur) {
+          document.activeElement.blur();
+        }
+      });
+    }
   });
 
   // ─────────────────────────────────────────
