@@ -4,13 +4,13 @@
  */
 class NotificacionesController {
   constructor() {
-    this.todas     = [];   // Todas las notificaciones cargadas
+    this.todas = [];   // Todas las notificaciones cargadas
     this.filtradas = [];   // Tras aplicar filtros
-    this.selected  = new Set(); // IDs seleccionados
-    this.userRole  = null;
-    this.userId    = null;
+    this.selected = new Set(); // IDs seleccionados
+    this.userRole = null;
+    this.userId = null;
     this.pendingBulkAction = null; // 'approve' | 'reject'
-    this.detailId  = null;
+    this.detailId = null;
     this.paginaActual = 1;
     this.porPagina = 10;
 
@@ -18,7 +18,7 @@ class NotificacionesController {
     const u = window.auth ? window.auth.getUser() : null;
     if (!u) return;
     this.userRole = u.rol;
-    this.userId   = u.id;
+    this.userId = u.id;
 
     this.init();
   }
@@ -59,7 +59,7 @@ class NotificacionesController {
 
       // Adaptar botones de la barra masiva para Vocero
       const approveBtn = document.getElementById('btnBulkApprove');
-      const rejectBtn  = document.getElementById('btnBulkReject');
+      const rejectBtn = document.getElementById('btnBulkReject');
       if (approveBtn) approveBtn.style.display = 'none'; // Vocero no puede aprobar
       if (rejectBtn) {
         rejectBtn.innerHTML = '<i class="fas fa-ban"></i> Cancelar Seleccionadas';
@@ -72,23 +72,23 @@ class NotificacionesController {
     try {
       const isVocero = this.userRole === 'vocero';
       let data;
-      
+
       if (isVocero && this.userId) {
         const response = await window.api._fetch(`${window.api.baseURL}/validaciones/mis-solicitudes?userId=${this.userId}`, window.api._getHeaders());
         data = await response.json().catch(() => []);
       } else {
         data = await window.api.getNotificaciones();
       }
-      
+
       const arrayData = Array.isArray(data) ? data : (data.pendientes || []);
-      
+
       // Normalizar estado_tramite a estado ('pendiente', 'aceptado', 'rechazado')
       this.todas = arrayData.map(n => {
         let raw = (n.estado_tramite || n.estado || 'pendiente').toLowerCase();
         if (raw === 'aprobado') raw = 'aceptado';
         return { ...n, estado: raw };
       });
-      
+
       this.aplicarFiltros();
     } catch (e) {
       console.error('Error cargando notificaciones:', e);
@@ -97,11 +97,11 @@ class NotificacionesController {
     }
   }
 
-  /* â”€â”€â”€ Filtrado â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
   aplicarFiltros() {
-    const tipo    = (document.getElementById('filterTipo')?.value   || '').toLowerCase();
-    const estado  = (document.getElementById('filterEstado')?.value || '').toLowerCase();
-    const busca   = (document.getElementById('filterSearch')?.value || '').toLowerCase().trim();
+    const tipo = (document.getElementById('filterTipo')?.value || '').toLowerCase();
+    const estado = (document.getElementById('filterEstado')?.value || '').toLowerCase();
+    const busca = (document.getElementById('filterSearch')?.value || '').toLowerCase().trim();
     const isVocero = this.userRole === 'vocero';
 
     let lista = [...this.todas];
@@ -135,7 +135,7 @@ class NotificacionesController {
     this.renderTabla(lista);
   }
 
-  /* â”€â”€â”€ KPI Stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
   renderStats() {
     const cont = document.getElementById('notificationStats');
     if (!cont) return;
@@ -145,20 +145,20 @@ class NotificacionesController {
       ? this.todas.filter(n => String(n.id_vocero) === String(this.userId))
       : this.todas;
 
-    const pendientes  = base.filter(n => !n.estado || n.estado === 'pendiente').length;
-    const aprobados   = base.filter(n => n.estado === 'aceptado').length;
-    const rechazados  = base.filter(n => n.estado === 'rechazado').length;
+    const pendientes = base.filter(n => !n.estado || n.estado === 'pendiente').length;
+    const aprobados = base.filter(n => n.estado === 'aceptado').length;
+    const rechazados = base.filter(n => n.estado === 'rechazado').length;
 
     const stats = isVocero ? [
       { label: 'Mis Solicitudes', value: base.length, sub: 'Total enviadas', color: 'azul', icon: 'paper-plane', trend: 'up' },
-      { label: 'Pendientes',      value: pendientes,  sub: 'En revisiÃ³n',    color: 'amarillo', icon: 'clock', trend: pendientes > 0 ? 'down' : 'up' },
-      { label: 'Aprobadas',       value: aprobados,   sub: 'Aceptadas',      color: 'verde', icon: 'check-circle', trend: 'up' },
-      { label: 'Rechazadas',      value: rechazados,  sub: 'No aprobadas',   color: 'rojo', icon: 'times-circle', trend: rechazados > 0 ? 'down' : 'up' }
+      { label: 'Pendientes', value: pendientes, sub: 'En revisiÃ³n', color: 'amarillo', icon: 'clock', trend: pendientes > 0 ? 'down' : 'up' },
+      { label: 'Aprobadas', value: aprobados, sub: 'Aceptadas', color: 'verde', icon: 'check-circle', trend: 'up' },
+      { label: 'Rechazadas', value: rechazados, sub: 'No aprobadas', color: 'rojo', icon: 'times-circle', trend: rechazados > 0 ? 'down' : 'up' }
     ] : [
-      { label: 'Pendientes',      value: pendientes,  sub: 'Requieren acciÃ³n', color: 'amarillo', icon: 'clock', trend: pendientes > 0 ? 'down' : 'up' },
-      { label: 'Total',           value: base.length, sub: 'En bandeja',        color: 'azul', icon: 'inbox', trend: 'up' },
-      { label: 'Aprobadas hoy',   value: aprobados,   sub: 'Procesadas',        color: 'verde', icon: 'check-double', trend: 'up' },
-      { label: 'Rechazadas',      value: rechazados,  sub: 'No aprobadas',      color: 'rojo', icon: 'ban', trend: rechazados > 0 ? 'down' : 'up' }
+      { label: 'Pendientes', value: pendientes, sub: 'Requieren acciÃ³n', color: 'amarillo', icon: 'clock', trend: pendientes > 0 ? 'down' : 'up' },
+      { label: 'Total', value: base.length, sub: 'En bandeja', color: 'azul', icon: 'inbox', trend: 'up' },
+      { label: 'Aprobadas hoy', value: aprobados, sub: 'Procesadas', color: 'verde', icon: 'check-double', trend: 'up' },
+      { label: 'Rechazadas', value: rechazados, sub: 'No aprobadas', color: 'rojo', icon: 'ban', trend: rechazados > 0 ? 'down' : 'up' }
     ];
 
     cont.innerHTML = stats.map(s => `
@@ -387,11 +387,36 @@ class NotificacionesController {
     // Construir filas de datos temporales
     let datosHtml = '';
     for (const [k, v] of Object.entries(registro)) {
-      if (['id','createdAt','updatedAt'].includes(k)) continue;
+      if (['id', 'createdAt', 'updatedAt'].includes(k)) continue;
+
+      let displayValue = '—';
+      if (v != null) {
+        if (typeof v === 'object') {
+          try {
+            if (Array.isArray(v) && k === 'familiares') {
+              displayValue = v.map((fam, i) => {
+                let nombre = fam.nombres || fam.datos_nuevos_habitante?.nombres || 'Sin nombre';
+                let ci = fam.cedula || (fam.datos_nuevos_habitante ? fam.datos_nuevos_habitante.nacionalidad + '-' + fam.datos_nuevos_habitante.cedula : 'Sin cédula');
+                let par = fam.parentesco || 'Familiar';
+                return `- ${par}: ${nombre} (${ci})`;
+              }).join('\n');
+            } else if (Array.isArray(v) && k === 'opciones') {
+              displayValue = v.map(o => `- ${this.capitalize(o.categoria)}: ${o.valor} ${o.cantidad && o.cantidad > 1 ? '(' + o.cantidad + ')' : ''}`).join('\n');
+            } else {
+              displayValue = JSON.stringify(v, null, 2);
+            }
+          } catch (e) {
+            displayValue = String(v);
+          }
+        } else {
+          displayValue = String(v);
+        }
+      }
+
       datosHtml += `
-        <div class="det-meta-item">
+        <div class="det-meta-item" ${typeof v === 'object' && v != null ? 'style="grid-column: 1 / -1;"' : ''}>
           <div class="det-meta-key">${this.capitalize(k.replace(/_/g, ' '))}</div>
-          <div class="det-meta-value">${this.escapeHtml(v != null ? String(v) : 'â€”')}</div>
+          <div class="det-meta-value" style="${typeof v === 'object' ? 'white-space: pre-wrap; word-break: break-all;' : ''}">${this.escapeHtml(displayValue)}</div>
         </div>`;
     }
 
@@ -658,7 +683,7 @@ class NotificacionesController {
     const t = (tabla || '').toLowerCase();
     for (const [key, [label, icon]] of Object.entries(map)) {
       if (t.includes(key)) {
-        return `<span class="v-tipo-badge v-tipo-${key.replace('_','').replace('produccion_agricola','produccion')}">
+        return `<span class="v-tipo-badge v-tipo-${key.replace('_', '').replace('produccion_agricola', 'produccion')}">
           <i class="fas fa-${icon}"></i> ${label}
         </span>`;
       }
@@ -669,9 +694,9 @@ class NotificacionesController {
   getEstadoPill(estado) {
     const map = {
       'pendiente': ['status-pendiente', 'Pendiente', 'clock'],
-      'aceptado':  ['status-aceptado',  'Aprobado',  'check-circle'],
+      'aceptado': ['status-aceptado', 'Aprobado', 'check-circle'],
       'rechazado': ['status-rechazado', 'Rechazado', 'times-circle'],
-      'reenvio':   ['status-reenvio',   'En revisiÃ³n', 'redo']
+      'reenvio': ['status-reenvio', 'En revisiÃ³n', 'redo']
     };
     const [cls, label, icon] = map[estado] || map['pendiente'];
     return `<span class="status-pill ${cls}"><i class="fas fa-${icon}"></i> ${label}</span>`;
