@@ -608,10 +608,20 @@ class EstudioDemograficoController {
       await updateChild(db.CensoSituacionComunidad, 10);
 
       // 4. Actualizar opciones múltiples (checkboxes)
-      if (body.opciones && body.opciones.length > 0) {
-        const categorias = [...new Set(body.opciones.map(o => o.categoria))];
-        await db.CensoOpcionMultiple.destroy({ where: { id_estudio: id, categoria: categorias }, transaction: t });
-        await db.CensoOpcionMultiple.bulkCreate(body.opciones.map(o => ({ ...o, id_estudio: id })), { transaction: t });
+      // Se actualiza si 'opciones' viene explícitamente en el body (incluso si está vacío),
+      // para soportar el caso donde el usuario desmarca todos los checkboxes.
+      if (Array.isArray(body.opciones)) {
+        // Categorías conocidas que pueden venir en el payload
+        const todasLasCategorias = ['enseres_vivienda', 'insectos_tipos', 'animales_tipos', 'gas_cilindros', 'enfermedades', 'misiones'];
+        if (body.opciones.length > 0) {
+          // Borrar solo las categorías que vienen en el payload, e insertar las nuevas
+          const categorias = [...new Set(body.opciones.map(o => o.categoria))];
+          await db.CensoOpcionMultiple.destroy({ where: { id_estudio: id, categoria: categorias }, transaction: t });
+          await db.CensoOpcionMultiple.bulkCreate(body.opciones.map(o => ({ ...o, id_estudio: id })), { transaction: t });
+        } else {
+          // Array vacío = se desmarcaron todos los checkboxes → borrar todas las categorías
+          await db.CensoOpcionMultiple.destroy({ where: { id_estudio: id, categoria: todasLasCategorias }, transaction: t });
+        }
       }
 
       await t.commit();
