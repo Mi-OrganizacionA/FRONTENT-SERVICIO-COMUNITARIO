@@ -139,20 +139,96 @@
       animation: float linear infinite;
     }
 
-    .particle:nth-child(1) { width: 6px; height: 6px; left: 10%; bottom: -20px; animation-duration: 12s; animation-delay: 0s; }
-    .particle:nth-child(2) { width: 10px; height: 10px; left: 20%; bottom: -20px; animation-duration: 18s; animation-delay: 2s; }
-    .particle:nth-child(3) { width: 4px; height: 4px; left: 35%; bottom: -20px; animation-duration: 14s; animation-delay: 4s; }
-    .particle:nth-child(4) { width: 8px; height: 8px; left: 50%; bottom: -20px; animation-duration: 20s; animation-delay: 1s; }
-    .particle:nth-child(5) { width: 5px; height: 5px; left: 65%; bottom: -20px; animation-duration: 16s; animation-delay: 3s; }
-    .particle:nth-child(6) { width: 12px; height: 12px; left: 80%; bottom: -20px; animation-duration: 22s; animation-delay: 5s; }
-    .particle:nth-child(7) { width: 7px; height: 7px; left: 90%; bottom: -20px; animation-duration: 15s; animation-delay: 0.5s; }
-    .particle:nth-child(8) { width: 3px; height: 3px; left: 45%; bottom: -20px; animation-duration: 11s; animation-delay: 6s; }
+    .particle:nth-child(1) {
+      width: 6px;
+      height: 6px;
+      left: 10%;
+      bottom: -20px;
+      animation-duration: 12s;
+      animation-delay: 0s;
+    }
+
+    .particle:nth-child(2) {
+      width: 10px;
+      height: 10px;
+      left: 20%;
+      bottom: -20px;
+      animation-duration: 18s;
+      animation-delay: 2s;
+    }
+
+    .particle:nth-child(3) {
+      width: 4px;
+      height: 4px;
+      left: 35%;
+      bottom: -20px;
+      animation-duration: 14s;
+      animation-delay: 4s;
+    }
+
+    .particle:nth-child(4) {
+      width: 8px;
+      height: 8px;
+      left: 50%;
+      bottom: -20px;
+      animation-duration: 20s;
+      animation-delay: 1s;
+    }
+
+    .particle:nth-child(5) {
+      width: 5px;
+      height: 5px;
+      left: 65%;
+      bottom: -20px;
+      animation-duration: 16s;
+      animation-delay: 3s;
+    }
+
+    .particle:nth-child(6) {
+      width: 12px;
+      height: 12px;
+      left: 80%;
+      bottom: -20px;
+      animation-duration: 22s;
+      animation-delay: 5s;
+    }
+
+    .particle:nth-child(7) {
+      width: 7px;
+      height: 7px;
+      left: 90%;
+      bottom: -20px;
+      animation-duration: 15s;
+      animation-delay: 0.5s;
+    }
+
+    .particle:nth-child(8) {
+      width: 3px;
+      height: 3px;
+      left: 45%;
+      bottom: -20px;
+      animation-duration: 11s;
+      animation-delay: 6s;
+    }
 
     @keyframes float {
-      0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: .6; }
-      100% { transform: translateY(-110vh) rotate(720deg); opacity: 0; }
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 1;
+      }
+
+      90% {
+        opacity: .6;
+      }
+
+      100% {
+        transform: translateY(-110vh) rotate(720deg);
+        opacity: 0;
+      }
     }
 
     /* Animaciones */
@@ -736,38 +812,44 @@
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.5);
+      background-color: rgba(0, 0, 0, 0.5);
       align-items: center;
       justify-content: center;
       backdrop-filter: blur(5px);
     }
+
     .modal.show {
       display: flex;
     }
+
     .modal-content {
       background-color: var(--wh);
       padding: 2.5rem;
       border-radius: 16px;
       width: 90%;
       max-width: 400px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
       position: relative;
     }
+
     .modal-content h2 {
       margin-bottom: 0.5rem;
       font-size: 1.4rem;
       color: var(--txt);
       font-weight: 700;
     }
+
     .modal-content p {
       margin-bottom: 1.5rem;
       font-size: 0.85rem;
       color: var(--sub);
       line-height: 1.5;
     }
+
     .modal-content .form-group {
       margin-bottom: 1.2rem;
     }
+
     .modal-content label {
       display: block;
       margin-bottom: 0.5rem;
@@ -775,6 +857,7 @@
       font-weight: 600;
       color: var(--sub);
     }
+
     .modal-content input {
       width: 100%;
       padding: 0.85rem 1rem;
@@ -785,9 +868,11 @@
       outline: none;
       transition: border-color 0.2s;
     }
+
     .modal-content input:focus {
       border-color: var(--vv);
     }
+
     .modal-content .close {
       position: absolute;
       top: 1rem;
@@ -797,9 +882,11 @@
       cursor: pointer;
       line-height: 1;
     }
+
     .modal-content .close:hover {
       color: var(--ru);
     }
+
     .btn-primary {
       background: linear-gradient(135deg, var(--vv) 0%, var(--vd) 100%);
       color: white;
@@ -813,6 +900,7 @@
       box-shadow: 0 4px 12px rgba(46, 125, 50, .2);
       transition: transform 0.2s, box-shadow 0.2s;
     }
+
     .btn-primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(46, 125, 50, .3);
@@ -829,7 +917,8 @@
 
   <div class="login-page">
     <!-- Botón Volver al Portal -->
-    <a href="index.html" style="position: absolute; top: 20px; left: 20px; z-index: 1000; display: inline-flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.85rem; font-weight: 600; font-family: 'Poppins', sans-serif; background: rgba(0,0,0,0.2); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px); transition: all 0.3s ease;">
+    <a href="index.html"
+      style="position: absolute; top: 20px; left: 20px; z-index: 1000; display: inline-flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.85rem; font-weight: 600; font-family: 'Poppins', sans-serif; background: rgba(0,0,0,0.2); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px); transition: all 0.3s ease;">
       <i class="fas fa-arrow-left"></i> Volver al Portal
     </a>
     <!-- Fondos compartidos (Unificados) -->
@@ -920,17 +1009,19 @@
 
           <!-- Usuario -->
           <div class="lg-group">
-            <label class="lg-label" for="loginUser">Correo o Teléfono <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Número de teléfono de contacto (Ej: 0414-1234567)"></i></label>
+            <label class="lg-label" for="loginUser">Correo <i class="fas fa-question-circle text-muted ms-1"
+                style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese su Correo electrónico"></i></label>
             <div class="lg-input-wrap">
               <i class="fas fa-id-card icon-l"></i>
-              <input class="lg-input" type="text" id="loginUser" placeholder="Ej: admin@sicag.com / 04120000000" autocomplete="username"
-                aria-required="true" required>
+              <input class="lg-input" type="text" id="loginUser" placeholder="Ej: admin@sicag.com / 04120000000"
+                autocomplete="username" aria-required="true" required>
             </div>
           </div>
 
           <!-- Contraseña -->
           <div class="lg-group">
-            <label class="lg-label" for="loginPass">Contraseña <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
+            <label class="lg-label" for="loginPass">Contraseña <i class="fas fa-question-circle text-muted ms-1"
+                style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
             <div class="lg-input-wrap">
               <i class="fas fa-lock icon-l"></i>
               <input class="lg-input" type="password" id="loginPass" placeholder="••••••••"
@@ -944,7 +1035,8 @@
           <div class="form-extras">
             <label class="remember-label">
               <input type="checkbox" id="rememberMe"> Recordarme
-             <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
+              <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip"
+                title="Proporcione la información solicitada en este campo"></i></label>
             <a href="#" id="forgotPasswordBtn" class="forgot-link">¿Olvidaste tu contraseña?</a>
           </div>
 
@@ -969,30 +1061,66 @@
   <div id="recoveryModal" class="modal">
     <div class="modal-content" style="max-width: 450px;">
       <span class="close" id="closeRecovery">&times;</span>
-      
+
       <!-- Indicador de Progreso -->
       <div style="display:flex; justify-content:space-between; margin-bottom: 2rem; position:relative;">
-        <div style="position:absolute; top:50%; left:0; right:0; height:2px; background:var(--border); z-index:0; transform:translateY(-50%);"></div>
+        <div
+          style="position:absolute; top:50%; left:0; right:0; height:2px; background:var(--border); z-index:0; transform:translateY(-50%);">
+        </div>
         <div class="wiz-step active" id="wiz1">1</div>
         <div class="wiz-step" id="wiz2">2</div>
         <div class="wiz-step" id="wiz3">3</div>
         <div class="wiz-step" id="wiz4">4</div>
       </div>
-      
+
       <style>
-        .wiz-step { width:30px; height:30px; border-radius:50%; background:var(--bg); border:2px solid var(--border); color:var(--sub); display:flex; align-items:center; justify-content:center; font-weight:bold; z-index:1; position:relative; transition:all 0.3s ease; }
-        .wiz-step.active { background:var(--vp); border-color:var(--vp); color:#fff; box-shadow:0 0 10px rgba(46,125,50,0.5); }
-        .pw-strength-bar { height: 5px; border-radius: 5px; background: #eee; margin-top: 5px; overflow: hidden; }
-        .pw-strength-fill { height: 100%; width: 0%; transition: all 0.3s; }
+        .wiz-step {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background: var(--bg);
+          border: 2px solid var(--border);
+          color: var(--sub);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          z-index: 1;
+          position: relative;
+          transition: all 0.3s ease;
+        }
+
+        .wiz-step.active {
+          background: var(--vp);
+          border-color: var(--vp);
+          color: #fff;
+          box-shadow: 0 0 10px rgba(46, 125, 50, 0.5);
+        }
+
+        .pw-strength-bar {
+          height: 5px;
+          border-radius: 5px;
+          background: #eee;
+          margin-top: 5px;
+          overflow: hidden;
+        }
+
+        .pw-strength-fill {
+          height: 100%;
+          width: 0%;
+          transition: all 0.3s;
+        }
       </style>
 
       <h2 id="wizTitle" style="text-align:center; color:var(--vp); margin-bottom:1rem;">Identificación</h2>
-      
+
       <!-- Paso 1: Correo -->
       <div id="stepEmail">
-        <p style="text-align:center; color:var(--sub); margin-bottom:1.5rem; font-size:0.9rem;">Ingresa tu correo electrónico asociado a la cuenta.</p>
+        <p style="text-align:center; color:var(--sub); margin-bottom:1.5rem; font-size:0.9rem;">Ingresa tu correo
+          electrónico asociado a la cuenta.</p>
         <div class="form-group">
-          <label>Correo Electrónico <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Dirección de correo electrónico válida"></i></label>
+          <label>Correo Electrónico <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;"
+              data-bs-toggle="tooltip" title="Dirección de correo electrónico válida"></i></label>
           <input type="email" id="recoveryEmail" class="lg-input" placeholder="ejemplo@correo.com" required>
         </div>
         <button class="btn-sicag btn-primary" id="btnRequestCode" style="width: 100%; margin-top:1rem;">
@@ -1002,10 +1130,14 @@
 
       <!-- Paso 2: Código -->
       <div id="stepCode" style="display: none;">
-        <p style="text-align:center; color:var(--sub); margin-bottom:1.5rem; font-size:0.9rem;" id="codeDescText">Tu solicitud ha sido enviada. Un administrador del sistema te proporcionará el código de verificación (válido por 15 min).</p>
+        <p style="text-align:center; color:var(--sub); margin-bottom:1.5rem; font-size:0.9rem;" id="codeDescText">Tu
+          solicitud ha sido enviada. Un administrador del sistema te proporcionará el código de verificación (válido por
+          15 min).</p>
         <div class="form-group">
-          <label>Código de Verificación <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
-          <input type="text" id="recoveryCode" class="lg-input" required maxlength="6" style="text-align: center; letter-spacing: 10px; font-weight: bold; font-size: 1.5rem;">
+          <label>Código de Verificación <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;"
+              data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
+          <input type="text" id="recoveryCode" class="lg-input" required maxlength="6"
+            style="text-align: center; letter-spacing: 10px; font-weight: bold; font-size: 1.5rem;">
         </div>
         <button class="btn-sicag btn-primary" id="btnVerifyCode" style="width: 100%; margin-top:1rem;">
           <i class="fas fa-check-circle"></i> Verificar Código
@@ -1014,16 +1146,23 @@
 
       <!-- Paso 3: Nueva Contraseña -->
       <div id="stepPassword" style="display: none;">
-        <p style="text-align:center; color:var(--sub); margin-bottom:1.5rem; font-size:0.9rem;">Crea una nueva contraseña segura.</p>
+        <p style="text-align:center; color:var(--sub); margin-bottom:1.5rem; font-size:0.9rem;">Crea una nueva
+          contraseña segura.</p>
         <div class="form-group">
-          <label>Nueva Contraseña <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
+          <label>Nueva Contraseña <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;"
+              data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
           <input type="password" id="recoveryNewPassword" class="lg-input" placeholder="Mínimo 8 caracteres" required>
-          <div class="pw-strength-bar"><div id="pwFill" class="pw-strength-fill"></div></div>
-          <small id="pwHint" style="font-size:0.75rem; color:var(--sub); display:block; margin-top:5px;">Nivel de seguridad</small>
+          <div class="pw-strength-bar">
+            <div id="pwFill" class="pw-strength-fill"></div>
+          </div>
+          <small id="pwHint" style="font-size:0.75rem; color:var(--sub); display:block; margin-top:5px;">Nivel de
+            seguridad</small>
         </div>
         <div class="form-group" style="margin-top:1rem;">
-          <label>Confirmar Contraseña <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
-          <input type="password" id="recoveryConfirmPassword" class="lg-input" placeholder="Repite la contraseña" required>
+          <label>Confirmar Contraseña <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;"
+              data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
+          <input type="password" id="recoveryConfirmPassword" class="lg-input" placeholder="Repite la contraseña"
+            required>
         </div>
         <button class="btn-sicag btn-primary" id="btnResetPassword" style="width: 100%; margin-top:1rem;">
           <i class="fas fa-key"></i> Guardar Nueva Contraseña
@@ -1034,7 +1173,8 @@
       <div id="stepSuccess" style="display: none; text-align:center;">
         <i class="fas fa-check-circle" style="font-size: 4rem; color: var(--vp); margin-bottom:1rem;"></i>
         <h3 style="color:var(--txt);">¡Contraseña Recuperada!</h3>
-        <p style="color:var(--sub); margin-top:1rem; font-size:0.9rem;">Tu contraseña ha sido actualizada con éxito. Ya puedes iniciar sesión con tus nuevas credenciales.</p>
+        <p style="color:var(--sub); margin-top:1rem; font-size:0.9rem;">Tu contraseña ha sido actualizada con éxito. Ya
+          puedes iniciar sesión con tus nuevas credenciales.</p>
         <button class="btn-sicag btn-primary" id="btnFinishRecovery" style="width: 100%; margin-top:2rem;">
           Iniciar Sesión
         </button>
