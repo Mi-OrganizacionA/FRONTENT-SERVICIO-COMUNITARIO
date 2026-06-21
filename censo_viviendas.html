@@ -4446,7 +4446,7 @@
     function hidratarFormulario(raw) {
       const boolToSiNo = (val) => (val === true || val === 1 || val === '1' || val === 'true') ? 'Si' : (val === false || val === 0 || val === '0' || val === 'false') ? 'No' : (val ?? '');
       const getSafe = (obj) => Array.isArray(obj) ? (obj[0] || {}) : (obj || {});
-      const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined && val !== null) el.value = val; };
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined && val !== null) { el.value = val; el.dispatchEvent(new Event('change')); } };
 
       // ── PANEL 1: Encuestador y Cabecera ──
       // Desactivar checkboxes "Auto" en modo edición para que no sobreescriban los valores
@@ -4896,12 +4896,19 @@
         const datosCenso = {};
         for (let paso = 1; paso <= totalSteps; paso++) {
           const datosDelPaso = typeof recolectarDatosDelPaso === 'function' ? recolectarDatosDelPaso(paso) : {};
-          // Merge especial: si ambos tienen 'opciones', concatenar los arrays en lugar de sobrescribir
+          // Merge especial: si ambos tienen 'opciones' o 'familiares', concatenar los arrays en lugar de sobrescribir
           const opcionesExistentes = datosCenso.opciones || [];
           const opcionesNuevas = datosDelPaso.opciones || [];
+          const familiaresExistentes = datosCenso.familiares || [];
+          const familiaresNuevos = datosDelPaso.familiares || [];
+          
           Object.assign(datosCenso, datosDelPaso);
+          
           if (opcionesExistentes.length > 0 || opcionesNuevas.length > 0) {
             datosCenso.opciones = [...opcionesExistentes, ...opcionesNuevas];
+          }
+          if (familiaresExistentes.length > 0 || familiaresNuevos.length > 0) {
+            datosCenso.familiares = [...familiaresExistentes, ...familiaresNuevos];
           }
         }
 
