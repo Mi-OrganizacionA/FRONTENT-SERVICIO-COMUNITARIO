@@ -3327,7 +3327,7 @@
         if (cedulaInput && cedulaInput.value) {
           const cedula = cedulaInput.value.trim();
           const cedulaLimpia = cedula.replace(/\./g, '').replace(/-/g, '');
-          const partes = cedulaLimpia.match(/^([VEve])(\d+)$/i);
+          const partes = cedulaLimpia.match(/^([VEve])?(\d+)$/i);
           if (!partes || partes[2].length < 6 || partes[2].length > 8) {
             valid = false;
             cedulaInput.style.borderColor = '#EF5350';
