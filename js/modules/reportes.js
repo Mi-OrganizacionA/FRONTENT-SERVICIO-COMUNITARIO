@@ -47,33 +47,48 @@ class ReportesController {
       });
     }
 
-    // Lógica del Modal de Filtros Avanzados
-    const btnOpenFilters = document.getElementById('btnOpenFilters');
-    const btnCloseFilters = document.getElementById('btnCloseFilters');
-    const modalFiltros = document.getElementById('modalFiltrosAvanzados');
-    const btnAplicarFiltros = document.getElementById('btnAplicarFiltros');
-    const btnLimpiarFiltros = document.getElementById('btnLimpiarFiltros');
+    // Lógica de Modales de Filtros Avanzados
+    const btnOpenFiltersPersonas = document.getElementById('btnOpenFiltersPersonas');
+    const btnCloseFiltersPersonas = document.getElementById('btnCloseFilters');
+    const modalFiltrosPersonas = document.getElementById('modalFiltrosPersonas');
+    
+    const btnOpenFiltersVivienda = document.getElementById('btnOpenFiltersVivienda');
+    const btnCloseFiltersVivienda = document.getElementById('btnCloseFiltersVivienda');
+    const modalFiltrosVivienda = document.getElementById('modalFiltrosVivienda');
 
-    // Ocultar filtro de consejo si es vocero
+    // Deshabilitar filtro de consejo si es vocero
     const user = window.auth ? window.auth.getUser() : null;
     const isVocero = user && user.rol && user.rol.toLowerCase() === 'vocero';
     
     if (isVocero) {
       const filtroCC = document.getElementById('filtroConsejo');
+      const filtroVCC = document.getElementById('filtroV_Consejo');
       if (filtroCC) {
         filtroCC.value = user.id_comunidad_asignada || '';
-        if (filtroCC.parentElement) filtroCC.parentElement.style.display = 'none';
+        filtroCC.disabled = true; // Solo deshabilitar, no ocultar
       }
-      // Mostrar etiqueta con la comunidad del vocero
+      if (filtroVCC) {
+        filtroVCC.value = user.id_comunidad_asignada || '';
+        filtroVCC.disabled = true;
+      }
       const subtitulo = document.getElementById('reportes-subtitulo');
       if (subtitulo) subtitulo.textContent = `Reportes de: ${user.nombre_comunidad || 'Tu Comunidad'}`;
     }
 
-    if (btnOpenFilters && modalFiltros) {
-      btnOpenFilters.addEventListener('click', () => modalFiltros.style.display = 'flex');
+    // Modal Personas
+    if (btnOpenFiltersPersonas && modalFiltrosPersonas) {
+      btnOpenFiltersPersonas.addEventListener('click', () => modalFiltrosPersonas.style.display = 'flex');
     }
-    if (btnCloseFilters && modalFiltros) {
-      btnCloseFilters.addEventListener('click', () => modalFiltros.style.display = 'none');
+    if (btnCloseFiltersPersonas && modalFiltrosPersonas) {
+      btnCloseFiltersPersonas.addEventListener('click', () => modalFiltrosPersonas.style.display = 'none');
+    }
+
+    // Modal Viviendas
+    if (btnOpenFiltersVivienda && modalFiltrosVivienda) {
+      btnOpenFiltersVivienda.addEventListener('click', () => modalFiltrosVivienda.style.display = 'flex');
+    }
+    if (btnCloseFiltersVivienda && modalFiltrosVivienda) {
+      btnCloseFiltersVivienda.addEventListener('click', () => modalFiltrosVivienda.style.display = 'none');
     }
 
     // Pre-cargar fecha mínima del sistema para "Fecha Desde"
@@ -140,26 +155,51 @@ class ReportesController {
     // Exportar desde Modal
     const btnCustomExcel = document.getElementById('btnCustomExcel');
     const btnCustomPDF = document.getElementById('btnCustomPDF');
-    const customSelect = document.getElementById('customReportType');
-    
-    if (btnCustomExcel && customSelect) {
+
+    if (btnCustomExcel) {
       btnCustomExcel.addEventListener('click', () => {
-        if (!customSelect.value) return Components.showToast('Selecciona un tipo de reporte', 'warning');
-        this.iniciarExportacion(customSelect.value, 'excel', btnCustomExcel);
-        if (modalFiltros) modalFiltros.style.display = 'none';
+        const type = document.getElementById('customReportType')?.value || 'total-personas';
+        this.iniciarExportacion(type, 'excel', btnCustomExcel, this.getFiltrosPersonasUrl());
       });
     }
 
-    if (btnCustomPDF && customSelect) {
+    if (btnCustomPDF) {
       btnCustomPDF.addEventListener('click', () => {
-        if (!customSelect.value) return Components.showToast('Selecciona un tipo de reporte', 'warning');
-        this.iniciarExportacion(customSelect.value, 'pdf', btnCustomPDF);
-        if (modalFiltros) modalFiltros.style.display = 'none';
+        const type = document.getElementById('customReportType')?.value || 'total-personas';
+        this.iniciarExportacion(type, 'pdf', btnCustomPDF, this.getFiltrosPersonasUrl());
+      });
+    }
+
+    // Modal de Viviendas - Botones de Exportación
+    const btnExportViviendaAvanzadoExcel = document.getElementById('btnExportViviendaAvanzadoExcel');
+    const btnExportViviendaAvanzadoPDF = document.getElementById('btnExportViviendaAvanzadoPDF');
+    const btnLimpiarFiltrosVivienda = document.getElementById('btnLimpiarFiltrosVivienda');
+
+    if (btnExportViviendaAvanzadoExcel) {
+      btnExportViviendaAvanzadoExcel.addEventListener('click', () => {
+        this.iniciarExportacion('viviendas_avanzado', 'excel', btnExportViviendaAvanzadoExcel, this.getFiltrosViviendaUrl());
+      });
+    }
+
+    if (btnExportViviendaAvanzadoPDF) {
+      btnExportViviendaAvanzadoPDF.addEventListener('click', () => {
+        this.iniciarExportacion('viviendas_avanzado', 'pdf', btnExportViviendaAvanzadoPDF, this.getFiltrosViviendaUrl());
+      });
+    }
+
+    if (btnLimpiarFiltrosVivienda) {
+      btnLimpiarFiltrosVivienda.addEventListener('click', () => {
+        document.querySelectorAll('#modalFiltrosVivienda select, #modalFiltrosVivienda input[type="text"]').forEach(el => {
+          if (!el.disabled || el.id === 'filtroV_Planilla' || el.id === 'filtroV_Encuestador') {
+            el.value = '';
+          }
+        });
       });
     }
   }
 
-  getFiltrosUrl() {
+  getFiltrosPersonasUrl() {
+    let q = '';
     const desde = document.getElementById('filtroDesde')?.value;
     const hasta = document.getElementById('filtroHasta')?.value;
     const user = window.auth ? window.auth.getUser() : null;
@@ -199,6 +239,49 @@ class ReportesController {
     if (extras) params.append('extras', extras);
 
     return params.toString();
+  }
+
+  getFiltrosViviendaUrl() {
+    let q = '&avanzado=true';
+    const user = window.auth ? window.auth.getUser() : null;
+    const isVocero = user && user.rol && user.rol.toLowerCase() === 'vocero';
+    
+    const consejo_id = isVocero ? user.id_comunidad_asignada : document.getElementById('filtroV_Consejo')?.value;
+    if (consejo_id) q += `&consejo_id=${encodeURIComponent(consejo_id)}`;
+
+    // Control
+    const planilla = document.getElementById('filtroV_Planilla')?.value;
+    if (planilla) q += `&planilla_nro=${encodeURIComponent(planilla)}`;
+    const encuestador = document.getElementById('filtroV_Encuestador')?.value;
+    if (encuestador) q += `&encuestador_cedula=${encodeURIComponent(encuestador)}`;
+
+    // Familia
+    const rangoHab = document.getElementById('filtroV_HabitantesRango')?.value;
+    if (rangoHab) q += `&rango_habitantes=${encodeURIComponent(rangoHab)}`;
+    const menores = document.getElementById('filtroV_TieneMenores12')?.value;
+    if (menores) q += `&tiene_menores_12=true`;
+    const disc = document.getElementById('filtroV_TieneDiscapacitados')?.value;
+    if (disc) q += `&tiene_discapacitados=true`;
+
+    // Vivienda
+    const tipo = document.getElementById('filtroV_Tipo')?.value;
+    if (tipo) q += `&tipo_vivienda=${encodeURIComponent(tipo)}`;
+    const gas = document.getElementById('filtroV_Gas')?.value;
+    if (gas) q += `&gas_tipo=${encodeURIComponent(gas)}`;
+    const agua = document.getElementById('filtroV_Agua')?.value;
+    if (agua) q += `&aguas_blancas_tipo=${encodeURIComponent(agua)}`;
+    const salubridad = document.getElementById('filtroV_Salubridad')?.value;
+    if (salubridad) q += `&condiciones_salubridad=${encodeURIComponent(salubridad)}`;
+
+    // Economía / Salud
+    const ingreso = document.getElementById('filtroV_Ingreso')?.value;
+    if (ingreso) q += `&ingreso_familiar_rango=${encodeURIComponent(ingreso)}`;
+    const ayuda = document.getElementById('filtroV_AyudaMedica')?.value;
+    if (ayuda === 'Sí') q += `&necesita_ayuda_especial=true`;
+    const comercio = document.getElementById('filtroV_Comercio')?.value;
+    if (comercio) q += `&actividad_comercial_vivienda=${encodeURIComponent(comercio)}`;
+
+    return q;
   }
 
   async cargarKPIs() {

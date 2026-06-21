@@ -264,13 +264,23 @@
 
   </main>
 
-  <!-- BOTÓN FLOTANTE (FAB) PARA FILTROS -->
-  <button class="fab-btn" id="btnOpenFilters" aria-label="Abrir Filtros" style="position:fixed;bottom:2rem;right:2rem;width:60px;height:60px;border-radius:50%;background:var(--vp);color:white;border:none;box-shadow:0 6px 16px rgba(46,125,50,0.3);font-size:1.5rem;cursor:pointer;z-index:99;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;">
-    <i class="fas fa-filter"></i>
-  </button>
+  <!-- BOTONES FLOTANTES (FAB) PARA FILTROS -->
+  <div style="position:fixed; bottom:2rem; right:2rem; display:flex; flex-direction:column; gap:1rem; z-index:99;">
+    
+    <!-- Botón Personas (Arriba) -->
+    <button class="fab-btn" id="btnOpenFiltersPersonas" aria-label="Filtros de Personas" title="Filtros de Habitantes" style="width:55px;height:55px;border-radius:50%;background:var(--vp);color:white;border:none;box-shadow:0 4px 12px rgba(46,125,50,0.3);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;">
+      <i class="fas fa-user-tag"></i>
+    </button>
 
-  <!-- MODAL DE FILTROS AVANZADOS -->
-  <div class="modal-overlay" id="modalFiltrosAvanzados" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); z-index:9999; display:none; align-items:center; justify-content:center; backdrop-filter:blur(8px); padding:1rem;">
+    <!-- Botón Viviendas (Abajo) -->
+    <button class="fab-btn" id="btnOpenFiltersVivienda" aria-label="Filtros de Viviendas" title="Filtros Avanzados de Viviendas" style="width:55px;height:55px;border-radius:50%;background:#E65100;color:white;border:none;box-shadow:0 4px 12px rgba(230,81,0,0.3);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;">
+      <i class="fas fa-home"></i>
+    </button>
+
+  </div>
+
+  <!-- MODAL DE FILTROS PERSONAS (ORIGINAL) -->
+  <div class="modal-overlay" id="modalFiltrosPersonas" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); z-index:9999; display:none; align-items:center; justify-content:center; backdrop-filter:blur(8px); padding:1rem;">
     <div class="modal-content" style="background:#ffffff; border-radius:16px; padding:0; max-width:800px; width:100%; max-height:95vh; box-shadow:0 25px 50px rgba(0,0,0,0.3); overflow:hidden; display:flex; flex-direction:column; animation: fadeUp 0.3s ease-out;">
       <div class="modal-header" style="background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%); padding:1.5rem 2.5rem; display:flex; justify-content:space-between; align-items:center;">
         <div style="display:flex; align-items:center;">
@@ -417,6 +427,182 @@
             <i class="fas fa-file-excel"></i> Exportar Excel
           </button>
           <button class="btn-sicag" id="btnCustomPDF" style="background:linear-gradient(135deg, #e53935 0%, #c62828 100%); color:white; border:none; padding:0.7rem 1.5rem; border-radius:8px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(229,57,53,0.3); display:flex; align-items:center; gap:0.5rem; transition:0.2s;">
+            <i class="fas fa-file-pdf"></i> Exportar PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE FILTROS AVANZADOS DE VIVIENDAS -->
+  <div class="modal-overlay" id="modalFiltrosVivienda" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); z-index:9999; display:none; align-items:center; justify-content:center; backdrop-filter:blur(8px); padding:1rem;">
+    <div class="modal-content" style="background:#ffffff; border-radius:16px; padding:0; max-width:900px; width:100%; max-height:95vh; box-shadow:0 25px 50px rgba(0,0,0,0.3); overflow:hidden; display:flex; flex-direction:column; animation: fadeUp 0.3s ease-out;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #E65100 0%, #FF8F00 100%); padding:1.5rem 2.5rem; display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center;">
+          <div style="background:rgba(255,255,255,0.2); width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-right:1rem; backdrop-filter:blur(4px);">
+            <i class="fas fa-home" style="color:#ffffff; font-size:1.4rem;"></i>
+          </div>
+          <div>
+            <h2 style="font-size:1.4rem; color:#ffffff; margin:0; font-weight:800; letter-spacing:-0.5px;">Filtros de Viviendas</h2>
+            <p style="color:rgba(255,255,255,0.8); margin:0; font-size:0.85rem; margin-top:0.2rem;">Exporta reportes altamente personalizables del Censo Demográfico.</p>
+          </div>
+        </div>
+        <button class="modal-close" id="btnCloseFiltersVivienda" style="background:rgba(255,255,255,0.15); border:none; width:36px; height:36px; border-radius:50%; color:#ffffff; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; transition:background 0.2s;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" style="padding:1.5rem; flex:1; overflow-y:auto; background:#f9fafb;">
+        
+        <style>
+          .acc-details { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 1rem; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+          .acc-summary { padding: 1rem 1.5rem; font-weight: 700; color: #374151; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; background: #fff; user-select: none; }
+          .acc-summary::-webkit-details-marker { display: none; }
+          .acc-summary:hover { background: #f3f4f6; }
+          .acc-content { padding: 1.5rem; border-top: 1px solid #e5e7eb; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; }
+          details[open] .acc-summary { background: #fff3e0; color: #E65100; border-bottom: 1px solid #fed7aa; }
+        </style>
+
+        <!-- 1. Control y Geografía -->
+        <details class="acc-details" open>
+          <summary class="acc-summary"><i class="fas fa-map-marker-alt"></i> Control y Geografía</summary>
+          <div class="acc-content">
+            <div class="form-group-sicag" style="grid-column:1/-1;">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Consejo Comunal</label>
+              <select id="filtroV_Consejo" class="input-sicag" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+                <option value="">Todos los Consejos Comunales</option>
+                <option value="1">Jobito I</option><option value="2">Jobito II</option><option value="3">Brisas del Yurubí</option><option value="4">Andrés Eloy Blanco</option><option value="5">Las Mercedes I</option><option value="6">Las Mercedes II</option><option value="7">Santa Cruz de las Mercedes</option><option value="8">Fortaleza del Corozo</option><option value="9">Vencedores del Corozo</option>
+              </select>
+            </div>
+            <div class="form-group-sicag">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Nro. Planilla Exacto</label>
+              <input type="text" id="filtroV_Planilla" class="input-sicag" placeholder="Ej: 001234" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+            </div>
+            <div class="form-group-sicag">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Cédula del Encuestador</label>
+              <input type="text" id="filtroV_Encuestador" class="input-sicag" placeholder="Ej: 12345678" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+            </div>
+          </div>
+        </details>
+
+        <!-- 2. Jefe y Familia -->
+        <details class="acc-details">
+          <summary class="acc-summary"><i class="fas fa-users"></i> Demografía Familiar</summary>
+          <div class="acc-content">
+            <div class="form-group-sicag">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Carga Familiar Total</label>
+              <select id="filtroV_HabitantesRango" class="input-sicag" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+                <option value="">Cualquier cantidad</option>
+                <option value="1-3">De 1 a 3 personas</option>
+                <option value="4-6">De 4 a 6 personas</option>
+                <option value="7+">7 o más personas</option>
+              </select>
+            </div>
+            <div class="form-group-sicag">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Presencia de Menores (< 12 años)</label>
+              <select id="filtroV_TieneMenores12" class="input-sicag" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+                <option value="">Indiferente</option>
+                <option value="true">Sí (hogares con niños menores de 12)</option>
+              </select>
+            </div>
+            <div class="form-group-sicag">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Personas con Discapacidad</label>
+              <select id="filtroV_TieneDiscapacitados" class="input-sicag" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+                <option value="">Indiferente</option>
+                <option value="true">Sí (hogares con personas discapacitadas)</option>
+              </select>
+            </div>
+          </div>
+        </details>
+
+        <!-- 3. Vivienda y Servicios -->
+        <details class="acc-details">
+          <summary class="acc-summary"><i class="fas fa-faucet"></i> Infraestructura y Servicios Básicos</summary>
+          <div class="acc-content">
+            <div class="form-group-sicag">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Tipo de Vivienda</label>
+              <select id="filtroV_Tipo" class="input-sicag" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+                <option value="">Cualquiera</option>
+                <option value="🏡 Quinta">🏡 Quinta</option>
+                <option value="🏠 Casa">🏠 Casa</option>
+                <option value="🏢 Apartamento">🏢 Apartamento</option>
+                <option value="🛖 Rancho">🛖 Rancho</option>
+                <option value="⛺ Barraca">⛺ Barraca</option>
+                <option value="🚪 Habitación">🚪 Habitación</option>
+              </select>
+            </div>
+            <div class="form-group-sicag">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Gas Doméstico</label>
+              <select id="filtroV_Gas" class="input-sicag" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+                <option value="">Cualquiera</option>
+                <option value="🔴 Bombona">🔴 Bombona</option>
+                <option value="🟢 Tubería">🟢 Tubería</option>
+                <option value="🚫 No posee">🚫 No posee</option>
+              </select>
+            </div>
+            <div class="form-group-sicag">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Aguas Blancas</label>
+              <select id="filtroV_Agua" class="input-sicag" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+                <option value="">Cualquiera</option>
+                <option value="💧 Acueducto">💧 Acueducto</option>
+                <option value="🚰 Pila pública">🚰 Pila pública</option>
+                <option value="🚛 Camión cisterna">🚛 Camión cisterna</option>
+                <option value="🚫 No tiene">🚫 No tiene</option>
+              </select>
+            </div>
+            <div class="form-group-sicag">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Condiciones de Salubridad</label>
+              <select id="filtroV_Salubridad" class="input-sicag" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+                <option value="">Todas</option>
+                <option value="✅ Buenas">✅ Buenas</option>
+                <option value="🟡 Regulares">🟡 Regulares</option>
+                <option value="🔴 Malas">🔴 Malas</option>
+              </select>
+            </div>
+          </div>
+        </details>
+
+        <!-- 4. Economía y Vulnerabilidad -->
+        <details class="acc-details">
+          <summary class="acc-summary"><i class="fas fa-hand-holding-medical"></i> Vulnerabilidad y Economía</summary>
+          <div class="acc-content">
+            <div class="form-group-sicag">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Rango de Ingresos Familiares</label>
+              <select id="filtroV_Ingreso" class="input-sicag" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+                <option value="">Todos</option>
+                <option value="Menos de 1 salario mínimo">Menos de 1 salario mínimo</option>
+                <option value="1 a 2 salarios mínimos">1 a 2 salarios mínimos</option>
+                <option value="2 a 5 salarios mínimos">2 a 5 salarios mínimos</option>
+                <option value="Más de 5 salarios mínimos">Más de 5 salarios mínimos</option>
+                <option value="Sin ingresos">Sin ingresos</option>
+              </select>
+            </div>
+            <div class="form-group-sicag">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Requiere Ayuda Médica Especial</label>
+              <select id="filtroV_AyudaMedica" class="input-sicag" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+                <option value="">Indiferente</option>
+                <option value="Sí">Sí (Necesita ayuda médica)</option>
+              </select>
+            </div>
+            <div class="form-group-sicag">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Actividad Comercial en la Vivienda</label>
+              <select id="filtroV_Comercio" class="input-sicag" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+                <option value="">Indiferente</option>
+                <option value="Sí">Sí</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+          </div>
+        </details>
+
+      </div>
+      <div class="modal-footer" style="padding:1.5rem; background:#fff3e0; border-top:1px solid #fed7aa; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <button class="btn-sicag" id="btnLimpiarFiltrosVivienda" style="background:#ffffff; border:1px solid #d1d5db; color:#4b5563; padding:0.7rem 1.5rem; border-radius:8px; font-weight:600; cursor:pointer; transition:0.2s; box-shadow:0 1px 2px rgba(0,0,0,0.05);">Limpiar Filtros</button>
+        
+        <div style="display:flex; gap:0.75rem;">
+          <button class="btn-sicag" id="btnExportViviendaAvanzadoExcel" style="background:#107c41; color:white; border:none; padding:0.7rem 1.5rem; border-radius:8px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(16,124,65,0.3); display:flex; align-items:center; gap:0.5rem; transition:0.2s;">
+            <i class="fas fa-file-excel"></i> Exportar Excel
+          </button>
+          <button class="btn-sicag" id="btnExportViviendaAvanzadoPDF" style="background:linear-gradient(135deg, #e53935 0%, #c62828 100%); color:white; border:none; padding:0.7rem 1.5rem; border-radius:8px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(229,57,53,0.3); display:flex; align-items:center; gap:0.5rem; transition:0.2s;">
             <i class="fas fa-file-pdf"></i> Exportar PDF
           </button>
         </div>
