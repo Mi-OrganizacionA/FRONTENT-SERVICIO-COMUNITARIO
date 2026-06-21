@@ -2266,7 +2266,7 @@
                   
                   <div class="cv-form-row cv-grid-2">
                     <div class="cv-form-group">
-                      <label>Cédula / Fecha Nacimiento <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese el número de cédula de identidad sin puntos ni guiones"></i></label>
+                      <label class="lbl-fam-cedula">Cédula / Fecha Nacimiento <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese el número de cédula de identidad sin puntos ni guiones"></i></label>
                       <div class="cv-input-group">
                         <input type="text" class="cv-form-control fam-cedula" placeholder="V-XX.XXX.XXX">
                         <button type="button" class="cv-btn-validate btn-validar-fam"><i class="fas fa-magnifying-glass"></i></button>
@@ -3533,7 +3533,7 @@
               fecha_nacimiento: fechaNac,
               genero: sexo,
               nivel_educativo: instruccion,
-              pensionado: pensionado === 'Si' || pensionado === 'true',
+              pensionado: pension === 'Si' || pension === 'true',
               embarazo_temprano: embarazo || false,
               estado_civil: estadoCivil,
               profesion: ocupacion,
@@ -5271,7 +5271,18 @@
 
       // ── 3. Autocompletado: Encuestado ──
       if (window.HabitanteAutocomplete) {
+        
+        const encuestadoCedInput = document.getElementById('encuestadoCedula');
+        if (encuestadoCedInput) {
+          encuestadoCedInput.addEventListener('input', () => {
+            if (encuestadoCedInput.value.trim() === '') {
+              const el = document.getElementById('encuestadoNombre');
+              if (el) el.value = '';
+            }
+          });
+        }
         HabitanteAutocomplete.attachTo('encuestadoCedula', (datos) => {
+
           const el = document.getElementById('encuestadoNombre');
           if (el) el.value = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
         }, {
@@ -5297,7 +5308,24 @@
           }
         });
 
+        
+        const cedulaJefeInput = document.getElementById('cedulaJefe');
+        if (cedulaJefeInput) {
+          cedulaJefeInput.addEventListener('input', () => {
+            if (cedulaJefeInput.value.trim() === '') {
+              document.getElementById('jefeHabitanteId').value = '';
+              window.currentJefeFamiliaId = null;
+              camposJefe.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+              });
+              const btnReg = document.getElementById('btnRegistrarJefe');
+              if (btnReg) btnReg.style.display = 'none';
+            }
+          });
+        }
         HabitanteAutocomplete.attachTo('cedulaJefe', (datos) => {
+
           document.getElementById('jefeHabitanteId').value = datos.id;
           window.currentJefeFamiliaId = datos.id;
           
@@ -5493,7 +5521,51 @@
             showToast('⚠️ Este registro no fue encontrado.', 'error');
           };
 
+          
+          row._onHabitanteClear = () => {
+            const idInput = row.querySelector('.fam-habitante-id');
+            const nombreInput = row.querySelector('.fam-nombres');
+            const sexoSel = row.querySelector('.fam-sexo');
+            const fechaInput = row.querySelector('.fam-fechanac');
+            const estadocivilInput = row.querySelector('.fam-estadocivil');
+            const instruccionInput = row.querySelector('.fam-instruccion');
+            const ocupacionInput = row.querySelector('.fam-ocupacion');
+            const cneInput = row.querySelector('.fam-cne');
+            const saludInput = row.querySelector('.fam-salud');
+            const incapacidadInput = row.querySelector('.fam-incapacidad');
+            const pensionInput = row.querySelector('.fam-pension');
+
+            if (idInput) idInput.value = '';
+            if (nombreInput) nombreInput.value = '';
+            if (sexoSel) sexoSel.value = '';
+            if (fechaInput) fechaInput.value = '';
+            if (estadocivilInput) estadocivilInput.value = '';
+            if (instruccionInput) instruccionInput.value = '';
+            if (ocupacionInput) ocupacionInput.value = '';
+            if (cneInput) cneInput.value = '';
+            if (saludInput) saludInput.value = '';
+            if (incapacidadInput) incapacidadInput.value = '';
+            if (pensionInput) pensionInput.value = '';
+
+            const readonlyDiv = row.querySelector('.fam-datos-readonly');
+            if (readonlyDiv) readonlyDiv.style.display = 'none';
+
+            const banner = row.querySelector('.fam-status-banner');
+            if (banner) banner.style.display = 'none';
+            const btnReg = row.querySelector('.fam-registrar-btn');
+            if (btnReg) btnReg.style.display = 'none';
+            
+            row._datos_nuevos_habitante = null;
+          };
+
+          cedulaInput.addEventListener('input', () => {
+            if (cedulaInput.value.trim() === '') {
+              row._onHabitanteClear();
+            }
+          });
+
           HabitanteAutocomplete.attachTo(cedulaInput, (datos) => {
+
             const isNombre = row.querySelector('.chk-buscar-nombre')?.checked;
             if (!isNombre) row._onHabitanteFill(datos);
           }, {
@@ -5956,11 +6028,17 @@
       try {
         window._registrandoTipo = tipo; // 'jefe' o 'familiar'
         let cedula = '';
+        let nombresPre = '';
         if (tipo === 'jefe') {
           cedula = document.getElementById('cedulaJefe')?.value || '';
         } else if (tipo === 'familiar' && window._registrandoFilaFamiliar) {
           const isNombre = window._registrandoFilaFamiliar.querySelector('.chk-buscar-nombre')?.checked;
-          cedula = isNombre ? '' : (window._registrandoFilaFamiliar.querySelector('.fam-cedula')?.value || '');
+          const valorInput = window._registrandoFilaFamiliar.querySelector('.fam-cedula')?.value || '';
+          if (isNombre) {
+            nombresPre = valorInput;
+          } else {
+            cedula = valorInput;
+          }
         }
         
         const wrapperSinCedula = document.getElementById('wrapper_rh_sin_cedula');
@@ -5976,20 +6054,29 @@
         if (!cedula && tipo === 'jefe') {
           showToast('Debe ingresar la cédula antes de registrar al jefe.', 'error');
           return;
-        } else if (!cedula && tipo === 'familiar' && (!chkSinCedula || !chkSinCedula.checked)) {
-          // If cedula is empty and checkbox is not checked, we should theoretically block it unless they check it in the modal.
-          // Since they might open it without typing a cedula to register a child, we'll allow it but cedula is required.
+        } else if (!cedula && !nombresPre && tipo === 'familiar' && (!chkSinCedula || !chkSinCedula.checked)) {
           cedula = '';
         }
 
         const setIfExist = (id, val) => {
           const el = document.getElementById(id);
           if (el) el.value = val;
-          else console.warn(`Elemento ${id} no encontrado en el modal`);
         };
 
         setIfExist('rh_cedula', cedula);
-        setIfExist('rh_nombres', '');
+        
+        const inputCedulaModal = document.getElementById('rh_cedula');
+        if (inputCedulaModal) {
+          if (!cedula) {
+            inputCedulaModal.removeAttribute('readonly');
+            inputCedulaModal.style.background = 'var(--bg-color)';
+          } else {
+            inputCedulaModal.setAttribute('readonly', 'true');
+            inputCedulaModal.style.background = 'var(--gray2)';
+          }
+        }
+
+        setIfExist('rh_nombres', nombresPre);
         setIfExist('rh_fecha_nacimiento', '');
         setIfExist('rh_genero', '');
         setIfExist('rh_nacionalidad', 'V');
