@@ -2271,6 +2271,10 @@
                         <input type="text" class="cv-form-control fam-cedula" placeholder="V-XX.XXX.XXX">
                         <button type="button" class="cv-btn-validate btn-validar-fam"><i class="fas fa-magnifying-glass"></i></button>
                       </div>
+                      <div style="margin-top: 5px; display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" class="chk-buscar-nombre" onchange="window.toggleBusquedaNombre(this)">
+                        <label style="font-size: 0.85rem; margin: 0; color: var(--text-muted, #666);">Buscar por nombre <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese los nombres y apellidos completos"></i></label>
+                      </div>
                     </div>
                     <div class="cv-form-group">
                       <label>Parentesco <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
