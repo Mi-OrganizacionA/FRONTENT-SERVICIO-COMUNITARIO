@@ -371,6 +371,7 @@ class HabitantesController {
         edad: h.edad,
         genero: h.genero,
         elector: h.elector,
+        fecha_nacimiento: h.fecha_nacimiento,
         consejo: h.consejo || null
       }));
 

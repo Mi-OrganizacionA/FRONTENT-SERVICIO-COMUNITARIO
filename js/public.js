@@ -914,6 +914,7 @@
       const initials = nombre.split(' ').slice(0,2).map(p => p[0]||'').join('').toUpperCase();
       
       const edadStr = h.edad ? `${h.edad} años` : 'N/D';
+      const fechaNacStr = h.fecha_nacimiento ? new Date(h.fecha_nacimiento).toLocaleDateString() : 'N/D';
       const generoStr = h.genero === 'M' ? 'Masculino' : (h.genero === 'F' ? 'Femenino' : (h.genero || 'N/D'));
       const electorStr = h.elector ? 'Habilitado(a)' : 'No Elector';
 
@@ -935,8 +936,12 @@
             <div style="color:var(--gray5); font-weight:600; font-size:0.75rem; text-transform:uppercase;">Género</div>
             <div style="color:var(--vp); font-weight:700;"><i class="fas fa-venus-mars" style="opacity:0.6;"></i> ${generoStr}</div>
           </div>
-          <div style="grid-column: span 2;">
-            <div style="color:var(--gray5); font-weight:600; font-size:0.75rem; text-transform:uppercase;">Estatus Electoral</div>
+          <div>
+            <div style="color:var(--gray5); font-weight:600; font-size:0.75rem; text-transform:uppercase;">Nacimiento</div>
+            <div style="color:var(--vp); font-weight:700;"><i class="fas fa-calendar-day" style="opacity:0.6;"></i> ${fechaNacStr}</div>
+          </div>
+          <div>
+            <div style="color:var(--gray5); font-weight:600; font-size:0.75rem; text-transform:uppercase;">Electoral</div>
             <div style="color:var(--vp); font-weight:700;"><i class="fas fa-vote-yea" style="opacity:0.6;"></i> ${electorStr}</div>
           </div>
         </div>
