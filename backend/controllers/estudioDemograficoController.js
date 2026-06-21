@@ -288,6 +288,7 @@ class EstudioDemograficoController {
         }
         const nuevoJefe = await models.Habitante.create({
           ...req.body.datos_nuevos_jefe,
+          consejo_comunal_id: id_comunidad || (cabecera ? cabecera.id_comunidad : null),
           activo: true,
           fecha_registro: new Date()
         }, { transaction: t });
@@ -304,6 +305,7 @@ class EstudioDemograficoController {
             }
             const nuevoHab = await models.Habitante.create({
               ...fam.datos_nuevos_habitante,
+              consejo_comunal_id: id_comunidad || (cabecera ? cabecera.id_comunidad : null),
               activo: true,
               fecha_registro: new Date()
             }, { transaction: t });
@@ -547,6 +549,7 @@ class EstudioDemograficoController {
       if (body.datos_nuevos_jefe && body.jefe_habitante_id != null && String(body.jefe_habitante_id).startsWith('tmp_')) {
         const nuevoJefe = await models.Habitante.create({
           ...body.datos_nuevos_jefe,
+          consejo_comunal_id: estudio.id_comunidad,
           activo: true,
           fecha_registro: new Date()
         }, { transaction: t });
@@ -559,6 +562,7 @@ class EstudioDemograficoController {
           if (fam.datos_nuevos_habitante && fam.id_habitante != null && String(fam.id_habitante).startsWith('tmp_')) {
             const nuevoHab = await models.Habitante.create({
               ...fam.datos_nuevos_habitante,
+              consejo_comunal_id: estudio.id_comunidad,
               activo: true,
               fecha_registro: new Date()
             }, { transaction: t });

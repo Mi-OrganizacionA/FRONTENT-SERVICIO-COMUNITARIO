@@ -129,6 +129,7 @@ class BandejaValidacionesController {
           try {
             const nuevoJefe = await models.Habitante.create({
               ...datos.datos_nuevos_jefe,
+              consejo_comunal_id: datos.id_comunidad,
               activo: true,
               fecha_registro: new Date()
             });
@@ -149,6 +150,7 @@ class BandejaValidacionesController {
               try {
                 const nuevoHab = await models.Habitante.create({
                   ...fam.datos_nuevos_habitante,
+                  consejo_comunal_id: datos.id_comunidad,
                   activo: true,
                   fecha_registro: new Date()
                 });
@@ -206,6 +208,7 @@ class BandejaValidacionesController {
           try {
             const nuevoJefe = await models.Habitante.create({
               ...datos.datos_nuevos_jefe,
+              consejo_comunal_id: datos.id_comunidad,
               activo: true,
               fecha_registro: new Date()
             });
@@ -226,6 +229,7 @@ class BandejaValidacionesController {
               try {
                 const nuevoHab = await models.Habitante.create({
                   ...fam.datos_nuevos_habitante,
+                  consejo_comunal_id: datos.id_comunidad,
                   activo: true,
                   fecha_registro: new Date()
                 });
