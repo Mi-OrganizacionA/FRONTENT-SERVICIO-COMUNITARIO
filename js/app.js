@@ -256,3 +256,22 @@ document.addEventListener('DOMContentLoaded', function () {
     'color: #228B22; font-size: 11px;'
   );
 });
+  // ---- REGISTRO DEL SERVICE WORKER (PWA - MODO OFFLINE) ----
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+          console.log('[PWA] Service Worker registrado con éxito. Scope:', registration.scope);
+        })
+        .catch((error) => {
+          console.error('[PWA] Error al registrar el Service Worker:', error);
+        });
+    });
+  }
+
+  // ---- GESTIÓN DE INSTALACIÓN (Añadir a pantalla de inicio) ----
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Guarda el evento para poder dispararlo luego con un botón de "Instalar App"
+    window.deferredPrompt = e;
+    console.log('[PWA] El evento beforeinstallprompt fue capturado. Listo para instalar.');
+  });

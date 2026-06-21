@@ -1,0 +1,1084 @@
+﻿diff --git a/censo_viviendas.html b/censo_viviendas.html
+index f5f3680..18cdc83 100644
+--- a/censo_viviendas.html
++++ b/censo_viviendas.html
+@@ -1,4 +1,4 @@
+-<!DOCTYPE html>
++´╗┐<!DOCTYPE html>
+ <html lang="es">
+ 
+ <head>
+@@ -25,9 +25,9 @@
+   <link href="css/admin.css" rel="stylesheet">
+ 
+   <style>
+-    /* ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++    /* ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+        TOKENS
+-    ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ */
++    ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É */
+     :root {
+       --vd: #1B5E20;
+       --vp: #2E7D32;
+@@ -77,7 +77,7 @@
+       min-height: calc(100vh - 70px);
+     }
+ 
+-    /* ÔöÇÔöÇ PAGE HEADER ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ PAGE HEADER ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     .cv-page-header {
+       background: linear-gradient(140deg, #0d3311 0%, #1B5E20 40%, #2E7D32 75%, #388E3C 100%);
+       padding: 2.25rem 2.25rem 4rem;
+@@ -229,7 +229,7 @@
+       box-shadow: 0 10px 28px rgba(0, 0, 0, .22);
+     }
+ 
+-    /* ÔöÇÔöÇ KPI CARDS ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ KPI CARDS ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     .cv-kpi-row {
+       display: grid;
+       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+@@ -356,12 +356,12 @@
+       margin-top: .1rem;
+     }
+ 
+-    /* ÔöÇÔöÇ CONTENT AREA ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ CONTENT AREA ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     .cv-content {
+       padding: 2rem;
+     }
+ 
+-    /* ÔöÇÔöÇ TOOLBAR ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ TOOLBAR ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     .cv-toolbar {
+       background: #fff;
+       border-radius: var(--r-lg);
+@@ -458,7 +458,7 @@
+       background: var(--vbg);
+     }
+ 
+-    /* ÔöÇÔöÇ TABLE CARD ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ TABLE CARD ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     .cv-table-card {
+       background: #fff;
+       border-radius: var(--r-lg);
+@@ -671,7 +671,7 @@
+       margin: 0;
+     }
+ 
+-    /* ÔöÇÔöÇ PAGINATION ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ PAGINATION ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     .cv-pagination {
+       padding: 1rem 1.5rem;
+       display: flex;
+@@ -713,9 +713,9 @@
+       color: #fff;
+     }
+ 
+-    /* ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++    /* ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+        MODAL ÔÇö WIZARD CON PESTA├æAS
+-    ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ */
++    ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É */
+     .cv-modal .modal-dialog {
+       max-width: 860px;
+     }
+@@ -807,7 +807,7 @@
+       background: rgba(255, 255, 255, .25);
+     }
+ 
+-    /* ÔöÇÔöÇ Stepper con flechas de navegaci├│n ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Stepper con flechas de navegaci├│n ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     .cv-stepper-wrapper {
+       position: relative;
+       display: flex;
+@@ -872,7 +872,7 @@
+       display: none;
+     }
+ 
+-    /* ÔöÇÔöÇ Cada paso ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Cada paso ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     .cv-step {
+       display: flex;
+       align-items: center;
+@@ -1276,7 +1276,7 @@
+       }
+     }
+ 
+-    /* ÔòÉÔòÉ RESPONSIVE ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ */
++    /* ├óÔÇó┬É├óÔÇó┬É RESPONSIVE ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É */
+ 
+     /* Tablet y m├│vil grande */
+     @media (max-width: 768px) {
+@@ -1499,7 +1499,7 @@
+ 
+   <main class="app-main">
+ 
+-    <!-- ÔòÉÔòÉ PAGE HEADER ÔòÉÔòÉ -->
++    <!-- ├óÔÇó┬É├óÔÇó┬É PAGE HEADER ├óÔÇó┬É├óÔÇó┬É -->
+     <div class="cv-page-header">
+       <div class="deco-dots" aria-hidden="true"></div>
+       <nav class="cv-breadcrumb" aria-label="Navegaci├│n">
+@@ -1528,7 +1528,7 @@
+       </div>
+     </div>
+ 
+-    <!-- ÔòÉÔòÉ KPI CARDS ÔòÉÔòÉ -->
++    <!-- ├óÔÇó┬É├óÔÇó┬É KPI CARDS ├óÔÇó┬É├óÔÇó┬É -->
+     <div class="cv-kpi-row">
+       <div class="cv-kpi green">
+         <div class="cv-kpi-icon"><i class="fas fa-house"></i></div>
+@@ -1566,7 +1566,7 @@
+       </div>
+     </div>
+ 
+-    <!-- ÔòÉÔòÉ CONTENT ÔòÉÔòÉ -->
++    <!-- ├óÔÇó┬É├óÔÇó┬É CONTENT ├óÔÇó┬É├óÔÇó┬É -->
+     <div class="cv-content">
+ 
+       <!-- Table card -->
+@@ -1638,7 +1638,7 @@
+         </div>
+       </div> <!-- /cv-table-card -->
+ 
+-      <!-- GR├üFICAS DE VIVIENDAS -->
++      <!-- GR├â┬üFICAS DE VIVIENDAS -->
+       <div style="margin-top: 3rem;">
+           <h2 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;"><i class="fas fa-chart-pie" style="color: #2E7D32;"></i> Gr├íficas Estad├¡sticas de Viviendas</h2>
+           
+@@ -1711,9 +1711,9 @@
+   </main>
+ 
+ 
+-  <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++  <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+        MODAL ÔÇö FILTROS AVANZADOS
+-  ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++  ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+   <div class="modal fade cv-modal" id="modalFiltrosAvanzados" tabindex="-1" aria-labelledby="modalFiltrosAvanzadosLabel"
+     aria-hidden="true">
+     <div class="modal-dialog modal-dialog-centered modal-lg">
+@@ -1831,9 +1831,9 @@
+     </div>
+   </div>
+ 
+-  <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++  <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+        MODAL ÔÇö VERIFICACI├ôN DE SEGURIDAD (CONTRASE├æA)
+-  ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++  ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+   <div class="modal fade cv-modal" id="modalVerifyPassword" tabindex="-1" aria-labelledby="modalVerifyPasswordLabel"
+     aria-hidden="true">
+     <div class="modal-dialog modal-dialog-centered modal-sm">
+@@ -1868,9 +1868,9 @@
+     </div>
+   </div>
+ 
+-  <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++  <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+        MODAL ÔÇö WIZARD REGISTRO VIVIENDA
+-  ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++  ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+   <div class="modal fade cv-modal" id="modalVivienda" tabindex="-1" aria-labelledby="modalViviendaLabel"
+     aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+@@ -1934,9 +1934,9 @@
+         <form id="formVivienda" novalidate>
+           <div class="cv-modal-body" id="cvModalBody">
+ 
+-            <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++            <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+                  PANEL 1: Datos del Encuestador / Cabecera
+-            ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++            ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+             <div class="cv-panel active" id="panel1"
+               data-required="planillaNro,fechaCenso,encuestadorNombre,encuestadorCedula,encuestadoNombre,encuestadoCedula">
+               <div class="cv-panel-title">
+@@ -2025,9 +2025,9 @@
+               </div>
+             </div><!-- /panel1 -->
+ 
+-            <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++            <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+                  PANEL 2: Direcci├│n de la Vivienda
+-            ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++            ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+             <div class="cv-panel" id="panel2">
+               <div class="cv-panel-title">
+                 <i class="fas fa-map-location-dot"></i>
+@@ -2069,9 +2069,9 @@
+ 
+ 
+ 
+-            <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++            <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+                  PANEL 3: Datos del Jefe de Familia
+-            ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++            ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+             <div class="cv-panel" id="panel3"
+               data-required="jefNombres,cedulaJefe,jefFechaNac,jefSexo,jefEstadoCivil,jefNivelInstruccion">
+               <div class="cv-panel-title">
+@@ -2223,9 +2223,9 @@
+               </div>
+             </div>
+ 
+-            <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++            <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+                  PANEL 4: Caracter├¡sticas del Grupo Familiar
+-            ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++            ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+             <div class="cv-panel" id="panel4" data-required="cantidadHabitantes">
+               <div class="cv-panel-title">
+                 <i class="fas fa-people-roof"></i>
+@@ -2242,10 +2242,10 @@
+                   <label for="condicionGeneral">Condici├│n General de la Vivienda <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la informaci├│n solicitada en este campo"></i></label>
+                   <select class="cv-form-control" id="condicionGeneral" required>
+                     <option value="">Seleccione...</option>
+-                    <option value="Buena">Ô£à Buena</option>
+-                    <option value="Regular">­ƒƒí Regular</option>
+-                    <option value="Mala">­ƒƒá Mala</option>
+-                    <option value="Alto Riesgo">­ƒö┤ Alto Riesgo</option>
++                    <option value="Buena">├ó┼ôÔÇª Buena</option>
++                    <option value="Regular">├░┼©┼©┬í Regular</option>
++                    <option value="Mala">├░┼©┼©┬á Mala</option>
++                    <option value="Alto Riesgo">├░┼©ÔÇØ┬┤ Alto Riesgo</option>
+                   </select>
+                 </div>
+               </div>
+@@ -2258,7 +2258,7 @@
+                 <!-- Familiar 1 -->
+                 <div class="familiar-row" style="background:var(--gray1);border:1.5px solid var(--gray3);border-radius:var(--r-md);padding:1rem">
+                   <div class="fam-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.6rem">
+-                    <span class="fam-label" style="font-size:.75rem;font-weight:700;color:var(--vp);">­ƒæñ Integrante #1</span>
++                    <span class="fam-label" style="font-size:.75rem;font-weight:700;color:var(--vp);">├░┼©ÔÇÿ┬ñ Integrante #1</span>
+                     <button type="button" class="fam-remove-btn cv-btn-validate" style="width:24px; height:24px; background:transparent; border:none; color:var(--danger); cursor:pointer;" onclick="this.closest('.familiar-row').remove(); window.renumerarFamiliares && window.renumerarFamiliares();">
+                       <i class="fas fa-times"></i>
+                     </button>
+@@ -2363,9 +2363,9 @@
+               </button>
+             </div>
+ 
+-            <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++            <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+                  PANEL 5: Situaci├│n Econ├│mica
+-            ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++            ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+             <div class="cv-panel" id="panel5" data-required="trabaja,ingresoFamiliarRango">
+               <div class="cv-panel-title">
+                 <i class="fas fa-sack-dollar"></i>
+@@ -2426,9 +2426,9 @@
+               </div>
+             </div>
+ 
+-            <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++            <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+                  PANEL 6: Situaci├│n de la Vivienda
+-            ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++            ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+             <div class="cv-panel" id="panel6"
+               data-required="tipoVivienda,tenencia,condicionesTerreno,materialParedes,materialTecho">
+               <div class="cv-panel-title">
+@@ -2441,33 +2441,33 @@
+                   <label for="tipoVivienda">Tipo de Vivienda <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Casa, apartamento, rancho, anexo, quinta, etc."></i></label>
+                   <select class="cv-form-control" id="tipoVivienda" required>
+                     <option value="">Seleccione...</option>
+-                    <option value="Quinta">­ƒÅí Quinta</option>
+-                    <option value="Casa">­ƒÅá Casa</option>
+-                    <option value="Apartamento">­ƒÅó Apartamento</option>
+-                    <option value="Rancho">­ƒøû Rancho</option>
+-                    <option value="Barraca">Ôø║ Barraca</option>
+-                    <option value="Habitaci├│n">­ƒÜ¬ Habitaci├│n</option>
++                    <option value="Quinta">├░┼©┬Å┬í Quinta</option>
++                    <option value="Casa">├░┼©┬Å┬á Casa</option>
++                    <option value="Apartamento">├░┼©┬Å┬ó Apartamento</option>
++                    <option value="Rancho">├░┼©ÔÇ║ÔÇô Rancho</option>
++                    <option value="Barraca">├óÔÇ║┬║ Barraca</option>
++                    <option value="Habitaci├│n">├░┼©┼í┬¬ Habitaci├│n</option>
+                   </select>
+                 </div>
+                 <div class="cv-form-group">
+                   <label for="tenencia">R├®gimen de Tenencia <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si la vivienda es propia, alquilada, prestada, etc."></i></label>
+                   <select class="cv-form-control" id="tenencia" required>
+                     <option value="">Seleccione...</option>
+-                    <option value="Propia">­ƒÅá Propia</option>
+-                    <option value="Alquilada">­ƒôä Alquilada</option>
+-                    <option value="Compartida">­ƒñØ Compartida</option>
+-                    <option value="Invadida">ÔÜá´©Å Invadida</option>
+-                    <option value="Prestada">­ƒÄü Prestada</option>
++                    <option value="Propia">├░┼©┬Å┬á Propia</option>
++                    <option value="Alquilada">├░┼©ÔÇ£ÔÇ× Alquilada</option>
++                    <option value="Compartida">├░┼©┬ñ┬Ø Compartida</option>
++                    <option value="Invadida">├ó┼í┬á├»┬©┬Å Invadida</option>
++                    <option value="Prestada">├░┼©┼¢┬ü Prestada</option>
+                   </select>
+                 </div>
+                 <div class="cv-form-group">
+                   <label for="condicionesTerreno">Condiciones del Terreno <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la informaci├│n solicitada en este campo"></i></label>
+                   <select class="cv-form-control" id="condicionesTerreno" required>
+                     <option value="">Seleccione...</option>
+-                    <option value="Estable">Ô£à Estable</option>
+-                    <option value="Inestable">ÔÜá´©Å Inestable</option>
+-                    <option value="Vulnerable">­ƒƒí Vulnerable</option>
+-                    <option value="Alto Riesgo">­ƒö┤ Alto Riesgo</option>
++                    <option value="Estable">├ó┼ôÔÇª Estable</option>
++                    <option value="Inestable">├ó┼í┬á├»┬©┬Å Inestable</option>
++                    <option value="Vulnerable">├░┼©┼©┬í Vulnerable</option>
++                    <option value="Alto Riesgo">├░┼©ÔÇØ┬┤ Alto Riesgo</option>
+                   </select>
+                 </div>
+               </div>
+@@ -2546,9 +2546,9 @@
+                   <label for="condicionesSalubridad">Condiciones de Salubridad <span class="text-danger">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la informaci├│n solicitada en este campo"></i></label>
+                   <select class="cv-form-control" id="condicionesSalubridad" required>
+                     <option value="">Seleccione...</option>
+-                    <option value="Buenas">Ô£à Buenas</option>
+-                    <option value="Regulares">­ƒƒí Regulares</option>
+-                    <option value="Malas">­ƒö┤ Malas</option>
++                    <option value="Buenas">├ó┼ôÔÇª Buenas</option>
++                    <option value="Regulares">├░┼©┼©┬í Regulares</option>
++                    <option value="Malas">├░┼©ÔÇØ┬┤ Malas</option>
+                   </select>
+                 </div>
+               </div>
+@@ -2619,9 +2619,9 @@
+               </div>
+             </div>
+ 
+-            <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++            <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+                  PANEL 7: Servicios B├ísicos
+-            ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++            ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+             <div class="cv-panel" id="panel7"
+               data-required="aguasBlancas,aguasServidas,sistemaElectrico,gasDomestico,recoleccionBasura">
+               <div class="cv-panel-title">
+@@ -2634,10 +2634,10 @@
+                   <label for="aguasBlancas">Aguas Blancas <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la informaci├│n solicitada en este campo"></i></label>
+                   <select class="cv-form-control" id="aguasBlancas" required>
+                     <option value="">Seleccione fuente...</option>
+-                    <option value="Acueducto">­ƒÆº Acueducto</option>
+-                    <option value="Pila p├║blica">­ƒÜ░ Pila p├║blica</option>
+-                    <option value="Cami├│n cisterna">­ƒÜø Cami├│n cisterna</option>
+-                    <option value="No tiene">­ƒÜ½ No tiene</option>
++                    <option value="Acueducto">├░┼©ÔÇÖ┬º Acueducto</option>
++                    <option value="Pila p├║blica">├░┼©┼í┬░ Pila p├║blica</option>
++                    <option value="Cami├│n cisterna">├░┼©┼íÔÇ║ Cami├│n cisterna</option>
++                    <option value="No tiene">├░┼©┼í┬½ No tiene</option>
+                   </select>
+                 </div>
+                 <div class="cv-form-group">
+@@ -2659,19 +2659,19 @@
+                   <label for="aguasServidas">Aguas Servidas <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la informaci├│n solicitada en este campo"></i></label>
+                   <select class="cv-form-control" id="aguasServidas" required>
+                     <option value="">Seleccione...</option>
+-                    <option value="Cloacas">­ƒÅù´©Å Cloacas</option>
+-                    <option value="Pozo s├®ptico">­ƒò│´©Å Pozo s├®ptico</option>
+-                    <option value="Letrinas">­ƒÜ¢ Letrinas</option>
+-                    <option value="Al aire libre">ÔÜá´©Å Al aire libre</option>
++                    <option value="Cloacas">├░┼©┬ÅÔÇö├»┬©┬Å Cloacas</option>
++                    <option value="Pozo s├®ptico">├░┼©ÔÇó┬│├»┬©┬Å Pozo s├®ptico</option>
++                    <option value="Letrinas">├░┼©┼í┬¢ Letrinas</option>
++                    <option value="Al aire libre">├ó┼í┬á├»┬©┬Å Al aire libre</option>
+                   </select>
+                 </div>
+                 <div class="cv-form-group">
+                   <label for="sistemaElectrico">Sistema El├®ctrico <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la informaci├│n solicitada en este campo"></i></label>
+                   <select class="cv-form-control" id="sistemaElectrico" required>
+                     <option value="">Seleccione...</option>
+-                    <option value="P├║blica">ÔÜí Red p├║blica</option>
+-                    <option value="Planta el├®ctrica">­ƒöï Planta el├®ctrica</option>
+-                    <option value="No tiene">­ƒÜ½ No tiene</option>
++                    <option value="P├║blica">├ó┼í┬í Red p├║blica</option>
++                    <option value="Planta el├®ctrica">├░┼©ÔÇØÔÇ╣ Planta el├®ctrica</option>
++                    <option value="No tiene">├░┼©┼í┬½ No tiene</option>
+                   </select>
+                 </div>
+                 <div class="cv-form-group">
+@@ -2689,9 +2689,9 @@
+                   <label for="gasDomestico">Gas Dom├®stico <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="V├¡a de obtenci├│n de gas (Bombona estadal, privada, directo)"></i></label>
+                   <select class="cv-form-control" id="gasDomestico" required onchange="const b = this.value === 'Bombona'; const c = document.getElementById('cantidadCilindrosGas'); c.disabled = !b; c.required = b; if(!b) c.value = '';">
+                     <option value="">Seleccione...</option>
+-                    <option value="Bombona">­ƒö┤ Bombona</option>
+-                    <option value="Tuber├¡a">­ƒƒó Tuber├¡a</option>
+-                    <option value="No posee">­ƒÜ½ No posee</option>
++                    <option value="Bombona">├░┼©ÔÇØ┬┤ Bombona</option>
++                    <option value="Tuber├¡a">├░┼©┼©┬ó Tuber├¡a</option>
++                    <option value="No posee">├░┼©┼í┬½ No posee</option>
+                   </select>
+                 </div>
+                 <div class="cv-form-group" id="rowCilindrosGas">
+@@ -2724,31 +2724,31 @@
+                   <label for="recoleccionBasura">Recolecci├│n de Basura <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la informaci├│n solicitada en este campo"></i></label>
+                   <select class="cv-form-control" id="recoleccionBasura" name="recoleccionBasura" required>
+                     <option value="">Seleccione...</option>
+-                    <option value="Aseo urbano">­ƒùæ´©Å Aseo urbano</option>
+-                    <option value="Contenedor">­ƒôª Contenedor</option>
+-                    <option value="Quema">­ƒöÑ Quema</option>
+-                    <option value="Al aire libre">ÔÜá´©Å Al aire libre</option>
++                    <option value="Aseo urbano">├░┼©ÔÇöÔÇÿ├»┬©┬Å Aseo urbano</option>
++                    <option value="Contenedor">├░┼©ÔÇ£┬ª Contenedor</option>
++                    <option value="Quema">├░┼©ÔÇØ┬Ñ Quema</option>
++                    <option value="Al aire libre">├ó┼í┬á├»┬©┬Å Al aire libre</option>
+                   </select>
+                 </div>
+                 <div class="cv-form-group">
+                   <label for="telefoniaServicio">Telefon├¡a <span class="text-danger">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la informaci├│n solicitada en este campo"></i></label>
+                   <select class="cv-form-control" id="telefoniaServicio" required>
+                     <option value="">Seleccione...</option>
+-                    <option value="Movistar">­ƒô▒ Movistar</option>
+-                    <option value="Digitel">­ƒô▒ Digitel</option>
+-                    <option value="Movilnet">­ƒô▒ Movilnet</option>
+-                    <option value="CANTV">ÔÿÄ´©Å CANTV (fija)</option>
+-                    <option value="No tiene">­ƒÜ½ No tiene</option>
++                    <option value="Movistar">├░┼©ÔÇ£┬▒ Movistar</option>
++                    <option value="Digitel">├░┼©ÔÇ£┬▒ Digitel</option>
++                    <option value="Movilnet">├░┼©ÔÇ£┬▒ Movilnet</option>
++                    <option value="CANTV">├ó╦£┼¢├»┬©┬Å CANTV (fija)</option>
++                    <option value="No tiene">├░┼©┼í┬½ No tiene</option>
+                   </select>
+                 </div>
+                 <div class="cv-form-group">
+                   <label for="transporte">Transporte cercano <span class="text-danger">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la informaci├│n solicitada en este campo"></i></label>
+                   <select class="cv-form-control" id="transporte" required>
+                     <option value="">Seleccione...</option>
+-                    <option value="Bus p├║blico">­ƒÜî Bus p├║blico</option>
+-                    <option value="Mototaxi">­ƒÅì´©Å Mototaxi</option>
+-                    <option value="Por puesto">­ƒÜÉ Por puesto</option>
+-                    <option value="Ninguno">­ƒÜ½ Ninguno</option>
++                    <option value="Bus p├║blico">├░┼©┼í┼Æ Bus p├║blico</option>
++                    <option value="Mototaxi">├░┼©┬Å┬ì├»┬©┬Å Mototaxi</option>
++                    <option value="Por puesto">├░┼©┼í┬É Por puesto</option>
++                    <option value="Ninguno">├░┼©┼í┬½ Ninguno</option>
+                   </select>
+                 </div>
+               </div>
+@@ -2771,9 +2771,9 @@
+               </div>
+             </div>
+ 
+-            <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++            <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+                  PANEL 8: Salud
+-            ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++            ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+             <div class="cv-panel" id="panel8" data-required="">
+               <div class="cv-panel-title">
+                 <i class="fas fa-heart-pulse"></i>
+@@ -2851,9 +2851,9 @@
+               </div>
+             </div>
+ 
+-            <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++            <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+                  PANEL 9: Participaci├│n Comunitaria
+-            ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++            ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+             <div class="cv-panel" id="panel9" data-required="">
+               <div class="cv-panel-title">
+                 <i class="fas fa-handshake-angle"></i>
+@@ -2947,7 +2947,7 @@
+               </div>
+ 
+               <div class="cv-form-group" style="margin-bottom:1rem">
+-                <label for="areaTrabajoInteres">├ürea de trabajo de inter├®s comunitario (m├íx. 3) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la informaci├│n solicitada en este campo"></i></label>
++                <label for="areaTrabajoInteres">├â┬ürea de trabajo de inter├®s comunitario (m├íx. 3) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la informaci├│n solicitada en este campo"></i></label>
+                 <input type="text" class="cv-form-control" id="areaTrabajoInteres" name="area_trabajo_interes"
+                   placeholder="Ej. Salud, Educaci├│n, Infraestructura...">
+               </div>
+@@ -2978,9 +2978,9 @@
+               </div>
+             </div>
+ 
+-            <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++            <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+                  PANEL 10: Situaci├│n y Diagn├│stico de la Comunidad
+-            ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++            ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+             <div class="cv-panel" id="panel10" data-required="">
+               <div class="cv-panel-title">
+                 <i class="fas fa-magnifying-glass-chart"></i>
+@@ -3054,9 +3054,9 @@
+     </div>
+   </div>
+ 
+-  <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++  <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+        MODAL DE FILTROS AVANZADOS
+-  ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++  ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+   <div class="modal fade cv-modal" id="modalFiltrosAvanzados" tabindex="-1" aria-hidden="true">
+     <div class="modal-dialog modal-dialog-centered">
+       <div class="modal-content">
+@@ -3175,9 +3175,9 @@
+     </div>
+   </div>
+ 
+-  <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++  <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+        MODAL DE VERIFICACI├ôN DE SEGURIDAD (PASSWORD)
+-  ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++  ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+   <div class="modal fade" id="modalVerifyPassword" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(4px);">
+     <div class="modal-dialog modal-sm modal-dialog-centered">
+       <div class="modal-content"
+@@ -3221,14 +3221,14 @@
+   <script src="js/roles.js"></script>
+ 
+   <script>
+-    /* ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++    /* ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+        WIZARD LOGIC ÔÇö 10 PASOS
+-    ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ */
++    ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É */
+     let currentStep = 1;
+     const totalSteps = 10;
+     window.currentCensoId = null;
+ 
+-    /* ÔöÇÔöÇ Auto-save y Recuperaci├│n ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Auto-save y Recuperaci├│n ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     function saveDraft() {
+       const form = document.getElementById('formVivienda');
+       const data = { _currentStep: currentStep, _currentCensoId: window.currentCensoId };
+@@ -3296,7 +3296,7 @@
+       window.currentCensoId = null;
+     }
+ 
+-    /* ÔöÇÔöÇ Validaci├│n din├ímica por panel ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Validaci├│n din├ímica por panel ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     function validateCurrentPanel() {
+       const panel = document.getElementById(`panel${currentStep}`);
+       let valid = true;
+@@ -3644,7 +3644,7 @@
+         // (el confirm() nativo hace que Bootstrap cierre el modal al quitarle el foco)
+         try {
+           loadDraft();
+-          showToast('­ƒôï Borrador restaurado. Contin├║a donde lo dejaste.', 'success');
++          showToast('├░┼©ÔÇ£ÔÇ╣ Borrador restaurado. Contin├║a donde lo dejaste.', 'success');
+         } catch (e) {
+           clearDraft();
+         }
+@@ -3711,7 +3711,7 @@
+ 
+     // Guardado manual al avanzar de paso ya se maneja en btnNext.click
+ 
+-    /* ÔöÇÔöÇ Gas cylinders toggle ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Gas cylinders toggle ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     document.getElementById('gasDomestico').addEventListener('change', function () {
+       const inp = document.getElementById('cantidadCilindrosGas');
+       const useBombona = this.value === 'Bombona';
+@@ -3719,35 +3719,35 @@
+       if (!useBombona) inp.value = '';
+     });
+ 
+-    /* ÔöÇÔöÇ Incapacidad toggle ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Incapacidad toggle ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     document.getElementById('jefIncapacitado').addEventListener('change', function () {
+       const inp = document.getElementById('jefTipoIncapacidad');
+       inp.disabled = this.value !== 'Si';
+       if (this.value !== 'Si') inp.value = '';
+     });
+ 
+-    /* ÔöÇÔöÇ Actividad comercial toggle ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Actividad comercial toggle ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     document.getElementById('actividadComercialVivienda').addEventListener('change', function () {
+       const inp = document.getElementById('ventasDe');
+       inp.disabled = this.value !== 'Si';
+       if (this.value !== 'Si') inp.value = '';
+     });
+ 
+-    /* ÔöÇÔöÇ Ayuda especial toggle ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Ayuda especial toggle ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     document.getElementById('necesitaAyudaEspecial').addEventListener('change', function () {
+       const inp = document.getElementById('cualAyudaEspecial');
+       inp.disabled = this.value !== 'Si';
+       if (this.value !== 'Si') inp.value = '';
+     });
+ 
+-    /* ÔöÇÔöÇ Organizaciones comunitarias toggle ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Organizaciones comunitarias toggle ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     document.getElementById('existenOrgComunitarias').addEventListener('change', function () {
+       const inp = document.getElementById('cualesOrgComunitarias');
+       inp.disabled = this.value !== 'Si';
+       if (this.value !== 'Si') inp.value = '';
+     });
+ 
+-    /* ÔöÇÔöÇ Service card checkboxes (checkcard style) ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Service card checkboxes (checkcard style) ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     document.querySelectorAll('.cv-service-card').forEach(card => {
+       const inp = card.querySelector('input[type="checkbox"], input[type="radio"]');
+       if (!inp) return;
+@@ -3761,7 +3761,7 @@
+       });
+     });
+ 
+-    /* ÔöÇÔöÇ L├│gica de Enfermedades (Excluyente para "Ninguna") ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ L├│gica de Enfermedades (Excluyente para "Ninguna") ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     document.querySelectorAll('input[name="enfermedades"]').forEach(chk => {
+       chk.addEventListener('change', function () {
+         if (this.value === 'Ninguna' && this.checked) {
+@@ -3781,7 +3781,7 @@
+       });
+     });
+ 
+-    /* ÔöÇÔöÇ Agregar integrante familiar din├ímicamente ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Agregar integrante familiar din├ímicamente ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     let familiarCount = 1;
+     document.getElementById('cantidadHabitantes').addEventListener('change', function () {
+       const extraMembers = parseInt(this.value) || 0;
+@@ -3811,7 +3811,7 @@
+       row.style.cssText = 'background:var(--gray1);border:1.5px solid var(--gray3);border-radius:var(--r-md);padding:1rem;position:relative';
+       row.innerHTML = `
+         <div class="fam-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.6rem">
+-          <span class="fam-label" style="font-size:.75rem;font-weight:700;color:var(--vp);">­ƒæñ Integrante #${familiarCount}</span>
++          <span class="fam-label" style="font-size:.75rem;font-weight:700;color:var(--vp);">├░┼©ÔÇÿ┬ñ Integrante #${familiarCount}</span>
+           <button type="button" class="fam-remove-btn cv-btn-validate" style="width:24px; height:24px; background:transparent; border:none; color:var(--danger); cursor:pointer;" onclick="this.closest('.familiar-row').remove(); window.renumerarFamiliares && window.renumerarFamiliares();">
+             <i class="fas fa-times"></i>
+           </button>
+@@ -3933,7 +3933,7 @@
+         }, {
+           debounce: 600, onNotFound: () => {
+             const isNombre = row.querySelector('.chk-buscar-nombre')?.checked;
+-            if (!isNombre) showToast('ÔÜá´©Å Esta c├®dula no est├í registrada como habitante. Debe registrarlo primero.', 'error');
++            if (!isNombre) showToast('├ó┼í┬á├»┬©┬Å Esta c├®dula no est├í registrada como habitante. Debe registrarlo primero.', 'error');
+           }
+         });
+         
+@@ -3958,9 +3958,9 @@
+       }
+     });
+ 
+-    /* ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++    /* ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+        TOAST
+-    ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ */
++    ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É */
+     function showToast(msg, type = 'success') {
+       const wrap = document.getElementById('cvToastWrap');
+       const t = document.createElement('div');
+@@ -3970,9 +3970,9 @@
+       setTimeout(() => t.remove(), 4000);
+     }
+ 
+-    /* ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++    /* ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+        DATA & TABLE (integra con censo-viviendas.js si existe)
+-    ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ */
++    ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É */
+     let viviendas = [];
+     let currentPage = 1;
+     const PAGE_SIZE = 10;
+@@ -4409,7 +4409,7 @@
+       const getSafe = (obj) => Array.isArray(obj) ? (obj[0] || {}) : (obj || {});
+       const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined && val !== null) el.value = val; };
+ 
+-      // ÔöÇÔöÇ PANEL 1: Encuestador y Cabecera ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ PANEL 1: Encuestador y Cabecera ├óÔÇØÔé¼├óÔÇØÔé¼
+       // Desactivar checkboxes "Auto" en modo edici├│n para que no sobreescriban los valores
+       const chkPlanillaAuto = document.getElementById('chkPlanillaAuto');
+       if (chkPlanillaAuto) { chkPlanillaAuto.checked = false; chkPlanillaAuto.dispatchEvent(new Event('change')); }
+@@ -4427,12 +4427,12 @@
+       setVal('encuestadoNombre',   raw.encuestado_nombre);
+       setVal('encuestadoCedula',   raw.encuestado_cedula);
+ 
+-      // ÔöÇÔöÇ PANEL 2: Direcci├│n ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ PANEL 2: Direcci├│n ├óÔÇØÔé¼├óÔÇØÔé¼
+       setVal('calleAvenida',   raw.calle_avenida);
+       setVal('numeroCasa',     raw.numero_casa);
+       setVal('direccionExacta', raw.referencia_ubicacion || raw.direccion_exacta);
+ 
+-      // ÔöÇÔöÇ PANEL 3: Jefe de Familia ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ PANEL 3: Jefe de Familia ├óÔÇØÔé¼├óÔÇØÔé¼
+       const famArr = getSafe(raw.familiares) instanceof Array ? raw.familiares : (Array.isArray(raw.familiares) ? raw.familiares : []);
+       const jefe = famArr.find(f => f.parentesco === 'Jefe(a) de Familia' || f.es_jefe_familia) || {};
+       setVal('cedulaJefe',            jefe.cedula_identidad);
+@@ -4466,7 +4466,7 @@
+       setVal('jefPensionadoInstitucion', jefe.pensionado_institucion || raw.jef_pensionado_institucion);
+       setVal('jefIngresoMensualBs',   jefe.ingreso_mensual_bs || raw.jef_ingreso_mensual_bs);
+ 
+-      // ÔöÇÔöÇ PANEL 4: Caracter├¡sticas del Grupo Familiar ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ PANEL 4: Caracter├¡sticas del Grupo Familiar ├óÔÇØÔé¼├óÔÇØÔé¼
+       const otrosFamiliares = famArr.filter(f => f.parentesco !== 'Jefe(a) de Familia' && !f.es_jefe_familia);
+       setVal('cantidadHabitantes', raw.cantidad_habitantes !== undefined ? raw.cantidad_habitantes : otrosFamiliares.length);
+       setVal('condicionGeneral',   raw.condicion_general);
+@@ -4483,7 +4483,7 @@
+         if (!row) return;
+         
+         const labelDiv = row.querySelector('div[style*="font-size:.75rem"]');
+-        if (labelDiv) labelDiv.innerHTML = `­ƒæñ Integrante #${i + 1}`;
++        if (labelDiv) labelDiv.innerHTML = `├░┼©ÔÇÿ┬ñ Integrante #${i + 1}`;
+ 
+         const set = (cls, val) => { const el = row.querySelector(cls); if (el) el.value = val || ''; };
+         const cedToShow = (fam.cedula_identidad && String(fam.cedula_identidad).startsWith('SC-')) ? 'Sin C├®dula (Menor)' : fam.cedula_identidad;
+@@ -4507,7 +4507,7 @@
+         if (emb) emb.checked = fam.embarazo_temprano === true;
+       });
+ 
+-      // ÔöÇÔöÇ PANEL 5: Situaci├│n Econ├│mica ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ PANEL 5: Situaci├│n Econ├│mica ├óÔÇØÔé¼├óÔÇØÔé¼
+       const eco = getSafe(raw.situacion_economica);
+       setVal('trabaja',                     boolToSiNo(eco.trabaja));
+       setVal('dondeTrabaja',                eco.donde_trabaja);
+@@ -4516,7 +4516,7 @@
+       setVal('actividadComercialVivienda',  boolToSiNo(eco.actividad_comercial_vivienda));
+       setVal('ventasDe', eco.ventas_de);
+ 
+-      // ÔöÇÔöÇ PANEL 6: Situaci├│n de la Vivienda (Estructura) ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ PANEL 6: Situaci├│n de la Vivienda (Estructura) ├óÔÇØÔé¼├óÔÇØÔé¼
+       const viv = getSafe(raw.situacion_vivienda);
+       setVal('tipoVivienda',        viv.tipo_vivienda);
+       setVal('tenencia',            viv.forma_tenencia);
+@@ -4533,7 +4533,7 @@
+       setVal('presenciaInsectos',   boolToSiNo(viv.presencia_insectos_roedores));
+       setVal('tieneAnimales',       boolToSiNo(viv.tiene_animales_domesticos));
+ 
+-      // ÔöÇÔöÇ Enseres, Insectos y Animales (Opciones Multiples) ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ Enseres, Insectos y Animales (Opciones Multiples) ├óÔÇØÔé¼├óÔÇØÔé¼
+       const opcionesMul = raw.opciones_multiples || raw.opciones || [];
+       const enseres = opcionesMul.filter(o => o.categoria === 'enseres_vivienda').map(o => o.valor);
+       document.querySelectorAll('input[name="enseres_vivienda"]').forEach(cb => { 
+@@ -4555,7 +4555,7 @@
+       });
+       if (animales.length > 0) { const g = document.getElementById('animalesTiposGroup'); if (g) g.style.display = 'block'; }
+ 
+-      // ÔöÇÔöÇ PANEL 7: Servicios B├ísicos ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ PANEL 7: Servicios B├ísicos ├óÔÇØÔé¼├óÔÇØÔé¼
+       const serv = getSafe(raw.servicios);
+       setVal('aguasBlancas',     serv.aguas_blancas_tipo);
+       setVal('aguasServidas',    serv.aguas_servidas_tipo);
+@@ -4574,14 +4574,14 @@
+       setVal('tieneMedidorLuz',  boolToSiNo(serv.tiene_medidor_luz));
+ 
+       setVal('cantidadCilindrosGas', serv.cantidad_cilindros_gas);
+-      // ÔöÇÔöÇ Cilindros gas (Opciones Multiples) ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ Cilindros gas (Opciones Multiples) ├óÔÇØÔé¼├óÔÇØÔé¼
+       const gasCilindros = (raw.opciones_multiples || raw.opciones || []).filter(o => o.categoria === 'gas_cilindros').map(o => o.valor);
+       document.querySelectorAll('input[name="gas_cilindros"]').forEach(cb => { 
+         cb.checked = gasCilindros.includes(cb.value); 
+         cb.dispatchEvent(new Event('change')); 
+       });
+ 
+-      // ÔöÇÔöÇ PANEL 8: Salud ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ PANEL 8: Salud ├óÔÇØÔé¼├óÔÇØÔé¼
+       const salud = getSafe(raw.salud);
+       const enfermedades = (salud.enfermedades_lista || '').split(',').map(s => s.trim()).filter(Boolean);
+       const opcionesMulSalud = raw.opciones_multiples || raw.opciones || [];
+@@ -4597,7 +4597,7 @@
+       setVal('exclusionDiscapacitados', salud.exclusion_discapacitados_cant);
+       setVal('exclusionTerceraEdad',  salud.exclusion_tercera_edad_cant);
+ 
+-      // ÔöÇÔöÇ PANEL 9: Participaci├│n Comunitaria ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ PANEL 9: Participaci├│n Comunitaria ├óÔÇØÔé¼├óÔÇØÔé¼
+       const part = getSafe(raw.participacion_comunitaria);
+       setVal('existenOrgComunitarias',   boolToSiNo(part.existen_org_comunitarias));
+       setVal('cualesOrgComunitarias',    part.cuales_org_comunitarias);
+@@ -4615,14 +4615,14 @@
+       setVal('compromisoConSector',      part.compromiso_con_sector);
+       setVal('opinionCensoEnergetico',   part.opinion_censo_energetico);
+       
+-      // ÔöÇÔöÇ Misiones (Opciones Multiples) ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ Misiones (Opciones Multiples) ├óÔÇØÔé¼├óÔÇØÔé¼
+       const misiones = (raw.opciones_multiples || raw.opciones || []).filter(o => o.categoria === 'misiones').map(o => o.valor);
+       document.querySelectorAll('input[name="misiones"]').forEach(cb => { 
+         cb.checked = misiones.includes(cb.value); 
+         cb.dispatchEvent(new Event('change')); 
+       });
+ 
+-      // ÔöÇÔöÇ PANEL 10: Diagn├│stico ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ PANEL 10: Diagn├│stico ├óÔÇØÔé¼├óÔÇØÔé¼
+       const com = getSafe(raw.situacion_comunidad);
+       setVal('potencialidadesComunidad', com.principales_potencialidades_ventajas);
+       setVal('problemasComunidad',       com.principales_problemas_debilidades);
+@@ -4651,9 +4651,9 @@
+           const res = await window.api.eliminarEstudioDemografico(id);
+           
+           if (res && res.validacion) {
+-            showToast('­ƒôï Solicitud de eliminaci├│n enviada al administrador para revisi├│n.', 'info');
++            showToast('├░┼©ÔÇ£ÔÇ╣ Solicitud de eliminaci├│n enviada al administrador para revisi├│n.', 'info');
+           } else {
+-            showToast('Ô£à Vivienda eliminada correctamente.', 'success');
++            showToast('├ó┼ôÔÇª Vivienda eliminada correctamente.', 'success');
+             viviendas.splice(index, 1);
+             renderTable();
+           }
+@@ -4666,7 +4666,7 @@
+       }
+     }
+ 
+-    /* ÔöÇÔöÇ Controles Autom├íticos ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Controles Autom├íticos ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     function setAutoFieldState(input, isAuto, autoValue) {
+       if (!input) return;
+       if (isAuto) {
+@@ -4754,7 +4754,7 @@
+       document.getElementById(id)?.addEventListener('input', syncEncuestadoDesdeJefe);
+     });
+ 
+-    /* ÔöÇÔöÇ Nuevo Registro ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Nuevo Registro ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     document.getElementById('btnNuevaVivienda').addEventListener('click', () => {
+       document.getElementById('formVivienda').reset();
+       window.currentCensoId = null;
+@@ -4777,7 +4777,7 @@
+     document.getElementById('chkPlanillaAuto').dispatchEvent(new Event('change'));
+     document.getElementById('chkFechaAuto').dispatchEvent(new Event('change'));
+ 
+-    /* ÔöÇÔöÇ Form submit (paso final) ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Form submit (paso final) ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     document.getElementById('formVivienda').addEventListener('submit', async function (e) {
+       e.preventDefault();
+ 
+@@ -4867,18 +4867,18 @@
+             if (window.api.actualizarEstudioDemografico) {
+               res = await window.api.actualizarEstudioDemografico(window.currentCensoId, datosCenso);
+               if (res && res.validacion) {
+-                showToast('­ƒôï Edici├│n enviada al administrador para aprobaci├│n.', 'info');
++                showToast('├░┼©ÔÇ£ÔÇ╣ Edici├│n enviada al administrador para aprobaci├│n.', 'info');
+               } else {
+-                showToast('Ô£à Censo actualizado correctamente.', 'success');
++                showToast('├ó┼ôÔÇª Censo actualizado correctamente.', 'success');
+               }
+               window.isEditingCenso = false;
+             }
+           } else if (window.api.crearCensoDemografico) {
+             res = await window.api.crearCensoDemografico(datosCenso);
+             if (res && res.validacion) {
+-              showToast('­ƒôï Censo enviado al administrador para aprobaci├│n.', 'info');
++              showToast('├░┼©ÔÇ£ÔÇ╣ Censo enviado al administrador para aprobaci├│n.', 'info');
+             } else {
+-              showToast('Ô£à Censo registrado correctamente.', 'success');
++              showToast('├ó┼ôÔÇª Censo registrado correctamente.', 'success');
+             }
+           }
+         }
+@@ -4893,7 +4893,7 @@
+       }
+     });
+ 
+-    /* ÔöÇÔöÇ Search & filters ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Search & filters ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     document.getElementById('cvSearch').addEventListener('input', renderTable);
+ 
+     document.getElementById('btnAplicarFiltros').addEventListener('click', () => {
+@@ -5014,7 +5014,7 @@
+       }
+     };
+ 
+-    /* ÔöÇÔöÇ Render Charts ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Render Charts ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     function renderChartsViviendas(data) {
+       if (typeof Chart === 'undefined') return;
+ 
+@@ -5103,7 +5103,7 @@
+       buildChart('chartAnimales', 'bar', Object.keys(animales), Object.values(animales), colors);
+     }
+ 
+-    /* ÔöÇÔöÇ Init ÔöÇÔöÇ */
++    /* ├óÔÇØÔé¼├óÔÇØÔé¼ Init ├óÔÇØÔé¼├óÔÇØÔé¼ */
+     loadViviendasData();
+   </script>
+ 
+@@ -5119,7 +5119,7 @@
+       document.querySelectorAll('input[type="date"]').forEach(input => {
+         input.setAttribute('max', hoy);
+       });
+-      // ­ƒöÑ FIX ARIA-HIDDEN BLOCKED: Remover foco al cerrar el modal
++      // ├░┼©ÔÇØ┬Ñ FIX ARIA-HIDDEN BLOCKED: Remover foco al cerrar el modal
+       const modalViviendaEl = document.getElementById('modalVivienda');
+       if (modalViviendaEl) {
+         modalViviendaEl.addEventListener('hide.bs.modal', function () {
+@@ -5129,7 +5129,7 @@
+         });
+       }
+ 
+-      // ­ƒöÑ HOTFIX PROTECCI├ôN DE CAMPOS:
++      // ├░┼©ÔÇØ┬Ñ HOTFIX PROTECCI├ôN DE CAMPOS:
+       // Se fuerza a que el campo de recolecci├│n de basura no sea bloqueado
+       // por el autocompletado del navegador (ej. Chrome Autofill) o extensiones.
+       setInterval(() => {
+@@ -5146,7 +5146,7 @@
+         });
+       }, 500);
+ 
+-      // ÔöÇÔöÇ 1. Cargar Consejos Comunales Din├ímicamente ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ 1. Cargar Consejos Comunales Din├ímicamente ├óÔÇØÔé¼├óÔÇØÔé¼
+       const selCC = document.getElementById('consejoComunalCab');
+       const advFilterCC = document.getElementById('advFilterCC');
+       const p2CCNombre = document.getElementById('p2CCNombre');
+@@ -5254,7 +5254,7 @@
+         })();
+       }
+ 
+-      // ÔöÇÔöÇ 2. Auto-fill del Encuestador (siempre desde sesi├│n) ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ 2. Auto-fill del Encuestador (siempre desde sesi├│n) ├óÔÇØÔé¼├óÔÇØÔé¼
+       const fillEncuestador = () => {
+         if (window.isEditingCenso) return; // No sobreescribir los datos del encuestador original
+         const nom = document.getElementById('encuestadorNombre');
+@@ -5265,7 +5265,7 @@
+       fillEncuestador();
+       document.getElementById('modalVivienda')?.addEventListener('show.bs.modal', fillEncuestador);
+ 
+-      // ÔöÇÔöÇ 3. Autocompletado: Encuestado ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ 3. Autocompletado: Encuestado ├óÔÇØÔé¼├óÔÇØÔé¼
+       if (window.HabitanteAutocomplete) {
+         HabitanteAutocomplete.attachTo('encuestadoCedula', (datos) => {
+           const el = document.getElementById('encuestadoNombre');
+@@ -5280,7 +5280,7 @@
+           if (input?.forceSearch) input.forceSearch();
+         });
+ 
+-        // ÔöÇÔöÇ 4. Autocompletado: Jefe de Familia (Secci├│n III) ÔöÇÔöÇ
++        // ├óÔÇØÔé¼├óÔÇØÔé¼ 4. Autocompletado: Jefe de Familia (Secci├│n III) ├óÔÇØÔé¼├óÔÇØÔé¼
+         // Campos del jefe son solo-lectura; se llenan con la c├®dula
+         const camposJefe = ['jefNombres', 'jefFechaNac', 'jefSexo', 'jefEstadoCivil', 'jefNivelInstruccion', 'jefProfesion', 'jefTiempoComunidad', 'jefInscritoCNE', 'jefTelfCel', 'jefEmail', 'jefIncapacitado'];
+         camposJefe.forEach(id => {
+@@ -5371,13 +5371,13 @@
+           }
+           document.getElementById('btnRegistrarJefe').style.display = 'none';
+ 
+-          showToast(`Ô£à Jefe de familia cargado: ${datos.nombres} ${datos.apellidos || ''}`, 'success');
++          showToast(`├ó┼ôÔÇª Jefe de familia cargado: ${datos.nombres} ${datos.apellidos || ''}`, 'success');
+         }, {
+           onNotFound: () => {
+             // Limpiar campos y mostrar bot├│n de registro
+             camposJefe.forEach(id => {
+               const el = document.getElementById(id);
+-              if (el) { el.value = ''; el.style.borderColor = '#EF5350'; }
++              if (el) { el.value = ''; el.style.borderColor = ''; el.style.boxShadow = ''; }
+             });
+             const camposExtra = ['jefTipoIncapacidad', 'jefPensionado', 'jefPensionadoInstitucion'];
+             camposExtra.forEach(id => {
+@@ -5397,7 +5397,7 @@
+             }
+             document.getElementById('btnRegistrarJefe').style.display = 'flex';
+ 
+-            showToast('ÔÜá´©Å Esta c├®dula no est├í registrada como habitante.', 'error');
++            showToast('├ó┼í┬á├»┬©┬Å Esta c├®dula no est├í registrada como habitante.', 'error');
+           }
+         });
+ 
+@@ -5406,7 +5406,7 @@
+           if (input?.forceSearch) input.forceSearch();
+         });
+ 
+-        // ÔöÇÔöÇ 5. Autocompletado: Integrantes (Secci├│n IV) ÔöÇÔöÇ
++        // ├óÔÇØÔé¼├óÔÇØÔé¼ 5. Autocompletado: Integrantes (Secci├│n IV) ├óÔÇØÔé¼├óÔÇØÔé¼
+         // Funci├│n para adjuntar autocomplete a una fila de familiar
+         window.adjuntarAutocompletadoFamiliar = function (row) {
+           const cedulaInput = row.querySelector('.fam-cedula');
+@@ -5486,7 +5486,7 @@
+             const btnReg = row.querySelector('.fam-registrar-btn');
+             if (btnReg) btnReg.style.display = 'flex';
+ 
+-            showToast('ÔÜá´©Å Este registro no fue encontrado.', 'error');
++            showToast('├ó┼í┬á├»┬©┬Å Este registro no fue encontrado.', 'error');
+           };
+ 
+           HabitanteAutocomplete.attachTo(cedulaInput, (datos) => {
+@@ -5530,7 +5530,7 @@
+         if (fam1Row) window.adjuntarAutocompletadoFamiliar(fam1Row);
+       }
+ 
+-      // ÔöÇÔöÇ 6. Redirecci├│n desde B├║squeda Global ÔöÇÔöÇ
++      // ├óÔÇØÔé¼├óÔÇØÔé¼ 6. Redirecci├│n desde B├║squeda Global ├óÔÇØÔé¼├óÔÇØÔé¼
+       const urlParams = new URLSearchParams(window.location.search);
+       const viewViviendaId = urlParams.get('viewVivienda');
+       const highlightFamiliar = urlParams.get('highlightFamiliar');
+@@ -5556,9 +5556,9 @@
+     });
+   </script>
+ 
+-  <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++  <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+        MODAL: Previsualizar Censo
+-  ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++  ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+   <div class="modal-overlay" id="modalPrevisualizarCenso" role="dialog" aria-modal="true">
+     <div class="modal-content-sicag" style="max-width: 800px;">
+       <div class="modal-header-sicag">
+@@ -5574,9 +5574,9 @@
+     </div>
+   </div> <!-- ESTE DIV CERRABA EL MODAL PREVISUALIZAR -->
+ 
+-  <!-- ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
++  <!-- ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É
+        MODAL: Registrar Habitante R├ípido
+-  ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ -->
++  ├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É├óÔÇó┬É -->
+   <div class="modal-overlay" id="modalRegistrarHabitanteRapido" role="dialog" aria-modal="true" style="display:none; z-index:9999;">
+     <div class="modal-content-sicag" style="max-width:560px;">
+       <div class="modal-header-sicag">
+@@ -6058,6 +6058,18 @@
+         return;
+       }
+ 
++      const email = gv('rh_email').trim();
++      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
++        showToast('Por favor ingrese un correo electr├│nico v├ílido.', 'error');
++        const emailInput = document.getElementById('rh_email');
++        if (emailInput) {
++          emailInput.style.borderColor = '#C62828';
++          emailInput.style.boxShadow = '0 0 0 3px rgba(198,40,40,.15)';
++          emailInput.addEventListener('input', function() { this.style.borderColor = ''; this.style.boxShadow = ''; }, { once: true });
++        }
++        return;
++      }
++
+       const birthDate = new Date(fecha_nacimiento);
+       const hoy = new Date();
+       if (birthDate > hoy) {
+@@ -6128,21 +6140,44 @@
+         const jEstadoCivil = document.getElementById('jefEstadoCivil'); if(jEstadoCivil) jEstadoCivil.value = datosNuevos.estado_civil;
+         const jInstruccion = document.getElementById('jefNivelInstruccion'); if(jInstruccion) jInstruccion.value = datosNuevos.nivel_educativo;
+         const jOcupacion = document.getElementById('jefProfesion'); if(jOcupacion) jOcupacion.value = datosNuevos.ocupacion;
+-        const jCne = document.getElementById('jefCNE'); if(jCne) jCne.value = datosNuevos.inscrito_cne ? 'true' : 'false';
+-        const jIncapacidad = document.getElementById('jefTieneIncapacidad');
+-        if(jIncapacidad) jIncapacidad.value = (datosNuevos.incapacitado_tipo && datosNuevos.incapacitado_tipo.trim() !== '') ? 'Si' : 'No';
++        
++        const jCne = document.getElementById('jefInscritoCNE'); if(jCne) jCne.value = datosNuevos.inscrito_cne ? 'Si' : 'No';
++        
++        const jIncapacidad = document.getElementById('jefIncapacitado');
++        if(jIncapacidad) jIncapacidad.value = datosNuevos.incapacitado ? 'Si' : 'No';
+         
+         const jTipoIncapacidad = document.getElementById('jefTipoIncapacidad'); 
+-        if(jTipoIncapacidad) jTipoIncapacidad.value = datosNuevos.incapacitado_tipo;
++        if(jTipoIncapacidad) jTipoIncapacidad.value = datosNuevos.incapacitado_tipo || '';
+         
+         const jPensionado = document.getElementById('jefPensionado');
+-        if(jPensionado) jPensionado.value = (datosNuevos.pensionado_institucion && datosNuevos.pensionado_institucion.trim() !== '') ? 'Si' : 'No';
++        if(jPensionado) jPensionado.value = datosNuevos.pensionado ? 'Si' : 'No';
+         
+         const jInstPension = document.getElementById('jefPensionadoInstitucion');
+-        if(jInstPension) jInstPension.value = datosNuevos.pensionado_institucion;
++        if(jInstPension) jInstPension.value = datosNuevos.pensionado_institucion || '';
++
++        const jTiempoComunidad = document.getElementById('jefTiempoComunidad');
++        if(jTiempoComunidad) jTiempoComunidad.value = datosNuevos.tiempo_comunidad || '';
++
++        const jTelefono = document.getElementById('jefTelfCel');
++        if(jTelefono) jTelefono.value = datosNuevos.telefono || '';
++
++        const jEmail = document.getElementById('jefEmail');
++        if(jEmail) jEmail.value = datosNuevos.email || '';
++
++        const jIngreso = document.getElementById('jefIngresoMensualBs');
++        if(jIngreso) jIngreso.value = datosNuevos.ingreso_mensual_bs || '';
+         
+         window._datos_nuevos_jefe = payload.datos_nuevos_habitante;
+         
++        // Limpiar los bordes rojos residuales si existian
++        ['jefNombres', 'jefFechaNac', 'jefSexo', 'jefNacionalidad', 'jefEstadoCivil', 'jefNivelInstruccion', 'jefProfesion', 'jefInscritoCNE', 'jefIncapacitado', 'jefPensionado', 'jefTiempoComunidad', 'jefTelfCel', 'jefEmail', 'jefIngresoMensualBs'].forEach(id => {
++          const el = document.getElementById(id);
++          if (el) {
++            el.style.borderColor = '';
++            el.style.boxShadow = '';
++          }
++        });
++        
+         const banner = document.getElementById('jefeStatusBanner');
+         if (banner) {
+           banner.style.display = 'block';
+@@ -6197,3 +6232,4 @@
+ </body>
+ </html>
+ 
++

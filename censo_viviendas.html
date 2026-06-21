@@ -6141,7 +6141,32 @@
         const jInstPension = document.getElementById('jefPensionadoInstitucion');
         if(jInstPension) jInstPension.value = datosNuevos.pensionado_institucion;
         
+        
+        // Nuevos campos
+        const jTelfCel = document.getElementById('jefTelfCel'); if(jTelfCel) jTelfCel.value = datosNuevos.telefono || '';
+        const jEmail = document.getElementById('jefEmail'); if(jEmail) jEmail.value = datosNuevos.email || '';
+        const jTiempoCom = document.getElementById('jefTiempoComunidad'); if(jTiempoCom) jTiempoCom.value = datosNuevos.tiempo_comunidad || '';
+        const jIngreso = document.getElementById('jefIngresoMensualBs'); if(jIngreso) jIngreso.value = datosNuevos.ingreso_mensual_bs || '';
+        
+        // Panel 5 (Trabaja)
+        const selTrabaja = document.getElementById('trabaja'); 
+        if(selTrabaja) selTrabaja.value = datosNuevos.trabaja_actualmente === true ? 'Sí' : (datosNuevos.trabaja_actualmente === false ? 'No' : '');
+        
+        const jIngresoRango = document.getElementById('ingresoFamiliarRango');
+        if(jIngresoRango) jIngresoRango.value = datosNuevos.clasificacion_ingreso_familiar || '';
+
+        // Limpiar bordes rojos (is-invalid) de Bootstrap o admin.css
+        ['jefNombres', 'jefFechaNac', 'jefNacionalidad', 'jefSexo', 'jefEstadoCivil', 'jefNivelInstruccion', 'jefProfesion', 'jefCNE', 'jefTieneIncapacidad', 'jefPensionado', 'jefTelfCel', 'jefEmail', 'jefTiempoComunidad', 'jefIngresoMensualBs', 'trabaja', 'ingresoFamiliarRango'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.classList.remove('is-invalid');
+                el.style.borderColor = '';
+                el.style.boxShadow = '';
+            }
+        });
+
         window._datos_nuevos_jefe = payload.datos_nuevos_habitante;
+
         
         const banner = document.getElementById('jefeStatusBanner');
         if (banner) {
@@ -6161,8 +6186,23 @@
         setR('.fam-nombres', nombres);
         setR('.fam-fechanac', fecha_nacimiento);
         setR('.fam-sexo', genero);
-        setR('.fam-cedula', document.getElementById('rh_sin_cedula')?.checked ? 'Sin Cédula (Menor)' : cedula);
+                setR('.fam-cedula', document.getElementById('rh_sin_cedula')?.checked ? 'Sin Cédula (Menor)' : cedula);
         
+        // Missing fields for familiar row
+        // (Currently familiar rows don't have all the extended fields in the UI, they only have the basics.
+        // We just assign the whole payload so it gets saved)
+        row._datos_nuevos_habitante = payload.datos_nuevos_habitante;
+        
+        // Clear red borders on the familiar inputs
+        ['.fam-nombres', '.fam-fechanac', '.fam-sexo', '.fam-cedula'].forEach(sel => {
+            const el = row.querySelector(sel);
+            if(el) {
+                el.classList.remove('is-invalid');
+                el.style.borderColor = '';
+                el.style.boxShadow = '';
+            }
+        });
+
         // Uncheck "Buscar por nombre" if it was checked
         const checkbox = row.querySelector('.chk-buscar-nombre');
         if (checkbox && checkbox.checked) {
