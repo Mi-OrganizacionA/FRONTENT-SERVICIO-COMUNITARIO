@@ -4477,6 +4477,15 @@
       setVal('cedulaJefe',            jefe.cedula_identidad);
       setVal('jefeHabitanteId',       jefe.id_habitante);
 
+      // Si el encuestado es el mismo que el jefe de familia, marcar el checkbox
+      if (raw.encuestado_cedula === jefe.cedula_identidad && raw.encuestado_cedula) {
+        const chkEnc = document.getElementById('chkEncuestadoEsJefe');
+        if (chkEnc) {
+          chkEnc.checked = true;
+          chkEnc.dispatchEvent(new Event('change'));
+        }
+      }
+
       // Disparar autocompletado para llenar campos faltantes que solo existen en la tabla Habitantes (Ej. Estado Civil, Teléfono)
       setTimeout(() => {
         const inputCedula = document.getElementById('cedulaJefe');
@@ -5377,6 +5386,7 @@
             if (el) { el.style.borderColor = ''; el.style.boxShadow = ''; }
           });
           document.getElementById('jefNombres').value = (datos.nombres + ' ' + (datos.apellidos || '')).trim();
+          if (typeof syncEncuestadoDesdeJefe === 'function') syncEncuestadoDesdeJefe();
           document.getElementById('jefProfesion').value = datos.ocupacion || '';
 
           if (document.getElementById('jefTiempoComunidad')) document.getElementById('jefTiempoComunidad').value = datos.tiempo_comunidad || '';
@@ -6277,6 +6287,7 @@
         
         // Nuevos campos
         const jTelfCel = document.getElementById('jefTelfCel'); if(jTelfCel) jTelfCel.value = datosNuevos.telefono || '';
+        if (typeof syncEncuestadoDesdeJefe === 'function') syncEncuestadoDesdeJefe();
         const jEmail = document.getElementById('jefEmail'); if(jEmail) jEmail.value = datosNuevos.email || '';
         const jTiempoCom = document.getElementById('jefTiempoComunidad'); if(jTiempoCom) jTiempoCom.value = datosNuevos.tiempo_comunidad || '';
         const jIngreso = document.getElementById('jefIngresoMensualBs'); if(jIngreso) jIngreso.value = datosNuevos.ingreso_mensual_bs || '';

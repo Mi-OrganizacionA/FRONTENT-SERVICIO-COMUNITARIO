@@ -15,6 +15,12 @@ function mapFrontendData(datos, paso) {
   for (const key in mapped) {
     if (mapped[key] === '') mapped[key] = null;
   }
+  
+  // Limpiar campos exclusivos de la interfaz de usuario que no van en la BD
+  delete mapped.chk_planilla_auto;
+  delete mapped.chk_fecha_auto;
+  delete mapped.chk_encuestado_es_jefe;
+  delete mapped.consejo_comunal_cab;
 
   // 2. Transformar booleanos 'Si'/'No' a true/false
   for (const key in mapped) {
@@ -431,7 +437,8 @@ class EstudioDemograficoController {
               if (paso === 3) {
                 await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio, parentesco: 'Jefe(a) de Familia' }, transaction: t });
               } else {
-                await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio, parentesco: { [db.Sequelize.Op.ne]: 'Jefe(a) de Familia' } }, transaction: t });
+                const { Op } = require('sequelize');
+                await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio, parentesco: { [Op.ne]: 'Jefe(a) de Familia' } }, transaction: t });
               }
               const fams = dbDatos.familiares.map(f => ({ ...f, id_estudio }));
               await db.CensoCaracteristicaFamiliar.bulkCreate(fams, { transaction: t });
