@@ -281,7 +281,7 @@
           <div class="section-divider"><i class="fas fa-user-magnifying-glass"></i> Identificar Habitante</div>
 
           <div class="form-group-sicag">
-            <label class="form-label-sicag" for="inputCedula">Buscar por Cédula del Habitante *</label>
+            <label class="form-label-sicag" for="inputCedula">Buscar por Cédula del Habitante * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese el número de cédula de identidad sin puntos ni guiones"></i></label>
             <div style="display:flex;">
               <input type="text" class="form-control-sicag" id="inputCedula"
                 placeholder="Ej: V-12.345.678" required
@@ -314,13 +314,13 @@
           <div class="section-divider"><i class="fas fa-key"></i> Datos de Acceso al Sistema</div>
           <div class="form-grid-2">
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="inputEmail">Correo Electrónico *</label>
+              <label class="form-label-sicag" for="inputEmail">Correo Electrónico * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Dirección de correo electrónico válida"></i></label>
               <input type="email" class="form-control-sicag" id="inputEmail"
                 placeholder="correo@ejemplo.com" required>
               <small style="color:var(--muted);font-size:.75rem;">Usado para iniciar sesión y recuperar contraseña.</small>
             </div>
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="inputTelefono">Teléfono de Contacto</label>
+              <label class="form-label-sicag" for="inputTelefono">Teléfono de Contacto <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Número de teléfono de contacto (Ej: 0414-1234567)"></i></label>
               <input type="text" class="form-control-sicag" id="inputTelefono"
                 placeholder="(0412) 123-4567">
             </div>
@@ -328,7 +328,7 @@
 
           <div class="form-grid-2">
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="inputPassword">Contraseña Inicial *</label>
+              <label class="form-label-sicag" for="inputPassword">Contraseña Inicial * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
               <div class="input-eye-wrap">
                 <input type="password" class="form-control-sicag" id="inputPassword"
                   placeholder="Mínimo 8 caracteres" required minlength="8">
@@ -337,7 +337,7 @@
               <small style="color:var(--muted);font-size:.75rem;">El vocero podrá cambiarla en su perfil.</small>
             </div>
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="inputPasswordConfirm">Confirmar Contraseña *</label>
+              <label class="form-label-sicag" for="inputPasswordConfirm">Confirmar Contraseña * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
               <div class="input-eye-wrap">
                 <input type="password" class="form-control-sicag" id="inputPasswordConfirm"
                   placeholder="Repite la contraseña" required>
@@ -349,7 +349,7 @@
           <!-- COMUNIDAD Y ROL -->
           <div class="section-divider"><i class="fas fa-map-location-dot"></i> Asignación de Comunidad</div>
           <div class="form-group-sicag">
-            <label class="form-label-sicag" for="selComunidad">Consejo Comunal Asignado *</label>
+            <label class="form-label-sicag" for="selComunidad">Consejo Comunal Asignado * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el consejo comunal al que pertenece"></i></label>
             <select class="form-control-sicag" id="selComunidad" required>
               <option value="">Seleccionar consejo comunal...</option>
               <option value="Jobito I">C.C. Jobito I</option>
@@ -368,7 +368,7 @@
           <!-- CONFIRMACIÓN ADMIN -->
           <div class="section-divider"><i class="fas fa-lock"></i> Autorización</div>
           <div class="form-group-sicag">
-            <label class="form-label-sicag" for="confirmPass">Tu Contraseña de Administrador *</label>
+            <label class="form-label-sicag" for="confirmPass">Tu Contraseña de Administrador * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
             <div class="input-eye-wrap">
               <input type="password" class="form-control-sicag" id="confirmPass"
                 placeholder="Ingresa tu contraseña para confirmar" required>
@@ -406,12 +406,12 @@
           <div class="section-divider"><i class="fas fa-user"></i> Información del Vocero</div>
           <div class="form-grid-2">
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="editNombre">Nombre Completo</label>
+              <label class="form-label-sicag" for="editNombre">Nombre Completo <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese los nombres y apellidos completos"></i></label>
               <input type="text" class="form-control-sicag" id="editNombre" readonly
                 style="background:#f5f5f5; cursor:not-allowed;">
             </div>
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="editCedula">Cédula</label>
+              <label class="form-label-sicag" for="editCedula">Cédula <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese el número de cédula de identidad sin puntos ni guiones"></i></label>
               <input type="text" class="form-control-sicag" id="editCedula" readonly
                 style="background:#f5f5f5; cursor:not-allowed;">
             </div>
@@ -420,17 +420,17 @@
           <div class="section-divider"><i class="fas fa-address-card"></i> Datos de Contacto y Acceso</div>
           <div class="form-grid-2">
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="editEmail">Correo Electrónico</label>
+              <label class="form-label-sicag" for="editEmail">Correo Electrónico <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Dirección de correo electrónico válida"></i></label>
               <input type="email" class="form-control-sicag" id="editEmail" placeholder="correo@ejemplo.com">
             </div>
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="editTelefono">Teléfono</label>
+              <label class="form-label-sicag" for="editTelefono">Teléfono <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Número de teléfono de contacto (Ej: 0414-1234567)"></i></label>
               <input type="text" class="form-control-sicag" id="editTelefono" placeholder="(0412) 123-4567">
             </div>
           </div>
 
           <div class="form-group-sicag">
-            <label class="form-label-sicag" for="editNuevaPassword">Nueva Contraseña <small style="color:var(--muted); font-weight:400;">(dejar en blanco para no cambiar)</small></label>
+            <label class="form-label-sicag" for="editNuevaPassword">Nueva Contraseña <small style="color:var(--muted); font-weight:400;">(dejar en blanco para no cambiar)</small> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
             <div class="input-eye-wrap">
               <input type="password" class="form-control-sicag" id="editNuevaPassword" placeholder="Nueva contraseña (opcional)">
               <button type="button" class="eye-btn" onclick="toggleEye('editNuevaPassword', this)"><i class="fas fa-eye"></i></button>
@@ -440,7 +440,7 @@
           <div class="section-divider"><i class="fas fa-map-location-dot"></i> Comunidad y Estado</div>
           <div class="form-grid-2">
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="editComunidad">Consejo Comunal</label>
+              <label class="form-label-sicag" for="editComunidad">Consejo Comunal <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el consejo comunal al que pertenece"></i></label>
               <select class="form-control-sicag" id="editComunidad">
                 <option value="">Sin asignar</option>
                 <option value="Jobito I">C.C. Jobito I</option>
@@ -455,7 +455,7 @@
               </select>
             </div>
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="editEstado">Estado de la Cuenta</label>
+              <label class="form-label-sicag" for="editEstado">Estado de la Cuenta <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
               <select class="form-control-sicag" id="editEstado">
                 <option value="activo">Activo</option>
                 <option value="inactivo">Inactivo (suspendido)</option>
@@ -465,7 +465,7 @@
 
           <div class="section-divider"><i class="fas fa-lock"></i> Autorización</div>
           <div class="form-group-sicag">
-            <label class="form-label-sicag" for="editConfirmPass">Tu Contraseña de Administrador *</label>
+            <label class="form-label-sicag" for="editConfirmPass">Tu Contraseña de Administrador * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
             <div class="input-eye-wrap">
               <input type="password" class="form-control-sicag" id="editConfirmPass"
                 placeholder="Ingresa tu contraseña para confirmar" required>

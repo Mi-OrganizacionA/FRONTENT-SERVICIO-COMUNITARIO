@@ -784,30 +784,30 @@
       <div class="modal-body-sicag">
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
           <div style="grid-column: 1 / -1; margin-bottom: 0.5rem;">
-            <label style="font-weight:700; color:var(--vp);">Título del Proyecto:</label>
+            <label style="font-weight:700; color:var(--vp);">Título del Proyecto: <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Nombre o título principal de la publicación/registro"></i></label>
             <div id="verProjTitulo" style="font-weight:600; font-size: 1.1rem;"></div>
           </div>
           <div style="grid-column: 1 / -1; margin-bottom: 0.5rem;">
-            <label style="font-weight:700; color:var(--vp);">Descripción:</label>
+            <label style="font-weight:700; color:var(--vp);">Descripción: <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Detalle completo o descripción ampliada"></i></label>
             <div id="verProjDesc" style="color:var(--muted); line-height: 1.5;"></div>
           </div>
-          <div><label style="font-weight:700; color:var(--vp);">Estado:</label> <span id="verProjEstado"></span></div>
-          <div><label style="font-weight:700; color:var(--vp);">Consejo Comunal:</label> <span
+          <div><label style="font-weight:700; color:var(--vp);">Estado: <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label> <span id="verProjEstado"></span></div>
+          <div><label style="font-weight:700; color:var(--vp);">Consejo Comunal: <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el consejo comunal al que pertenece"></i></label> <span
               id="verProjConsejo"></span></div>
-          <div><label style="font-weight:700; color:var(--vp);">Presupuesto:</label> <span
+          <div><label style="font-weight:700; color:var(--vp);">Presupuesto: <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label> <span
               id="verProjPresupuesto"></span></div>
-          <div><label style="font-weight:700; color:var(--vp);">Fecha Inicio:</label> <span id="verProjInicio"></span>
+          <div><label style="font-weight:700; color:var(--vp);">Fecha Inicio: <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label> <span id="verProjInicio"></span>
           </div>
-          <div><label style="font-weight:700; color:var(--vp);">Fecha Fin:</label> <span id="verProjFin"></span></div>
-          <div><label style="font-weight:700; color:var(--vp);">Responsable:</label> <span
+          <div><label style="font-weight:700; color:var(--vp);">Fecha Fin: <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label> <span id="verProjFin"></span></div>
+          <div><label style="font-weight:700; color:var(--vp);">Responsable: <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label> <span
               id="verProjResponsable"></span></div>
-          <div><label style="font-weight:700; color:var(--vp);">Tipo:</label> <span id="verProjTipo"></span></div>
+          <div><label style="font-weight:700; color:var(--vp);">Tipo: <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione la categoría o tipo correspondiente"></i></label> <span id="verProjTipo"></span></div>
           <div style="grid-column: 1 / -1; margin-bottom: 0.5rem;">
-            <label style="font-weight:700; color:var(--vp);">Observaciones:</label>
+            <label style="font-weight:700; color:var(--vp);">Observaciones: <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <div id="verProjObservaciones" style="color:var(--muted); line-height: 1.5; font-style: italic;"></div>
           </div>
           <div style="grid-column: 1 / -1; margin-top: 0.5rem;">
-            <label style="font-weight:700; color:var(--vp);">Avance:</label>
+            <label style="font-weight:700; color:var(--vp);">Avance: <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <div class="proj-progress" style="margin-top: 0.2rem;">
               <div class="proj-progress-label">
                 <span id="verProjAvanceText">0%</span>
@@ -850,14 +850,14 @@
 
           <div class="mfg-2">
             <div class="form-group-sicag" style="grid-column:1/-1">
-              <label class="form-label-sicag" for="projTitulo">Título del Proyecto *</label>
+              <label class="form-label-sicag" for="projTitulo">Título del Proyecto * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Nombre o título principal de la publicación/registro"></i></label>
               <input type="text" class="form-control-sicag" id="projTitulo"
                 placeholder="Ej: Plan de Siembra Intensiva — Sector Norte" required>
             </div>
           </div>
 
           <div class="form-group-sicag" style="margin-bottom:1rem;">
-            <label class="form-label-sicag" for="projDescripcion">Descripción *</label>
+            <label class="form-label-sicag" for="projDescripcion">Descripción * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Detalle completo o descripción ampliada"></i></label>
             <textarea class="form-control-sicag" id="projDescripcion" rows="3"
               placeholder="Describe el objetivo principal, actividades y beneficiarios del proyecto..."
               required></textarea>
@@ -865,7 +865,7 @@
 
           <div class="mfg-3">
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="projEstado">Estado *</label>
+              <label class="form-label-sicag" for="projEstado">Estado * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
               <select class="form-control-sicag" id="projEstado" required>
                 <option value="">Seleccionar...</option>
                 <option value="propuesto">💡 Propuesto</option>
@@ -876,7 +876,7 @@
               </select>
             </div>
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="projConsejo">Consejo Comunal *</label>
+              <label class="form-label-sicag" for="projConsejo">Consejo Comunal * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el consejo comunal al que pertenece"></i></label>
               <select class="form-control-sicag" id="projConsejo" required>
                 <option value="">Seleccionar...</option>
                 <option value="10" style="font-weight: 600; color: var(--vp);">(Para toda la Comuna)</option>
@@ -892,7 +892,7 @@
               </select>
             </div>
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="projPresupuesto">Presupuesto (Bs.)</label>
+              <label class="form-label-sicag" for="projPresupuesto">Presupuesto (Bs.) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
               <input type="number" class="form-control-sicag" id="projPresupuesto" data-mask="decimal"
                 placeholder="0.00" min="0" step="0.01">
             </div>
@@ -905,15 +905,15 @@
 
           <div class="mfg-3">
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="projFechaInicio">Fecha de Inicio</label>
+              <label class="form-label-sicag" for="projFechaInicio">Fecha de Inicio <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
               <input type="date" class="form-control-sicag" id="projFechaInicio">
             </div>
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="projFechaFin">Fecha de Culminación</label>
+              <label class="form-label-sicag" for="projFechaFin">Fecha de Culminación <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
               <input type="date" class="form-control-sicag" id="projFechaFin">
             </div>
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="projAvance">% de Avance</label>
+              <label class="form-label-sicag" for="projAvance">% de Avance <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
               <input type="number" class="form-control-sicag" id="projAvance" data-mask="numero" placeholder="0" min="0"
                 max="100">
             </div>
@@ -926,11 +926,11 @@
 
           <div class="mfg-2">
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="projResponsable">Nombre del Responsable</label>
+              <label class="form-label-sicag" for="projResponsable">Nombre del Responsable <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese los nombres y apellidos completos"></i></label>
               <input type="text" class="form-control-sicag" id="projResponsable" placeholder="Nombre completo">
             </div>
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="projTipo">Tipo de Proyecto</label>
+              <label class="form-label-sicag" for="projTipo">Tipo de Proyecto <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione la categoría o tipo correspondiente"></i></label>
               <select class="form-control-sicag" id="projTipo">
                 <option value="">Seleccionar...</option>
                 <option value="agricola">🌱 Agrícola / Productivo</option>
@@ -945,7 +945,7 @@
           </div>
 
           <div class="form-group-sicag" style="margin-bottom:0;">
-            <label class="form-label-sicag" for="projObservaciones">Observaciones adicionales</label>
+            <label class="form-label-sicag" for="projObservaciones">Observaciones adicionales <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <textarea class="form-control-sicag" id="projObservaciones" rows="2"
               placeholder="Notas internas, dificultades encontradas, logros destacados..."></textarea>
           </div>

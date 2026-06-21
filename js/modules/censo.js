@@ -497,8 +497,8 @@ class CensoController {
   }
 
   _getColorClasificacion(clasif) {
-    const map = { 'adulto_mayor': 'badge-danger', 'niño': 'badge-warning', 'adulto': 'badge-primary' };
-    return map[clasif] || 'badge-secondary';
+    const map = { 'adulto_mayor': 'badge-sicag badge-finalizado', 'niño': 'badge-sicag badge-desarrollo', 'adulto': 'badge-sicag badge-activo' };
+    return map[clasif] || 'badge-sicag badge-pendiente';
   }
 
   _formatClasificacion(clasif) {

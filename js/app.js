@@ -175,7 +175,9 @@ function initScrollAnimations() {
 // ---- TOOLTIP INIT (Bootstrap) ----
 function initTooltips() {
   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-  tooltipTriggerList.forEach((el) => new bootstrap.Tooltip(el));
+  if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+    tooltipTriggerList.forEach((el) => bootstrap.Tooltip.getOrCreateInstance(el));
+  }
 }
 
 // ---- DARK MODE TOGGLE (future) ----
@@ -237,6 +239,13 @@ document.addEventListener('DOMContentLoaded', function () {
   if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
     initTooltips();
   }
+
+  // Re-init tooltips when any modal opens (useful for dynamically loaded forms)
+  document.addEventListener('shown.bs.modal', function () {
+    if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+      initTooltips();
+    }
+  });
 
   console.log(
     '%c🌿 SICAG v2.5 — Sistema de Información Comunal Agroecológica',

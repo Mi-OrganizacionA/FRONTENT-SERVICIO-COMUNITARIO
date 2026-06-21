@@ -175,7 +175,7 @@
 
   <div class="filter-bar fade-in-up">
     <div class="filter-group">
-      <label class="filter-label" for="filterCC">Consejo Comunal</label>
+      <label class="filter-label" for="filterCC">Consejo Comunal <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el consejo comunal al que pertenece"></i></label>
       <select class="filter-select" id="filterCC">
         <option value="">Todos</option>
         <option value="jobito_i">C.C. Jobito I</option>
@@ -190,7 +190,7 @@
       </select>
     </div>
     <div class="filter-group">
-      <label class="filter-label" for="filterClasif">Clasificacion</label>
+      <label class="filter-label" for="filterClasif">Clasificacion <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
       <select class="filter-select" id="filterClasif">
         <option value="">Todas</option>
         <option value="nino">Nino (0-11)</option>
@@ -202,7 +202,7 @@
       </select>
     </div>
     <div class="filter-group">
-      <label class="filter-label" for="filterGenero">Genero</label>
+      <label class="filter-label" for="filterGenero">Genero <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el género de la persona"></i></label>
       <select class="filter-select" id="filterGenero">
         <option value="">Todos</option>
         <option value="M">Masculino</option>
@@ -210,7 +210,7 @@
       </select>
     </div>
     <div class="filter-group">
-      <label class="filter-label" for="filterElector">Elector</label>
+      <label class="filter-label" for="filterElector">Elector <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
       <select class="filter-select" id="filterElector">
         <option value="">Todos</option>
         <option value="si">Si</option>
@@ -218,7 +218,7 @@
       </select>
     </div>
     <div class="filter-group" style="flex:1;min-width:220px;">
-      <label class="filter-label" for="filterBuscar">Buscar</label>
+      <label class="filter-label" for="filterBuscar">Buscar <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Escriba aquí para buscar rápidamente en la tabla"></i></label>
       <div class="input-with-icon">
         <i class="fas fa-search input-icon" aria-hidden="true"></i>
         <input type="text" class="filter-input" id="filterBuscar" placeholder="Cedula o nombre...">
@@ -358,7 +358,7 @@
               <div class="cv-panel-title"><i class="fas fa-id-card"></i> Paso 1 &ndash; Datos Personales</div>
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="habCedula">Cédula de Identidad <span class="req">*</span></label>
+                  <label for="habCedula">Cédula de Identidad <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese el número de cédula de identidad sin puntos ni guiones"></i></label>
                   <div class="cv-input-group" style="display:flex;">
                     <select class="cv-form-control" id="habNacionalidad" style="flex: 0 0 70px; padding-left:0.5rem; padding-right:0.5rem; border-right:none; border-top-right-radius:0; border-bottom-right-radius:0;">
                       <option value="V">V-</option>
@@ -368,26 +368,26 @@
                   </div>
                   <div style="margin-top: 5px; display: flex; align-items: center; gap: 5px;">
                     <input type="checkbox" id="habSinCedula" onchange="window.toggleSinCedulaCenso()">
-                    <label for="habSinCedula" style="font-size: 0.85rem; margin: 0; color: var(--text-muted, #666);">Menor sin Cédula</label>
+                    <label for="habSinCedula" style="font-size: 0.85rem; margin: 0; color: var(--text-muted, #666);">Menor sin Cédula <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese el número de cédula de identidad sin puntos ni guiones"></i></label>
                   </div>
                 </div>
                 <div class="cv-form-group">
-                  <label for="habNombre">Nombres y Apellidos <span class="req">*</span></label>
+                  <label for="habNombre">Nombres y Apellidos <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese los nombres y apellidos completos"></i></label>
                   <input type="text" class="cv-form-control" id="habNombre" data-mask="nombre" name="nombres_apellidos" placeholder="Nombre completo" required>
                 </div>
               </div>
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="habFechaNac">Fecha de Nacimiento <span class="req">*</span></label>
+                  <label for="habFechaNac">Fecha de Nacimiento <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione la fecha de nacimiento"></i></label>
                   <input type="date" class="cv-form-control" id="habFechaNac" name="fecha_nacimiento" required>
                   <span class="cv-form-hint">Calcula edad, T4 y estado electoral.</span>
                 </div>
                 <div class="cv-form-group">
-                  <label for="habEdad">Edad (calculada)</label>
+                  <label for="habEdad">Edad (calculada) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Este campo se calcula automáticamente"></i></label>
                   <input type="number" class="cv-form-control" id="habEdad" name="edad" readonly placeholder="Automático" tabindex="-1" style="background:var(--gray1);font-weight:700;color:var(--vp);border-style:dashed;">
                 </div>
                 <div class="cv-form-group">
-                  <label for="habGenero">Género <span class="req">*</span></label>
+                  <label for="habGenero">Género <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el género de la persona"></i></label>
                   <select class="cv-form-control" id="habGenero" name="genero" required>
                     <option value="">Seleccionar...</option>
                     <option value="M">Masculino</option>
@@ -397,7 +397,7 @@
                 </div>
               </div>
               <div class="cv-form-group">
-                <label for="habEstadoCivil">Estado Civil</label>
+                <label for="habEstadoCivil">Estado Civil <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique el estado civil actual"></i></label>
                 <select class="cv-form-control" id="habEstadoCivil" name="estado_civil" style="width:32%">
                   <option value="">Seleccionar...</option>
                   <option value="Soltero/a">Soltero/a</option>
@@ -413,26 +413,26 @@
               <div class="cv-panel-title"><i class="fas fa-map-location-dot"></i> Paso 2 &ndash; Contacto y Ubicación</div>
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="habTelefono">Teléfono</label>
+                  <label for="habTelefono">Teléfono <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Número de teléfono de contacto (Ej: 0414-1234567)"></i></label>
                   <input type="tel" class="cv-form-control" id="habTelefono" data-mask="telefono" name="telefono" placeholder="0412-1234567">
                 </div>
                 <div class="cv-form-group">
-                  <label for="habEmail">Correo Electrónico</label>
+                  <label for="habEmail">Correo Electrónico <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Dirección de correo electrónico válida"></i></label>
                   <input type="email" class="cv-form-control" id="habEmail" name="email" placeholder="ejemplo@correo.com">
                 </div>
               </div>
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="habDireccion">Dirección de Residencia <span class="req">*</span></label>
+                  <label for="habDireccion">Dirección de Residencia <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Escriba la dirección exacta o punto de referencia"></i></label>
                   <textarea class="cv-form-control" id="habDireccion" name="direccion" rows="1" placeholder="Sector, calle, casa..." required></textarea>
                 </div>
                 <div class="cv-form-group">
-                  <label for="habTiempoComunidad">Tiempo en la Comunidad</label>
+                  <label for="habTiempoComunidad">Tiempo en la Comunidad <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Años o meses residiendo en el sector"></i></label>
                   <input type="text" class="cv-form-control" id="habTiempoComunidad" name="tiempo_comunidad" placeholder="Ej: 5 años, Toda la vida...">
                 </div>
               </div>
               <div class="cv-form-group">
-                <label for="habCC">Consejo Comunal <span class="req">*</span></label>
+                <label for="habCC">Consejo Comunal <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el consejo comunal al que pertenece"></i></label>
                 <select class="cv-form-control" id="habCC" name="id_comunidad" required>
                   <option value="">Seleccionar...</option>
                   <option value="1">C.C. Jobito I</option>
@@ -453,7 +453,7 @@
               <div class="cv-panel-title"><i class="fas fa-briefcase"></i> Paso 3 &ndash; Perfil Socioeconómico</div>
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="habNivelEducativo">Nivel Educativo</label>
+                  <label for="habNivelEducativo">Nivel Educativo <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Último nivel de estudios alcanzado"></i></label>
                   <select class="cv-form-control" id="habNivelEducativo" name="nivel_educativo">
                     <option value="">Seleccionar...</option>
                     <option value="Primaria">Primaria</option>
@@ -466,13 +466,13 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="habOcupacion">Ocupación</label>
+                  <label for="habOcupacion">Ocupación <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Profesión, oficio o labor principal"></i></label>
                   <input type="text" class="cv-form-control" id="habOcupacion" name="ocupacion" placeholder="Estudiante, Albañil...">
                 </div>
               </div>
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="habTrabaja">Trabaja Actualmente</label>
+                  <label for="habTrabaja">Trabaja Actualmente <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si tiene un empleo activo y remunerado"></i></label>
                   <select class="cv-form-control" id="habTrabaja" name="trabaja_actualmente">
                     <option value="">Seleccionar...</option>
                     <option value="true">Sí</option>
@@ -480,11 +480,11 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="habIngresoMensual">Ingreso Mensual (Bs)</label>
+                  <label for="habIngresoMensual">Ingreso Mensual (Bs) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Monto estimado de ingresos personales al mes"></i></label>
                   <input type="number" step="0.01" class="cv-form-control" id="habIngresoMensual" name="ingreso_mensual_bs" placeholder="0.00">
                 </div>
                 <div class="cv-form-group">
-                  <label for="habClasificacionIngreso">Ingreso Familiar</label>
+                  <label for="habClasificacionIngreso">Ingreso Familiar <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Suma estimada de ingresos de todo el núcleo familiar"></i></label>
                   <select class="cv-form-control" id="habClasificacionIngreso" name="clasificacion_ingreso_familiar">
                     <option value="">Seleccionar...</option>
                     <option value="Menor a salario mínimo">Menor a salario mínimo</option>
@@ -501,7 +501,7 @@
               <div class="cv-panel-title"><i class="fas fa-heartbeat"></i> Paso 4 &ndash; Salud y Estatus Electoral</div>
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="condicionSalud">Condición de Salud <span class="req">*</span></label>
+                  <label for="condicionSalud">Condición de Salud <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si es saludable, encamado o posee una condición crónica"></i></label>
                   <select class="cv-form-control" id="condicionSalud" name="condicion_salud" required>
                     <option value="saludable">Saludable</option>
                     <option value="enfermedad_cronica">Enfermedad Crónica</option>
@@ -510,32 +510,32 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="habIncapacitado">Incapacitado</label>
+                  <label for="habIncapacitado">Incapacitado <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si posee alguna discapacidad permanente"></i></label>
                   <select class="cv-form-control" id="habIncapacitado" name="incapacitado" onchange="document.getElementById('habIncapTipoGrp').style.display = this.value === 'true' ? 'block' : 'none'">
                     <option value="false">No</option>
                     <option value="true">Sí</option>
                   </select>
                 </div>
                 <div class="cv-form-group" id="habIncapTipoGrp" style="display:none;">
-                  <label for="habIncapTipo">Tipo de Incapacidad</label>
+                  <label for="habIncapTipo">Tipo de Incapacidad <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Especifique el tipo de discapacidad (Ej. Motora, Visual)"></i></label>
                   <input type="text" class="cv-form-control" id="habIncapTipo" name="incapacitado_tipo" placeholder="Ej: Motora, Visual...">
                 </div>
               </div>
               
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="habPensionado">Pensionado</label>
+                  <label for="habPensionado">Pensionado <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si recibe pensión del estado"></i></label>
                   <select class="cv-form-control" id="habPensionado" name="pensionado" onchange="document.getElementById('habPensInstGrp').style.display = this.value === 'true' ? 'block' : 'none'">
                     <option value="false">No</option>
                     <option value="true">Sí</option>
                   </select>
                 </div>
                 <div class="cv-form-group" id="habPensInstGrp" style="display:none;">
-                  <label for="habPensInst">Institución</label>
+                  <label for="habPensInst">Institución <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Institución que otorga la pensión (Ej. IVSS, Amor Mayor)"></i></label>
                   <input type="text" class="cv-form-control" id="habPensInst" name="pensionado_institucion" placeholder="Ej: IVSS, Amor Mayor...">
                 </div>
                 <div class="cv-form-group">
-                  <label for="habInscritoCNE">Inscrito en el CNE</label>
+                  <label for="habInscritoCNE">Inscrito en el CNE <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si está inscrito como elector en el CNE"></i></label>
                   <select class="cv-form-control" id="habInscritoCNE" name="inscrito_cne">
                     <option value="false">No</option>
                     <option value="true">Sí</option>
@@ -545,11 +545,11 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-top:1rem; border-top: 1px dashed var(--gray3); padding-top: 1rem;">
                 <div class="cv-form-group">
-                  <label for="t4Status">Clasificación T4</label>
+                  <label for="t4Status">Clasificación T4 <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Clasificación sociodemográfica de uso interno"></i></label>
                   <input type="text" class="cv-form-control" id="t4Status" readonly placeholder="Calculado auto" style="background:var(--gray1);font-weight:700;color:var(--vp);border-style:dashed;" tabindex="-1">
                 </div>
                 <div class="cv-form-group">
-                  <label for="electoralStatus">Estado Electoral</label>
+                  <label for="electoralStatus">Estado Electoral <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique el estado de votación"></i></label>
                   <input type="text" class="cv-form-control" id="electoralStatus" readonly placeholder="Calculado auto" style="background:var(--gray1);font-weight:700;color:var(--az);border-style:dashed;" tabindex="-1">
                 </div>
               </div>
@@ -1117,15 +1117,15 @@
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;">
           
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Fecha Desde</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Fecha Desde <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <input type="date" id="filtroDesde" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; transition:border 0.2s;">
           </div>
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Fecha Hasta</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Fecha Hasta <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <input type="date" id="filtroHasta" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; transition:border 0.2s;">
           </div>
           <div class="form-group-sicag" style="grid-column:1/-1;">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Consejo Comunal</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Consejo Comunal <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el consejo comunal al que pertenece"></i></label>
             <select id="filtroConsejoExport" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; transition:border 0.2s; background:#fff;">
               <option value="">Todos los Consejos Comunales</option>
               <option value="1">Jobito I</option>
@@ -1141,27 +1141,27 @@
           </div>
           <div class="form-group-sicag" style="grid-column:1/-1; background:#f0fdf4; border:1px solid #bbf7d0; padding:1rem; border-radius:8px; display:flex; align-items:center; gap:0.5rem; margin-top:0.5rem;">
             <input type="checkbox" id="chkNacimiento" style="width:1.2rem; height:1.2rem; cursor:pointer;">
-            <label for="chkNacimiento" style="font-weight:700; color:#166534; cursor:pointer; margin:0;">Usar Rango de Fechas de Nacimiento (desactiva Edad)</label>
+            <label for="chkNacimiento" style="font-weight:700; color:#166534; cursor:pointer; margin:0;">Usar Rango de Fechas de Nacimiento (desactiva Edad) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Este campo se calcula automáticamente"></i></label>
           </div>
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;" id="lblNacMin">F. Nacimiento Desde</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;" id="lblNacMin">F. Nacimiento Desde <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <input type="date" id="filtroNacMin" class="input-sicag" disabled style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#f3f4f6; cursor:not-allowed;">
           </div>
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;" id="lblNacMax">F. Nacimiento Hasta</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;" id="lblNacMax">F. Nacimiento Hasta <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <input type="date" id="filtroNacMax" class="input-sicag" disabled style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#f3f4f6; cursor:not-allowed;">
           </div>
           
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Mínima</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Mínima <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Este campo se calcula automáticamente"></i></label>
             <input type="number" id="filtroEdadMin" class="input-sicag" placeholder="Ej: 18" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none;">
           </div>
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Máxima</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Máxima <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Este campo se calcula automáticamente"></i></label>
             <input type="number" id="filtroEdadMax" class="input-sicag" placeholder="Ej: 60" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none;">
           </div>
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Género</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Género <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el género de la persona"></i></label>
             <select id="filtroGeneroExport" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
               <option value="">Cualquiera</option>
               <option value="M">Masculino</option>
@@ -1170,7 +1170,7 @@
           </div>
 
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Condición de Salud</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Condición de Salud <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si es saludable, encamado o posee una condición crónica"></i></label>
             <select id="filtroSalud" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
               <option value="">Todas</option>
               <option value="saludable">Saludable</option>
@@ -1180,7 +1180,7 @@
             </select>
           </div>
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Elector / Inscrito CNE</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Elector / Inscrito CNE <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si está inscrito como elector en el CNE"></i></label>
             <select id="filtroCne" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
               <option value="">Ambos</option>
               <option value="1">Sí (Inscritos)</option>
@@ -1188,7 +1188,7 @@
             </select>
           </div>
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Situación Laboral</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Situación Laboral <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <select id="filtroTrabajo" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
               <option value="">Cualquiera</option>
               <option value="1">Trabaja Actualmente</option>
@@ -1201,20 +1201,20 @@
         <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed #e5e7eb;">
           <label style="font-weight:700; color:#111; font-size:1rem; margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem;">
             <i class="fas fa-columns" style="color:var(--vp);"></i> ¿Deseas incluir columnas adicionales en el reporte?
-          </label>
+           <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
           <div style="display:flex; flex-wrap:wrap; gap:1.5rem; background:#f8fafc; padding:1rem; border-radius:8px; border:1px solid #e2e8f0;">
             <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
               <input type="checkbox" class="chk-extra" value="telefono"> Teléfono
-            </label>
+             <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Número de teléfono de contacto (Ej: 0414-1234567)"></i></label>
             <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
               <input type="checkbox" class="chk-extra" value="nivel_academico"> Nivel Académico
-            </label>
+             <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
               <input type="checkbox" class="chk-extra" value="trabajo"> Situación Laboral
-            </label>
+             <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
               <input type="checkbox" class="chk-extra" value="salud"> Condición de Salud
-            </label>
+             <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si es saludable, encamado o posee una condición crónica"></i></label>
           </div>
         </div>
 
@@ -1222,7 +1222,7 @@
         <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed #e5e7eb;">
           <label style="font-weight:700; color:#111; font-size:1rem; margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem;">
             <i class="fas fa-file-export" style="color:var(--vp);"></i> ¿Qué reporte deseas generar con estos filtros?
-          </label>
+           <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
           <select id="customReportType" class="input-sicag" style="width:100%; padding:0.85rem 1rem; border:2px solid #e5e7eb; border-radius:10px; font-size:1rem; color:#222; outline:none; background:#fff; font-weight:500; cursor:pointer;">
             <option value="total-personas">Padrón Completo de Personas</option>
             <option value="electores">Registro Electoral (Mayores de 18)</option>

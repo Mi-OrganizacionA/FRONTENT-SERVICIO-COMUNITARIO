@@ -403,12 +403,12 @@
 
           <div class="mfg-2">
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="notTitulo">Título *</label>
+              <label class="form-label-sicag" for="notTitulo">Título * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Nombre o título principal de la publicación/registro"></i></label>
               <input type="text" class="form-control-sicag" id="notTitulo"
                 placeholder="Ej: Reparación del transformador..." required>
             </div>
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="notTipo">Tipo de Publicación *</label>
+              <label class="form-label-sicag" for="notTipo">Tipo de Publicación * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione la categoría o tipo correspondiente"></i></label>
               <select class="form-control-sicag" id="notTipo" required>
                 <option value="">Seleccionar...</option>
                 <option value="noticia">📰 Noticia</option>
@@ -420,45 +420,45 @@
           </div>
 
           <div class="form-group-sicag">
-            <label class="form-label-sicag" for="notDescripcion">Descripción *</label>
+            <label class="form-label-sicag" for="notDescripcion">Descripción * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Detalle completo o descripción ampliada"></i></label>
             <textarea class="form-control-sicag" id="notDescripcion" rows="4"
               placeholder="Detalle completo de la noticia o convocatoria..." required></textarea>
           </div>
 
           <div class="mfg-3">
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="notFecha">Fecha *</label>
+              <label class="form-label-sicag" for="notFecha">Fecha * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
               <input type="date" class="form-control-sicag" id="notFecha" required>
             </div>
             <div class="form-group-sicag">
-              <label class="form-label-sicag" for="notAutor">Autor</label>
+              <label class="form-label-sicag" for="notAutor">Autor <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
               <input type="text" class="form-control-sicag" id="notAutor" value="Sala de Autogobierno" readonly style="background:var(--gray1);">
             </div>
             <div class="form-group-sicag" style="padding-top:1.65rem">
               <label style="display:flex;align-items:center;gap:8px;font-size:.875rem;cursor:pointer;color:var(--sub)">
                 <input type="checkbox" id="notDestacada" style="accent-color:var(--au);width:15px;height:15px">
                 <i class="fas fa-star" style="color:var(--au)"></i> Destacada
-              </label>
+               <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             </div>
           </div>
 
           <div id="notExtraGroup" style="display:none">
             <div class="mfg-2">
               <div class="form-group-sicag">
-                <label class="form-label-sicag" id="notExtraLabel" for="notExtra">Detalle adicional</label>
+                <label class="form-label-sicag" id="notExtraLabel" for="notExtra">Detalle adicional <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                 <input type="text" class="form-control-sicag" id="notExtra"
                   placeholder="URL, lugar/hora o comentario extra">
                 <small class="text-gris" id="notExtraHint">Información complementaria.</small>
               </div>
               <div class="form-group-sicag">
-                <label class="form-label-sicag" for="notCierre">Fecha de cierre</label>
+                <label class="form-label-sicag" for="notCierre">Fecha de cierre <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                 <input type="date" class="form-control-sicag" id="notCierre">
               </div>
             </div>
           </div>
 
           <div class="form-group-sicag">
-            <label class="form-label-sicag" for="notFoto">Fotografía (opcional)</label>
+            <label class="form-label-sicag" for="notFoto">Fotografía (opcional) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <input type="file" class="form-control-sicag" id="notFoto" accept="image/*">
             <small style="color:var(--muted);font-size:.75rem">Formatos: JPG, PNG. Máximo 5MB.</small>
           </div>

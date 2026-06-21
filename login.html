@@ -920,7 +920,7 @@
 
           <!-- Usuario -->
           <div class="lg-group">
-            <label class="lg-label" for="loginUser">Correo o Teléfono</label>
+            <label class="lg-label" for="loginUser">Correo o Teléfono <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Número de teléfono de contacto (Ej: 0414-1234567)"></i></label>
             <div class="lg-input-wrap">
               <i class="fas fa-id-card icon-l"></i>
               <input class="lg-input" type="text" id="loginUser" placeholder="Ej: admin@sicag.com / 04120000000" autocomplete="username"
@@ -930,7 +930,7 @@
 
           <!-- Contraseña -->
           <div class="lg-group">
-            <label class="lg-label" for="loginPass">Contraseña</label>
+            <label class="lg-label" for="loginPass">Contraseña <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
             <div class="lg-input-wrap">
               <i class="fas fa-lock icon-l"></i>
               <input class="lg-input" type="password" id="loginPass" placeholder="••••••••"
@@ -944,7 +944,7 @@
           <div class="form-extras">
             <label class="remember-label">
               <input type="checkbox" id="rememberMe"> Recordarme
-            </label>
+             <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <a href="#" id="forgotPasswordBtn" class="forgot-link">¿Olvidaste tu contraseña?</a>
           </div>
 
@@ -992,7 +992,7 @@
       <div id="stepEmail">
         <p style="text-align:center; color:var(--sub); margin-bottom:1.5rem; font-size:0.9rem;">Ingresa tu correo electrónico asociado a la cuenta.</p>
         <div class="form-group">
-          <label>Correo Electrónico</label>
+          <label>Correo Electrónico <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Dirección de correo electrónico válida"></i></label>
           <input type="email" id="recoveryEmail" class="lg-input" placeholder="ejemplo@correo.com" required>
         </div>
         <button class="btn-sicag btn-primary" id="btnRequestCode" style="width: 100%; margin-top:1rem;">
@@ -1004,7 +1004,7 @@
       <div id="stepCode" style="display: none;">
         <p style="text-align:center; color:var(--sub); margin-bottom:1.5rem; font-size:0.9rem;" id="codeDescText">Tu solicitud ha sido enviada. Un administrador del sistema te proporcionará el código de verificación (válido por 15 min).</p>
         <div class="form-group">
-          <label>Código de Verificación</label>
+          <label>Código de Verificación <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
           <input type="text" id="recoveryCode" class="lg-input" required maxlength="6" style="text-align: center; letter-spacing: 10px; font-weight: bold; font-size: 1.5rem;">
         </div>
         <button class="btn-sicag btn-primary" id="btnVerifyCode" style="width: 100%; margin-top:1rem;">
@@ -1016,13 +1016,13 @@
       <div id="stepPassword" style="display: none;">
         <p style="text-align:center; color:var(--sub); margin-bottom:1.5rem; font-size:0.9rem;">Crea una nueva contraseña segura.</p>
         <div class="form-group">
-          <label>Nueva Contraseña</label>
+          <label>Nueva Contraseña <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
           <input type="password" id="recoveryNewPassword" class="lg-input" placeholder="Mínimo 8 caracteres" required>
           <div class="pw-strength-bar"><div id="pwFill" class="pw-strength-fill"></div></div>
           <small id="pwHint" style="font-size:0.75rem; color:var(--sub); display:block; margin-top:5px;">Nivel de seguridad</small>
         </div>
         <div class="form-group" style="margin-top:1rem;">
-          <label>Confirmar Contraseña</label>
+          <label>Confirmar Contraseña <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
           <input type="password" id="recoveryConfirmPassword" class="lg-input" placeholder="Repite la contraseña" required>
         </div>
         <button class="btn-sicag btn-primary" id="btnResetPassword" style="width: 100%; margin-top:1rem;">

@@ -1659,7 +1659,7 @@
         <div class="cv-modal-body">
           <div class="cv-form-row cv-grid-3">
             <div class="cv-form-group">
-              <label>Consejo Comunal</label>
+              <label>Consejo Comunal <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el consejo comunal al que pertenece"></i></label>
               <select class="cv-form-control" id="advFilterCC">
                 <option value="">Todos</option>
                 <option value="El Cercado">El Cercado</option>
@@ -1669,7 +1669,7 @@
               </select>
             </div>
             <div class="cv-form-group">
-              <label>Condición Física</label>
+              <label>Condición Física <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Estado físico general de la persona"></i></label>
               <select class="cv-form-control" id="advFilterCond">
                 <option value="">Todas</option>
                 <option value="Buena">Buena</option>
@@ -1679,7 +1679,7 @@
               </select>
             </div>
             <div class="cv-form-group">
-              <label>Tipo de Vivienda</label>
+              <label>Tipo de Vivienda <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Casa, apartamento, rancho, anexo, quinta, etc."></i></label>
               <select class="cv-form-control" id="advFilterTipo">
                 <option value="">Todos</option>
                 <option value="Casa">Casa</option>
@@ -1691,7 +1691,7 @@
               </select>
             </div>
             <div class="cv-form-group">
-              <label>Tenencia</label>
+              <label>Tenencia <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si la vivienda es propia, alquilada, prestada, etc."></i></label>
               <select class="cv-form-control" id="advFilterTenencia">
                 <option value="">Todas</option>
                 <option value="Propia">Propia</option>
@@ -1702,7 +1702,7 @@
               </select>
             </div>
             <div class="cv-form-group">
-              <label>Material de Paredes</label>
+              <label>Material de Paredes <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Material predominante: bloque, adobe, madera, zinc, etc."></i></label>
               <select class="cv-form-control" id="advFilterParedes">
                 <option value="">Todos</option>
                 <option value="Bloque obra limpia">Bloque obra limpia</option>
@@ -1714,7 +1714,7 @@
               </select>
             </div>
             <div class="cv-form-group">
-              <label>Material de Techo</label>
+              <label>Material de Techo <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Material predominante: platabanda, acerolit, asbesto, etc."></i></label>
               <select class="cv-form-control" id="advFilterTecho">
                 <option value="">Todos</option>
                 <option value="Platabanda">Platabanda</option>
@@ -1725,7 +1725,7 @@
               </select>
             </div>
             <div class="cv-form-group">
-              <label>Agua Potable</label>
+              <label>Agua Potable <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Vía de obtención de agua potable (Acueducto, cisterna, pozo)"></i></label>
               <select class="cv-form-control" id="advFilterAgua">
                 <option value="">Todos</option>
                 <option value="Acueducto">Acueducto (Tubería)</option>
@@ -1736,7 +1736,7 @@
               </select>
             </div>
             <div class="cv-form-group">
-              <label>Gas Doméstico</label>
+              <label>Gas Doméstico <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Vía de obtención de gas (Bombona estadal, privada, directo)"></i></label>
               <select class="cv-form-control" id="advFilterGas">
                 <option value="">Todos</option>
                 <option value="Bombona">Bombona</option>
@@ -1778,7 +1778,7 @@
             por favor ingrese su clave de usuario.</p>
 
           <div class="cv-form-group" style="text-align: left;">
-            <label>Contraseña</label>
+            <label>Contraseña <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese una clave de acceso segura"></i></label>
             <input type="password" class="cv-form-control" id="verifyPasswordInput" placeholder="********">
             <div id="verifyPasswordError"
               style="color: #E53935; font-size: .75rem; margin-top: .4rem; display: none; font-weight: 600;"><i
@@ -1873,11 +1873,11 @@
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
                   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.4rem;">
-                    <label for="planillaNro" style="margin:0;">N° de Planilla <span class="req">*</span></label>
+                    <label for="planillaNro" style="margin:0;">N° de Planilla <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                     <label
                       style="font-size:0.7rem; color:var(--gray5); font-weight:normal; cursor:pointer; display:flex; align-items:center; gap:4px; margin:0;">
                       <input type="checkbox" id="chkPlanillaAuto" checked> Auto
-                    </label>
+                     <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   </div>
                   <input type="text" class="cv-form-control" id="planillaNro" placeholder="N° de Planilla" required
                     readonly
@@ -1885,17 +1885,17 @@
                 </div>
                 <div class="cv-form-group">
                   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.4rem;">
-                    <label for="fechaCenso" style="margin:0;">Fecha del Censo <span class="req">*</span></label>
+                    <label for="fechaCenso" style="margin:0;">Fecha del Censo <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Fecha en la que se realizó la encuesta presencial"></i></label>
                     <label
                       style="font-size:0.7rem; color:var(--gray5); font-weight:normal; cursor:pointer; display:flex; align-items:center; gap:4px; margin:0;">
                       <input type="checkbox" id="chkFechaAuto" checked> Auto
-                    </label>
+                     <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   </div>
                   <input type="date" class="cv-form-control" id="fechaCenso" required readonly
                     style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
                 </div>
                 <div class="cv-form-group">
-                  <label for="consejoComunalCab">Consejo Comunal <span class="req">*</span></label>
+                  <label for="consejoComunalCab">Consejo Comunal <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el consejo comunal al que pertenece"></i></label>
                   <select class="cv-form-control" id="consejoComunalCab" required>
                     <option value="">Seleccione...</option>
                     <option value="Jobito I">C.C. Jobito I</option>
@@ -1913,13 +1913,13 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="encuestadorNombre">Nombre del Encuestador <span class="req">*</span></label>
+                  <label for="encuestadorNombre">Nombre del Encuestador <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese los nombres y apellidos completos"></i></label>
                   <input type="text" class="cv-form-control" id="encuestadorNombre" placeholder="Nombre completo"
                     required readonly
                     style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
                 </div>
                 <div class="cv-form-group">
-                  <label for="encuestadorCedula">Cédula del Encuestador <span class="req">*</span></label>
+                  <label for="encuestadorCedula">Cédula del Encuestador <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese el número de cédula de identidad sin puntos ni guiones"></i></label>
                   <input type="text" class="cv-form-control" id="encuestadorCedula" data-mask="cedula"
                     placeholder="Ej. V-12.345.678" required readonly
                     style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
@@ -1930,11 +1930,11 @@
                 <label style="font-size:0.85rem;cursor:pointer;display:flex;align-items:center;gap:8px;">
                   <input type="checkbox" id="chkEncuestadoEsJefe">
                   ¿El encuestado es el jefe(a) de familia? (se completará automáticamente en el Paso 3)
-                </label>
+                 <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Persona que proporcionó la información al momento del censo"></i></label>
               </div>
               <div class="cv-form-row cv-grid-2">
                 <div class="cv-form-group">
-                  <label for="encuestadoCedula">Cédula del Encuestado <span class="req">*</span></label>
+                  <label for="encuestadoCedula">Cédula del Encuestado <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese el número de cédula de identidad sin puntos ni guiones"></i></label>
                   <div class="cv-input-group">
                     <input type="text" class="cv-form-control" id="encuestadoCedula" data-mask="cedula"
                       placeholder="Ej. V-12.345.678" required>
@@ -1943,7 +1943,7 @@
                   </div>
                 </div>
                 <div class="cv-form-group">
-                  <label for="encuestadoNombre">Nombre del Encuestado <span class="req">*</span></label>
+                  <label for="encuestadoNombre">Nombre del Encuestado <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese los nombres y apellidos completos"></i></label>
                   <input type="text" class="cv-form-control" id="encuestadoNombre" placeholder="Nombre completo"
                     required readonly
                     style="background-color: var(--gray1); font-weight: 700; color: var(--vp); border-style: dashed;">
@@ -1974,12 +1974,12 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="calleAvenida">Calle / Avenida <span class="req">*</span></label>
+                  <label for="calleAvenida">Calle / Avenida <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Nombre de la calle, avenida o vereda donde se ubica la vivienda"></i></label>
                   <input type="text" class="cv-form-control" id="calleAvenida"
                     placeholder="Ej. Calle El Progreso, Av. Principal..." required>
                 </div>
                 <div class="cv-form-group">
-                  <label for="numeroCasa">N° de Casa / Apartamento <span class="req">*</span></label>
+                  <label for="numeroCasa">N° de Casa / Apartamento <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <input type="text" class="cv-form-control" id="numeroCasa" placeholder="Ej. Casa #12, Apto 3-B..."
                     required>
                 </div>
@@ -1987,7 +1987,7 @@
 
               <div class="cv-form-group">
                 <label for="direccionExacta">Referencia de Ubicación <span
-                    style="color:var(--gray4);font-weight:400;">(opcional)</span></label>
+                    style="color:var(--gray4);font-weight:400;">(opcional)</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Lugar conocido, bodega o punto de referencia cercano"></i></label>
                 <textarea class="cv-form-control" id="direccionExacta" rows="2"
                   placeholder="Puntos de referencia, color de la casa, entre calles..."></textarea>
               </div>
@@ -2007,7 +2007,7 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="cedulaJefe">Cédula <span class="req">*</span></label>
+                  <label for="cedulaJefe">Cédula <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese el número de cédula de identidad sin puntos ni guiones"></i></label>
                   <div class="cv-input-group">
                     <input type="text" class="cv-form-control" id="cedulaJefe" data-mask="cedula"
                       placeholder="V-12.345.678" required>
@@ -2017,25 +2017,25 @@
                   <span class="cv-form-hint">Una cédula = una vivienda</span>
                 </div>
                 <div class="cv-form-group">
-                  <label for="jefNombres">Nombres y Apellidos <span class="req">*</span></label>
+                  <label for="jefNombres">Nombres y Apellidos <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese los nombres y apellidos completos"></i></label>
                   <input type="text" class="cv-form-control" id="jefNombres" placeholder="Nombre completo" required>
                 </div>
               </div>
 
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="jefNacionalidad">Nacionalidad</label>
+                  <label for="jefNacionalidad">Nacionalidad <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="País de origen"></i></label>
                   <select class="cv-form-control" id="jefNacionalidad">
                     <option value="V">Venezolano (V)</option>
                     <option value="E">Extranjero (E)</option>
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="jefFechaNac">Fecha de Nacimiento <span class="req">*</span></label>
+                  <label for="jefFechaNac">Fecha de Nacimiento <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione la fecha de nacimiento"></i></label>
                   <input type="date" class="cv-form-control" id="jefFechaNac" required>
                 </div>
                 <div class="cv-form-group">
-                  <label for="jefSexo">Sexo <span class="req">*</span></label>
+                  <label for="jefSexo">Sexo <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el sexo biológico"></i></label>
                   <select class="cv-form-control" id="jefSexo" required>
                     <option value="">Seleccione...</option>
                     <option value="M">Masculino</option>
@@ -2047,7 +2047,7 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="jefEstadoCivil">Estado Civil <span class="req">*</span></label>
+                  <label for="jefEstadoCivil">Estado Civil <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique el estado civil actual"></i></label>
                   <select class="cv-form-control" id="jefEstadoCivil" required>
                     <option value="">Seleccione...</option>
                     <option value="Soltero/a">Soltero(a)</option>
@@ -2058,7 +2058,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="jefNivelInstruccion">Nivel de Instrucción <span class="req">*</span></label>
+                  <label for="jefNivelInstruccion">Nivel de Instrucción <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Último nivel de estudios alcanzado"></i></label>
                   <select class="cv-form-control" id="jefNivelInstruccion" required>
                     <option value="">Seleccione...</option>
                     <option value="Primaria">Primaria</option>
@@ -2074,15 +2074,15 @@
 
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="jefProfesion">Profesión / Oficio</label>
+                  <label for="jefProfesion">Profesión / Oficio <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Profesión u oficio principal"></i></label>
                   <input type="text" class="cv-form-control" id="jefProfesion" placeholder="Ej. Albañil, Maestra...">
                 </div>
                 <div class="cv-form-group">
-                  <label for="jefTiempoComunidad">Tiempo en la Comunidad</label>
+                  <label for="jefTiempoComunidad">Tiempo en la Comunidad <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Años o meses residiendo en el sector"></i></label>
                   <input type="text" class="cv-form-control" id="jefTiempoComunidad" placeholder="Ej. 10 años">
                 </div>
                 <div class="cv-form-group">
-                  <label for="jefInscritoCNE">¿Inscrito en el CNE?</label>
+                  <label for="jefInscritoCNE">¿Inscrito en el CNE? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si está inscrito como elector en el CNE"></i></label>
                   <select class="cv-form-control" id="jefInscritoCNE">
                     <option value="">Seleccione...</option>
                     <option value="Si">Sí</option>
@@ -2093,18 +2093,18 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="jefTelfCel">Teléfono Celular</label>
+                  <label for="jefTelfCel">Teléfono Celular <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Número de teléfono de contacto (Ej: 0414-1234567)"></i></label>
                   <input type="tel" class="cv-form-control" id="jefTelfCel" placeholder="Ej. 0414-1234567">
                 </div>
                 <div class="cv-form-group">
-                  <label for="jefEmail">Correo Electrónico</label>
+                  <label for="jefEmail">Correo Electrónico <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Dirección de correo electrónico válida"></i></label>
                   <input type="email" class="cv-form-control" id="jefEmail" placeholder="correo@ejemplo.com">
                 </div>
               </div>
 
               <div class="cv-form-row cv-grid-2">
                 <div class="cv-form-group">
-                  <label for="jefIncapacitado">¿Tiene Incapacidad?</label>
+                  <label for="jefIncapacitado">¿Tiene Incapacidad? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="jefIncapacitado">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
@@ -2112,7 +2112,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="jefTipoIncapacidad">Tipo de Incapacidad</label>
+                  <label for="jefTipoIncapacidad">Tipo de Incapacidad <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Especifique el tipo de discapacidad (Ej. Motora, Visual)"></i></label>
                   <input type="text" class="cv-form-control" id="jefTipoIncapacidad" placeholder="Especifique si aplica"
                     disabled>
                 </div>
@@ -2130,12 +2130,12 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="cantidadHabitantes">Cantidad de Integrantes Extra (Sin contar al Jefe) <span class="req">*</span></label>
+                  <label for="cantidadHabitantes">Cantidad de Integrantes Extra (Sin contar al Jefe) <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Datos del jefe o jefa principal de la familia"></i></label>
                   <input type="number" class="cv-form-control" id="cantidadHabitantes" min="0" max="30"
                     placeholder="Ej. 2" required>
                 </div>
                 <div class="cv-form-group">
-                  <label for="condicionGeneral">Condición General de la Vivienda <span class="req">*</span></label>
+                  <label for="condicionGeneral">Condición General de la Vivienda <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="condicionGeneral" required>
                     <option value="">Seleccione...</option>
                     <option value="Buena">✅ Buena</option>
@@ -2158,7 +2158,7 @@
                   </div>
                   <div class="cv-form-row cv-grid-3">
                     <div class="cv-form-group">
-                      <label>Cédula / Fecha Nacimiento</label>
+                      <label>Cédula / Fecha Nacimiento <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese el número de cédula de identidad sin puntos ni guiones"></i></label>
                       <div class="cv-input-group">
                         <input type="text" class="cv-form-control fam-cedula" placeholder="V-XX.XXX.XXX">
                         <button type="button" class="cv-btn-validate btn-validar-fam"><i
@@ -2166,11 +2166,11 @@
                       </div>
                     </div>
                     <div class="cv-form-group">
-                      <label>Nombres y Apellidos</label>
+                      <label>Nombres y Apellidos <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese los nombres y apellidos completos"></i></label>
                       <input type="text" class="cv-form-control fam-nombres" placeholder="Nombres y apellidos">
                     </div>
                     <div class="cv-form-group">
-                      <label>Parentesco</label>
+                      <label>Parentesco <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                       <select class="cv-form-control fam-parentesco">
                         <option value="">Seleccione...</option>
                         <option value="Cónyuge">Cónyuge</option>
@@ -2185,7 +2185,7 @@
                   </div>
                   <div class="cv-form-row cv-grid-3" style="margin-top:.5rem">
                     <div class="cv-form-group">
-                      <label>Sexo</label>
+                      <label>Sexo <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el sexo biológico"></i></label>
                       <select class="cv-form-control fam-sexo">
                         <option value="">Seleccione...</option>
                         <option value="M">Masculino</option>
@@ -2193,7 +2193,7 @@
                       </select>
                     </div>
                     <div class="cv-form-group">
-                      <label>Grado de Instrucción</label>
+                      <label>Grado de Instrucción <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                       <select class="cv-form-control fam-instruccion">
                         <option value="">Seleccione...</option>
                         <option value="Sin instrucción">Sin instrucción</option>
@@ -2204,7 +2204,7 @@
                       </select>
                     </div>
                     <div class="cv-form-group">
-                      <label>Pensionado</label>
+                      <label>Pensionado <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si recibe pensión del estado"></i></label>
                       <select class="cv-form-control fam-pensionado">
                         <option value="No">No</option>
                         <option value="Si">Sí</option>
@@ -2231,7 +2231,7 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="trabaja">¿Trabaja actualmente? <span class="req">*</span></label>
+                  <label for="trabaja">¿Trabaja actualmente? <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si tiene un empleo activo y remunerado"></i></label>
                   <select class="cv-form-control" id="trabaja" required>
                     <option value="">Seleccione...</option>
                     <option value="Si">Sí</option>
@@ -2239,7 +2239,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="dondeTrabaja">¿Dónde trabaja?</label>
+                  <label for="dondeTrabaja">¿Dónde trabaja? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="dondeTrabaja">
                     <option value="">Seleccione...</option>
                     <option value="Institución Pública">Institución Pública</option>
@@ -2254,7 +2254,7 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="ingresoFamiliarRango">Rango de Ingreso Familiar <span class="req">*</span></label>
+                  <label for="ingresoFamiliarRango">Rango de Ingreso Familiar <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Suma estimada de ingresos de todo el núcleo familiar"></i></label>
                   <select class="cv-form-control" id="ingresoFamiliarRango" required>
                     <option value="">Seleccione rango...</option>
                     <option value="Menos de 1 salario">Menos de 1 salario mínimo</option>
@@ -2265,14 +2265,14 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="ingresoBs">Ingreso mensual aprox. (Bs.)</label>
+                  <label for="ingresoBs">Ingreso mensual aprox. (Bs.) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Monto estimado de ingresos personales al mes"></i></label>
                   <input type="number" class="cv-form-control" id="ingresoBs" min="0" placeholder="Ej. 500">
                 </div>
               </div>
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="actividadComercialVivienda">¿Realiza actividad comercial en la vivienda?</label>
+                  <label for="actividadComercialVivienda">¿Realiza actividad comercial en la vivienda? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="actividadComercialVivienda">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
@@ -2280,7 +2280,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="ventasDe">¿Qué vende / produce?</label>
+                  <label for="ventasDe">¿Qué vende / produce? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <input type="text" class="cv-form-control" id="ventasDe"
                     placeholder="Ej. Empanadas, helados, artesanía..." disabled>
                 </div>
@@ -2299,7 +2299,7 @@
 
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="tipoVivienda">Tipo de Vivienda <span class="req">*</span></label>
+                  <label for="tipoVivienda">Tipo de Vivienda <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Casa, apartamento, rancho, anexo, quinta, etc."></i></label>
                   <select class="cv-form-control" id="tipoVivienda" required>
                     <option value="">Seleccione...</option>
                     <option value="Quinta">🏡 Quinta</option>
@@ -2311,7 +2311,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="tenencia">Régimen de Tenencia <span class="req">*</span></label>
+                  <label for="tenencia">Régimen de Tenencia <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si la vivienda es propia, alquilada, prestada, etc."></i></label>
                   <select class="cv-form-control" id="tenencia" required>
                     <option value="">Seleccione...</option>
                     <option value="Propia">🏠 Propia</option>
@@ -2322,7 +2322,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="condicionesTerreno">Condiciones del Terreno <span class="req">*</span></label>
+                  <label for="condicionesTerreno">Condiciones del Terreno <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="condicionesTerreno" required>
                     <option value="">Seleccione...</option>
                     <option value="Estable">✅ Estable</option>
@@ -2335,7 +2335,7 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="materialParedes">Material de Paredes <span class="req">*</span></label>
+                  <label for="materialParedes">Material de Paredes <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Material predominante: bloque, adobe, madera, zinc, etc."></i></label>
                   <select class="cv-form-control" id="materialParedes" required>
                     <option value="">Seleccione...</option>
                     <option value="Frisadas">Bloque / Frisadas</option>
@@ -2347,7 +2347,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="materialTecho">Material de Techo <span class="req">*</span></label>
+                  <label for="materialTecho">Material de Techo <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Material predominante: platabanda, acerolit, asbesto, etc."></i></label>
                   <select class="cv-form-control" id="materialTecho" required>
                     <option value="">Seleccione...</option>
                     <option value="Platabanda">Platabanda (concreto)</option>
@@ -2361,15 +2361,15 @@
 
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="numCuartos">N° de Cuartos</label>
+                  <label for="numCuartos">N° de Cuartos <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <input type="number" class="cv-form-control" id="numCuartos" min="0" placeholder="Ej. 3">
                 </div>
                 <div class="cv-form-group">
-                  <label for="numBanos">N° de Baños</label>
+                  <label for="numBanos">N° de Baños <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <input type="number" class="cv-form-control" id="numBanos" min="0" placeholder="Ej. 1">
                 </div>
                 <div class="cv-form-group">
-                  <label for="ambientesVivienda">Ambientes disponibles</label>
+                  <label for="ambientesVivienda">Ambientes disponibles <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <input type="text" class="cv-form-control" id="ambientesVivienda"
                     placeholder="Sala, comedor, cocina...">
                 </div>
@@ -2377,7 +2377,7 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="terrenoPropio">¿Terreno Propio?</label>
+                  <label for="terrenoPropio">¿Terreno Propio? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="terrenoPropio">
                     <option value="">Seleccione...</option>
                     <option value="Si">Sí</option>
@@ -2385,7 +2385,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="inscritaSIVIH">¿Inscrita en SIVIH?</label>
+                  <label for="inscritaSIVIH">¿Inscrita en SIVIH? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="inscritaSIVIH">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
@@ -2396,7 +2396,7 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="requiereAyuda">¿Requiere ayuda de mejora?</label>
+                  <label for="requiereAyuda">¿Requiere ayuda de mejora? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="requiereAyuda">
                     <option value="Ninguna">Ninguna</option>
                     <option value="Rehabilitación">Rehabilitación</option>
@@ -2404,7 +2404,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="condicionesSalubridad">Condiciones de Salubridad <span class="text-danger">*</span></label>
+                  <label for="condicionesSalubridad">Condiciones de Salubridad <span class="text-danger">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="condicionesSalubridad" required>
                     <option value="">Seleccione...</option>
                     <option value="Buenas">✅ Buenas</option>
@@ -2416,7 +2416,7 @@
 
               <div class="cv-form-row cv-grid-2">
                 <div class="cv-form-group">
-                  <label for="presenciaInsectos">¿Presencia de insectos o roedores?</label>
+                  <label for="presenciaInsectos">¿Presencia de insectos o roedores? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="presenciaInsectos">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
@@ -2424,7 +2424,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="tieneAnimales">¿Tiene animales domésticos?</label>
+                  <label for="tieneAnimales">¿Tiene animales domésticos? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="tieneAnimales">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
@@ -2446,7 +2446,7 @@
 
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="aguasBlancas">Aguas Blancas <span class="req">*</span></label>
+                  <label for="aguasBlancas">Aguas Blancas <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="aguasBlancas" required>
                     <option value="">Seleccione fuente...</option>
                     <option value="Acueducto">💧 Acueducto</option>
@@ -2456,11 +2456,11 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="tieneTanque">¿Tiene tanque? (litros)</label>
+                  <label for="tieneTanque">¿Tiene tanque? (litros) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <input type="number" class="cv-form-control" id="tieneTanque" min="0" placeholder="0 = No tiene">
                 </div>
                 <div class="cv-form-group">
-                  <label for="tieneMedidorAgua">¿Tiene medidor de agua?</label>
+                  <label for="tieneMedidorAgua">¿Tiene medidor de agua? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="tieneMedidorAgua">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
@@ -2471,7 +2471,7 @@
 
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="aguasServidas">Aguas Servidas <span class="req">*</span></label>
+                  <label for="aguasServidas">Aguas Servidas <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="aguasServidas" required>
                     <option value="">Seleccione...</option>
                     <option value="Cloacas">🏗️ Cloacas</option>
@@ -2481,7 +2481,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="sistemaElectrico">Sistema Eléctrico <span class="req">*</span></label>
+                  <label for="sistemaElectrico">Sistema Eléctrico <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="sistemaElectrico" required>
                     <option value="">Seleccione...</option>
                     <option value="Pública">⚡ Red pública</option>
@@ -2490,7 +2490,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="tieneMedidorLuz">¿Tiene medidor de luz?</label>
+                  <label for="tieneMedidorLuz">¿Tiene medidor de luz? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="tieneMedidorLuz">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
@@ -2501,7 +2501,7 @@
 
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="gasDomestico">Gas Doméstico <span class="req">*</span></label>
+                  <label for="gasDomestico">Gas Doméstico <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Vía de obtención de gas (Bombona estadal, privada, directo)"></i></label>
                   <select class="cv-form-control" id="gasDomestico" required>
                     <option value="">Seleccione...</option>
                     <option value="Bombona">🔴 Bombona</option>
@@ -2510,12 +2510,12 @@
                   </select>
                 </div>
                 <div class="cv-form-group" id="rowCilindrosGas">
-                  <label for="cantidadCilindrosGas">N° Cilindros de Gas</label>
+                  <label for="cantidadCilindrosGas">N° Cilindros de Gas <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <input type="number" class="cv-form-control" id="cantidadCilindrosGas" min="1" placeholder="Ej. 2"
                     disabled>
                 </div>
                 <div class="cv-form-group">
-                  <label for="gasEmpresa">Empresa que suministra</label>
+                  <label for="gasEmpresa">Empresa que suministra <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <input type="text" class="cv-form-control" id="gasEmpresa"
                     placeholder="Ej. PDVSA Gas, Distribuidor...">
                 </div>
@@ -2523,7 +2523,7 @@
 
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="recoleccionBasura">Recolección de Basura <span class="req">*</span></label>
+                  <label for="recoleccionBasura">Recolección de Basura <span class="req">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="recoleccionBasura" required>
                     <option value="">Seleccione...</option>
                     <option value="Aseo urbano">🗑️ Aseo urbano</option>
@@ -2533,7 +2533,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="telefoniaServicio">Telefonía <span class="text-danger">*</span></label>
+                  <label for="telefoniaServicio">Telefonía <span class="text-danger">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="telefoniaServicio" required>
                     <option value="">Seleccione...</option>
                     <option value="Movistar">📱 Movistar</option>
@@ -2544,7 +2544,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="transporte">Transporte cercano <span class="text-danger">*</span></label>
+                  <label for="transporte">Transporte cercano <span class="text-danger">*</span> <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="transporte" required>
                     <option value="">Seleccione...</option>
                     <option value="Bus público">🚌 Bus público</option>
@@ -2556,7 +2556,7 @@
               </div>
 
               <div class="cv-form-group">
-                <label for="bombillosNecesita">Bombillos ahorradores que necesita (cantidad)</label>
+                <label for="bombillosNecesita">Bombillos ahorradores que necesita (cantidad) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                 <input type="number" class="cv-form-control" id="bombillosNecesita" min="0" placeholder="Ej. 4"
                   style="max-width:200px">
               </div>
@@ -2572,44 +2572,44 @@
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
-                <label>Enfermedades en el núcleo familiar (marque todas las que apliquen)</label>
+                <label>Enfermedades en el núcleo familiar (marque todas las que apliquen) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Este campo se calcula automáticamente"></i></label>
                 <div class="cv-service-grid">
                   <label class="cv-service-card" id="enf-cancer">
                     <input type="checkbox" name="enfermedades" value="Cancer">
                     <div class="cv-check-mark"><i class="fas fa-check"></i></div>
                     <i class="fas fa-ribbon"></i><span>Cáncer</span>
-                  </label>
+                   <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <label class="cv-service-card" id="enf-diabetes">
                     <input type="checkbox" name="enfermedades" value="Diabetes">
                     <div class="cv-check-mark"><i class="fas fa-check"></i></div>
                     <i class="fas fa-syringe"></i><span>Diabetes</span>
-                  </label>
+                   <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <label class="cv-service-card" id="enf-asma">
                     <input type="checkbox" name="enfermedades" value="Asma">
                     <div class="cv-check-mark"><i class="fas fa-check"></i></div>
                     <i class="fas fa-lungs"></i><span>Asma</span>
-                  </label>
+                   <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <label class="cv-service-card" id="enf-hipertension">
                     <input type="checkbox" name="enfermedades" value="Hipertensión">
                     <div class="cv-check-mark"><i class="fas fa-check"></i></div>
                     <i class="fas fa-heart"></i><span>Hipertensión</span>
-                  </label>
+                   <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <label class="cv-service-card" id="enf-renal">
                     <input type="checkbox" name="enfermedades" value="Renal">
                     <div class="cv-check-mark"><i class="fas fa-check"></i></div>
                     <i class="fas fa-kidneys"></i><span>Renal</span>
-                  </label>
+                   <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <label class="cv-service-card" id="enf-ninguna">
                     <input type="checkbox" name="enfermedades" value="Ninguna">
                     <div class="cv-check-mark"><i class="fas fa-check"></i></div>
                     <i class="fas fa-circle-check"></i><span>Ninguna</span>
-                  </label>
+                   <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                 </div>
               </div>
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="necesitaAyudaEspecial">¿Necesita ayuda especial?</label>
+                  <label for="necesitaAyudaEspecial">¿Necesita ayuda especial? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="necesitaAyudaEspecial">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
@@ -2617,7 +2617,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="cualAyudaEspecial">¿Cuál ayuda especial?</label>
+                  <label for="cualAyudaEspecial">¿Cuál ayuda especial? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <input type="text" class="cv-form-control" id="cualAyudaEspecial"
                     placeholder="Silla de ruedas, prótesis, medicamentos..." disabled>
                 </div>
@@ -2628,15 +2628,15 @@
               </div>
               <div class="cv-form-row cv-grid-3">
                 <div class="cv-form-group">
-                  <label for="exclusionNinosCalle">Niños en situación de calle</label>
+                  <label for="exclusionNinosCalle">Niños en situación de calle <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Nombre de la calle, avenida o vereda donde se ubica la vivienda"></i></label>
                   <input type="number" class="cv-form-control" id="exclusionNinosCalle" min="0" placeholder="0">
                 </div>
                 <div class="cv-form-group">
-                  <label for="exclusionDiscapacitados">Con discapacidad</label>
+                  <label for="exclusionDiscapacitados">Con discapacidad <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <input type="number" class="cv-form-control" id="exclusionDiscapacitados" min="0" placeholder="0">
                 </div>
                 <div class="cv-form-group">
-                  <label for="exclusionTerceraEdad">Tercera edad (60+)</label>
+                  <label for="exclusionTerceraEdad">Tercera edad (60+) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Este campo se calcula automáticamente"></i></label>
                   <input type="number" class="cv-form-control" id="exclusionTerceraEdad" min="0" placeholder="0">
                 </div>
               </div>
@@ -2653,7 +2653,7 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="existenOrgComunitarias">¿Existen organizaciones comunitarias en el sector?</label>
+                  <label for="existenOrgComunitarias">¿Existen organizaciones comunitarias en el sector? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="existenOrgComunitarias">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
@@ -2661,7 +2661,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="cualesOrgComunitarias">¿Cuáles organizaciones?</label>
+                  <label for="cualesOrgComunitarias">¿Cuáles organizaciones? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <input type="text" class="cv-form-control" id="cualesOrgComunitarias"
                     placeholder="Ej. Comité de salud, Misiones..." disabled>
                 </div>
@@ -2669,7 +2669,7 @@
 
               <div class="cv-form-row cv-grid-3" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="participaUsted">¿Participa usted?</label>
+                  <label for="participaUsted">¿Participa usted? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="participaUsted">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
@@ -2677,7 +2677,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="participaFamiliar">¿Participa algún familiar?</label>
+                  <label for="participaFamiliar">¿Participa algún familiar? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="participaFamiliar">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
@@ -2685,7 +2685,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="asisteAsambleas">¿Asiste a asambleas de ciudadanos?</label>
+                  <label for="asisteAsambleas">¿Asiste a asambleas de ciudadanos? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="asisteAsambleas">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
@@ -2696,7 +2696,7 @@
 
               <div class="cv-form-row cv-grid-2" style="margin-bottom:1rem">
                 <div class="cv-form-group">
-                  <label for="infoCCs">¿Tiene información sobre Consejos Comunales?</label>
+                  <label for="infoCCs">¿Tiene información sobre Consejos Comunales? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                   <select class="cv-form-control" id="infoCCs">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
@@ -2704,7 +2704,7 @@
                   </select>
                 </div>
                 <div class="cv-form-group">
-                  <label for="dispuestoApoyar">¿Dispuesto a apoyar el Consejo Comunal?</label>
+                  <label for="dispuestoApoyar">¿Dispuesto a apoyar el Consejo Comunal? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el consejo comunal al que pertenece"></i></label>
                   <select class="cv-form-control" id="dispuestoApoyar">
                     <option value="">Seleccione...</option>
                     <option value="No">No</option>
@@ -2714,13 +2714,13 @@
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
-                <label for="misiones">Misiones implementadas en el sector</label>
+                <label for="misiones">Misiones implementadas en el sector <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                 <input type="text" class="cv-form-control" id="misiones"
                   placeholder="Ej. Barrio Adentro, Mercal, CLAP, Madres del Barrio...">
               </div>
 
               <div class="cv-form-group">
-                <label for="areaTrabajoInteres">Área de trabajo de interés comunitario (máx. 3)</label>
+                <label for="areaTrabajoInteres">Área de trabajo de interés comunitario (máx. 3) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                 <input type="text" class="cv-form-control" id="areaTrabajoInteres"
                   placeholder="Ej. Salud, Educación, Infraestructura...">
               </div>
@@ -2736,31 +2736,31 @@
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
-                <label for="potencialidadesComunidad">Principales potencialidades y ventajas del sector</label>
+                <label for="potencialidadesComunidad">Principales potencialidades y ventajas del sector <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                 <textarea class="cv-form-control" id="potencialidadesComunidad" rows="3"
                   placeholder="Describa las fortalezas, recursos, ventajas geográficas, talentos de la comunidad..."></textarea>
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
-                <label for="problemasComunidad">Principales problemas y debilidades del sector</label>
+                <label for="problemasComunidad">Principales problemas y debilidades del sector <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                 <textarea class="cv-form-control" id="problemasComunidad" rows="3"
                   placeholder="Vías, drenajes, seguridad, agua, luz, gas, transporte, salud..."></textarea>
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
-                <label for="comoResolverProblemas">¿Cómo propone resolver los problemas del sector?</label>
+                <label for="comoResolverProblemas">¿Cómo propone resolver los problemas del sector? <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                 <textarea class="cv-form-control" id="comoResolverProblemas" rows="2"
                   placeholder="Propuestas del encuestado..."></textarea>
               </div>
 
               <div class="cv-form-group" style="margin-bottom:1rem">
-                <label for="tipoProyectosDeseados">Tipo de proyectos deseados</label>
+                <label for="tipoProyectosDeseados">Tipo de proyectos deseados <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione la categoría o tipo correspondiente"></i></label>
                 <input type="text" class="cv-form-control" id="tipoProyectosDeseados"
                   placeholder="Ej. Vialidad, canchas, módulos de salud...">
               </div>
 
               <div class="cv-form-group">
-                <label for="observaciones">Observaciones generales adicionales</label>
+                <label for="observaciones">Observaciones generales adicionales <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
                 <textarea class="cv-form-control" id="observaciones" rows="3"
                   placeholder="Daños visibles, necesidades urgentes, situación especial de la familia..."></textarea>
               </div>
@@ -2821,14 +2821,14 @@
         <div class="cv-modal-body" style="padding: 1.5rem; max-height: 70vh; overflow-y: auto;">
           <div class="cv-form-row cv-grid-2" style="margin-bottom: 1rem;">
             <div class="cv-form-group">
-              <label>Consejo Comunal</label>
+              <label>Consejo Comunal <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el consejo comunal al que pertenece"></i></label>
               <select class="cv-form-control" id="advFilterCC">
                 <option value="">Todos</option>
                 <!-- JS Llenará esto -->
               </select>
             </div>
             <div class="cv-form-group">
-              <label>Condición General</label>
+              <label>Condición General <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
               <select class="cv-form-control" id="advFilterCond">
                 <option value="">Todas</option>
                 <option value="Buena">Buena</option>
@@ -2841,7 +2841,7 @@
 
           <div class="cv-form-row cv-grid-2" style="margin-bottom: 1rem;">
             <div class="cv-form-group">
-              <label>Servicio de Gas</label>
+              <label>Servicio de Gas <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
               <select class="cv-form-control" id="advFilterGas">
                 <option value="">Todos</option>
                 <option value="Si">Con Gas (Bombona/Tubería)</option>
@@ -2849,7 +2849,7 @@
               </select>
             </div>
             <div class="cv-form-group">
-              <label>Servicio de Agua</label>
+              <label>Servicio de Agua <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
               <select class="cv-form-control" id="advFilterAgua">
                 <option value="">Todos</option>
                 <option value="Acueducto">Acueducto</option>
@@ -2862,7 +2862,7 @@
 
           <div class="cv-form-row cv-grid-2" style="margin-bottom: 1rem;">
             <div class="cv-form-group">
-              <label>Tipo de Vivienda</label>
+              <label>Tipo de Vivienda <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Casa, apartamento, rancho, anexo, quinta, etc."></i></label>
               <select class="cv-form-control" id="advFilterTipo">
                 <option value="">Todos</option>
                 <option value="Casa">Casa</option>
@@ -2874,7 +2874,7 @@
               </select>
             </div>
             <div class="cv-form-group">
-              <label>Tenencia</label>
+              <label>Tenencia <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si la vivienda es propia, alquilada, prestada, etc."></i></label>
               <select class="cv-form-control" id="advFilterTenencia">
                 <option value="">Todas</option>
                 <option value="Propia Pagada">Propia Pagada</option>
@@ -2888,7 +2888,7 @@
 
           <div class="cv-form-row cv-grid-2">
             <div class="cv-form-group">
-              <label>Material de Paredes</label>
+              <label>Material de Paredes <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Material predominante: bloque, adobe, madera, zinc, etc."></i></label>
               <select class="cv-form-control" id="advFilterParedes">
                 <option value="">Todos</option>
                 <option value="Bloque/Ladrillo">Bloque/Ladrillo</option>
@@ -2899,7 +2899,7 @@
               </select>
             </div>
             <div class="cv-form-group">
-              <label>Material del Techo</label>
+              <label>Material del Techo <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
               <select class="cv-form-control" id="advFilterTecho">
                 <option value="">Todos</option>
                 <option value="Platabanda">Platabanda</option>
@@ -3518,18 +3518,18 @@
         </button>
         <div class="cv-form-row cv-grid-3">
           <div class="cv-form-group">
-            <label>Cédula / Fecha Nacimiento</label>
+            <label>Cédula / Fecha Nacimiento <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese el número de cédula de identidad sin puntos ni guiones"></i></label>
             <div class="cv-input-group">
               <input type="text" class="cv-form-control fam-cedula" placeholder="V-XX.XXX.XXX">
               <button type="button" class="cv-btn-validate btn-validar-fam"><i class="fas fa-magnifying-glass"></i></button>
             </div>
           </div>
           <div class="cv-form-group">
-            <label>Nombres y Apellidos</label>
+            <label>Nombres y Apellidos <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese los nombres y apellidos completos"></i></label>
             <input type="text" class="cv-form-control fam-nombres" placeholder="Nombres y apellidos">
           </div>
           <div class="cv-form-group">
-            <label>Parentesco</label>
+            <label>Parentesco <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <select class="cv-form-control fam-parentesco">
               <option value="">Seleccione...</option>
               <option value="Cónyuge">Cónyuge</option>
@@ -3544,7 +3544,7 @@
         </div>
         <div class="cv-form-row cv-grid-3" style="margin-top:.5rem">
           <div class="cv-form-group">
-            <label>Sexo</label>
+            <label>Sexo <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el sexo biológico"></i></label>
             <select class="cv-form-control fam-sexo">
               <option value="">Seleccione...</option>
               <option value="M">Masculino</option>
@@ -3552,7 +3552,7 @@
             </select>
           </div>
           <div class="cv-form-group">
-            <label>Grado de Instrucción</label>
+            <label>Grado de Instrucción <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <select class="cv-form-control fam-instruccion">
               <option value="">Seleccione...</option>
               <option value="Sin instrucción">Sin instrucción</option>
@@ -3563,7 +3563,7 @@
             </select>
           </div>
           <div class="cv-form-group">
-            <label>Pensionado</label>
+            <label>Pensionado <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si recibe pensión del estado"></i></label>
             <select class="cv-form-control fam-pensionado">
               <option value="No">No</option>
               <option value="Si">Sí</option>
@@ -3905,13 +3905,13 @@
             <i class="fas fa-home"></i> Datos Estructurales
           </div>
           <div class="mfg-3" style="margin-bottom: 1.5rem;">
-            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Tipo de Vivienda</label><span style="font-weight:500;">${tipoVivienda}</span></div>
-            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Condición</label><span style="font-weight:500;">${condicion}</span></div>
-            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Tenencia</label><span style="font-weight:500;">${tenencia}</span></div>
-            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Paredes</label><span style="font-weight:500;">${paredes}</span></div>
-            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Techo</label><span style="font-weight:500;">${techo}</span></div>
-            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Habitaciones</label><span style="font-weight:500;">${numHabitaciones}</span></div>
-            <div style="grid-column: 1 / -1;"><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Dirección Exacta</label><span style="font-weight:500;">${direccion}</span></div>
+            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Tipo de Vivienda <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Casa, apartamento, rancho, anexo, quinta, etc."></i></label><span style="font-weight:500;">${tipoVivienda}</span></div>
+            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Condición <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label><span style="font-weight:500;">${condicion}</span></div>
+            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Tenencia <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si la vivienda es propia, alquilada, prestada, etc."></i></label><span style="font-weight:500;">${tenencia}</span></div>
+            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Paredes <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label><span style="font-weight:500;">${paredes}</span></div>
+            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Techo <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label><span style="font-weight:500;">${techo}</span></div>
+            <div><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Habitaciones <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label><span style="font-weight:500;">${numHabitaciones}</span></div>
+            <div style="grid-column: 1 / -1;"><label style="font-weight:700; color:var(--vp); display:block; font-size:0.8rem;">Dirección Exacta <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Escriba la dirección exacta o punto de referencia"></i></label><span style="font-weight:500;">${direccion}</span></div>
           </div>
           
           <div class="mfg-2" style="margin-bottom: 1.5rem; align-items: start;">

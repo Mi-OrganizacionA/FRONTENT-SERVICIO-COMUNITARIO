@@ -290,15 +290,15 @@
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;">
           
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Fecha Desde</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Fecha Desde <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <input type="date" id="filtroDesde" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; transition:border 0.2s;">
           </div>
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Fecha Hasta</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Fecha Hasta <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <input type="date" id="filtroHasta" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; transition:border 0.2s;">
           </div>
           <div class="form-group-sicag" style="grid-column:1/-1;">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Consejo Comunal</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Consejo Comunal <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el consejo comunal al que pertenece"></i></label>
             <select id="filtroConsejo" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; transition:border 0.2s; background:#fff;">
               <option value="">Todos los Consejos Comunales</option>
               <option value="1">Jobito I</option>
@@ -314,27 +314,27 @@
           </div>
           <div class="form-group-sicag" style="grid-column:1/-1; background:#f0fdf4; border:1px solid #bbf7d0; padding:1rem; border-radius:8px; display:flex; align-items:center; gap:0.5rem; margin-top:0.5rem;">
             <input type="checkbox" id="chkNacimiento" style="width:1.2rem; height:1.2rem; cursor:pointer;">
-            <label for="chkNacimiento" style="font-weight:700; color:#166534; cursor:pointer; margin:0;">Usar Rango de Fechas de Nacimiento (desactiva Edad)</label>
+            <label for="chkNacimiento" style="font-weight:700; color:#166534; cursor:pointer; margin:0;">Usar Rango de Fechas de Nacimiento (desactiva Edad) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Este campo se calcula automáticamente"></i></label>
           </div>
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;" id="lblNacMin">F. Nacimiento Desde</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;" id="lblNacMin">F. Nacimiento Desde <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <input type="date" id="filtroNacMin" class="input-sicag" disabled style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#f3f4f6; cursor:not-allowed;">
           </div>
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;" id="lblNacMax">F. Nacimiento Hasta</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;" id="lblNacMax">F. Nacimiento Hasta <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <input type="date" id="filtroNacMax" class="input-sicag" disabled style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#f3f4f6; cursor:not-allowed;">
           </div>
           
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Mínima</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Mínima <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Este campo se calcula automáticamente"></i></label>
             <input type="number" id="filtroEdadMin" class="input-sicag" placeholder="Ej: 18" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none;">
           </div>
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Máxima</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Máxima <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Este campo se calcula automáticamente"></i></label>
             <input type="number" id="filtroEdadMax" class="input-sicag" placeholder="Ej: 60" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none;">
           </div>
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Género</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Género <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el género de la persona"></i></label>
             <select id="filtroGenero" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
               <option value="">Cualquiera</option>
               <option value="M">Masculino</option>
@@ -343,7 +343,7 @@
           </div>
 
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Condición de Salud</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Condición de Salud <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si es saludable, encamado o posee una condición crónica"></i></label>
             <select id="filtroSalud" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
               <option value="">Todas</option>
               <option value="saludable">Saludable</option>
@@ -353,7 +353,7 @@
             </select>
           </div>
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Elector / Inscrito CNE</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Elector / Inscrito CNE <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si está inscrito como elector en el CNE"></i></label>
             <select id="filtroCne" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
               <option value="">Ambos</option>
               <option value="1">Sí (Inscritos)</option>
@@ -361,7 +361,7 @@
             </select>
           </div>
           <div class="form-group-sicag">
-            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Situación Laboral</label>
+            <label style="font-weight:600; color:#444; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Situación Laboral <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <select id="filtroTrabajo" class="input-sicag" style="width:100%; padding:0.75rem 1rem; border:1px solid #d1d5db; border-radius:8px; font-size:0.95rem; color:#333; outline:none; background:#fff;">
               <option value="">Cualquiera</option>
               <option value="1">Trabaja Actualmente</option>
@@ -374,20 +374,20 @@
         <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed #e5e7eb;">
           <label style="font-weight:700; color:#111; font-size:1rem; margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem;">
             <i class="fas fa-columns" style="color:var(--vp);"></i> ¿Deseas incluir columnas adicionales en el reporte?
-          </label>
+           <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
           <div style="display:flex; flex-wrap:wrap; gap:1.5rem; background:#f8fafc; padding:1rem; border-radius:8px; border:1px solid #e2e8f0;">
             <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
               <input type="checkbox" class="chk-extra" value="telefono"> Teléfono
-            </label>
+             <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Número de teléfono de contacto (Ej: 0414-1234567)"></i></label>
             <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
               <input type="checkbox" class="chk-extra" value="nivel_academico"> Nivel Académico
-            </label>
+             <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
               <input type="checkbox" class="chk-extra" value="trabajo"> Situación Laboral
-            </label>
+             <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.95rem; color:#333; cursor:pointer;">
               <input type="checkbox" class="chk-extra" value="salud"> Condición de Salud
-            </label>
+             <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Indique si es saludable, encamado o posee una condición crónica"></i></label>
           </div>
         </div>
 
@@ -395,7 +395,7 @@
         <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px dashed #e5e7eb;">
           <label style="font-weight:700; color:#111; font-size:1rem; margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem;">
             <i class="fas fa-file-export" style="color:var(--vp);"></i> ¿Qué reporte deseas generar con estos filtros?
-          </label>
+           <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
           <select id="customReportType" class="input-sicag" style="width:100%; padding:0.85rem 1rem; border:2px solid #e5e7eb; border-radius:10px; font-size:1rem; color:#222; outline:none; background:#fff; font-weight:500; cursor:pointer;">
             <option value="total-personas">Padrón Completo de Personas</option>
             <option value="electores">Registro Electoral (Mayores de 18)</option>
