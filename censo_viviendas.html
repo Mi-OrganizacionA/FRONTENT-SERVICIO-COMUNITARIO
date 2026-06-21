@@ -6128,8 +6128,8 @@
         const jEstadoCivil = document.getElementById('jefEstadoCivil'); if(jEstadoCivil) jEstadoCivil.value = datosNuevos.estado_civil;
         const jInstruccion = document.getElementById('jefNivelInstruccion'); if(jInstruccion) jInstruccion.value = datosNuevos.nivel_educativo;
         const jOcupacion = document.getElementById('jefProfesion'); if(jOcupacion) jOcupacion.value = datosNuevos.ocupacion;
-        const jCne = document.getElementById('jefCNE'); if(jCne) jCne.value = datosNuevos.inscrito_cne ? 'true' : 'false';
-        const jIncapacidad = document.getElementById('jefTieneIncapacidad');
+        const jCne = document.getElementById('jefInscritoCNE'); if(jCne) jCne.value = datosNuevos.inscrito_cne ? 'Si' : 'No';
+        const jIncapacidad = document.getElementById('jefIncapacitado');
         if(jIncapacidad) jIncapacidad.value = (datosNuevos.incapacitado_tipo && datosNuevos.incapacitado_tipo.trim() !== '') ? 'Si' : 'No';
         
         const jTipoIncapacidad = document.getElementById('jefTipoIncapacidad'); 
@@ -6156,7 +6156,7 @@
         if(jIngresoRango) jIngresoRango.value = datosNuevos.clasificacion_ingreso_familiar || '';
 
         // Limpiar bordes rojos (is-invalid) de Bootstrap o admin.css
-        ['jefNombres', 'jefFechaNac', 'jefNacionalidad', 'jefSexo', 'jefEstadoCivil', 'jefNivelInstruccion', 'jefProfesion', 'jefCNE', 'jefTieneIncapacidad', 'jefPensionado', 'jefTelfCel', 'jefEmail', 'jefTiempoComunidad', 'jefIngresoMensualBs', 'trabaja', 'ingresoFamiliarRango'].forEach(id => {
+        ['jefNombres', 'jefFechaNac', 'jefNacionalidad', 'jefSexo', 'jefEstadoCivil', 'jefNivelInstruccion', 'jefProfesion', 'jefInscritoCNE', 'jefIncapacitado', 'jefPensionado', 'jefTelfCel', 'jefEmail', 'jefTiempoComunidad', 'jefIngresoMensualBs', 'trabaja', 'ingresoFamiliarRango'].forEach(id => {
             const el = document.getElementById(id);
             if(el) {
                 el.classList.remove('is-invalid');
