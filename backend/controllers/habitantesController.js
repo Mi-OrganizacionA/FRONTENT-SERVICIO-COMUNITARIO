@@ -31,7 +31,11 @@ class HabitantesController {
           { nombres: { [Op.like]: `%${nombre}%` } },
           { apellidos: { [Op.like]: `%${nombre}%` } },
           { cedula: { [Op.like]: `%${nombre.replace(/\D/g, '')}%` } },
-          { cedula: { [Op.like]: `%${nombre}%` } }
+          { cedula: { [Op.like]: `%${nombre}%` } },
+          HabitanteModel.sequelize.where(
+            HabitanteModel.sequelize.fn('lower', HabitanteModel.sequelize.fn('concat', HabitanteModel.sequelize.col('nombres'), ' ', HabitanteModel.sequelize.col('apellidos'))),
+            { [Op.like]: `%${nombre.toLowerCase()}%` }
+          )
         ];
       }
 
@@ -419,7 +423,11 @@ class HabitantesController {
         const { Op } = require('sequelize');
         where[Op.or] = [
           { nombres: { [Op.like]: `%${nombre}%` } },
-          { apellidos: { [Op.like]: `%${nombre}%` } }
+          { apellidos: { [Op.like]: `%${nombre}%` } },
+          HabitanteModel.sequelize.where(
+            HabitanteModel.sequelize.fn('lower', HabitanteModel.sequelize.fn('concat', HabitanteModel.sequelize.col('nombres'), ' ', HabitanteModel.sequelize.col('apellidos'))),
+            { [Op.like]: `%${nombre.toLowerCase()}%` }
+          )
         ];
       }
 
@@ -456,10 +464,16 @@ class HabitantesController {
       // Permitir flexiblidad en cedula
       const qNum = q.replace(/\D/g, '');
 
+      // Buscar también por nombre completo (nombres + apellidos)
+      const qLower = q.toLowerCase();
       let orConditions = [
         { nombres: { [Op.like]: `%${q}%` } },
         { apellidos: { [Op.like]: `%${q}%` } },
-        { cedula: { [Op.like]: `%${q}%` } }
+        { cedula: { [Op.like]: `%${q}%` } },
+        HabitanteModel.sequelize.where(
+          HabitanteModel.sequelize.fn('lower', HabitanteModel.sequelize.fn('concat', HabitanteModel.sequelize.col('nombres'), ' ', HabitanteModel.sequelize.col('apellidos'))),
+          { [Op.like]: `%${qLower}%` }
+        )
       ];
 
       if (qNum.length > 0) {

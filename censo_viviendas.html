@@ -3349,6 +3349,36 @@
         }
       }
 
+      if (currentStep === 4) {
+        const cantidadExtra = parseInt(document.getElementById('cantidadHabitantes')?.value) || 0;
+        const filasFamiliar = panel.querySelectorAll('.familiar-row');
+        
+        if (cantidadExtra !== filasFamiliar.length) {
+          valid = false;
+          errors.push(`Debe agregar exactamente ${cantidadExtra} integrante(s) en la lista`);
+        }
+
+        filasFamiliar.forEach((row, index) => {
+          const nombres = row.querySelector('.fam-nombres')?.value;
+          const parentesco = row.querySelector('.fam-parentesco')?.value;
+          
+          if (!nombres) {
+            valid = false;
+            errors.push(`El Integrante #${index + 1} no ha sido buscado ni registrado`);
+            row.style.borderColor = '#EF5350';
+          }
+          if (!parentesco) {
+            valid = false;
+            errors.push(`Seleccione el parentesco del Integrante #${index + 1}`);
+            const selectParentesco = row.querySelector('.fam-parentesco');
+            if (selectParentesco) {
+              selectParentesco.style.borderColor = '#EF5350';
+              selectParentesco.style.boxShadow = '0 0 0 3px rgba(239,83,80,.15)';
+            }
+          }
+        });
+      }
+
       if (!valid) {
         showToast(`Campos obligatorios incompletos: ${errors.slice(0, 3).join(', ')}`, 'error');
       }
