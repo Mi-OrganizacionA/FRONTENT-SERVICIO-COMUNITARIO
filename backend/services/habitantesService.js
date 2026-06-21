@@ -168,6 +168,12 @@ class HabitantesService {
             { nombres: { [Op.like]: `%${termino}%` } },
             { apellidos: { [Op.like]: `%${termino}%` } },
             habitanteModel.sequelize.where(
+              habitanteModel.sequelize.fn('replace', 
+                habitanteModel.sequelize.fn('replace', habitanteModel.sequelize.col('cedula'), '.', ''), 
+              '-', ''),
+              { [Op.like]: `%${cedulaNorm}%` }
+            ),
+            habitanteModel.sequelize.where(
               habitanteModel.sequelize.fn('lower', habitanteModel.sequelize.fn('concat', habitanteModel.sequelize.col('nombres'), ' ', habitanteModel.sequelize.col('apellidos'))),
               { [Op.like]: `%${termino.toLowerCase()}%` }
             )

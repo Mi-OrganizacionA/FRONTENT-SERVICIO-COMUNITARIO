@@ -322,9 +322,12 @@ class EstudioDemograficoController {
       }
 
       // 1. Crear Cabecera (EstudioDemografico)
+      const colsEstudio = Object.keys(EstudioDemografico.getAttributes());
+      const rawDatosCabecera = { ...(cabecera || req.body), id_comunidad: id_comunidad || (cabecera ? cabecera.id_comunidad : null) };
+      const safeCabecera = Object.fromEntries(colsEstudio.filter(c => c in rawDatosCabecera).map(c => [c, rawDatosCabecera[c]]));
+
       const data = await EstudioDemografico.create({
-        ...(cabecera || req.body),
-        id_comunidad: id_comunidad || cabecera.id_comunidad,
+        ...safeCabecera,
         fecha_creacion: new Date(),
         activo: true
       }, { transaction: t });
@@ -412,15 +415,18 @@ class EstudioDemograficoController {
       if (paso === 1 || paso === 2) {
         if (!id_estudio) throw new Error("id_estudio es requerido para guardar la cabecera");
         
+        const colsEstudio = Object.keys(EstudioDemografico.getAttributes());
+        const safeDatos = Object.fromEntries(colsEstudio.filter(c => c in datos).map(c => [c, datos[c]]));
+
         const [estudio, created] = await EstudioDemografico.findOrCreate({
           where: { id: id_estudio },
           // Los borradores se crean inactivos para no mostrarse en getAll hasta ser aprobados
-          defaults: { ...datos, activo: false, fecha_creacion: new Date() },
+          defaults: { ...safeDatos, activo: false, fecha_creacion: new Date() },
           transaction: t
         });
         
         if (!created) {
-          await estudio.update(datos, { transaction: t });
+          await estudio.update(safeDatos, { transaction: t });
         }
       } 
       // Pasos posteriores requieren que exista el id_estudio

@@ -5265,7 +5265,7 @@
           selCC.innerHTML = optionsHtml;
           if (advFilterCC) advFilterCC.innerHTML = filterHtml;
 
-          if (currentVal && currentVal !== '') selCC.value = currentVal;
+          if (currentVal && currentVal !== '') { selCC.value = currentVal; selCC.dispatchEvent(new Event('change')); }
           if (advFilterCC && currentFilterVal && currentFilterVal !== '') advFilterCC.value = currentFilterVal;
           
           // Auto-asignar comunidad si es vocero
