@@ -3902,13 +3902,13 @@
             readonlyDiv.style.opacity = '1';
             readonlyDiv.style.paddingTop = '1rem';
             readonlyDiv.style.borderTop = '1px dashed var(--gray3)';
-            this.innerHTML = '<i class=\\'fas fa-chevron-up\\'></i> Ocultar información';
+            this.innerHTML = '<i class=\&quot;fas fa-chevron-up\&quot;></i> Ocultar información';
           } else {
             readonlyDiv.style.maxHeight = '0px';
             readonlyDiv.style.opacity = '0';
             readonlyDiv.style.paddingTop = '0';
             readonlyDiv.style.borderTop = 'none';
-            this.innerHTML = '<i class=\\'fas fa-chevron-down\\'></i> Ver más datos';
+            this.innerHTML = '<i class=\&quot;fas fa-chevron-down\&quot;></i> Ver más datos';
           }
         ">
           <i class="fas fa-chevron-down"></i> Ver más datos
@@ -5652,7 +5652,7 @@
             const btnToggle = row.querySelector('.btn-toggle-info');
             if (btnToggle) {
               btnToggle.style.display = 'none';
-              btnToggle.innerHTML = '<i class=\\'fas fa-chevron-down\\'></i> Ver más datos';
+              btnToggle.innerHTML = '<i class="fas fa-chevron-down"></i> Ver más datos';
             }
             
             const readonlyDiv = row.querySelector('.fam-datos-readonly');
