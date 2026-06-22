@@ -1322,9 +1322,10 @@ class APIManager {
       const token = window.auth?.getToken();
       if (!token && !this.isDevelopment) throw new Error('NO_TOKEN');
 
-      // Realizar peticiÃ³n al endpoint /api/search
-      const response = await this.fetchWithAuth(`/search?q=${encodeURIComponent(query)}`);
-      return response;
+      // Realizar petición al endpoint /api/search
+      const response = await this._fetch(`${this.baseURL}/search?q=${encodeURIComponent(query)}`, this._getHeaders());
+      if (!response.ok) throw new Error('Error buscando');
+      return await response.json();
     } catch (e) {
       if (e.message === 'NO_TOKEN' || e.message === 'TOKEN_EXPIRED') {
         throw e;
