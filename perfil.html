@@ -471,6 +471,10 @@
                   if (habitante.fecha_nacimiento) document.getElementById('cdFechaNac').value = habitante.fecha_nacimiento.split('T')[0];
                   if (habitante.genero) document.getElementById('cdGenero').value = habitante.genero;
                   if (habitante.telefono) document.getElementById('cdTelefono').value = habitante.telefono;
+                  
+                  // Vincular el registro existente para que se actualice en lugar de crear uno nuevo
+                  esHabitante = true;
+                  habitanteInfo = habitante;
                 }
               });
             }
@@ -482,7 +486,12 @@
             btnSubmit.disabled = true;
             btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
 
-            const cedula = document.getElementById('cdCedula').value;
+            let cedula = document.getElementById('cdCedula').value.trim().toUpperCase();
+            // Normalizar cédula a formato V-12345678 para evitar duplicados por puntos
+            let cedNum = cedula.replace(/[\.\s-]/g, '').replace(/^[VE]/i, '');
+            let prefijo = cedula.startsWith('E') ? 'E-' : 'V-';
+            cedula = prefijo + cedNum;
+
             const fechaNac = document.getElementById('cdFechaNac').value;
             const genero = document.getElementById('cdGenero').value;
             const telefono = document.getElementById('cdTelefono').value;

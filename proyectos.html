@@ -1203,6 +1203,23 @@
         btnText.textContent = 'Guardar Proyecto';
       }
 
+      // Lógica de deshabilitado para voceros
+      const isVocero = window.auth && window.auth.getUserRole() === 'vocero';
+      const currentUser = window.auth && window.auth.getUser();
+      const selectConsejo = document.getElementById('projConsejo');
+
+      if (isVocero && currentUser) {
+        if (!id) {
+          // Si es nuevo, preseleccionar su comunidad
+          selectConsejo.value = currentUser.id_comunidad || '';
+        }
+        // Siempre deshabilitado para vocero
+        selectConsejo.disabled = true;
+      } else {
+        // Habilitado para admin
+        selectConsejo.disabled = false;
+      }
+
       if (modal) modal.classList.add('show');
     }
 
@@ -1228,7 +1245,8 @@
       const titulo = document.getElementById('projTitulo').value.trim();
       const desc = document.getElementById('projDescripcion').value.trim();
       const estado = document.getElementById('projEstado').value;
-      const consejo = document.getElementById('projConsejo').value;
+      const selectConsejo = document.getElementById('projConsejo');
+      const consejo = selectConsejo.value || (selectConsejo.disabled && window.auth.getUser() ? window.auth.getUser().id_comunidad : '');
 
       if (!titulo || !desc || !estado || !consejo) {
         if (window.Components) Components.showToast('Completa los campos obligatorios.', 'error');
