@@ -316,7 +316,7 @@ class CensoReportesService {
    * Extrae los datos formateados según el tipo de reporte solicitado
    */
   static async getReporteData(models, tipo, filtros = {}) {
-    const { EstudioDemografico, Habitante, Vivienda, ConsejoComunal, CensoSituacionVivienda, CensoServicios, CensoSalud, CensoSituacionEconomica, CensoCaracteristicaFamiliar } = models;
+    const { EstudioDemografico, Habitante, Vivienda, ConsejoComunal, CensoSituacionVivienda, CensoServicios, CensoSalud, CensoSituacionEconomica, CensoCaracteristicaFamiliar, CensoOpcionMultiple } = models;
     let title = 'Reporte del Sistema';
     let headers = [];
     
@@ -352,7 +352,14 @@ class CensoReportesService {
         title = 'Censo de Viviendas';
         headers = ['Tipo Vivienda', 'Dirección', 'Consejo Comunal', 'Cédula del Jefe', 'Nombre del Jefe', 'Nro. Habitantes'];
         
-        rowsNuevos = await EstudioDemografico.findAll({ where: we, include: [{ model: ConsejoComunal, as: 'consejo' }, { model: CensoSituacionVivienda, as: 'situacion_vivienda' }] });
+        rowsNuevos = await EstudioDemografico.findAll({ 
+          where: we, 
+          include: [
+            { model: ConsejoComunal, as: 'consejo' }, 
+            { model: CensoSituacionVivienda, as: 'situacion_vivienda' },
+            { model: CensoCaracteristicaFamiliar, as: 'caracteristicas_familiares', required: false }
+          ] 
+        });
         rowsViejos = await Vivienda.findAll({ where: wv, include: [...incConsejoLegacy, { model: Habitante, as: 'jefe' }] });
         break;
 
@@ -377,6 +384,28 @@ class CensoReportesService {
           if (filtros.rango_habitantes === '1-3') we.cantidad_habitantes = { [Op.between]: [1, 3] };
           else if (filtros.rango_habitantes === '4-6') we.cantidad_habitantes = { [Op.between]: [4, 6] };
           else if (filtros.rango_habitantes === '7+') we.cantidad_habitantes = { [Op.gte]: 7 };
+        }
+
+        // Rango de Edad Jefe de Familia
+        if (filtros.edad_min || filtros.edad_max) {
+           const whereEdad = {};
+           const hoy = new Date();
+           if (filtros.edad_min) {
+              const maxDate = new Date(hoy.getFullYear() - parseInt(filtros.edad_min), hoy.getMonth(), hoy.getDate());
+              whereEdad.fecha_nacimiento = { [Op.lte]: maxDate };
+           }
+           if (filtros.edad_max) {
+              const minDate = new Date(hoy.getFullYear() - parseInt(filtros.edad_max) - 1, hoy.getMonth(), hoy.getDate() + 1);
+              whereEdad.fecha_nacimiento = { ...whereEdad.fecha_nacimiento, [Op.gte]: minDate };
+           }
+           // Obtener cédulas válidas
+           const jefesValidos = await Habitante.findAll({ where: whereEdad, attributes: ['cedula'] });
+           const cedulasValidas = jefesValidos.map(h => h.cedula);
+           if (cedulasValidas.length === 0) {
+             we.encuestado_cedula = 'NONE'; // Forzar 0 resultados
+           } else {
+             we.encuestado_cedula = { [Op.in]: cedulasValidas };
+           }
         }
 
         // Filtros en Relaciones (forzan required: true en el JOIN si tienen valor)
@@ -432,6 +461,23 @@ class CensoReportesService {
           const famInc = incAvanzado.find(i => i.as === 'caracteristicas_familiares');
           famInc.where = whereFamiliar;
           famInc.required = true;
+        }
+
+        // Opciones Múltiples (Plagas y Enfermedades)
+        if (filtros.insectos || filtros.enfermedades) {
+          const orConditions = [];
+          if (filtros.insectos) {
+            orConditions.push({ categoria: 'insectos_tipos', valor: { [Op.in]: filtros.insectos.split(',') } });
+          }
+          if (filtros.enfermedades) {
+            orConditions.push({ categoria: 'enfermedades', valor: { [Op.in]: filtros.enfermedades.split(',') } });
+          }
+          incAvanzado.push({
+            model: CensoOpcionMultiple,
+            as: 'opciones_multiples',
+            where: { [Op.or]: orConditions },
+            required: true
+          });
         }
 
         rowsNuevos = await EstudioDemografico.findAll({ where: we, include: incAvanzado });
@@ -515,7 +561,7 @@ class CensoReportesService {
               v.encuestado_nombre || 'N/A',
               v.encuestado_cedula ? `V-${v.encuestado_cedula}` : 'N/A',
               v.situacion_vivienda ? v.situacion_vivienda.tipo_vivienda : 'N/A',
-              v.cantidad_habitantes || 1,
+              v.caracteristicas_familiares ? v.caracteristicas_familiares.length + 1 : (v.cantidad_habitantes || 1),
               v.situacion_vivienda ? v.situacion_vivienda.forma_tenencia : 'N/A',
               v.servicios ? v.servicios.gas_tipo : 'N/A',
               v.servicios ? v.servicios.aguas_blancas_tipo : 'N/A',
@@ -529,7 +575,7 @@ class CensoReportesService {
               v.consejo ? v.consejo.nombre_comunidad : 'N/A',
               v.encuestado_cedula ? `V-${v.encuestado_cedula}` : 'N/A',
               v.encuestado_nombre || 'N/A',
-              v.cantidad_habitantes || 1
+              v.caracteristicas_familiares ? v.caracteristicas_familiares.length + 1 : (v.cantidad_habitantes || 1)
             ]);
           }
         });

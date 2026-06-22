@@ -489,6 +489,14 @@
           <summary class="acc-summary"><i class="fas fa-users"></i> Demografía Familiar</summary>
           <div class="acc-content">
             <div class="form-group-sicag">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Jefe Fam. (Mín)</label>
+              <input type="number" id="filtroV_EdadMin" class="input-sicag" placeholder="Ej: 18" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+            </div>
+            <div class="form-group-sicag">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Edad Jefe Fam. (Máx)</label>
+              <input type="number" id="filtroV_EdadMax" class="input-sicag" placeholder="Ej: 60" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+            </div>
+            <div class="form-group-sicag">
               <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Carga Familiar Total</label>
               <select id="filtroV_HabitantesRango" class="input-sicag" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
                 <option value="">Cualquier cantidad</option>
@@ -558,6 +566,18 @@
                 <option value="🔴 Malas">🔴 Malas</option>
               </select>
             </div>
+            <div class="form-group-sicag" style="grid-column:1/-1;">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.6rem; display:block;">Insectos / Roedores (Plagas)</label>
+              <div style="display:flex; flex-wrap:wrap; gap:1rem; background:#f8fafc; padding:1rem; border-radius:8px; border:1px solid #e2e8f0;">
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-insectos" value="Hormigas" checked> Hormigas</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-insectos" value="Cucarachas" checked> Cucarachas</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-insectos" value="Roedores" checked> Roedores</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-insectos" value="Moscas" checked> Moscas</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-insectos" value="Mosquitos" checked> Mosquitos</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-insectos" value="Chinches" checked> Chinches</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-insectos" value="Arañas" checked> Arañas</label>
+              </div>
+            </div>
           </div>
         </details>
 
@@ -591,6 +611,17 @@
                 <option value="No">No</option>
               </select>
             </div>
+            <div class="form-group-sicag" style="grid-column:1/-1;">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.6rem; display:block;">Enfermedades Presentes en el Hogar</label>
+              <div style="display:flex; flex-wrap:wrap; gap:1rem; background:#fef2f2; padding:1rem; border-radius:8px; border:1px solid #fecaca;">
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enfermedades" value="Cancer"> Cáncer</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enfermedades" value="Diabetes"> Diabetes</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enfermedades" value="Asma"> Asma</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enfermedades" value="Hipertensión"> Hipertensión</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enfermedades" value="Renal"> Renal</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enfermedades" value="Ninguna"> Ninguna</label>
+              </div>
+            </div>
           </div>
         </details>
 
@@ -613,7 +644,7 @@
   <!-- BOTONES FLOTANTES DE FILTRADO -->
   <div class="floating-filters" style="position: fixed; bottom: 2rem; right: 2rem; display: flex; flex-direction: column; gap: 1rem; z-index: 1000;">
     <!-- Botón Habitantes (y=1, arriba) -->
-    <button class="btn-floating" onclick="document.getElementById('filtroPersonasModal').style.display='flex'" title="Filtros de Habitantes" style="width: 56px; height: 56px; border-radius: 50%; background-color: var(--primary-light, #e8f5e9); color: var(--vd, #2E7D32); border: 2px solid var(--vd, #2E7D32); box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease;">
+    <button class="btn-floating" onclick="document.getElementById('modalFiltrosPersonas').style.display='flex'" title="Filtros de Habitantes" style="width: 56px; height: 56px; border-radius: 50%; background-color: var(--primary-light, #e8f5e9); color: var(--vd, #2E7D32); border: 2px solid var(--vd, #2E7D32); box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease;">
       <i class="fas fa-user-friends"></i>
     </button>
     <!-- Botón Viviendas (y=0, abajo) -->

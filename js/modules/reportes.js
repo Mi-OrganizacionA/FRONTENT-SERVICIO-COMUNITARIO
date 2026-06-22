@@ -256,6 +256,11 @@ class ReportesController {
     if (encuestador) q += `&encuestador_cedula=${encodeURIComponent(encuestador)}`;
 
     // Familia
+    const edadMin = document.getElementById('filtroV_EdadMin')?.value;
+    if (edadMin) q += `&edad_min=${encodeURIComponent(edadMin)}`;
+    const edadMax = document.getElementById('filtroV_EdadMax')?.value;
+    if (edadMax) q += `&edad_max=${encodeURIComponent(edadMax)}`;
+    
     const rangoHab = document.getElementById('filtroV_HabitantesRango')?.value;
     if (rangoHab) q += `&rango_habitantes=${encodeURIComponent(rangoHab)}`;
     const menores = document.getElementById('filtroV_TieneMenores12')?.value;
@@ -273,13 +278,25 @@ class ReportesController {
     const salubridad = document.getElementById('filtroV_Salubridad')?.value;
     if (salubridad) q += `&condiciones_salubridad=${encodeURIComponent(salubridad)}`;
 
-    // Economía / Salud
+    // Salud y Economía
     const ingreso = document.getElementById('filtroV_Ingreso')?.value;
     if (ingreso) q += `&ingreso_familiar_rango=${encodeURIComponent(ingreso)}`;
-    const ayuda = document.getElementById('filtroV_AyudaMedica')?.value;
-    if (ayuda === 'Sí') q += `&necesita_ayuda_especial=true`;
+    const ayudaMed = document.getElementById('filtroV_AyudaMedica')?.value;
+    if (ayudaMed) q += `&necesita_ayuda_especial=${encodeURIComponent(ayudaMed)}`;
     const comercio = document.getElementById('filtroV_Comercio')?.value;
     if (comercio) q += `&actividad_comercial_vivienda=${encodeURIComponent(comercio)}`;
+
+    // Opciones Múltiples (Plagas y Enfermedades)
+    const insectosSeleccionados = Array.from(document.querySelectorAll('.chk-insectos:checked')).map(el => el.value);
+    if (insectosSeleccionados.length > 0 && insectosSeleccionados.length < 7) {
+      // Si todos están marcados, no filtramos por defecto. Solo filtramos si hay alguna desmarcada.
+      q += `&insectos=${encodeURIComponent(insectosSeleccionados.join(','))}`;
+    }
+    
+    const enfermedadesSeleccionadas = Array.from(document.querySelectorAll('.chk-enfermedades:checked')).map(el => el.value);
+    if (enfermedadesSeleccionadas.length > 0) {
+      q += `&enfermedades=${encodeURIComponent(enfermedadesSeleccionadas.join(','))}`;
+    }
 
     return q;
   }
