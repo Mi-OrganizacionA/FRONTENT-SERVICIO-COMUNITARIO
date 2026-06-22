@@ -15,35 +15,40 @@ class ExportGeneratorService {
     const workbook = new excel.Workbook();
     const worksheet = workbook.addWorksheet(sheetName);
 
-    // Definir columnas
-    worksheet.columns = headers.map(h => ({
-      header: h,
-      key: h.toLowerCase().replace(/ /g, '_'),
-      width: Math.max(h.length + 5, 15)
-    }));
+    let currentRow = 1;
 
-    // Estilos de cabecera
-    worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
-    worksheet.getRow(1).fill = {
+    // Fila de Filtros (si hay)
+    if (filtrosText) {
+      worksheet.addRow([filtrosText]);
+      worksheet.getRow(currentRow).font = { italic: true };
+      worksheet.mergeCells(currentRow, 1, currentRow, headers.length);
+      currentRow++;
+    }
+
+    // Fila de Cabeceras
+    const headerRow = worksheet.addRow(headers);
+    headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    headerRow.fill = {
       type: 'pattern',
       pattern: 'solid',
       fgColor: { argb: 'FF2E7D32' } // Verde SICAG
     };
+    currentRow++;
 
-    if (filtrosText) {
-      worksheet.insertRow(1, [filtrosText]);
-      worksheet.getRow(1).font = { italic: true };
-      worksheet.mergeCells(`A1:${String.fromCharCode(65 + headers.length - 1)}1`);
-    }
-
-    // Agregar filas
+    // Agregar filas de datos
     data.forEach(item => {
       const row = worksheet.addRow(item);
       if (item[0] && item[0].toString().startsWith('  ↳')) {
         row.font = { italic: true, color: { argb: 'FF666666' }, size: 9 };
         row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF9FAFB' } };
       }
+      currentRow++;
     });
+
+    // Ajustar anchos de columnas
+    for (let i = 0; i < headers.length; i++) {
+      worksheet.getColumn(i + 1).width = Math.max(headers[i].length + 5, 15);
+    }
 
     return await workbook.xlsx.writeBuffer();
   }

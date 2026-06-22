@@ -144,7 +144,7 @@ class CensoReportesController {
           const excelBuffer = await ExportGeneratorService.generateExcel(headers, rows, title, filtrosText);
           res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
           res.setHeader('Content-Disposition', `attachment; filename=reporte_${tipo}_${Date.now()}.xlsx`);
-          return res.send(excelBuffer);
+          return res.end(excelBuffer);
         }
       } 
       else {
