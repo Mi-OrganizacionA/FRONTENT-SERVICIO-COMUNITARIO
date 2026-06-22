@@ -327,6 +327,9 @@
       const id = (input.id || '').toLowerCase();
       const name = (input.name || '').toLowerCase();
 
+      // NUNCA aplicar máscara por detección al buscador global
+      if (id === 'globalsearch') return;
+
       // Detectar cédulas por placeholder/id
       if (ph.includes('cédula') || ph.includes('cedula') || ph.includes('v-12') ||
           id.includes('cedula') || name.includes('cedula')) {
