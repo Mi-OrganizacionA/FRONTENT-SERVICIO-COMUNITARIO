@@ -4573,6 +4573,9 @@
         set('.fam-habitante-id', fam.id_habitante);
         const emb = row.querySelector('.fam-embarazo');
         if (emb) emb.checked = fam.embarazo_temprano === true;
+        
+        const btnToggle = row.querySelector('.btn-toggle-info');
+        if (btnToggle) btnToggle.style.display = 'block';
       });
 
       // ── PANEL 5: Situación Económica ──
