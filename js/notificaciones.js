@@ -151,11 +151,11 @@ class NotificacionesController {
 
     const stats = isVocero ? [
       { label: 'Mis Solicitudes', value: base.length, sub: 'Total enviadas', color: 'azul', icon: 'paper-plane', trend: 'up' },
-      { label: 'Pendientes', value: pendientes, sub: 'En revisiÃ³n', color: 'amarillo', icon: 'clock', trend: pendientes > 0 ? 'down' : 'up' },
+      { label: 'Pendientes', value: pendientes, sub: 'En revisión', color: 'amarillo', icon: 'clock', trend: pendientes > 0 ? 'down' : 'up' },
       { label: 'Aprobadas', value: aprobados, sub: 'Aceptadas', color: 'verde', icon: 'check-circle', trend: 'up' },
       { label: 'Rechazadas', value: rechazados, sub: 'No aprobadas', color: 'rojo', icon: 'times-circle', trend: rechazados > 0 ? 'down' : 'up' }
     ] : [
-      { label: 'Pendientes', value: pendientes, sub: 'Requieren acciÃ³n', color: 'amarillo', icon: 'clock', trend: pendientes > 0 ? 'down' : 'up' },
+      { label: 'Pendientes', value: pendientes, sub: 'Requieren acción', color: 'amarillo', icon: 'clock', trend: pendientes > 0 ? 'down' : 'up' },
       { label: 'Total', value: base.length, sub: 'En bandeja', color: 'azul', icon: 'inbox', trend: 'up' },
       { label: 'Aprobadas hoy', value: aprobados, sub: 'Procesadas', color: 'verde', icon: 'check-double', trend: 'up' },
       { label: 'Rechazadas', value: rechazados, sub: 'No aprobadas', color: 'rojo', icon: 'ban', trend: rechazados > 0 ? 'down' : 'up' }
@@ -501,12 +501,12 @@ class NotificacionesController {
     try {
       const n = this.todas.find(x => x.id === id);
       await window.api.aprobarNotificacion(id, 'Aprobado por el administrador.');
-      
+
       if (n && n.tabla_afectada === 'proyectos' && n.datos_temporales?.quitar_imagen && n.datos_temporales?.old_imagen_portada) {
         try {
           const { eliminarImagenFirebase } = await import('./js/config/firebase-config.js');
           await eliminarImagenFirebase(n.datos_temporales.old_imagen_portada);
-        } catch (ignore) {}
+        } catch (ignore) { }
       }
 
       Components.showToast('✅ Solicitud aprobada correctamente.', 'success');
@@ -597,12 +597,12 @@ class NotificacionesController {
         const n = this.todas.find(x => x.id === id);
         if (isApprove && !isVocero) {
           await window.api.aprobarNotificacion(id, 'Aprobado en lote por el administrador.');
-          
+
           if (n && n.tabla_afectada === 'proyectos' && n.datos_temporales?.quitar_imagen && n.datos_temporales?.old_imagen_portada) {
             try {
               const { eliminarImagenFirebase } = await import('./js/config/firebase-config.js');
               await eliminarImagenFirebase(n.datos_temporales.old_imagen_portada);
-            } catch (ignore) {}
+            } catch (ignore) { }
           }
         } else {
           if (n && n.tabla_afectada === 'proyectos' && n.datos_temporales?.imagen_portada) {

@@ -13,7 +13,7 @@
  */
 
 // ── VERSIONES DE CACHÉ ──────────────────────────────────────────────────────
-const CORE_CACHE   = 'sicag-core-v3.5';
+const CORE_CACHE   = 'sicag-core-v3.6';
 const CDN_CACHE    = 'sicag-cdn-v3';
 const API_CACHE    = 'sicag-api-v3';
 const TODOS_LOS_CACHES = [CORE_CACHE, CDN_CACHE, API_CACHE];
