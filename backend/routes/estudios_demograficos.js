@@ -7,6 +7,8 @@ const { verifyToken, requireRole } = require('../middleware/auth');
 // de lo contrario Express captura 'consejo' como un valor de :id
 router.get('/consejo/:consejoId', verifyToken, estudioDemograficoController.getPorConsejo);
 
+router.get('/verificar-habitante/:cedula', verifyToken, estudioDemograficoController.verificarHabitanteCensado);
+
 router.get('/', verifyToken, estudioDemograficoController.getAll);
 router.get('/:id', verifyToken, estudioDemograficoController.getById);
 

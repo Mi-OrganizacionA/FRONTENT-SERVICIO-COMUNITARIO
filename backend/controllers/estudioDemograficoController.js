@@ -438,16 +438,77 @@ class EstudioDemograficoController {
         
         switch (paso) {
           case 3: // Jefe
-          case 4: // Otros Familiares
-            if (dbDatos.familiares && dbDatos.familiares.length > 0) {
-              if (paso === 3) {
-                await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio, parentesco: 'Jefe(a) de Familia' }, transaction: t });
-              } else {
-                const { Op } = require('sequelize');
-                await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio, parentesco: { [Op.ne]: 'Jefe(a) de Familia' } }, transaction: t });
+            if (dbDatos.encuestado_cedula) {
+              const { Op } = require('sequelize');
+              const existenteJefe = await EstudioDemografico.findOne({
+                where: { 
+                  encuestado_cedula: dbDatos.encuestado_cedula,
+                  id: { [Op.ne]: id_estudio }
+                },
+                transaction: t
+              });
+              if (existenteJefe) {
+                throw new Error(`CONFLICTO: La cédula ${dbDatos.encuestado_cedula} ya está registrada como jefe en la planilla ${existenteJefe.planilla_nro}`);
               }
+              const existenteFam = await db.CensoCaracteristicaFamiliar.findOne({
+                where: { 
+                  cedula_identidad: dbDatos.encuestado_cedula,
+                  id_estudio: { [Op.ne]: id_estudio }
+                },
+                include: [{ model: EstudioDemografico, as: 'estudio', attributes: ['planilla_nro', 'encuestado_cedula'] }],
+                transaction: t
+              });
+              if (existenteFam) {
+                const num = existenteFam.estudio ? existenteFam.estudio.planilla_nro : '';
+                throw new Error(`CONFLICTO: La cédula ${dbDatos.encuestado_cedula} ya está registrada como familiar en la planilla ${num}`);
+              }
+            }
+            // Update the Jefe in EstudioDemografico table:
+            await EstudioDemografico.update({
+              encuestado_cedula: dbDatos.encuestado_cedula,
+              encuestado_nombre: dbDatos.encuestado_nombre,
+              jefe_habitante_id: dbDatos.jefe_habitante_id || null
+            }, { where: { id: id_estudio }, transaction: t });
+
+            // Ensure the main Jefe is in the familiares table as well
+            if (dbDatos.familiares && dbDatos.familiares.length > 0) {
+              await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio, parentesco: 'Jefe(a) de Familia' }, transaction: t });
               const fams = dbDatos.familiares.map(f => ({ ...f, id_estudio }));
               await db.CensoCaracteristicaFamiliar.bulkCreate(fams, { transaction: t });
+            }
+            break;
+          case 4: // Otros Familiares
+            if (dbDatos.familiares && dbDatos.familiares.length > 0) {
+              const { Op } = require('sequelize');
+              
+              // Validate duplicate cedulas in the incoming data against the DB
+              for (const f of dbDatos.familiares) {
+                if (f.cedula_identidad) {
+                  const checkJefe = await EstudioDemografico.findOne({
+                    where: { encuestado_cedula: f.cedula_identidad, id: { [Op.ne]: id_estudio } },
+                    transaction: t
+                  });
+                  if (checkJefe) throw new Error(`CONFLICTO: El integrante con cédula ${f.cedula_identidad} ya es jefe en otra planilla (${checkJefe.planilla_nro}).`);
+
+                  const checkFam = await db.CensoCaracteristicaFamiliar.findOne({
+                    where: { cedula_identidad: f.cedula_identidad, id_estudio: { [Op.ne]: id_estudio } },
+                    include: [{ model: EstudioDemografico, as: 'estudio', attributes: ['planilla_nro'] }],
+                    transaction: t
+                  });
+                  if (checkFam) {
+                    const num = checkFam.estudio ? checkFam.estudio.planilla_nro : '';
+                    throw new Error(`CONFLICTO: El integrante con cédula ${f.cedula_identidad} ya pertenece a otra planilla (${num}).`);
+                  }
+                }
+              }
+
+              await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio, parentesco: { [Op.ne]: 'Jefe(a) de Familia' } }, transaction: t });
+              const fams = dbDatos.familiares.map(f => ({ ...f, id_estudio }));
+              await db.CensoCaracteristicaFamiliar.bulkCreate(fams, { transaction: t });
+            } else {
+              // si envían lista vacía de familiares, se borran los existentes menos el jefe
+              const { Op } = require('sequelize');
+              await db.CensoCaracteristicaFamiliar.destroy({ where: { id_estudio, parentesco: { [Op.ne]: 'Jefe(a) de Familia' } }, transaction: t });
             }
             break;
           case 5: { // Economía
@@ -716,6 +777,56 @@ class EstudioDemograficoController {
     } catch (error) {
       console.error('Error exportando PDF del estudio demográfico:', error);
       res.status(500).json({ error: 'Error generando el PDF: ' + error.message });
+    }
+  }
+  /**
+   * Verificar si un habitante ya está en un censo
+   */
+  static async verificarHabitanteCensado(req, res) {
+    try {
+      const db = models;
+      const { cedula } = req.params;
+      if (!cedula) return res.status(400).json({ error: 'Cédula es requerida' });
+
+      // Clean the cedula if it has extra characters (assuming V-12345 format might come in)
+      const cedulaLimpia = cedula.replace(/^V-|^E-/i, '').trim();
+
+      // Check if is Jefe in any census
+      const jefe = await EstudioDemografico.findOne({
+        where: { encuestado_cedula: cedulaLimpia }
+      });
+      if (jefe) {
+        return res.json({
+          censado: true,
+          rol: 'Jefe(a) de Familia',
+          planilla_nro: jefe.planilla_nro,
+          jefe_cedula: jefe.encuestado_cedula
+        });
+      }
+
+      // Check if is Familiar in any census
+      const familiar = await db.CensoCaracteristicaFamiliar.findOne({
+        where: { cedula_identidad: cedulaLimpia },
+        include: [{
+          model: EstudioDemografico,
+          as: 'estudio',
+          attributes: ['planilla_nro', 'encuestado_cedula']
+        }]
+      });
+
+      if (familiar && familiar.estudio) {
+        return res.json({
+          censado: true,
+          rol: familiar.parentesco,
+          planilla_nro: familiar.estudio.planilla_nro,
+          jefe_cedula: familiar.estudio.encuestado_cedula
+        });
+      }
+
+      res.json({ censado: false });
+    } catch (error) {
+      logger.error('Error verificando habitante en censo:', error);
+      res.status(500).json({ error: 'Error verificando habitante' });
     }
   }
 }

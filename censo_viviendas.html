@@ -3894,8 +3894,28 @@
         <!-- Campo oculto para ID -->
         <input type="hidden" class="fam-habitante-id">
 
+        <!-- Botón para mostrar/ocultar info -->
+        <button type="button" class="btn-toggle-info cv-btn cv-btn-outline" style="display:none; width:100%; margin-top:1rem; border-style:dashed;" onclick="
+          const readonlyDiv = this.nextElementSibling;
+          if (readonlyDiv.style.maxHeight === '0px' || !readonlyDiv.style.maxHeight) {
+            readonlyDiv.style.maxHeight = '1000px';
+            readonlyDiv.style.opacity = '1';
+            readonlyDiv.style.paddingTop = '1rem';
+            readonlyDiv.style.borderTop = '1px dashed var(--gray3)';
+            this.innerHTML = '<i class=\\'fas fa-chevron-up\\'></i> Ocultar información';
+          } else {
+            readonlyDiv.style.maxHeight = '0px';
+            readonlyDiv.style.opacity = '0';
+            readonlyDiv.style.paddingTop = '0';
+            readonlyDiv.style.borderTop = 'none';
+            this.innerHTML = '<i class=\\'fas fa-chevron-down\\'></i> Ver más datos';
+          }
+        ">
+          <i class="fas fa-chevron-down"></i> Ver más datos
+        </button>
+
         <!-- Campos de solo lectura (colapsables / visibles al encontrar) -->
-        <div class="fam-datos-readonly" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px dashed var(--gray3);">
+        <div class="fam-datos-readonly" style="max-height:0px; opacity:0; overflow:hidden; transition:all 0.3s ease; margin-top:0.5rem;">
           <div class="cv-form-row cv-grid-3" style="margin-bottom:.5rem;">
             <div class="cv-form-group">
               <label>Nombres y Apellidos <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese los nombres y apellidos completos"></i></label>
@@ -5288,7 +5308,6 @@
 
             if (matched) {
               selCC.setAttribute('disabled', 'true');
-              selCC.style.backgroundColor = 'var(--gray1)';
               selCC.style.fontWeight = '700';
               selCC.style.color = 'var(--vp)';
               selCC.removeAttribute('required');
@@ -5384,7 +5403,43 @@
             }
           });
         }
-        HabitanteAutocomplete.attachTo('cedulaJefe', (datos) => {
+        HabitanteAutocomplete.attachTo('cedulaJefe', async (datos) => {
+          // Verify if already registered in a census
+          if (datos.cedula && window.auth) {
+            try {
+              const resCenso = await fetch(`${baseURL}/estudios_demograficos/verificar-habitante/${datos.cedula}`, {
+                headers: { 'Authorization': `Bearer ${window.auth.getToken()}` }
+              });
+              const dataCenso = await resCenso.json();
+              if (dataCenso.censado) {
+                camposJefe.forEach(id => {
+                  const el = document.getElementById(id);
+                  if (el) { el.value = ''; el.style.borderColor = '#EF5350'; }
+                });
+                const camposExtra = ['jefTipoIncapacidad', 'jefPensionado', 'jefPensionadoInstitucion'];
+                camposExtra.forEach(id => {
+                  const el = document.getElementById(id);
+                  if (el) el.value = '';
+                });
+
+                document.getElementById('jefeHabitanteId').value = '';
+                window.currentJefeFamiliaId = null;
+
+                const banner = document.getElementById('jefeStatusBanner');
+                if (banner) {
+                  banner.style.display = 'block';
+                  banner.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                  banner.style.color = 'var(--danger)';
+                  banner.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Este habitante está censado con el jefe de familia: 
+                    <strong style="cursor:pointer; text-decoration:underline;" onclick="navigator.clipboard.writeText('${dataCenso.jefe_cedula}'); window.showToast('Cédula copiada al portapapeles', 'success');">${dataCenso.jefe_cedula}</strong>.`;
+                }
+                const btnReg = document.getElementById('btnRegistrarJefe');
+                if (btnReg) btnReg.style.display = 'none';
+                window.showToast('⚠️ Este habitante ya está en un censo.', 'error');
+                return; // Stop loading data
+              }
+            } catch(e) { console.error('Error validando censo', e); }
+          }
 
           document.getElementById('jefeHabitanteId').value = datos.id;
           window.currentJefeFamiliaId = datos.id;
@@ -5505,7 +5560,35 @@
           const cedulaInput = row.querySelector('.fam-cedula');
           if (!cedulaInput) return;
 
-          row._onHabitanteFill = (datos) => {
+          row._onHabitanteFill = async (datos) => {
+            // Validate against duplicates
+            if (datos.cedula && window.auth) {
+              try {
+                const resCenso = await fetch(`${baseURL}/estudios_demograficos/verificar-habitante/${datos.cedula}`, {
+                  headers: { 'Authorization': `Bearer ${window.auth.getToken()}` }
+                });
+                const dataCenso = await resCenso.json();
+                if (dataCenso.censado) {
+                  const banner = row.querySelector('.fam-status-banner');
+                  if (banner) {
+                    banner.style.display = 'block';
+                    banner.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                    banner.style.color = 'var(--danger)';
+                    banner.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Este integrante está censado con el jefe de familia: 
+                      <strong style="cursor:pointer; text-decoration:underline;" onclick="navigator.clipboard.writeText('${dataCenso.jefe_cedula}'); window.showToast('Cédula copiada al portapapeles', 'success');">${dataCenso.jefe_cedula}</strong>.`;
+                  }
+                  window.showToast('⚠️ Este integrante ya pertenece a otro censo.', 'error');
+                  
+                  // Reset fields
+                  if (row.querySelector('.fam-habitante-id')) row.querySelector('.fam-habitante-id').value = '';
+                  if (row.querySelector('.fam-nombres')) row.querySelector('.fam-nombres').value = '';
+                  const btnToggle = row.querySelector('.btn-toggle-info');
+                  if (btnToggle) btnToggle.style.display = 'none';
+                  return; // Stop filling
+                }
+              } catch(e) { console.error(e); }
+            }
+
             const idInput = row.querySelector('.fam-habitante-id');
             const nombreInput = row.querySelector('.fam-nombres');
             const sexoSel = row.querySelector('.fam-sexo');
@@ -5545,8 +5628,8 @@
               pensionInput.value = (datos.pensionado === true || datos.pensionado === 'true') ? (datos.pensionado_institucion || 'Sí') : 'No';
             }
 
-            const readonlyDiv = row.querySelector('.fam-datos-readonly');
-            if (readonlyDiv) readonlyDiv.style.display = 'block';
+            const btnToggle = row.querySelector('.btn-toggle-info');
+            if (btnToggle) btnToggle.style.display = 'block';
 
             const banner = row.querySelector('.fam-status-banner');
             if (banner) {
@@ -5566,8 +5649,19 @@
             if (idInput) idInput.value = '';
             if (nombreInput) nombreInput.value = '';
             
+            const btnToggle = row.querySelector('.btn-toggle-info');
+            if (btnToggle) {
+              btnToggle.style.display = 'none';
+              btnToggle.innerHTML = '<i class=\\'fas fa-chevron-down\\'></i> Ver más datos';
+            }
+            
             const readonlyDiv = row.querySelector('.fam-datos-readonly');
-            if (readonlyDiv) readonlyDiv.style.display = 'none';
+            if (readonlyDiv) {
+               readonlyDiv.style.maxHeight = '0px';
+               readonlyDiv.style.opacity = '0';
+               readonlyDiv.style.paddingTop = '0';
+               readonlyDiv.style.borderTop = 'none';
+            }
 
             const banner = row.querySelector('.fam-status-banner');
             if (banner) {
