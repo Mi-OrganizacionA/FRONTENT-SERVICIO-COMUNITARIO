@@ -90,7 +90,7 @@ class Components {
         align-items: center;
         justify-content: center;
         z-index: 9999;
-      ">
+      " onclick="if(event.target === this) window['cancel_${modalId}']()">
         <div style="
           background: white;
           border-radius: 12px;
@@ -99,7 +99,21 @@ class Components {
           max-width: 400px;
           box-shadow: 0 8px 24px rgba(0,0,0,0.2);
           text-align: center;
+          position: relative;
         ">
+          <button onclick="window['cancel_${modalId}']()" style="
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.2s;
+          " onmouseover="this.style.color='#333'" onmouseout="this.style.color='#999'" title="Cerrar">
+            <i class="fas fa-times"></i>
+          </button>
           <div style="font-size: 48px; color: #F9A825; margin-bottom: 16px;">
             <i class="fas fa-exclamation-triangle"></i>
           </div>
@@ -167,7 +181,7 @@ class Components {
         justify-content: center;
         z-index: 9999;
         animation: fadeIn 0.2s ease-out;
-      ">
+      " onclick="if(event.target === this) { document.getElementById('${modalId}').remove(); delete window['primary_${modalId}']; delete window['secondary_${modalId}']; }">
         <div style="
           background: white;
           border-radius: 12px;
@@ -176,8 +190,22 @@ class Components {
           max-width: 450px;
           box-shadow: 0 8px 24px rgba(0,0,0,0.2);
           text-align: center;
+          position: relative;
           animation: slideUp 0.3s ease-out;
         ">
+          <button onclick="document.getElementById('${modalId}').remove(); delete window['primary_${modalId}']; delete window['secondary_${modalId}'];" style="
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.2s;
+          " onmouseover="this.style.color='#333'" onmouseout="this.style.color='#999'" title="Cerrar">
+            <i class="fas fa-times"></i>
+          </button>
           <div style="font-size: 48px; color: ${colorIcono}; margin-bottom: 16px;">
             <i class="fas ${icono}"></i>
           </div>
