@@ -989,6 +989,7 @@ ul {
   position: absolute;
   top: 1rem;
   right: 1rem;
+  z-index: 50;
   width: 36px;
   height: 36px;
   background: rgba(0, 0, 0, .5);

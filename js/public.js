@@ -572,7 +572,25 @@
   };
 
   document.getElementById('modalDetalleClose')?.addEventListener('click', () => {
-    modalDetalleOverlay.classLis  window.abrirModalDetalle = function(id, tipo) {
+    modalDetalleOverlay.classList.remove('open');
+    modalDetalleOverlay.setAttribute('aria-hidden', 'true');
+    if(!modalExploradorOverlay.classList.contains('open')) document.body.style.overflow = '';
+  });
+  
+  modalDetalleOverlay?.addEventListener('click', (e) => {
+    if (e.target === modalDetalleOverlay) {
+      window.cerrarModales();
+    }
+  });
+
+  document.getElementById('modalExploradorClose')?.addEventListener('click', window.cerrarModales);
+  modalExploradorOverlay?.addEventListener('click', (e) => {
+    if (e.target === modalExploradorOverlay) {
+      window.cerrarModales();
+    }
+  });
+
+  window.abrirModalDetalle = function(id, tipo) {
     const titleEl = document.getElementById('modalDetalleTitle');
     const infoEl = document.getElementById('modalDetalleInfo');
     const descEl = document.getElementById('modalDetalleDesc');
