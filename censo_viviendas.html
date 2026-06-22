@@ -6541,6 +6541,40 @@
       showToast('Habitante registrado y vinculado temporalmente. Se guardará definitivamente al aprobar el censo.', 'success');
     }
   </script>
+
+  <!-- MODAL ELIMINAR CENSO -->
+  <div class="modal fade cv-modal" id="modalEliminarCenso" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:430px;">
+      <div class="modal-content">
+        <div class="cv-modal-header" style="background:linear-gradient(135deg,#7f1d1d,#C62828);">
+          <div class="cv-modal-header-left">
+            <div class="cv-modal-header-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div>
+              <h5 class="cv-modal-title">Eliminar Vivienda / Censo</h5>
+              <p class="cv-modal-sub">Esta accion no se puede deshacer.</p>
+            </div>
+          </div>
+          <button type="button" class="cv-modal-close" data-bs-dismiss="modal" aria-label="Cerrar">
+            <i class="fas fa-xmark"></i>
+          </button>
+        </div>
+        <div class="cv-modal-body" style="text-align:center;padding:2rem;">
+          <div style="width:72px;height:72px;border-radius:50%;background:rgba(198,40,40,.1);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:2rem;color:#C62828">
+            <i class="fas fa-home"></i>
+          </div>
+          <p style="font-size:1rem;font-weight:600;margin-bottom:.5rem">&iquest;Eliminar este censo irreversiblemente?</p>
+          <p style="font-size:.875rem;color:var(--gray4)">Se eliminaran la vivienda, sus caracteristicas y los vinculos familiares. Los habitantes no seran borrados de la base de datos general.</p>
+        </div>
+        <div class="cv-modal-footer" style="justify-content:center;gap:.75rem;">
+          <button type="button" class="cv-btn cv-btn-ghost" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
+          <button type="button" class="cv-btn" style="background:#C62828;color:#fff;" onclick="procesarEliminarCenso(); bootstrap.Modal.getInstance(document.getElementById('modalEliminarCenso')).hide();">
+            <i class="fas fa-trash-alt"></i> Si, Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- CHART JS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
