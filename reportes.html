@@ -473,13 +473,9 @@
                 <option value="1">Jobito I</option><option value="2">Jobito II</option><option value="3">Brisas del Yurubí</option><option value="4">Andrés Eloy Blanco</option><option value="5">Las Mercedes I</option><option value="6">Las Mercedes II</option><option value="7">Santa Cruz de las Mercedes</option><option value="8">Fortaleza del Corozo</option><option value="9">Vencedores del Corozo</option>
               </select>
             </div>
-            <div class="form-group-sicag">
-              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Nro. Planilla Exacto</label>
-              <input type="text" id="filtroV_Planilla" class="input-sicag" placeholder="Ej: 001234" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
-            </div>
-            <div class="form-group-sicag">
-              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.4rem; display:block;">Cédula del Encuestador</label>
-              <input type="text" id="filtroV_Encuestador" class="input-sicag" placeholder="Ej: 12345678" style="width:100%; padding:0.75rem; border-radius:8px; border:1px solid #d1d5db;">
+            <div class="form-group-sicag" style="grid-column:1/-1; background:#f0fdf4; border:1px solid #bbf7d0; padding:1rem; border-radius:8px; display:flex; align-items:center; gap:0.5rem;">
+              <input type="checkbox" id="filtroV_IncluirIntegrantes" style="width:1.2rem; height:1.2rem; cursor:pointer;">
+              <label for="filtroV_IncluirIntegrantes" style="font-weight:700; color:#166534; cursor:pointer; margin:0;">Incluir listado de integrantes familiares debajo de cada vivienda</label>
             </div>
           </div>
         </details>
@@ -588,6 +584,22 @@
                 <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-animales" value="Peces" checked> Peces</label>
                 <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-animales" value="Aves de Corral" checked> Aves de Corral</label>
                 <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-animales" value="Porcinos" checked> Porcinos</label>
+              </div>
+            </div>
+            
+            <div class="form-group-sicag" style="grid-column:1/-1;">
+              <label style="font-weight:600; font-size:0.9rem; margin-bottom:0.6rem; display:block;">Enseres de la Vivienda</label>
+              <div style="display:flex; flex-wrap:wrap; gap:1rem; background:#f0f9ff; padding:1rem; border-radius:8px; border:1px solid #bae6fd;">
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enseres" value="Televisor" checked> Televisor</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enseres" value="Nevera" checked> Nevera</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enseres" value="Cocina" checked> Cocina</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enseres" value="Lavadora" checked> Lavadora</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enseres" value="Aire Acondicionado" checked> Aire Acond.</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enseres" value="Computadora" checked> Computadora</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enseres" value="Ventilador" checked> Ventilador</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enseres" value="Cama" checked> Cama</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enseres" value="Muebles" checked> Muebles</label>
+                <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer;"><input type="checkbox" class="chk-enseres" value="Comedor" checked> Comedor</label>
               </div>
             </div>
           </div>

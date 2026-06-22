@@ -95,7 +95,7 @@ class CensoReportesController {
         consejo_id = req.user.consejo_comunal_id || req.user.id_comunidad_asignada;
       }
 
-      const filtros = { desde, hasta, consejo_id, edad_min, edad_max, genero, salud, cne, trabajo, nac_min, nac_max, extras };
+      const filtros = { ...req.query, consejo_id };
       
       if (!CensoReportesController.dbModels) throw new Error('Modelos de base de datos no inyectados en CensoReportesController');
 

@@ -190,9 +190,7 @@ class ReportesController {
     if (btnLimpiarFiltrosVivienda) {
       btnLimpiarFiltrosVivienda.addEventListener('click', () => {
         document.querySelectorAll('#modalFiltrosVivienda select, #modalFiltrosVivienda input[type="text"]').forEach(el => {
-          if (!el.disabled || el.id === 'filtroV_Planilla' || el.id === 'filtroV_Encuestador') {
-            el.value = '';
-          }
+          if (!el.disabled) el.value = '';
         });
       });
     }
@@ -252,11 +250,7 @@ class ReportesController {
     const incluirIntegrantes = document.getElementById('filtroV_IncluirIntegrantes')?.checked;
     if (incluirIntegrantes) q += `&incluir_integrantes=true`;
 
-    // Identificación
-    const planilla = document.getElementById('filtroV_Planilla')?.value;
-    if (planilla) q += `&planilla_nro=${encodeURIComponent(planilla)}`;
-    const encuestador = document.getElementById('filtroV_Encuestador')?.value;
-    if (encuestador) q += `&encuestador_cedula=${encodeURIComponent(encuestador)}`;
+
 
     // Familia
     const edadMin = document.getElementById('filtroV_EdadMin')?.value;
@@ -299,6 +293,11 @@ class ReportesController {
     const animalesSeleccionados = Array.from(document.querySelectorAll('.chk-animales:checked')).map(el => el.value);
     if (animalesSeleccionados.length > 0 && animalesSeleccionados.length < 6) {
       q += `&animales=${encodeURIComponent(animalesSeleccionados.join(','))}`;
+    }
+    
+    const enseresSeleccionados = Array.from(document.querySelectorAll('.chk-enseres:checked')).map(el => el.value);
+    if (enseresSeleccionados.length > 0 && enseresSeleccionados.length < 10) {
+      q += `&enseres=${encodeURIComponent(enseresSeleccionados.join(','))}`;
     }
     
     const enfermedadesSeleccionadas = Array.from(document.querySelectorAll('.chk-enfermedades:checked')).map(el => el.value);
