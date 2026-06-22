@@ -15,8 +15,12 @@ class HabitanteAutocomplete {
     const input = typeof inputEl === 'string' ? document.getElementById(inputEl) : inputEl;
     if (!input) return;
 
-    const debounceTime = options.debounce  || 500;
-    const onNotFound   = options.onNotFound || null;
+    const isOptionsObj = typeof onFill === 'object' && onFill !== null;
+    const actualOnFill = typeof onFill === 'function' ? onFill : (isOptionsObj ? onFill.onSelect : null);
+    const actualOptions = isOptionsObj ? onFill : options;
+
+    const debounceTime = actualOptions.debounce  || 500;
+    const onNotFound   = actualOptions.onNotFound || null;
     let timeoutId;
 
     // Crear un chip de estado UI que mostraremos junto al input
@@ -85,7 +89,7 @@ class HabitanteAutocomplete {
 
         if (habitante) {
           setStatus('success', habitante.nombres || 'Encontrado');
-          if (onFill) onFill(habitante);
+          if (actualOnFill) actualOnFill(habitante);
         } else {
           setStatus('error', 'No registrado');
           if (onNotFound) onNotFound(cedula);
@@ -101,7 +105,7 @@ class HabitanteAutocomplete {
             const hab = todos.find(h => String(h.cedula).replace(/[\.\s-]/g, '') === cedNorm);
             if (hab) {
               setStatus('success', hab.nombres || 'Encontrado');
-              if (onFill) onFill(hab);
+              if (actualOnFill) actualOnFill(hab);
               return;
             }
           }
