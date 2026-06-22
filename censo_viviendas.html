@@ -5604,22 +5604,26 @@
                 });
                 const dataCenso = await resCenso.json();
                 if (dataCenso.censado) {
-                  const banner = row.querySelector('.fam-status-banner');
-                  if (banner) {
-                    banner.style.display = 'block';
-                    banner.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
-                    banner.style.color = 'var(--danger)';
-                    banner.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Este integrante está censado con el jefe de familia: 
-                      <strong style="cursor:pointer; text-decoration:underline;" onclick="navigator.clipboard.writeText('${dataCenso.jefe_cedula}'); window.showToast('Cédula copiada al portapapeles', 'success');">${dataCenso.jefe_cedula}</strong>.`;
-                  }
-                  window.showToast('⚠️ Este integrante ya pertenece a otro censo.', 'error');
+                  const isSameCensus = window.isEditingCenso && dataCenso.planilla_nro === document.getElementById('planillaNro').value;
                   
-                  // Reset fields
-                  if (row.querySelector('.fam-habitante-id')) row.querySelector('.fam-habitante-id').value = '';
-                  if (row.querySelector('.fam-nombres')) row.querySelector('.fam-nombres').value = '';
-                  const btnToggle = row.querySelector('.btn-toggle-info');
-                  if (btnToggle) btnToggle.style.display = 'none';
-                  return; // Stop filling
+                  if (!isSameCensus) {
+                    const banner = row.querySelector('.fam-status-banner');
+                    if (banner) {
+                      banner.style.display = 'block';
+                      banner.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                      banner.style.color = 'var(--danger)';
+                      banner.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Este integrante está censado con el jefe de familia: 
+                        <strong style="cursor:pointer; text-decoration:underline;" onclick="navigator.clipboard.writeText('${dataCenso.jefe_cedula}'); window.showToast('Cédula copiada al portapapeles', 'success');">${dataCenso.jefe_cedula}</strong>.`;
+                    }
+                    window.showToast('⚠️ Este integrante ya pertenece a otro censo.', 'error');
+                    
+                    // Reset fields
+                    if (row.querySelector('.fam-habitante-id')) row.querySelector('.fam-habitante-id').value = '';
+                    if (row.querySelector('.fam-nombres')) row.querySelector('.fam-nombres').value = '';
+                    const btnToggle = row.querySelector('.btn-toggle-info');
+                    if (btnToggle) btnToggle.style.display = 'none';
+                    return; // Stop filling
+                  }
                 }
               } catch(e) { console.error(e); }
             }
