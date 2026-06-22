@@ -783,6 +783,9 @@
       </div>
       <div class="modal-body-sicag">
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.9rem;">
+          <div style="grid-column: 1 / -1; margin-bottom: 0.5rem; display:none;" id="verProjImagenContainer">
+            <img id="verProjImagen" src="" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border);">
+          </div>
           <div style="grid-column: 1 / -1; margin-bottom: 0.5rem;">
             <label style="font-weight:700; color:var(--vp);">Título del Proyecto: <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Nombre o título principal de la publicación/registro"></i></label>
             <div id="verProjTitulo" style="font-weight:600; font-size: 1.1rem;"></div>
@@ -944,6 +947,16 @@
             </div>
           </div>
 
+          <div class="mfg-2">
+            <div class="form-group-sicag">
+              <label class="form-label-sicag" for="projImagen">Imagen del Proyecto (Opcional) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Sube una foto del proyecto"></i></label>
+              <input type="file" class="form-control-sicag" id="projImagen" accept="image/*">
+            </div>
+            <div class="form-group-sicag" style="display: flex; align-items: center; justify-content: center;">
+              <img id="projImagenPreview" src="" alt="Previsualización" style="max-height: 80px; display: none; border-radius: 8px; border: 1px solid var(--border);">
+            </div>
+          </div>
+
           <div class="form-group-sicag" style="margin-bottom:0;">
             <label class="form-label-sicag" for="projObservaciones">Observaciones adicionales <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
             <textarea class="form-control-sicag" id="projObservaciones" rows="2"
@@ -1053,6 +1066,7 @@
         return `
         <div class="proj-card fade-in-up" data-estado="${p.estado}" data-id="${p.id}">
           <div class="proj-bar ${barClass}"></div>
+          ${p.imagen_portada ? `<div style="height:140px; overflow:hidden; background:#eee; display:flex; align-items:center; justify-content:center; border-bottom: 1px solid var(--border);"><img src="${p.imagen_portada}" style="width:100%; height:100%; object-fit:cover;"></div>` : ''}
           <div class="proj-card-body">
             <div class="proj-card-top">
               <span class="proj-badge ${badgeClass}"><i class="fas fa-${iconEstado}"></i> ${statusLabel}</span>
@@ -1119,7 +1133,8 @@
             fechaInicio: p.fecha_inicio ? p.fecha_inicio.split('T')[0] : (p.fechaInicio || null),
             fechaFin: p.fecha_fin ? p.fecha_fin.split('T')[0] : (p.fechaFin || null),
             responsable: p.responsable || '',
-            observaciones: p.observaciones || ''
+            observaciones: p.observaciones || '',
+            imagen_portada: p.imagen_portada || null
           }));
         }
       } catch (err) {
@@ -1134,6 +1149,22 @@
       const inp = document.getElementById('projSearchInput');
       if (inp) inp.addEventListener('input', renderGrid);
       await cargarProyectos();
+
+      document.getElementById('projImagen')?.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        const preview = document.getElementById('projImagenPreview');
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            preview.src = evt.target.result;
+            preview.style.display = 'block';
+          }
+          reader.readAsDataURL(file);
+        } else {
+          preview.src = '';
+          preview.style.display = 'none';
+        }
+      });
     });
 
     // ── MODAL NUEVO / EDITAR ──
@@ -1160,6 +1191,11 @@
         document.getElementById('projFechaInicio').value = p.fechaInicio || '';
         document.getElementById('projFechaFin').value = p.fechaFin || '';
         document.getElementById('projObservaciones').value = p.observaciones || '';
+        if (p.imagen_portada) {
+          const imgPreview = document.getElementById('projImagenPreview');
+          imgPreview.src = p.imagen_portada;
+          imgPreview.style.display = 'block';
+        }
         titleTxt.textContent = 'Editar Proyecto';
         btnText.textContent = 'Guardar Cambios';
       } else {
@@ -1176,10 +1212,12 @@
     }
 
     function limpiarFormProyecto() {
-      ['projId', 'projTitulo', 'projDescripcion', 'projPresupuesto', 'projAvance', 'projResponsable', 'projFechaInicio', 'projFechaFin', 'projObservaciones'].forEach(id => {
+      ['projId', 'projTitulo', 'projDescripcion', 'projPresupuesto', 'projAvance', 'projResponsable', 'projFechaInicio', 'projFechaFin', 'projObservaciones', 'projImagen'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
       });
+      const imgPreview = document.getElementById('projImagenPreview');
+      if (imgPreview) { imgPreview.src = ''; imgPreview.style.display = 'none'; }
       ['projEstado', 'projConsejo', 'projTipo'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
@@ -1211,6 +1249,34 @@
         fecha_fin: document.getElementById('projFechaFin').value || null,
         observaciones: document.getElementById('projObservaciones').value.trim()
       };
+
+      const fileInput = document.getElementById('projImagen');
+      const file = fileInput ? fileInput.files[0] : null;
+      let urlImagen = id ? (proyectos.find(x => String(x.id) === String(id))?.imagen_portada || null) : null;
+
+      if (file) {
+        if (window.Components) Components.showToast('Comprimiendo y subiendo imagen...', 'info');
+        const btnText = document.getElementById('btnGuardarText');
+        const oldText = btnText.textContent;
+        btnText.textContent = 'Subiendo...';
+        
+        try {
+          const compressedBlob = await comprimirImagenWebP(file, 800, 0.7);
+          const { uploadBytes, getDownloadURL, ref } = await import('https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js');
+          const { storage } = await import('./js/config/firebase-config.js');
+          const fileName = `proyectos/proj_${Date.now()}_${Math.floor(Math.random()*1000)}.webp`;
+          const storageRef = ref(storage, fileName);
+          await uploadBytes(storageRef, compressedBlob);
+          urlImagen = await getDownloadURL(storageRef);
+        } catch (uploadErr) {
+          console.error('Error al subir:', uploadErr);
+          if (window.Components) Components.showToast('No se pudo subir la imagen.', 'error');
+          btnText.textContent = oldText;
+          return;
+        }
+        btnText.textContent = oldText;
+      }
+      data.imagen_portada = urlImagen;
 
       try {
         if (id) {
@@ -1245,6 +1311,12 @@
     async function eliminarProyectoConfirmado() {
       if (!projEliminarId) return;
       try {
+        const p = proyectos.find(x => String(x.id) === String(projEliminarId));
+        if (p && p.imagen_portada) {
+          const { eliminarImagenFirebase } = await import('./js/config/firebase-config.js');
+          await eliminarImagenFirebase(p.imagen_portada);
+        }
+        
         await window.api.eliminarProyecto(projEliminarId);
         cerrarModalElimProj();
         await cargarProyectos();
@@ -1260,6 +1332,13 @@
     function verProyecto(id) {
       const p = proyectos.find(x => x.id === id);
       if (!p) return;
+
+      if (p.imagen_portada) {
+        document.getElementById('verProjImagen').src = p.imagen_portada;
+        document.getElementById('verProjImagenContainer').style.display = 'block';
+      } else {
+        document.getElementById('verProjImagenContainer').style.display = 'none';
+      }
 
       document.getElementById('verProjTitulo').textContent = p.titulo;
       document.getElementById('verProjDesc').textContent = p.descripcion || 'Sin descripción.';
@@ -1307,6 +1386,30 @@
       return str.toString()
         .replace(/&/g, '&amp;').replace(/</g, '&lt;')
         .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function comprimirImagenWebP(file, maxWidth, quality) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            resolve(blob);
+          }, 'image/webp', quality);
+        };
+        img.onerror = (err) => reject(err);
+      });
     }
 
     function formatDate(val) {

@@ -511,6 +511,11 @@ class NotificacionesController {
   async rechazarUno(id) {
     Components.confirmDialog('¿Está seguro de rechazar esta solicitud?', async () => {
       try {
+        const n = this.todas.find(x => x.id === id);
+        if (n && n.tabla_afectada === 'proyectos' && n.datos_temporales?.imagen_portada) {
+          const { eliminarImagenFirebase } = await import('./js/config/firebase-config.js');
+          await eliminarImagenFirebase(n.datos_temporales.imagen_portada);
+        }
         await window.api.rechazarNotificacion(id, 'Rechazado por el administrador.');
         Components.showToast('Solicitud rechazada.', 'info');
         this.selected.delete(id);
@@ -523,9 +528,14 @@ class NotificacionesController {
 
   async cancelarSolicitud(id) {
     Components.confirmDialog(
-      'Â¿Deseas cancelar esta solicitud? Esta acciÃ³n no se puede deshacer.',
+      '¿Deseas cancelar esta solicitud? Esta acción no se puede deshacer.',
       async () => {
         try {
+          const n = this.todas.find(x => x.id === id);
+          if (n && n.tabla_afectada === 'proyectos' && n.datos_temporales?.imagen_portada) {
+            const { eliminarImagenFirebase } = await import('./js/config/firebase-config.js');
+            await eliminarImagenFirebase(n.datos_temporales.imagen_portada);
+          }
           await window.api.rechazarNotificacion(id, 'Cancelado por el solicitante.');
           Components.showToast('Solicitud cancelada.', 'info');
           await this.cargarDatos();
@@ -575,9 +585,14 @@ class NotificacionesController {
     let ok = 0, err = 0;
     for (const id of ids) {
       try {
+        const n = this.todas.find(x => x.id === id);
         if (isApprove && !isVocero) {
           await window.api.aprobarNotificacion(id, 'Aprobado en lote por el administrador.');
         } else {
+          if (n && n.tabla_afectada === 'proyectos' && n.datos_temporales?.imagen_portada) {
+            const { eliminarImagenFirebase } = await import('./js/config/firebase-config.js');
+            await eliminarImagenFirebase(n.datos_temporales.imagen_portada);
+          }
           const motivo = isVocero ? 'Cancelado en lote por el solicitante.' : 'Rechazado en lote por el administrador.';
           await window.api.rechazarNotificacion(id, motivo);
         }

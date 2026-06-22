@@ -22,7 +22,8 @@ module.exports = (sequelize) => {
     fecha_creacion: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     fecha_inicio: DataTypes.DATE,
     fecha_fin: DataTypes.DATE,
-    activo: { type: DataTypes.BOOLEAN, defaultValue: true }
+    activo: { type: DataTypes.BOOLEAN, defaultValue: true },
+    imagen_portada: { type: DataTypes.TEXT, allowNull: true }
   }, { tableName: 'proyectos', timestamps: false });
 
   return Proyecto;

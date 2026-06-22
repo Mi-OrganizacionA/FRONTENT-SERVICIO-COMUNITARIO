@@ -418,6 +418,7 @@
      return `
         <div class="proj-card fade-in-up" data-id="${p.id}" onclick="abrirModalDetalle(${p.id}, 'proyecto')" style="background:#fff; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05); overflow:hidden; position:relative; display:flex; flex-direction:column; cursor:pointer; transition:transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 25px rgba(0,0,0,.1)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 15px rgba(0,0,0,0.05)';">
           <div style="height:4px; width:100%; background:${textColor};"></div>
+          ${p.imagen_portada ? `<div style="height:180px; width:100%; overflow:hidden;"><img src="${p.imagen_portada}" alt="Portada" style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"></div>` : ''}
           <div style="padding: 1.5rem; display: flex; flex-direction: column; flex: 1; gap: 1rem;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="background: ${badgeColor}; color: ${textColor}; padding: 0.35rem 0.85rem; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-circle" style="font-size:0.5rem;margin-right:4px;vertical-align:middle;margin-bottom:1px;"></i> ${estado}</span>

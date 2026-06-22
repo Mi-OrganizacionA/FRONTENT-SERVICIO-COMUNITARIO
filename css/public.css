@@ -2124,7 +2124,7 @@ ul {
 
   .pub-news-card {
     flex: 0 0 85% !important;
-    max-width: 85% !important;
+    max-width: 350px !important;
     scroll-snap-align: center;
   }
 

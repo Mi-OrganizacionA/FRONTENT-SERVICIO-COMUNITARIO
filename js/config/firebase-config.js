@@ -1,7 +1,7 @@
-﻿import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js';
 import { getFirestore } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
-import { getStorage } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js';
+import { getStorage, ref, deleteObject } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js';
 import { getFunctions } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-functions.js';
 
 // Reemplaza estas credenciales con las de tu proyecto Firebase.
@@ -20,5 +20,16 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 const functions = getFunctions(app);
+
+export const eliminarImagenFirebase = async (url) => {
+  if (!url || !url.includes('firebasestorage')) return;
+  try {
+    const fileRef = ref(storage, url);
+    await deleteObject(fileRef);
+    console.log('Imagen eliminada de Firebase Storage:', url);
+  } catch (error) {
+    console.error('Error al eliminar imagen de Firebase Storage:', error);
+  }
+};
 
 export { app, auth, db, storage, functions };
