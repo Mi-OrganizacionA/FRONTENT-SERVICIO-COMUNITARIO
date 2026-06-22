@@ -366,9 +366,6 @@ class CensoReportesService {
       case 'viviendas_avanzado':
         title = 'Censo Avanzado de Viviendas';
         headers = ['Planilla', 'Consejo Comunal', 'Dirección', 'Jefe de Familia', 'Cédula', 'Tipo Vivienda', 'Nro. Habitantes', 'Tenencia', 'Gas', 'Agua', 'Ingreso', 'Ayuda Médica'];
-        if (filtros.incluir_integrantes === 'true') {
-          headers.push('Integrantes Familiares');
-        }
         
         // Includes básicos obligatorios
         const incAvanzado = [
@@ -578,20 +575,25 @@ class CensoReportesService {
               (v.salud && v.salud.necesita_ayuda_especial === 'Sí') ? `Sí, ${v.salud.cual_ayuda_especial || 'No especificada'}` : 'No'
             ];
 
-            if (filtros.incluir_integrantes === 'true') {
-              if (v.familiares && v.familiares.length > 0) {
-                const familiaresStr = v.familiares.map((f, i) => {
+            rowsCombinados.push(rowAv);
+            
+            if (filtros.incluir_integrantes === 'true' && v.familiares && v.familiares.length > 0) {
+              const otrosFamiliares = v.familiares.filter(f => f.parentesco !== 'Jefe(a) de Familia' && !f.es_jefe_familia);
+              if (otrosFamiliares.length > 0) {
+                // Header de sub-tabla
+                rowsCombinados.push([
+                  '', '', '  ↳ [Integrantes]', 'Cédula', 'Nombres y Apellidos', 'Parentesco', 'Edad', 'Ocupación', '', '', '', ''
+                ]);
+                
+                otrosFamiliares.forEach(f => {
                   const edad = f.fecha_nacimiento ? Math.floor((new Date() - new Date(f.fecha_nacimiento)) / (1000 * 60 * 60 * 24 * 365.25)) + ' años' : 'N/A';
                   const doc = f.cedula_identidad ? `V-${f.cedula_identidad}` : 'S/C';
-                  return `${i+1}. ${f.nombres_apellidos} (${f.parentesco}, ${doc}, ${edad})`;
-                }).join('\n');
-                rowAv.push(familiaresStr);
-              } else {
-                rowAv.push('Ninguno registrado');
+                  rowsCombinados.push([
+                    '', '', '    •', doc, f.nombres_apellidos || 'N/A', f.parentesco || 'N/A', edad, f.ocupacion || 'N/A', '', '', '', ''
+                  ]);
+                });
               }
             }
-            
-            rowsCombinados.push(rowAv);
           } else {
             rowsCombinados.push([
               v.situacion_vivienda ? v.situacion_vivienda.tipo_vivienda : 'N/A',

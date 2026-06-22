@@ -38,6 +38,13 @@ class ExportGeneratorService {
     // Agregar filas de datos
     data.forEach(item => {
       const row = worksheet.addRow(item);
+      if (item[2] && item[2].toString().startsWith('  ↳')) {
+        row.font = { bold: true, color: { argb: 'FF444444' }, size: 9 };
+        row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEAEAEA' } };
+      } else if (item[2] && item[2].toString().startsWith('    •')) {
+        row.font = { italic: true, color: { argb: 'FF666666' }, size: 9 };
+        row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF9FAFB' } };
+      }
       row.alignment = { wrapText: true, vertical: 'top' };
       currentRow++;
     });
@@ -100,7 +107,9 @@ class ExportGeneratorService {
         doc.table(table, {
           prepareHeader: () => doc.font('Helvetica-Bold').fontSize(10).fillColor('#000000'),
           prepareRow: (row, i) => {
-            if (row[0] && row[0].toString().startsWith('  ↳')) {
+            if (row[2] && row[2].toString().startsWith('  ↳')) {
+              doc.font('Helvetica-Bold').fontSize(8).fillColor('#444444');
+            } else if (row[2] && row[2].toString().startsWith('    •')) {
               doc.font('Helvetica-Oblique').fontSize(8).fillColor('#666666');
             } else {
               doc.font('Helvetica').fontSize(9).fillColor('#333333');
@@ -126,8 +135,13 @@ class ExportGeneratorService {
   static generateExcelHTML(headers, data, title = 'Reporte', filtrosText = '') {
     const thead = headers.map(h => `<th>${h}</th>`).join('');
     const tbody = data.map(row => {
-      const tds = row.map(cell => `<td>${cell !== null && cell !== undefined ? cell : ''}</td>`).join('');
-      return `<tr>${tds}</tr>`;
+      let cssClass = '';
+      if (row[2] && row[2].toString().startsWith('  ↳')) {
+        cssClass = 'class="sub-header"';
+      } else if (row[2] && row[2].toString().startsWith('    •')) {
+        cssClass = 'class="sub-row"';
+      }
+      return `<tr ${cssClass}>${row.map(cell => `<td>${(cell || '').toString().replace(/\n/g, '<br>')}</td>`).join('')}</tr>`;
     }).join('');
 
     return `
@@ -147,6 +161,8 @@ class ExportGeneratorService {
           th { background-color: #2E7D32; color: white; position: sticky; top: 0; z-index: 10; font-weight: 500; }
           tr:nth-child(even) { background-color: #f9f9f9; }
           tr:hover { background-color: #f1f8e9; }
+          .sub-header { background-color: #eaeaea !important; font-weight: bold; color: #444; }
+          .sub-row { background-color: #f9fafb !important; font-style: italic; color: #666; }
           .btn-print { margin-bottom: 20px; padding: 10px 20px; background: #1565C0; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
           .btn-print:hover { background: #0D47A1; }
           @media print { .btn-print { display: none; } body { padding: 0; background: white; } .container { box-shadow: none; } }
