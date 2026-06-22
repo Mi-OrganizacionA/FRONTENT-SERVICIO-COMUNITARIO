@@ -276,6 +276,20 @@ class NoticiasController {
 
     try {
       if (idInput) {
+        if (window.Components) {
+          const confirmed = await new Promise(resolve => {
+            window.Components.confirmDialog(
+              '¿Estás seguro de que deseas guardar los cambios en esta publicación?',
+              () => resolve(true),
+              () => resolve(false)
+            );
+          });
+          if (!confirmed) {
+            btnGuardar.textContent = oldBtnText;
+            btnGuardar.disabled = false;
+            return;
+          }
+        }
         await window.api.actualizarNoticia(idInput, data);
         if (window.Components) Components.showToast('Publicación actualizada', 'success');
       } else {

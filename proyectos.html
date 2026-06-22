@@ -951,9 +951,12 @@
             <div class="form-group-sicag">
               <label class="form-label-sicag" for="projImagen">Imagen del Proyecto (Opcional) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Sube una foto del proyecto"></i></label>
               <input type="file" class="form-control-sicag" id="projImagen" accept="image/*">
-            </div>
-            <div class="form-group-sicag" style="display: flex; align-items: center; justify-content: center;">
-              <img id="projImagenPreview" src="" alt="Previsualización" style="max-height: 80px; display: none; border-radius: 8px; border: 1px solid var(--border);">
+              <div style="margin-top: 0.5rem; display: flex; align-items: center; gap: 1rem;">
+                <img id="projImagenPreview" src="" alt="Previsualización" style="max-height: 80px; display: none; border-radius: 8px; border: 1px solid var(--border);">
+                <button type="button" class="btn-sicag btn-danger" id="btnQuitarImagen" style="display: none; padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                  <i class="fas fa-trash"></i> Quitar imagen actual
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1150,6 +1153,18 @@
       if (inp) inp.addEventListener('input', renderGrid);
       await cargarProyectos();
 
+      const btnQuitar = document.getElementById('btnQuitarImagen');
+
+      if (btnQuitar) {
+        btnQuitar.addEventListener('click', () => {
+          document.getElementById('projImagen').value = '';
+          const preview = document.getElementById('projImagenPreview');
+          preview.src = '';
+          preview.style.display = 'none';
+          btnQuitar.style.display = 'none';
+        });
+      }
+
       document.getElementById('projImagen')?.addEventListener('change', (e) => {
         const file = e.target.files[0];
         const preview = document.getElementById('projImagenPreview');
@@ -1158,11 +1173,13 @@
           reader.onload = function(evt) {
             preview.src = evt.target.result;
             preview.style.display = 'block';
+            if (btnQuitar) btnQuitar.style.display = 'inline-block';
           }
           reader.readAsDataURL(file);
         } else {
           preview.src = '';
           preview.style.display = 'none';
+          if (btnQuitar) btnQuitar.style.display = 'none';
         }
       });
     });
@@ -1193,8 +1210,12 @@
         document.getElementById('projObservaciones').value = p.observaciones || '';
         if (p.imagen_portada) {
           const imgPreview = document.getElementById('projImagenPreview');
+          const btnQuitar = document.getElementById('btnQuitarImagen');
           imgPreview.src = p.imagen_portada;
           imgPreview.style.display = 'block';
+          if (btnQuitar) btnQuitar.style.display = 'inline-block';
+          // Guardar url temporalmente por si la elimina
+          document.getElementById('modalProyecto').dataset.oldImageUrl = p.imagen_portada;
         }
         titleTxt.textContent = 'Editar Proyecto';
         btnText.textContent = 'Guardar Cambios';
@@ -1229,12 +1250,16 @@
     }
 
     function limpiarFormProyecto() {
+      document.getElementById('modalProyecto').dataset.oldImageUrl = '';
+
       ['projId', 'projTitulo', 'projDescripcion', 'projPresupuesto', 'projAvance', 'projResponsable', 'projFechaInicio', 'projFechaFin', 'projObservaciones', 'projImagen'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
       });
       const imgPreview = document.getElementById('projImagenPreview');
       if (imgPreview) { imgPreview.src = ''; imgPreview.style.display = 'none'; }
+      const btnQuitar = document.getElementById('btnQuitarImagen');
+      if (btnQuitar) btnQuitar.style.display = 'none';
       ['projEstado', 'projConsejo', 'projTipo'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
@@ -1294,12 +1319,45 @@
         }
         btnText.textContent = oldText;
       }
-      data.imagen_portada = urlImagen;
+
+      // Si el usuario marcó explícitamente "Quitar imagen"
+      const oldImageUrl = document.getElementById('modalProyecto').dataset.oldImageUrl;
+      const btnQuitar = document.getElementById('btnQuitarImagen');
+      const isQuitarActivo = (btnQuitar && btnQuitar.style.display === 'none' && oldImageUrl && !file);
+
+      if (isQuitarActivo) {
+        data.imagen_portada = null;
+        data.quitar_imagen = true;
+        data.old_imagen_portada = oldImageUrl;
+      } else {
+        data.imagen_portada = urlImagen;
+      }
 
       try {
         if (id) {
+          if (window.Components) {
+            const confirmed = await new Promise(resolve => {
+              window.Components.confirmDialog(
+                '¿Estás seguro de que deseas guardar los cambios en este proyecto?',
+                () => resolve(true),
+                () => resolve(false)
+              );
+            });
+            if (!confirmed) {
+              const btnText = document.getElementById('btnGuardarText');
+              if (btnText) btnText.textContent = 'Guardar Cambios';
+              return;
+            }
+          }
           await window.api.actualizarProyecto(id, data);
-          if (window.Components) Components.showToast('Proyecto actualizado correctamente.', 'success');
+          if (window.Components) Components.showToast('Proyecto actualizado.', 'success');
+          const currentUser = window.auth?.getUser();
+          if (isQuitarActivo && currentUser?.rol === 'admin') {
+            try {
+              const { eliminarImagenFirebase } = await import('./js/config/firebase-config.js');
+              await eliminarImagenFirebase(oldImageUrl);
+            } catch (ignore) {}
+          }
         } else {
           await window.api.crearProyecto(data);
           if (window.Components) Components.showToast('Proyecto registrado correctamente.', 'success');

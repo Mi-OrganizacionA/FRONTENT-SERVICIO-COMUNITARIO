@@ -5003,6 +5003,16 @@
         if (window.api) {
           let res;
           if (window.currentCensoId && window.isEditingCenso) {
+            if (window.Components) {
+              const confirmed = await new Promise(resolve => {
+                window.Components.confirmDialog(
+                  '¿Estás seguro de que deseas guardar los cambios en este estudio demográfico?',
+                  () => resolve(true),
+                  () => resolve(false)
+                );
+              });
+              if (!confirmed) return;
+            }
             if (window.api.actualizarEstudioDemografico) {
               res = await window.api.actualizarEstudioDemografico(window.currentCensoId, datosCenso);
               if (res && res.validacion) {

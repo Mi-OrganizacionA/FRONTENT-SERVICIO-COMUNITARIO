@@ -3,6 +3,7 @@ import { getAuth } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-aut
 import { getFirestore } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js';
 import { getStorage, ref, deleteObject } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-storage.js';
 import { getFunctions } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-functions.js';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-app-check.js';
 
 // Reemplaza estas credenciales con las de tu proyecto Firebase.
 // Import the functions you need from the SDKs you need
@@ -20,6 +21,14 @@ const firebaseConfig = {
 // Initialize Firebase
 
 const app = initializeApp(firebaseConfig);
+
+// Inicializar App Check (Seguridad)
+// NOTA: Reemplaza 'TU_RECAPTCHA_SITE_KEY' por la llave pública (Site Key) de reCAPTCHA v3
+const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider('6LffLC4tAAAAABDk9hvaE8FnFHpiH4qX5etp7HYT'),
+  isTokenAutoRefreshEnabled: true
+});
+
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);

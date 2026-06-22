@@ -499,8 +499,17 @@ class NotificacionesController {
   /* â”€â”€â”€ Acciones individuales â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   async aprobarUno(id) {
     try {
+      const n = this.todas.find(x => x.id === id);
       await window.api.aprobarNotificacion(id, 'Aprobado por el administrador.');
-      Components.showToast('âœ… Solicitud aprobada correctamente.', 'success');
+      
+      if (n && n.tabla_afectada === 'proyectos' && n.datos_temporales?.quitar_imagen && n.datos_temporales?.old_imagen_portada) {
+        try {
+          const { eliminarImagenFirebase } = await import('./js/config/firebase-config.js');
+          await eliminarImagenFirebase(n.datos_temporales.old_imagen_portada);
+        } catch (ignore) {}
+      }
+
+      Components.showToast('✅ Solicitud aprobada correctamente.', 'success');
       this.selected.delete(id);
       await this.cargarDatos();
     } catch (e) {
@@ -588,6 +597,13 @@ class NotificacionesController {
         const n = this.todas.find(x => x.id === id);
         if (isApprove && !isVocero) {
           await window.api.aprobarNotificacion(id, 'Aprobado en lote por el administrador.');
+          
+          if (n && n.tabla_afectada === 'proyectos' && n.datos_temporales?.quitar_imagen && n.datos_temporales?.old_imagen_portada) {
+            try {
+              const { eliminarImagenFirebase } = await import('./js/config/firebase-config.js');
+              await eliminarImagenFirebase(n.datos_temporales.old_imagen_portada);
+            } catch (ignore) {}
+          }
         } else {
           if (n && n.tabla_afectada === 'proyectos' && n.datos_temporales?.imagen_portada) {
             const { eliminarImagenFirebase } = await import('./js/config/firebase-config.js');

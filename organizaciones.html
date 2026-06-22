@@ -414,6 +414,16 @@
 
     try {
       if(id) {
+        if (window.Components) {
+          const confirmed = await new Promise(resolve => {
+            window.Components.confirmDialog(
+              '¿Estás seguro de que deseas guardar los cambios en esta organización?',
+              () => resolve(true),
+              () => resolve(false)
+            );
+          });
+          if (!confirmed) return;
+        }
         await window.api.actualizarOrganizacion(id, data);
         if(window.Components) Components.showToast('Organización actualizada.', 'success');
       } else {

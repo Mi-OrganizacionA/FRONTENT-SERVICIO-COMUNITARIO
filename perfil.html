@@ -514,6 +514,20 @@
 
             try {
               if (esHabitante && window.api.actualizarHabitante) {
+                if (window.Components) {
+                  const confirmed = await new Promise(resolve => {
+                    window.Components.confirmDialog(
+                      '¿Estás seguro de que deseas guardar los cambios en tus datos personales?',
+                      () => resolve(true),
+                      () => resolve(false)
+                    );
+                  });
+                  if (!confirmed) {
+                    btnSubmit.innerHTML = oldHtml;
+                    btnSubmit.disabled = false;
+                    return;
+                  }
+                }
                 await window.api.actualizarHabitante(habitanteInfo.id, datosHabitante);
               } else if (window.api.crearHabitante) {
                 await window.api.crearHabitante(datosHabitante);
@@ -642,6 +656,22 @@
 
           try {
             if (!window.api || !window.api.changePassword) throw new Error("La API no está conectada");
+            
+            if (window.Components) {
+              const confirmed = await new Promise(resolve => {
+                window.Components.confirmDialog(
+                  '¿Estás seguro de que deseas cambiar tu contraseña?',
+                  () => resolve(true),
+                  () => resolve(false)
+                );
+              });
+              if (!confirmed) {
+                btn.innerHTML = oldHtml;
+                btn.disabled = false;
+                return;
+              }
+            }
+            
             await window.api.changePassword(actual, nueva);
             
             formPass.reset();
@@ -675,6 +705,20 @@
             if (!isVocero) {
                // Es Admin, cambiar correo directamente pidiendo contraseña
                if (window.api && window.api.changeEmail) {
+                 if (window.Components) {
+                   const confirmed = await new Promise(resolve => {
+                     window.Components.confirmDialog(
+                       '¿Estás seguro de que deseas cambiar tu correo electrónico?',
+                       () => resolve(true),
+                       () => resolve(false)
+                     );
+                   });
+                   if (!confirmed) {
+                     btn.innerHTML = oldHtml;
+                     btn.disabled = false;
+                     return;
+                   }
+                 }
                  await window.api.changeEmail(nuevoCorreo, passActual);
                  Components.showToast('Tu correo ha sido actualizado exitosamente. Usa este nuevo correo la próxima vez que inicies sesión.', 'success');
                  const displayCorreo = document.getElementById('detCorreo');
@@ -765,6 +809,20 @@
 
           try {
             if (window.api && window.api._fetch && window.auth) {
+              if (window.Components) {
+                const confirmed = await new Promise(resolve => {
+                  window.Components.confirmDialog(
+                    '¿Estás seguro de que deseas guardar los cambios en la configuración pública?',
+                    () => resolve(true),
+                    () => resolve(false)
+                  );
+                });
+                if (!confirmed) {
+                  btn.innerHTML = oldHtml;
+                  btn.disabled = false;
+                  return;
+                }
+              }
               await window.api._fetch(window.api.baseURL + '/system/config-portal', {
                 method: 'POST',
                 headers: {

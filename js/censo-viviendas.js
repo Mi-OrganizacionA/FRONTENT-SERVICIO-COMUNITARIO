@@ -247,6 +247,20 @@ async function guardarVivienda(event) {
 
   try {
     if (editingId) {
+      if (window.Components) {
+        const confirmed = await new Promise(resolve => {
+          window.Components.confirmDialog(
+            '¿Estás seguro de que deseas guardar los cambios en esta vivienda?',
+            () => resolve(true),
+            () => resolve(false)
+          );
+        });
+        if (!confirmed) {
+          btnGuardar.innerHTML = oldHtml;
+          btnGuardar.disabled = false;
+          return;
+        }
+      }
       await window.api.actualizarVivienda(editingId, registro);
       showToast('Registro actualizado correctamente.', 'success');
     } else {
