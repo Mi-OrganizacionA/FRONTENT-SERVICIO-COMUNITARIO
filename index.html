@@ -194,7 +194,9 @@
         <div class="pub-search-inner" style="grid-template-columns:1fr auto;">
           <label for="habSearch" class="sr-only"
             style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Número
-            de cédula del habitante <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese el número de cédula de identidad sin puntos ni guiones"></i></label>
+            de cédula del habitante <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;"
+              data-bs-toggle="tooltip"
+              title="Ingrese el número de cédula de identidad sin puntos ni guiones"></i></label>
           <input type="text" id="habSearch" inputmode="numeric" placeholder="Ingresa el N° de Cédula (ej. 12345678)"
             maxlength="12" autocomplete="off" style="font-size:1rem;letter-spacing:.03em;"
             aria-label="Número de cédula del habitante">
@@ -240,7 +242,7 @@
   <section class="pub-section" id="proyectos" aria-labelledby="projTitle">
     <div class="pub-container">
       <div class="pub-section-label fade-up"><i class="fas fa-seedling"></i> Obras e Iniciativas</div>
-      <h2 class="pub-section-title fade-up" id="projTitle">Proyectos <span>Agroecológicos</span></h2>
+      <h2 class="pub-section-title fade-up" id="projTitle">Proyectos <span>Comunales</span></h2>
       <p class="pub-section-sub fade-up">Conoce los proyectos en ejecución, propuestos y finalizados por los 9 consejos
         comunales.</p>
 
@@ -410,16 +412,21 @@
           <form id="contactForm" novalidate>
             <div class="pub-form-row">
               <div class="pub-form-group">
-                <label for="cNombre">Nombre Completo * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese los nombres y apellidos completos"></i></label>
+                <label for="cNombre">Nombre Completo * <i class="fas fa-question-circle text-muted ms-1"
+                    style="cursor:help;" data-bs-toggle="tooltip"
+                    title="Ingrese los nombres y apellidos completos"></i></label>
                 <input type="text" id="cNombre" placeholder="Ej: María González" required>
               </div>
               <div class="pub-form-group">
-                <label for="cCorreo">Correo Electrónico (Opcional) <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Dirección de correo electrónico válida"></i></label>
+                <label for="cCorreo">Correo Electrónico (Opcional) <i class="fas fa-question-circle text-muted ms-1"
+                    style="cursor:help;" data-bs-toggle="tooltip"
+                    title="Dirección de correo electrónico válida"></i></label>
                 <input type="email" id="cCorreo" placeholder="maria@ejemplo.com">
               </div>
             </div>
             <div class="pub-form-group">
-              <label for="cCC">Consejo Comunal <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Seleccione el consejo comunal al que pertenece"></i></label>
+              <label for="cCC">Consejo Comunal <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;"
+                  data-bs-toggle="tooltip" title="Seleccione el consejo comunal al que pertenece"></i></label>
               <select id="cCC">
                 <option value="">Seleccionar consejo comunal...</option>
                 <option>C.C. Jobito I</option>
@@ -434,7 +441,8 @@
               </select>
             </div>
             <div class="pub-form-group">
-              <label for="cMensaje">Mensaje * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
+              <label for="cMensaje">Mensaje * <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;"
+                  data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
               <textarea id="cMensaje" rows="4" placeholder="Escribe tu consulta aquí..." required></textarea>
             </div>
             <button type="submit" class="pub-submit-btn" id="submitBtn">

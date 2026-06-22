@@ -396,7 +396,14 @@
   }
 
   function generarHtmlProyecto(p) {
-     const estado = (p.estado || 'propuesto').toLowerCase();
+     const estadoRaw = (p.estado || 'propuesto').toLowerCase();
+     let estadoFormat = estadoRaw;
+     if (estadoRaw === 'en_ejecucion') estadoFormat = 'En Ejecución';
+     else if (estadoRaw === 'aprobado') estadoFormat = 'Aprobado';
+     else if (estadoRaw === 'propuesto') estadoFormat = 'Propuesto';
+     else if (estadoRaw === 'finalizado') estadoFormat = 'Finalizado';
+     else if (estadoRaw === 'rechazado') estadoFormat = 'Rechazado';
+
      const avance = p.avance || 0;
      const esDestacado = p.destacado === true || p.destacado === 1 ||
                          p.is_featured === true || p.is_featured === 1;
@@ -411,9 +418,9 @@
 
      let badgeColor = 'rgba(21,101,192,.1)';
      let textColor = '#1565C0';
-     if(estado === 'aprobado') { badgeColor = 'rgba(106,27,154,.1)'; textColor = '#6A1B9A'; }
-     else if(estado === 'en_ejecucion') { badgeColor = 'rgba(230,81,0,.1)'; textColor = '#E65100'; }
-     else if(estado === 'finalizado') { badgeColor = 'rgba(27,94,32,.12)'; textColor = '#1B5E20'; }
+     if(estadoRaw === 'aprobado') { badgeColor = 'rgba(106,27,154,.1)'; textColor = '#6A1B9A'; }
+     else if(estadoRaw === 'en_ejecucion') { badgeColor = 'rgba(230,81,0,.1)'; textColor = '#E65100'; }
+     else if(estadoRaw === 'finalizado') { badgeColor = 'rgba(27,94,32,.12)'; textColor = '#1B5E20'; }
 
      return `
         <div class="proj-card fade-in-up" data-id="${p.id}" onclick="abrirModalDetalle(${p.id}, 'proyecto')" style="background:#fff; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05); overflow:hidden; position:relative; display:flex; flex-direction:column; cursor:pointer; transition:transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 25px rgba(0,0,0,.1)';" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 15px rgba(0,0,0,0.05)';">
@@ -421,7 +428,7 @@
           ${p.imagen_portada ? `<div style="height:180px; width:100%; overflow:hidden;"><img src="${p.imagen_portada}" alt="Portada" style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"></div>` : ''}
           <div style="padding: 1.5rem; display: flex; flex-direction: column; flex: 1; gap: 1rem;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="background: ${badgeColor}; color: ${textColor}; padding: 0.35rem 0.85rem; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-circle" style="font-size:0.5rem;margin-right:4px;vertical-align:middle;margin-bottom:1px;"></i> ${estado}</span>
+              <span style="background: ${badgeColor}; color: ${textColor}; padding: 0.35rem 0.85rem; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fas fa-circle" style="font-size:0.5rem;margin-right:4px;vertical-align:middle;margin-bottom:1px;"></i> ${estadoFormat}</span>
               <span style="font-size: 0.8rem; font-weight: 700; color: var(--gray5);"><i class="fas fa-tag" style="color:var(--gray4);"></i> ${p.tipo_proyecto || 'General'}</span>
             </div>
             
@@ -565,22 +572,32 @@
   };
 
   document.getElementById('modalDetalleClose')?.addEventListener('click', () => {
-    modalDetalleOverlay.classList.remove('open');
-    modalDetalleOverlay.setAttribute('aria-hidden', 'true');
-    if(!modalExploradorOverlay.classList.contains('open')) document.body.style.overflow = '';
-  });
-  document.getElementById('modalExploradorClose')?.addEventListener('click', window.cerrarModales);
-
-  window.abrirModalDetalle = function(id, tipo) {
+    modalDetalleOverlay.classLis  window.abrirModalDetalle = function(id, tipo) {
     const titleEl = document.getElementById('modalDetalleTitle');
     const infoEl = document.getElementById('modalDetalleInfo');
     const descEl = document.getElementById('modalDetalleDesc');
+    const imgEl = document.getElementById('modalDetalleImg');
+
+    if (imgEl) {
+      imgEl.style.display = 'none';
+      imgEl.style.backgroundImage = 'none';
+      imgEl.style.height = '180px';
+    }
 
     let item = null;
     if (tipo === 'proyecto') {
       item = todosLosProyectos.find(p => String(p.id) === String(id));
       if (!item) return;
       titleEl.textContent = item.titulo || item.nombre_proyecto || 'Proyecto sin título';
+
+      if (imgEl && item.imagen_portada) {
+         imgEl.style.display = 'block';
+         imgEl.style.height = '280px'; // Imagen más grande y responsiva
+         imgEl.style.backgroundImage = `url('${item.imagen_portada}')`;
+         imgEl.style.backgroundSize = 'cover';
+         imgEl.style.backgroundPosition = 'center';
+         imgEl.style.borderBottom = '4px solid var(--vp)';
+      }
       
       const nombresConsejo = {
         1: 'C.C. Jobito I',
@@ -590,11 +607,18 @@
       };
       const nombreConsejo = nombresConsejo[item.id_comunidad] || item.consejo_comunal || item.consejo || 'Sector General';
 
-      const estado = (item.estado || 'propuesto').toLowerCase();
+      const estadoRaw = (item.estado || 'propuesto').toLowerCase();
+      let estadoFormat = estadoRaw;
+      if (estadoRaw === 'en_ejecucion') estadoFormat = 'En Ejecución';
+      else if (estadoRaw === 'aprobado') estadoFormat = 'Aprobado';
+      else if (estadoRaw === 'propuesto') estadoFormat = 'Propuesto';
+      else if (estadoRaw === 'finalizado') estadoFormat = 'Finalizado';
+      else if (estadoRaw === 'rechazado') estadoFormat = 'Rechazado';
+
       let badgeColor = 'rgba(21,101,192,.1)'; let textColor = '#1565C0';
-      if(estado === 'aprobado') { badgeColor = 'rgba(106,27,154,.1)'; textColor = '#6A1B9A'; }
-      else if(estado === 'en_ejecucion') { badgeColor = 'rgba(230,81,0,.1)'; textColor = '#E65100'; }
-      else if(estado === 'finalizado') { badgeColor = 'rgba(27,94,32,.12)'; textColor = '#1B5E20'; }
+      if(estadoRaw === 'aprobado') { badgeColor = 'rgba(106,27,154,.1)'; textColor = '#6A1B9A'; }
+      else if(estadoRaw === 'en_ejecucion') { badgeColor = 'rgba(230,81,0,.1)'; textColor = '#E65100'; }
+      else if(estadoRaw === 'finalizado') { badgeColor = 'rgba(27,94,32,.12)'; textColor = '#1B5E20'; }
 
       infoEl.innerHTML = `
         <div style="grid-column: 1 / -1; display: flex; flex-direction: column; width: 100%;">
@@ -628,8 +652,8 @@
           </div>
           
           <div style="display:flex;gap:1rem;margin-bottom:0.5rem;flex-wrap:wrap;">
-             <div style="background:${badgeColor};color:${textColor};padding:.4rem 1rem;border-radius:20px;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;"><i class="fas fa-circle" style="font-size:0.5rem;vertical-align:middle;margin-bottom:1px;margin-right:2px;"></i> ${estado}</div>
-             <div style="background:#FFF3E0;color:#E65100;padding:.4rem 1rem;border-radius:20px;font-size:.75rem;font-weight:800;"><i class="fas fa-coins"></i> ${item.presupuesto_estimado && item.presupuesto_estimado > 0 ? Number(item.presupuesto_estimado).toLocaleString('es-VE',{style:'currency',currency:'VES'}) : 'Sin presupuesto'}</div>
+             <div style="background:${badgeColor};color:${textColor};padding:.4rem 1rem;border-radius:20px;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;"><i class="fas fa-circle" style="font-size:0.5rem;vertical-align:middle;margin-bottom:1px;margin-right:2px;"></i> ${estadoFormat}</div>
+             <div style="background:#FFF3E0;color:#E65100;padding:.4rem 1rem;border-radius:20px;font-size:.75rem;font-weight:800;"><i class="fas fa-coins"></i> ${item.presupuesto && item.presupuesto > 0 ? Number(item.presupuesto).toLocaleString('es-VE',{style:'currency',currency:'VES'}) : 'Sin presupuesto'}</div>
           </div>
         </div>
       `;
