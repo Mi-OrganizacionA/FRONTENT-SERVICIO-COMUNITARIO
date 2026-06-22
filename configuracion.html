@@ -242,16 +242,6 @@
           </div>
           <div class="card-body-sicag">
 
-            <div class="switch-container">
-              <div class="switch-info">
-                <h4>Apertura del Censo Comunitario</h4>
-                <p>Permitir a los Voceros registrar nuevos habitantes y viviendas. Si se apaga, el censo se bloquea (Solo lectura).</p>
-              </div>
-              <label class="switch">
-                <input type="checkbox" id="toggleCenso" onchange="toggleSetting('Censo', this.checked)">
-                <span class="slider"></span>
-              </label>
-            </div>
 
             <div class="switch-container" style="border-left: 4px solid var(--ru);">
               <div class="switch-info">
@@ -311,11 +301,11 @@
 
             <div class="switch-container">
               <div class="switch-info">
-                <h4>Aprobación Reportes Inter-comunales</h4>
-                <p>Auto aprobar reportes que abarcan varias comunas.</p>
+                <h4>Aprobación Producción Agrícola</h4>
+                <p>Auto aprobar reportes de producción agrícola.</p>
               </div>
               <label class="switch">
-                <input type="checkbox" id="toggleAutoReportes" onchange="toggleSetting('Aprobación Automática Reportes', this.checked)">
+                <input type="checkbox" id="toggleAutoProduccion" onchange="toggleSetting('Aprobación Automática Producción', this.checked)">
                 <span class="slider"></span>
               </label>
             </div>
@@ -323,33 +313,39 @@
           </div>
         </section>
 
-        <!-- Datos de Identidad -->
+        <!-- Almacenamiento en la Nube -->
         <section class="card-sicag" style="margin-top: 2rem;">
           <div class="card-header-sicag">
-            <span><i class="fas fa-map-location-dot"></i> Identidad de la Comuna</span>
+            <span><i class="fas fa-cloud-upload-alt"></i> Almacenamiento en la Nube</span>
           </div>
           <div class="card-body-sicag">
-            <form id="formIdentidad">
-              <div class="form-group-sicag">
-                <label class="form-label-sicag">Nombre de la Comuna <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Ingrese los nombres y apellidos completos"></i></label>
-                <input type="text" class="form-control-sicag" value="Comuna Socialista Agroecológica Simón Rodríguez"
-                  readonly style="background:#f5f5f5; cursor:not-allowed;">
+            <div class="action-row">
+              <div class="action-icon" style="background: rgba(25, 118, 210, 0.1); color: var(--vp);">
+                <i class="fas fa-cloud"></i>
               </div>
-              <div class="config-2col-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-                <div class="form-group-sicag" style="margin-bottom:0;">
-                  <label class="form-label-sicag">Estado <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
-                  <input type="text" class="form-control-sicag" value="Yaracuy" readonly
-                    style="background:#f5f5f5; cursor:not-allowed;">
-                </div>
-                <div class="form-group-sicag" style="margin-bottom:0;">
-                  <label class="form-label-sicag">Municipio <i class="fas fa-question-circle text-muted ms-1" style="cursor:help;" data-bs-toggle="tooltip" title="Proporcione la información solicitada en este campo"></i></label>
-                  <input type="text" class="form-control-sicag" value="San Felipe" readonly
-                    style="background:#f5f5f5; cursor:not-allowed;">
-                </div>
+              <div class="action-content">
+                <h4>ImgBB (Imágenes Externas)</h4>
+                <p>Las imágenes de proyectos y noticias se guardan automáticamente en la nube, manteniendo tu base de datos y servidor ligeros. Espacio y ancho de banda ilimitados.</p>
+                <div style="margin-top: 0.5rem; font-weight: 600; color: var(--vp);" id="storageUsage"><i class="fas fa-check-circle"></i> Conectado Correctamente</div>
               </div>
-            </form>
+            </div>
           </div>
         </section>
+
+        <!-- Modal de Contraseña Personalizado -->
+        <div id="passwordModal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+          <div class="modal-content" style="background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+            <h3 style="margin-top:0; color: var(--txt);"><i class="fas fa-lock" style="color:var(--ru);"></i> Confirmar Acción</h3>
+            <p style="color: var(--sub); font-size: 0.9rem;">Por seguridad, ingresa tu contraseña de administrador para activar la aprobación global.</p>
+            <input type="password" id="adminPasswordInput" class="form-control-sicag" placeholder="Contraseña de administrador" style="width: 100%; margin-bottom: 1rem;">
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+              <button class="btn btn-secondary" onclick="cerrarPasswordModal()">Cancelar</button>
+              <button class="btn btn-primary" onclick="confirmarPasswordGlobal()" style="background: var(--vp); color: white;">Confirmar</button>
+            </div>
+          </div>
+        </div>
+
+
 
       </div>
 
@@ -369,13 +365,12 @@
     document.addEventListener('DOMContentLoaded', () => {
       // Mapeo de IDs de checkbox a claves de localStorage
       const configs = {
-        'toggleCenso': 'sicag_auto_viviendas', // o sicag_censo_abierto
         'toggleAutoGlobal': 'sicag_auto_global',
         'toggleAutoHabitantes': 'sicag_auto_habitantes',
         'toggleAutoNoticias': 'sicag_auto_noticias',
         'toggleAutoProyectos': 'sicag_auto_proyectos',
         'toggleAutoOrganizaciones': 'sicag_auto_organizaciones',
-        'toggleAutoReportes': 'sicag_auto_reportes'
+        'toggleAutoProduccion': 'sicag_auto_produccion_agricola'
       };
 
       // Cargar estados
@@ -389,34 +384,26 @@
       });
     });
 
+    let pendingGlobalActivation = false;
+
     function toggleSetting(nombre, activado, esGlobal = false) {
-      // Mapear nombre a la clave
       const nombreMap = {
-        'Censo': 'sicag_auto_viviendas',
         'Aprobación Automática Global': 'sicag_auto_global',
         'Aprobación Automática Habitantes': 'sicag_auto_habitantes',
         'Aprobación Automática Noticias': 'sicag_auto_noticias',
         'Aprobación Automática Proyectos': 'sicag_auto_proyectos',
         'Aprobación Automática Organizaciones': 'sicag_auto_organizaciones',
-        'Aprobación Automática Reportes': 'sicag_auto_reportes'
+        'Aprobación Automática Producción': 'sicag_auto_produccion_agricola'
       };
       
       const clave = nombreMap[nombre];
       
       if (esGlobal) {
         if (activado) {
-          Components.confirmDialog(
-            '⚠️ ADVERTENCIA: Estás a punto de activar la Aprobación Automática Global. Todas las peticiones de los voceros se guardarán directamente en la base de datos sin requerir validación. ¿Deseas continuar?',
-            async () => {
-              localStorage.setItem(clave, 'true');
-              await syncConfigWithBackend(nombre, 'true');
-              Components.showToast('Aprobación Automática Global ACTIVADA.', 'warning');
-            },
-            () => {
-              // Revertir switch si cancela
-              document.getElementById('toggleAutoGlobal').checked = false;
-            }
-          );
+          // Prevenir activación inmediata, abrir modal
+          document.getElementById('toggleAutoGlobal').checked = false;
+          pendingGlobalActivation = true;
+          document.getElementById('passwordModal').style.display = 'flex';
         } else {
           localStorage.setItem(clave, 'false');
           syncConfigWithBackend(nombre, 'false');
@@ -427,8 +414,69 @@
         localStorage.setItem(clave, activado ? 'true' : 'false');
         syncConfigWithBackend(nombre, activado ? 'true' : 'false');
         Components.showToast(`Política de ${nombre}: ${estado}`, activado ? 'success' : 'info');
+
+        // Si apagan uno individual, se debe apagar el maestro
+        if (!activado) {
+          const maestro = document.getElementById('toggleAutoGlobal');
+          if (maestro && maestro.checked) {
+            maestro.checked = false;
+            localStorage.setItem('sicag_auto_global', 'false');
+            syncConfigWithBackend('Aprobación Automática Global', 'false');
+            Components.showToast('El interruptor Global se ha apagado porque un submódulo fue desactivado.', 'info');
+          }
+        }
       }
     }
+
+    function cerrarPasswordModal() {
+      document.getElementById('passwordModal').style.display = 'none';
+      document.getElementById('adminPasswordInput').value = '';
+      pendingGlobalActivation = false;
+    }
+
+    async function confirmarPasswordGlobal() {
+      const pass = document.getElementById('adminPasswordInput').value;
+      if (!pass) {
+        Components.showToast('Debes ingresar la contraseña.', 'error');
+        return;
+      }
+      
+      try {
+        // Verificar la contraseña con la API (si existe el método)
+        await window.api.verifyPassword(pass);
+        
+        // Contraseña correcta
+        cerrarPasswordModal();
+        
+        // Activar el global
+        document.getElementById('toggleAutoGlobal').checked = true;
+        localStorage.setItem('sicag_auto_global', 'true');
+        await syncConfigWithBackend('Aprobación Automática Global', 'true');
+        
+        // Encender TODOS los submódulos automáticamente
+        const switches = [
+          { id: 'toggleAutoHabitantes', name: 'Aprobación Automática Habitantes' },
+          { id: 'toggleAutoNoticias', name: 'Aprobación Automática Noticias' },
+          { id: 'toggleAutoProyectos', name: 'Aprobación Automática Proyectos' },
+          { id: 'toggleAutoOrganizaciones', name: 'Aprobación Automática Organizaciones' },
+          { id: 'toggleAutoProduccion', name: 'Aprobación Automática Producción' }
+        ];
+
+        switches.forEach(s => {
+          const el = document.getElementById(s.id);
+          if (el && !el.checked) {
+            el.checked = true;
+            toggleSetting(s.name, true, false); // No es global
+          }
+        });
+
+        Components.showToast('Aprobación Automática Global ACTIVADA con éxito.', 'warning');
+
+      } catch (err) {
+        Components.showToast('Contraseña incorrecta.', 'error');
+      }
+    }
+
 
     async function syncConfigWithBackend(nombreClaveOriginal, valor) {
       if (window.api && !window.api.isDevelopment) {

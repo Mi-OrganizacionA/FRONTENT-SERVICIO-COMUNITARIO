@@ -196,6 +196,65 @@ class SystemController {
     }
   }
 
+  static async getStorageUsage(req, res) {
+    try {
+      const uploadDir = path.join(__dirname, '..', 'public', 'uploads');
+      if (!fs.existsSync(uploadDir)) {
+        return res.json({ size: 0, files: 0 });
+      }
+      
+      const files = fs.readdirSync(uploadDir);
+      let totalSize = 0;
+      files.forEach(file => {
+        const filePath = path.join(uploadDir, file);
+        const stats = fs.statSync(filePath);
+        if (stats.isFile()) {
+          totalSize += stats.size;
+        }
+      });
+      
+      res.json({ size: totalSize, files: files.length });
+    } catch (error) {
+      logger.error('Error calculando almacenamiento local:', error);
+      res.status(500).json({ error: 'Error al calcular almacenamiento' });
+    }
+  }
+
+  static async cleanStorage(req, res) {
+    try {
+      const uploadDir = path.join(__dirname, '..', 'public', 'uploads');
+      if (!fs.existsSync(uploadDir)) {
+        return res.json({ deletedCount: 0 });
+      }
+      
+      const files = fs.readdirSync(uploadDir);
+      const tresAniosMs = 3 * 365 * 24 * 60 * 60 * 1000;
+      const ahora = Date.now();
+      let deletedCount = 0;
+      
+      files.forEach(file => {
+        const filePath = path.join(uploadDir, file);
+        const stats = fs.statSync(filePath);
+        if (stats.isFile()) {
+          const antiguedadMs = ahora - stats.birthtimeMs;
+          if (antiguedadMs > tresAniosMs) {
+            try {
+              fs.unlinkSync(filePath);
+              deletedCount++;
+            } catch(e) {
+              logger.warn(`No se pudo eliminar archivo antiguo: ${filePath}`);
+            }
+          }
+        }
+      });
+      
+      res.json({ deletedCount, success: true });
+    } catch (error) {
+      logger.error('Error limpiando almacenamiento local:', error);
+      res.status(500).json({ error: 'Error al limpiar almacenamiento' });
+    }
+  }
+
   static setBandejaModel(model) {
     SystemController.BandejaModel = model;
   }

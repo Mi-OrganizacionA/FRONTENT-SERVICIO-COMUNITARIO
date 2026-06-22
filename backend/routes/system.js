@@ -11,5 +11,6 @@ router.get('/backup', systemController.downloadBackup);
 router.get('/public-stats', systemController.getPublicStats);
 router.get('/consejos', systemController.getConsejos);
 router.post('/contacto', systemController.enviarContacto);
-
+router.get('/storage', verifyToken, requireRole(['admin']), systemController.getStorageUsage);
+router.delete('/storage/clean', verifyToken, requireRole(['admin']), systemController.cleanStorage);
 module.exports = router;

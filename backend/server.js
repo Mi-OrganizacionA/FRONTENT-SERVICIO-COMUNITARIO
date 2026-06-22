@@ -7,6 +7,7 @@ const env = require('./config/environment');
 const { initDatabase } = require('./config/database');
 const { runMigrations } = require('./migrate');
 const logger = require('./utils/logger');
+const path = require('path');
 
 const authRoutes = require('./routes/auth');
 const habitantesRoutes = require('./routes/habitantes');
@@ -25,6 +26,7 @@ const personaGrupoSocialRoutes = require('./routes/persona_grupo_social');
 const estudiosDemograficosRoutes = require('./routes/estudios_demograficos');
 const systemRoutes = require('./routes/system');
 const searchRoutes = require('./routes/searchRoutes');
+const uploadRoutes = require('./routes/upload');
 const errorHandler = require('./middleware/errorHandler');
 const { captureClientInfo } = require('./middleware/auditMiddleware');
 
@@ -36,6 +38,9 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
 app.use(captureClientInfo);
+
+// Servir la carpeta de imágenes estáticas
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 const apiLimiter = rateLimit({
   windowMs: env.rate_limit.window_ms,
@@ -68,6 +73,7 @@ app.use('/api/membresias', personaGrupoSocialRoutes);
 app.use('/api/estudios-demograficos', estudiosDemograficosRoutes);
 app.use('/api/system', systemRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/upload', uploadRoutes);
 app.use((req, res) => res.status(404).json({ error: 'Ruta no encontrada', path: req.path }));
 app.use(errorHandler);
 

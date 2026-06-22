@@ -173,7 +173,7 @@ class NotificacionesController {
     `).join('');
   }
 
-  /* â”€â”€â”€ Render Tabla â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
   renderTabla(lista) {
     const tbody = document.getElementById('validacionesTbody');
     const countBadge = document.getElementById('countBadge');
@@ -313,7 +313,7 @@ class NotificacionesController {
     this.renderTabla(this.filtradas);
   }
 
-  /* â”€â”€â”€ Bind Eventos de Tabla â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
   bindCheckboxEvents() {
     const checkAll = document.getElementById('checkAll');
     if (checkAll) {
@@ -496,7 +496,7 @@ class NotificacionesController {
     this.detailId = null;
   }
 
-  /* â”€â”€â”€ Acciones individuales â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
   async aprobarUno(id) {
     try {
       const n = this.todas.find(x => x.id === id);
@@ -629,7 +629,7 @@ class NotificacionesController {
     }
   }
 
-  /* â”€â”€â”€ Bind eventos globales â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
   bindUIEvents() {
     // BotÃ³n Actualizar
     document.getElementById('btnRefresh')?.addEventListener('click', async () => {

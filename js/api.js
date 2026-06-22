@@ -514,6 +514,39 @@ class APIManager {
     return data;
   }
 
+  // Subida de archivos al servidor local
+  async subirImagenLocal(archivo) {
+    if (this.isDevelopment) {
+      console.warn("Modo simulación: La imagen no se subirá. Retornando URL falsa.");
+      return `/uploads/simulacion-${Date.now()}.png`;
+    }
+    const formData = new FormData();
+    formData.append('image', archivo, archivo.name || 'upload.webp');
+
+    const token = window.auth ? window.auth.getToken() : null;
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${this.baseURL}/upload`, {
+      method: 'POST',
+      headers: headers,
+      body: formData
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Error al subir la imagen.');
+    
+    // Si la URL es absoluta (ImgBB), retornarla directo
+    if (data.url.startsWith('http')) {
+      return data.url;
+    }
+    
+    const backendHost = this.baseURL.replace('/api', '');
+    return `${backendHost}${data.url}`;
+  }
+
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // CONFIGURACIÃ“N DEL SISTEMA Y RECOVERY PASS
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
