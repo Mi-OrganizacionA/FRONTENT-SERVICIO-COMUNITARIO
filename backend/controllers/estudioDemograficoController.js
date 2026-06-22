@@ -815,9 +815,24 @@ class EstudioDemograficoController {
       const cedulaSoloNumeros = cedula.replace(/\D/g, '');
       const { Op } = require('sequelize');
 
+      let cedulaConPuntos = cedulaSoloNumeros;
+      if (cedulaSoloNumeros.length > 6) {
+        cedulaConPuntos = cedulaSoloNumeros.slice(0, -6) + '.' +
+                          cedulaSoloNumeros.slice(-6, -3) + '.' +
+                          cedulaSoloNumeros.slice(-3);
+      } else if (cedulaSoloNumeros.length > 3) {
+        cedulaConPuntos = cedulaSoloNumeros.slice(0, -3) + '.' +
+                          cedulaSoloNumeros.slice(-3);
+      }
+
+      const cedulaConditions = [
+        { [Op.like]: `%${cedulaSoloNumeros}%` },
+        { [Op.like]: `%${cedulaConPuntos}%` }
+      ];
+
       // Check if is Jefe in any census
       const jefe = await EstudioDemografico.findOne({
-        where: { encuestado_cedula: { [Op.like]: `%${cedulaSoloNumeros}%` } }
+        where: { encuestado_cedula: { [Op.or]: cedulaConditions } }
       });
       if (jefe) {
         return res.json({
@@ -830,7 +845,7 @@ class EstudioDemograficoController {
 
       // Check if is Familiar in any census
       const familiar = await db.CensoCaracteristicaFamiliar.findOne({
-        where: { cedula_identidad: { [Op.like]: `%${cedulaSoloNumeros}%` } },
+        where: { cedula_identidad: { [Op.or]: cedulaConditions } },
         include: [{
           model: EstudioDemografico,
           as: 'estudio',
