@@ -317,9 +317,32 @@ class BandejaValidacionesController {
       if (tabla === 'usuarios' && validacion.tipo_accion === 'UPDATE') {
         nuevoRegistro = await models.Usuario.findByPk(validacion.registro_id);
         if (!nuevoRegistro) throw new Error('El usuario a actualizar no existe');
-        const nuevoCorreo = datos.nuevo_correo || datos.email;
-        if (!nuevoCorreo) throw new Error('No se especificÃ³ un nuevo correo en la solicitud');
-        await nuevoRegistro.update({ email: nuevoCorreo });
+        
+        if (datos.credenciales) {
+          await nuevoRegistro.update({ credenciales: datos.credenciales });
+        }
+        if (datos.nuevo_correo || datos.email) {
+          const nuevoCorreo = datos.nuevo_correo || datos.email;
+          await nuevoRegistro.update({ email: nuevoCorreo });
+          
+          if (nuevoRegistro.cedula && models.Habitante) {
+            const { Op } = require('sequelize');
+            const cedNorm = String(nuevoRegistro.cedula).replace(/[.\s-]/g, '').replace(/^[VE]/i, '');
+            const habitantes = await models.Habitante.findAll({
+              where: {
+                [Op.or]: [
+                  { cedula: { [Op.like]: `%${cedNorm}%` } },
+                  { cedula: nuevoRegistro.cedula }
+                ]
+              }
+            });
+            const habitante = habitantes.find(h => String(h.cedula).replace(/[.\s-]/g, '').replace(/^[VE]/i, '') === cedNorm);
+            
+            if (habitante) {
+              await habitante.update({ correo_electronico: nuevoCorreo });
+            }
+          }
+        }
       } else if (tabla === 'recuperacion_clave' || tabla === 'contacto') {
         nuevoRegistro = { id: validacion.registro_id };
       } else if (Modelo) {

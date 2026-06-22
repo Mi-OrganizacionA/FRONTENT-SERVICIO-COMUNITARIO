@@ -54,16 +54,17 @@ class AuthController {
 
   static async updateProfile(req, res) {
     try {
-      const { cedula, telefono } = req.body;
+      const { cedula, telefono, nombres } = req.body;
       const user = await UsuarioModel.findByPk(req.user.id);
       if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
       
       if (cedula !== undefined) user.cedula = cedula;
       if (telefono !== undefined) user.telefono = telefono;
+      if (nombres !== undefined) user.nombre = nombres;
       
       await user.save();
       
-      res.json({ success: true, message: 'Perfil actualizado', usuario: user });
+      res.json({ success: true, message: 'Perfil completado y vinculado', usuario: user });
     } catch (error) {
       logger.error('Error actualizando perfil:', error);
       res.status(500).json({ error: 'Error del servidor al actualizar perfil' });
@@ -101,10 +102,26 @@ class AuthController {
       const isValid = AuthService.validatePassword(passwordActual, user.credenciales);
       if (!isValid) return res.status(401).json({ error: 'La contraseña actual es incorrecta' });
 
-      user.credenciales = AuthService.hashPassword(nuevaPassword);
-      await user.save();
-
-      res.json({ success: true, message: 'Contraseña actualizada exitosamente' });
+      if (req.user.rol === 'admin') {
+        user.credenciales = AuthService.hashPassword(nuevaPassword);
+        await user.save();
+        return res.json({ success: true, message: 'Contraseña actualizada exitosamente' });
+      } else {
+        if (BandejaModel) {
+          await BandejaModel.create({
+            id_vocero: req.user.id,
+            tabla_afectada: 'usuarios',
+            registro_id: req.user.id,
+            tipo_accion: 'UPDATE',
+            datos_temporales: { credenciales: AuthService.hashPassword(nuevaPassword) },
+            estado_tramite: 'Pendiente',
+            fecha_solicitud: new Date()
+          });
+          return res.json({ success: true, message: 'Solicitud de cambio de contraseña enviada al administrador para su aprobación', require_approval: true });
+        } else {
+          return res.status(500).json({ error: 'El módulo de validaciones no está disponible' });
+        }
+      }
     } catch (error) {
       logger.error('Error cambiando contraseña:', error);
       res.status(500).json({ error: 'Error del servidor al cambiar contraseña' });
@@ -120,20 +137,53 @@ class AuthController {
       const user = await UsuarioModel.findByPk(userId);
       if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
 
-      // Validar contraseña
       const isValid = AuthService.validatePassword(passwordActual, user.credenciales);
       if (!isValid) return res.status(401).json({ error: 'La contraseña actual es incorrecta' });
 
-      // Verificar si el correo ya está en uso
       const existingUser = await UsuarioModel.findOne({ where: { email } });
       if (existingUser && existingUser.id !== userId) {
         return res.status(400).json({ error: 'El correo ya está en uso por otro usuario' });
       }
 
-      user.email = email;
-      await user.save();
-
-      res.json({ success: true, message: 'Correo actualizado exitosamente', nuevoCorreo: email });
+      if (req.user.rol === 'admin') {
+        user.email = email;
+        await user.save();
+        
+        if (user.cedula && UsuarioModel.sequelize.models.Habitante) {
+          const { Op } = require('sequelize');
+          const cedNorm = String(user.cedula).replace(/[.\s-]/g, '').replace(/^[VE]/i, '');
+          const habitantes = await UsuarioModel.sequelize.models.Habitante.findAll({
+            where: {
+              [Op.or]: [
+                { cedula: { [Op.like]: `%${cedNorm}%` } },
+                { cedula: user.cedula }
+              ]
+            }
+          });
+          const habitante = habitantes.find(h => String(h.cedula).replace(/[.\s-]/g, '').replace(/^[VE]/i, '') === cedNorm);
+          
+          if (habitante) {
+            habitante.correo_electronico = email;
+            await habitante.save();
+          }
+        }
+        return res.json({ success: true, message: 'Correo actualizado exitosamente', nuevoCorreo: email });
+      } else {
+        if (BandejaModel) {
+          await BandejaModel.create({
+            id_vocero: req.user.id,
+            tabla_afectada: 'usuarios',
+            registro_id: req.user.id,
+            tipo_accion: 'UPDATE',
+            datos_temporales: { email: email, nuevo_correo: email },
+            estado_tramite: 'Pendiente',
+            fecha_solicitud: new Date()
+          });
+          return res.json({ success: true, message: 'Solicitud de cambio de correo enviada al administrador para su aprobación', nuevoCorreo: email, require_approval: true });
+        } else {
+          return res.status(500).json({ error: 'El módulo de validaciones no está disponible' });
+        }
+      }
     } catch (error) {
       logger.error('Error cambiando correo:', error);
       res.status(500).json({ error: 'Error del servidor al cambiar correo' });

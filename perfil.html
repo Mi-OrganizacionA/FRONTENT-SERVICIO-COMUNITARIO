@@ -385,6 +385,7 @@
   <script src="js/api.js"></script>
   <script src="js/components.js"></script>
   <script src="js/layout-menu.js"></script>
+  <script src="js/habitante-autocomplete.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // Cargar datos del usuario
@@ -448,33 +449,31 @@
             }
           }
 
-          if (esHabitante) {
-            document.getElementById('detCedula').textContent = habitanteInfo.cedula || perfilUser.cedula;
-            document.getElementById('detTelefono').textContent = habitanteInfo.telefono || perfilUser.telefono;
+          if (esHabitante || perfilUser.cedula) {
+            document.getElementById('detCedula').textContent = habitanteInfo ? habitanteInfo.cedula : perfilUser.cedula;
+            document.getElementById('detTelefono').textContent = habitanteInfo ? habitanteInfo.telefono : perfilUser.telefono;
             
-            // Si ya es habitante, cambiar el banner a "Actualizar Datos"
-            bannerCompletar.querySelector('h4').textContent = 'Datos Registrados';
-            bannerCompletar.querySelector('p').textContent = 'Tus datos están sincronizados con el censo comunal.';
-            bannerCompletar.style.background = 'rgba(67, 160, 71, 0.1)';
-            bannerCompletar.style.borderLeftColor = '#43A047';
-            btnCompletar.innerHTML = '<i class="fas fa-edit"></i> Actualizar Datos';
-            
-            // Pre-llenar el formulario del modal
-            document.getElementById('cdCedula').value = habitanteInfo.cedula || '';
-            document.getElementById('cdCedula').disabled = true; // No permitir cambiar cédula si ya existe
-            if (habitanteInfo.fecha_nacimiento) document.getElementById('cdFechaNac').value = habitanteInfo.fecha_nacimiento.split('T')[0];
-            document.getElementById('cdGenero').value = habitanteInfo.genero || '';
-            document.getElementById('cdTelefono').value = habitanteInfo.telefono || '';
-            
+            // Ocultar el banner de Completar Perfil si ya está enlazado
+            bannerCompletar.style.display = 'none';
+            btnCompletar.style.display = 'none';
           } else {
-            // Pre-llenar con lo que haya del usuario
-            if (perfilUser.cedula) document.getElementById('cdCedula').value = perfilUser.cedula;
-            if (perfilUser.telefono) document.getElementById('cdTelefono').value = perfilUser.telefono;
+            bannerCompletar.style.display = 'flex';
+            btnCompletar.style.display = 'inline-block';
           }
 
-          // Lógica del botón Completar/Actualizar
+          // Lógica del botón Completar
           btnCompletar.addEventListener('click', () => {
             document.getElementById('modalCompletarDatos').classList.add('show');
+            // Adjuntar autocompletado flexible
+            if (window.HabitanteAutocomplete) {
+              window.HabitanteAutocomplete.attachTo('cdCedula', {
+                onSelect: (habitante) => {
+                  if (habitante.fecha_nacimiento) document.getElementById('cdFechaNac').value = habitante.fecha_nacimiento.split('T')[0];
+                  if (habitante.genero) document.getElementById('cdGenero').value = habitante.genero;
+                  if (habitante.telefono) document.getElementById('cdTelefono').value = habitante.telefono;
+                }
+              });
+            }
           });
           
           document.getElementById('formCompletarDatos').addEventListener('submit', async (e) => {
