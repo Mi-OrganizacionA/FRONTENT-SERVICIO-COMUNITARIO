@@ -5321,9 +5321,16 @@
           let matchedValue = '';
           if (u.rol === 'vocero') {
             const cid = u.id_comunidad_asignada || u.id_comunidad;
-            if (cid) {
+            const mapIdName = {
+              1: 'Jobito I', 2: 'Jobito II', 3: 'Brisas del Yurubí', 4: 'Andrés Eloy Blanco',
+              5: 'Las Mercedes I', 6: 'Las Mercedes II', 7: 'Santa Cruz de las Mercedes',
+              8: 'Fortaleza del Corozo', 9: 'Vencedores del Corozo'
+            };
+            const targetName = mapIdName[cid];
+            
+            if (targetName) {
               for (let option of selCC.options) {
-                if (option.value === String(cid)) {
+                if (option.value === targetName) {
                   selCC.value = option.value;
                   matchedValue = option.value;
                   matched = true;
