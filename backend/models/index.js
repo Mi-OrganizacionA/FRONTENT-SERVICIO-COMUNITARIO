@@ -71,7 +71,7 @@ async function initModels(sequelize) {
   // Relaciones del Censo de Viviendas
 
   EstudioDemografico.hasMany(CensoCaracteristicaFamiliar, { foreignKey: 'id_estudio', as: 'familiares' });
-  CensoCaracteristicaFamiliar.belongsTo(EstudioDemografico, { foreignKey: 'id_estudio' });
+  CensoCaracteristicaFamiliar.belongsTo(EstudioDemografico, { foreignKey: 'id_estudio', as: 'estudio' });
 
   EstudioDemografico.hasOne(CensoSituacionEconomica, { foreignKey: 'id_estudio', as: 'situacion_economica' });
   CensoSituacionEconomica.belongsTo(EstudioDemografico, { foreignKey: 'id_estudio' });
