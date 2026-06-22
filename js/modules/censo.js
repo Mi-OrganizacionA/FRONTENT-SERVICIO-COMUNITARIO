@@ -228,7 +228,7 @@ class CensoController {
       const row = tbody.querySelector(`tr[data-hab-id="${highlightId}"]`);
       if (row) {
         row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        setTimeout(() => row.classList.remove('row-highlight'), 4000);
+        setTimeout(() => row.classList.remove('row-highlight'), 10000);
       }
     }
 

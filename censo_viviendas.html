@@ -4143,6 +4143,13 @@
         return matchQ && matchCC && matchC && matchG && matchAgua && matchTipo && matchTenencia && matchParedes && matchTecho;
       });
 
+      if (highlightId) {
+        const foundIdx = data.findIndex(v => String(v.id || v._id) === String(highlightId));
+        if (foundIdx !== -1) {
+          currentPage = Math.floor(foundIdx / PAGE_SIZE) + 1;
+        }
+      }
+
       const totalPages = Math.ceil(data.length / PAGE_SIZE) || 1;
       if (currentPage > totalPages) currentPage = totalPages;
       const paginated = data.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -4193,11 +4200,13 @@
       `).join('');
 
       if (highlightId) {
-        const row = body.querySelector(`tr[data-censo-id="${highlightId}"]`);
-        if (row) {
-          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          setTimeout(() => row.classList.remove('row-highlight'), 4000);
-        }
+        setTimeout(() => {
+          const row = body.querySelector(`tr[data-censo-id="${highlightId}"]`);
+          if (row) {
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => row.classList.remove('row-highlight'), 10000);
+          }
+        }, 100);
       }
 
       renderPagination(totalPages, data.length);
