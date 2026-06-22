@@ -127,22 +127,6 @@ class HabitantesController {
     }
   }
 
-  /**
-   * Buscar habitantes
-   */
-  static async buscar(req, res) {
-    try {
-      const { q } = req.query;
-      if (!q || q.length < 2) {
-        return res.status(400).json({ error: 'Ingrese al menos 2 caracteres para buscar' });
-      }
-      
-      const resultados = await HabitantesService.buscar(HabitanteModel, q);
-      res.json(resultados);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
 
   /**
    * Obtener habitante por ID
@@ -397,9 +381,26 @@ class HabitantesController {
         return res.status(400).json({ error: 'Formato de cédula inválido (7-8 dígitos)' });
       }
 
+      const { Op } = require('sequelize');
+      let cedulaPuntos = cedulaLimpia;
+      if (cedulaLimpia.length > 6) {
+        cedulaPuntos = cedulaLimpia.slice(0, -6) + '.' + cedulaLimpia.slice(-6, -3) + '.' + cedulaLimpia.slice(-3);
+      } else if (cedulaLimpia.length > 3) {
+        cedulaPuntos = cedulaLimpia.slice(0, -3) + '.' + cedulaLimpia.slice(-3);
+      }
+
+      const orConditions = [
+        { cedula: cedulaLimpia },
+        { cedula: cedulaPuntos },
+        { cedula: `V-${cedulaPuntos}` },
+        { cedula: `V-${cedulaLimpia}` },
+        { cedula: `E-${cedulaPuntos}` },
+        { cedula: `E-${cedulaLimpia}` }
+      ];
+
       const existe = await HabitanteModel.findOne({
-        where: { cedula: cedulaLimpia, activo: true },
-        attributes: ['id'] // Solo verificar existencia, no retornar datos sensibles
+        where: { [Op.or]: orConditions, activo: true },
+        attributes: ['id']
       });
 
       res.json({ existe: !!existe });
@@ -478,11 +479,32 @@ class HabitantesController {
       ];
 
       if (qNum.length > 0) {
-        orConditions.push({ cedula: { [Op.like]: `%${qNum}%` } });
+        let qPuntos = qNum;
+        if (qNum.length > 6) {
+          qPuntos = qNum.slice(0, -6) + '.' + qNum.slice(-6, -3) + '.' + qNum.slice(-3);
+        } else if (qNum.length > 3) {
+          qPuntos = qNum.slice(0, -3) + '.' + qNum.slice(-3);
+        }
+        
+        orConditions.push(
+          { cedula: { [Op.like]: `%${qNum}%` } },
+          { cedula: { [Op.like]: `%${qPuntos}%` } },
+          { cedula: { [Op.like]: `%V-${qPuntos}%` } },
+          { cedula: { [Op.like]: `%V-${qNum}%` } },
+          { cedula: { [Op.like]: `%E-${qPuntos}%` } },
+          { cedula: { [Op.like]: `%E-${qNum}%` } }
+        );
+      }
+
+      let where = { [Op.or]: orConditions, activo: true };
+      
+      // Restricción de acceso para voceros
+      if (req.user?.rol === 'vocero') {
+        where.consejo_comunal_id = req.user.id_comunidad_asignada;
       }
 
       const habitantes = await HabitanteModel.findAll({
-        where: { [Op.or]: orConditions, activo: true },
+        where,
         include,
         limit: 10
       });

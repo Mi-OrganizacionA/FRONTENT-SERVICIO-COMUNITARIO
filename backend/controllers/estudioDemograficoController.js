@@ -827,7 +827,12 @@ class EstudioDemograficoController {
 
       const cedulaConditions = [
         { [Op.like]: `%${cedulaSoloNumeros}%` },
-        { [Op.like]: `%${cedulaConPuntos}%` }
+        { [Op.like]: `%${cedulaConPuntos}%` },
+        { [Op.like]: `%V-${cedulaSoloNumeros}%` },
+        { [Op.like]: `%V-${cedulaConPuntos}%` },
+        { [Op.like]: `%E-${cedulaSoloNumeros}%` },
+        { [Op.like]: `%E-${cedulaConPuntos}%` },
+        { [Op.like]: `%V${cedulaConPuntos}%` }
       ];
 
       // Check if is Jefe in any census

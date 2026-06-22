@@ -168,10 +168,19 @@ class CensoController {
       }
       // Filtro Búsqueda (Cedula o nombre)
       if (buscarVal) {
-        const term = removeAccents(buscarVal);
-        const name = removeAccents(`${h.nombre} ${h.apellido}`);
-        const ci = String(h.cedula);
-        if (!name.includes(term) && !ci.includes(term)) return false;
+        const term = removeAccents(buscarVal).toLowerCase();
+        const termNum = term.replace(/\D/g, '');
+        const name = removeAccents(`${h.nombres || h.nombre || ''} ${h.apellidos || h.apellido || ''}`).toLowerCase();
+        const ci = String(h.cedula || '').toLowerCase();
+        const ciNum = ci.replace(/\D/g, '');
+
+        let matchName = name.includes(term);
+        let matchCiNum = false;
+        if (termNum.length > 0) {
+           matchCiNum = ciNum.includes(termNum);
+        }
+
+        if (!matchName && !matchCiNum && !ci.includes(term)) return false;
       }
       return true;
     });

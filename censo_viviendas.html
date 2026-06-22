@@ -4120,7 +4120,18 @@
       const techo = document.getElementById('advFilterTecho').value;
 
       let data = viviendas.filter(v => {
-        const matchQ = !q || (v.cedula || '').toLowerCase().includes(q) || (v.sector || '').toLowerCase().includes(q) || (v.direccion || '').toLowerCase().includes(q);
+        let matchQ = true;
+        if (q) {
+           const termNum = q.replace(/\D/g, '');
+           const cedula = (v.cedula || '').toLowerCase();
+           const cedulaNum = cedula.replace(/\D/g, '');
+           const encuestado = (v.encuestado || '').toLowerCase();
+           
+           let matchCiNum = false;
+           if (termNum.length > 0) matchCiNum = cedulaNum.includes(termNum);
+           
+           matchQ = cedula.includes(q) || matchCiNum || encuestado.includes(q) || (v.sector || '').toLowerCase().includes(q) || (v.direccion || '').toLowerCase().includes(q);
+        }
         const matchCC = !cc || v.sector === cc;
         const matchC = !cond || v.condicion === cond;
         const matchG = !gas || v.gas === gas || (gas === 'Si' && v.gas !== 'No posee');
