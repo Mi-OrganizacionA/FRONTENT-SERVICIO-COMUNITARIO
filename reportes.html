@@ -127,7 +127,7 @@
               </div>
               <div>
                 <div class="report-dl-title">Total de Personas</div>
-                <div class="report-dl-desc">Padrón completo de 347 personas registradas en los 9 consejos comunales. Incluye nombre, cédula, edad, género, dirección y clasificación.</div>
+                <div class="report-dl-desc">Padrón completo de las personas registradas en la comuna. Incluye nombre, cédula, edad, género, dirección y clasificación.</div>
               </div>
             </div>
             <div class="report-dl-actions">
@@ -148,7 +148,7 @@
               </div>
               <div>
                 <div class="report-dl-title">Personas con Discapacidad</div>
-                <div class="report-dl-desc">Listado de 12 personas registradas con algún tipo de discapacidad física, sensorial o cognitiva, con tipo de discapacidad y datos de contacto.</div>
+                <div class="report-dl-desc">Listado de personas registradas con algún tipo de discapacidad física, sensorial o cognitiva, con tipo de discapacidad y datos de contacto.</div>
               </div>
             </div>
             <div class="report-dl-actions">
@@ -169,7 +169,7 @@
               </div>
               <div>
                 <div class="report-dl-title">Censo de Viviendas</div>
-                <div class="report-dl-desc">Registro de 198 viviendas con tipo de construcción, servicios básicos (agua, electricidad, cloacas), número de familias por vivienda y CC.</div>
+                <div class="report-dl-desc">Registro detallado de viviendas con tipo de construcción, servicios básicos (agua, electricidad, cloacas), número de familias y condiciones generales de la vivienda.</div>
               </div>
             </div>
             <div class="report-dl-actions">
@@ -190,7 +190,7 @@
               </div>
               <div>
                 <div class="report-dl-title">Adultos Mayores (≥ 60 años)</div>
-                <div class="report-dl-desc">39 personas de 60 años o más. Incluye condición de salud reportada, si tiene cuidador asignado y si percibe pensión del IVSS.</div>
+                <div class="report-dl-desc">Personas de 60 años o más. Incluye condición de salud reportada, si tiene cuidador asignado y si recibe pensión u otro beneficio social.</div>
               </div>
             </div>
             <div class="report-dl-actions">
@@ -211,7 +211,7 @@
               </div>
               <div>
                 <div class="report-dl-title">Niños y Adolescentes</div>
-                <div class="report-dl-desc">110 personas menores de 18 años (niños 0–11: 62 · adolescentes 12–17: 48). Incluye escolaridad, vacunación y CC de residencia.</div>
+                <div class="report-dl-desc">Personas menores de 18 años. Incluye datos de escolaridad, vacunación y comunidad de residencia. Útil para planificación educativa y de salud.</div>
               </div>
             </div>
             <div class="report-dl-actions">
@@ -609,6 +609,27 @@
       </div>
     </div>
   </div>
+
+  <!-- BOTONES FLOTANTES DE FILTRADO -->
+  <div class="floating-filters" style="position: fixed; bottom: 2rem; right: 2rem; display: flex; flex-direction: column; gap: 1rem; z-index: 1000;">
+    <!-- Botón Habitantes (y=1, arriba) -->
+    <button class="btn-floating" onclick="document.getElementById('filtroPersonasModal').style.display='flex'" title="Filtros de Habitantes" style="width: 56px; height: 56px; border-radius: 50%; background-color: var(--primary-light, #e8f5e9); color: var(--vd, #2E7D32); border: 2px solid var(--vd, #2E7D32); box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease;">
+      <i class="fas fa-user-friends"></i>
+    </button>
+    <!-- Botón Viviendas (y=0, abajo) -->
+    <button class="btn-floating" onclick="document.getElementById('modalFiltrosVivienda').style.display='flex'" title="Filtros de Viviendas" style="width: 56px; height: 56px; border-radius: 50%; background-color: var(--primary-light, #e8f5e9); color: var(--vd, #2E7D32); border: 2px solid var(--vd, #2E7D32); box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease;">
+      <i class="fas fa-home"></i>
+    </button>
+  </div>
+  
+  <style>
+    .btn-floating:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+      background-color: var(--vd, #2E7D32) !important;
+      color: white !important;
+    }
+  </style>
 
   <!-- OVERLAY DE CARGA PARA REPORTES -->
   <div id="reporteLoadingOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:9999; flex-direction:column; gap:1rem; align-items:center; justify-content:center;">

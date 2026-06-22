@@ -204,13 +204,21 @@ class CensoReportesService {
     const whereVivLegacy = CensoReportesService._buildFiltrosViviendaLegacy(filtros, Op);
     const whereHab = CensoReportesService._buildFiltrosHabitanteLegacy(filtros, Op);
 
+    const includeConsejo = models.ConsejoComunal ? [{
+      model: models.ConsejoComunal,
+      as: 'consejo',
+      attributes: ['id']
+    }] : [];
+
     // 1. Total Personas (solo Habitantes)
-    const totalPersonas = await Habitante.count({ where: whereHab });
+    const resTotal = await Habitante.findAndCountAll({ where: whereHab, include: includeConsejo });
+    const totalPersonas = resTotal.count;
 
     // 2. Discapacidad
-    const conDiscapacidad = await Habitante.count({
-      where: { ...whereHab, incapacitado: true }
+    const resDisc = await Habitante.findAndCountAll({
+      where: { ...whereHab, incapacitado: true }, include: includeConsejo
     });
+    const conDiscapacidad = resDisc.count;
 
     // 3. Viviendas (Estudio Demográfico + Vivienda)
     const vivNuevos = await EstudioDemografico.count({ where: whereEstudio });
@@ -219,15 +227,17 @@ class CensoReportesService {
 
     // 4. Adultos mayores (60+ años)
     const hace60 = new Date(); hace60.setFullYear(hace60.getFullYear() - 60);
-    const adultosMayores = await Habitante.count({
-      where: { ...whereHab, fecha_nacimiento: { [Op.lte]: hace60 } }
+    const resMayores = await Habitante.findAndCountAll({
+      where: { ...whereHab, fecha_nacimiento: { [Op.lte]: hace60 } }, include: includeConsejo
     });
+    const adultosMayores = resMayores.count;
 
     // 5. Niños y adolescentes (< 18 años)
     const hace18 = new Date(); hace18.setFullYear(hace18.getFullYear() - 18);
-    const ninos = await Habitante.count({
-      where: { ...whereHab, fecha_nacimiento: { [Op.gt]: hace18 } }
+    const resNinos = await Habitante.findAndCountAll({
+      where: { ...whereHab, fecha_nacimiento: { [Op.gt]: hace18 } }, include: includeConsejo
     });
+    const ninos = resNinos.count;
 
     return { totalPersonas, conDiscapacidad, totalViviendas, adultosMayores, ninos };
   }
@@ -340,7 +350,7 @@ class CensoReportesService {
 
       case 'viviendas':
         title = 'Censo de Viviendas';
-        headers = ['Tipo Vivienda', 'Dirección', 'Consejo Comunal', 'Cédula del Jefe', 'Nombre del Jefe'];
+        headers = ['Tipo Vivienda', 'Dirección', 'Consejo Comunal', 'Cédula del Jefe', 'Nombre del Jefe', 'Nro. Habitantes'];
         
         rowsNuevos = await EstudioDemografico.findAll({ where: we, include: [{ model: ConsejoComunal, as: 'consejo' }, { model: CensoSituacionVivienda, as: 'situacion_vivienda' }] });
         rowsViejos = await Vivienda.findAll({ where: wv, include: [...incConsejoLegacy, { model: Habitante, as: 'jefe' }] });
@@ -348,7 +358,7 @@ class CensoReportesService {
 
       case 'viviendas_avanzado':
         title = 'Censo Avanzado de Viviendas';
-        headers = ['Planilla', 'Consejo Comunal', 'Dirección', 'Jefe de Familia', 'Cédula', 'Tipo Vivienda', 'Tenencia', 'Gas Doméstico', 'Agua Blanca', 'Ingreso', 'Ayuda Médica'];
+        headers = ['Planilla', 'Consejo Comunal', 'Dirección', 'Jefe de Familia', 'Cédula', 'Tipo Vivienda', 'Nro. Habitantes', 'Tenencia', 'Gas', 'Agua', 'Ingreso', 'Ayuda Médica'];
         
         // Includes básicos obligatorios
         const incAvanzado = [
@@ -496,40 +506,43 @@ class CensoReportesService {
 
     // Mapear
     if (tipo === 'viviendas' || tipo === 'viviendas_avanzado') {
-       rowsNuevos.forEach(v => {
-         if (tipo === 'viviendas_avanzado') {
-           rowsCombinados.push([
-             v.planilla_nro || 'N/A',
-             v.consejo ? v.consejo.nombre_comunidad : 'N/A',
-             v.direccion_comunidad || 'N/A',
-             v.encuestado_nombre || 'N/A',
-             v.encuestado_cedula ? `V-${v.encuestado_cedula}` : 'N/A',
-             v.situacion_vivienda ? v.situacion_vivienda.tipo_vivienda : 'N/A',
-             v.situacion_vivienda ? v.situacion_vivienda.forma_tenencia : 'N/A',
-             v.servicios ? v.servicios.gas_tipo : 'N/A',
-             v.servicios ? v.servicios.aguas_blancas_tipo : 'N/A',
-             v.situacion_economica ? v.situacion_economica.ingreso_familiar_rango : 'N/A',
-             v.salud ? v.salud.necesita_ayuda_especial : 'N/A'
-           ]);
-         } else {
-           rowsCombinados.push([
-             v.situacion_vivienda ? v.situacion_vivienda.tipo_vivienda : 'N/A',
-             v.direccion_comunidad || 'N/A',
-             v.consejo ? v.consejo.nombre_comunidad : 'N/A',
-             v.encuestado_cedula ? `V-${v.encuestado_cedula}` : 'N/A',
-             v.encuestado_nombre || 'N/A'
-           ]);
-         }
-       });
-       if (tipo !== 'viviendas_avanzado') {
-         rowsViejos.forEach(v => rowsCombinados.push([
-           v.tipo_vivienda || 'N/A',
-           v.direccion || 'N/A',
-           v.consejo ? v.consejo.nombre_comunidad : 'N/A',
-           v.jefe && v.jefe.cedula ? `V-${v.jefe.cedula}` : 'N/A',
-           v.jefe ? `${v.jefe.nombres || ''} ${v.jefe.apellidos || ''}`.trim() : 'N/A'
-         ]));
-       }
+        rowsNuevos.forEach(v => {
+          if (tipo === 'viviendas_avanzado') {
+            rowsCombinados.push([
+              v.planilla_nro || 'N/A',
+              v.consejo ? v.consejo.nombre_comunidad : 'N/A',
+              v.direccion_comunidad || 'N/A',
+              v.encuestado_nombre || 'N/A',
+              v.encuestado_cedula ? `V-${v.encuestado_cedula}` : 'N/A',
+              v.situacion_vivienda ? v.situacion_vivienda.tipo_vivienda : 'N/A',
+              v.cantidad_habitantes || 1,
+              v.situacion_vivienda ? v.situacion_vivienda.forma_tenencia : 'N/A',
+              v.servicios ? v.servicios.gas_tipo : 'N/A',
+              v.servicios ? v.servicios.aguas_blancas_tipo : 'N/A',
+              v.situacion_economica ? v.situacion_economica.ingreso_familiar_rango : 'N/A',
+              v.salud ? v.salud.necesita_ayuda_especial : 'N/A'
+            ]);
+          } else {
+            rowsCombinados.push([
+              v.situacion_vivienda ? v.situacion_vivienda.tipo_vivienda : 'N/A',
+              v.direccion_comunidad || 'N/A',
+              v.consejo ? v.consejo.nombre_comunidad : 'N/A',
+              v.encuestado_cedula ? `V-${v.encuestado_cedula}` : 'N/A',
+              v.encuestado_nombre || 'N/A',
+              v.cantidad_habitantes || 1
+            ]);
+          }
+        });
+        if (tipo !== 'viviendas_avanzado') {
+          rowsViejos.forEach(v => rowsCombinados.push([
+            v.tipo_vivienda || 'N/A',
+            v.direccion || 'N/A',
+            v.consejo ? v.consejo.nombre_comunidad : 'N/A',
+            v.jefe && v.jefe.cedula ? `V-${v.jefe.cedula}` : 'N/A',
+            v.jefe ? `${v.jefe.nombres || ''} ${v.jefe.apellidos || ''}`.trim() : 'N/A',
+            'N/A'
+          ]));
+        }
     } else {
        const mapPersona = (item) => {
          let cedula = item.cedula;

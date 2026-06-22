@@ -5137,9 +5137,10 @@
       // 7. Insectos
       const insectos = { 'Sin Presencia': 0 };
       data.forEach(d => {
-        if (d.raw.situacion_vivienda?.presencia_insectos_roedores === 'Si') {
+        const tieneInsectos = d.raw.situacion_vivienda?.presencia_insectos_roedores;
+        if (tieneInsectos === true || tieneInsectos === 1 || tieneInsectos === 'true' || tieneInsectos === 'Si') {
           try {
-            const arr = JSON.parse(d.raw.situacion_vivienda.insectos_roedores_tipos || '[]');
+            const arr = (d.raw.opciones_multiples || []).filter(o => o.categoria === 'insectos_tipos').map(o => o.valor);
             if (arr.length === 0) insectos['Sí (No especificado)'] = (insectos['Sí (No especificado)'] || 0) + 1;
             arr.forEach(a => insectos[a] = (insectos[a] || 0) + 1);
           } catch(e) { insectos['Sí (Error parseo)'] = (insectos['Sí (Error parseo)'] || 0) + 1; }
@@ -5152,9 +5153,10 @@
       // 8. Animales
       const animales = { 'Sin Animales': 0 };
       data.forEach(d => {
-        if (d.raw.situacion_vivienda?.tiene_animales_domesticos === 'Si') {
+        const tieneAnimales = d.raw.situacion_vivienda?.tiene_animales_domesticos;
+        if (tieneAnimales === true || tieneAnimales === 1 || tieneAnimales === 'true' || tieneAnimales === 'Si') {
           try {
-            const arr = JSON.parse(d.raw.situacion_vivienda.animales_domesticos_tipos || '[]');
+            const arr = (d.raw.opciones_multiples || []).filter(o => o.categoria === 'animales_tipos').map(o => o.valor);
             if (arr.length === 0) animales['Sí (No especificado)'] = (animales['Sí (No especificado)'] || 0) + 1;
             arr.forEach(a => animales[a] = (animales[a] || 0) + 1);
           } catch(e) { animales['Sí (Error parseo)'] = (animales['Sí (Error parseo)'] || 0) + 1; }

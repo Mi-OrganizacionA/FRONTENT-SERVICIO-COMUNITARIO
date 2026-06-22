@@ -29,14 +29,14 @@ class ReportesController {
     const btnExportExcel = document.getElementById('btnExportExcel');
     if (btnExportExcel) {
       btnExportExcel.addEventListener('click', () => {
-        this.iniciarExportacion('total-personas', 'excel', btnExportExcel);
+        this.iniciarExportacion('total-personas', 'excel', btnExportExcel, this.getFiltrosPersonasUrl());
       });
     }
 
     const btnExportPDF = document.getElementById('btnExportPDF');
     if (btnExportPDF) {
       btnExportPDF.addEventListener('click', () => {
-        this.iniciarExportacion('total-personas', 'pdf', btnExportPDF);
+        this.iniciarExportacion('total-personas', 'pdf', btnExportPDF, this.getFiltrosPersonasUrl());
       });
     }
 
@@ -398,10 +398,16 @@ class ReportesController {
     const formato = btn.getAttribute('data-format');
     
     if (!tipo || !formato) return;
-    this.iniciarExportacion(tipo, formato, btn);
+    
+    // Si el reporte es de viviendas, usar el filtro de viviendas
+    const paramsAdicionales = (tipo === 'viviendas' || tipo === 'viviendas_avanzado') 
+      ? this.getFiltrosViviendaUrl() 
+      : this.getFiltrosPersonasUrl();
+      
+    this.iniciarExportacion(tipo, formato, btn, paramsAdicionales);
   }
 
-  iniciarExportacion(tipo, formato, btn) {
+  iniciarExportacion(tipo, formato, btn, paramsAdicionales = '') {
     const orig = btn.innerHTML;
 
     if (window.Components && typeof Components.actionDialog === 'function') {
@@ -416,20 +422,20 @@ class ReportesController {
         btnSecondaryText: 'Solo Ver',
         btnSecondaryIcon: 'fa-eye',
         onPrimary: () => {
-          this._ejecutarRequestExportacion(tipo, formato, btn, orig, 'download');
+          this._ejecutarRequestExportacion(tipo, formato, btn, orig, 'download', paramsAdicionales);
         },
         onSecondary: () => {
-          this._ejecutarRequestExportacion(tipo, formato, btn, orig, 'view');
+          this._ejecutarRequestExportacion(tipo, formato, btn, orig, 'view', paramsAdicionales);
         }
       });
     } else {
       // Fallback si no está cargado el componente
       const accion = confirm('Pulsa Aceptar para VER el reporte, o Cancelar para DESCARGARLO.') ? 'view' : 'download';
-      this._ejecutarRequestExportacion(tipo, formato, btn, orig, accion);
+      this._ejecutarRequestExportacion(tipo, formato, btn, orig, accion, paramsAdicionales);
     }
   }
 
-  async _ejecutarRequestExportacion(tipo, formato, btn, orig, action) {
+  async _ejecutarRequestExportacion(tipo, formato, btn, orig, action, paramsAdicionales = '') {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
     btn.disabled = true;
 
@@ -440,11 +446,9 @@ class ReportesController {
       if (overlay) overlay.style.display = 'flex';
       if (msg) msg.textContent = 'Consultando base de datos...';
 
-      // Obtener filtros
-      const urlParams = this.getFiltrosUrl();
       const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
       
-      const downloadUrl = `${baseUrl}/censo-reportes/exportar?tipo=${tipo}&format=${formato}&action=${action}&${urlParams}`;
+      const downloadUrl = `${baseUrl}/censo-reportes/exportar?tipo=${tipo}&format=${formato}&action=${action}&${paramsAdicionales}`;
       
       if (msg) msg.textContent = 'Preparando archivo...';
       const headers = window.auth ? { 'Authorization': `Bearer ${window.auth.getToken()}` } : {};
