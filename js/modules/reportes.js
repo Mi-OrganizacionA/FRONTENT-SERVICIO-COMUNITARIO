@@ -286,11 +286,16 @@ class ReportesController {
     const comercio = document.getElementById('filtroV_Comercio')?.value;
     if (comercio) q += `&actividad_comercial_vivienda=${encodeURIComponent(comercio)}`;
 
-    // Opciones Múltiples (Plagas y Enfermedades)
+    // Opciones Múltiples (Plagas, Animales y Enfermedades)
     const insectosSeleccionados = Array.from(document.querySelectorAll('.chk-insectos:checked')).map(el => el.value);
     if (insectosSeleccionados.length > 0 && insectosSeleccionados.length < 7) {
       // Si todos están marcados, no filtramos por defecto. Solo filtramos si hay alguna desmarcada.
       q += `&insectos=${encodeURIComponent(insectosSeleccionados.join(','))}`;
+    }
+    
+    const animalesSeleccionados = Array.from(document.querySelectorAll('.chk-animales:checked')).map(el => el.value);
+    if (animalesSeleccionados.length > 0 && animalesSeleccionados.length < 6) {
+      q += `&animales=${encodeURIComponent(animalesSeleccionados.join(','))}`;
     }
     
     const enfermedadesSeleccionadas = Array.from(document.querySelectorAll('.chk-enfermedades:checked')).map(el => el.value);

@@ -463,11 +463,14 @@ class CensoReportesService {
           famInc.required = true;
         }
 
-        // Opciones Múltiples (Plagas y Enfermedades)
-        if (filtros.insectos || filtros.enfermedades) {
+        // Opciones Múltiples (Plagas, Animales y Enfermedades)
+        if (filtros.insectos || filtros.enfermedades || filtros.animales) {
           const orConditions = [];
           if (filtros.insectos) {
             orConditions.push({ categoria: 'insectos_tipos', valor: { [Op.in]: filtros.insectos.split(',') } });
+          }
+          if (filtros.animales) {
+            orConditions.push({ categoria: 'animales_tipos', valor: { [Op.in]: filtros.animales.split(',') } });
           }
           if (filtros.enfermedades) {
             orConditions.push({ categoria: 'enfermedades', valor: { [Op.in]: filtros.enfermedades.split(',') } });
