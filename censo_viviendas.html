@@ -5440,7 +5440,8 @@
           // Verify if already registered in a census
           if (datos.cedula && window.auth) {
             try {
-              const resCenso = await fetch(`${baseURL}/estudios_demograficos/verificar-habitante/${datos.cedula}`, {
+              const apiBase = window.api?.baseURL || 'https://sicag-api.onrender.com/api';
+              const resCenso = await fetch(`${apiBase}/estudios_demograficos/verificar-habitante/${datos.cedula}`, {
                 headers: { 'Authorization': `Bearer ${window.auth.getToken()}` }
               });
               const dataCenso = await resCenso.json();
@@ -5597,7 +5598,8 @@
             // Validate against duplicates
             if (datos.cedula && window.auth) {
               try {
-                const resCenso = await fetch(`${baseURL}/estudios_demograficos/verificar-habitante/${datos.cedula}`, {
+                const apiBase = window.api?.baseURL || 'https://sicag-api.onrender.com/api';
+                const resCenso = await fetch(`${apiBase}/estudios_demograficos/verificar-habitante/${datos.cedula}`, {
                   headers: { 'Authorization': `Bearer ${window.auth.getToken()}` }
                 });
                 const dataCenso = await resCenso.json();
