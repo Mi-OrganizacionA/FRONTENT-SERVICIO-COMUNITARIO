@@ -357,7 +357,7 @@ class CensoReportesService {
           include: [
             { model: ConsejoComunal, as: 'consejo' }, 
             { model: CensoSituacionVivienda, as: 'situacion_vivienda' },
-            { model: CensoCaracteristicaFamiliar, as: 'caracteristicas_familiares', required: false }
+            { model: CensoCaracteristicaFamiliar, as: 'familiares', required: false }
           ] 
         });
         rowsViejos = await Vivienda.findAll({ where: wv, include: [...incConsejoLegacy, { model: Habitante, as: 'jefe' }] });
@@ -374,7 +374,7 @@ class CensoReportesService {
           { model: CensoServicios, as: 'servicios', required: false },
           { model: CensoSituacionEconomica, as: 'situacion_economica', required: false },
           { model: CensoSalud, as: 'salud', required: false },
-          { model: CensoCaracteristicaFamiliar, as: 'caracteristicas_familiares', required: false }
+          { model: CensoCaracteristicaFamiliar, as: 'familiares', required: false }
         ];
 
         // Lógica de Filtros Dinámicos
@@ -458,7 +458,7 @@ class CensoReportesService {
           whereFamiliar.discapacidad_tipo = { [Op.not]: null, [Op.ne]: '' }; // Verifica si tiene texto en discapacidad_tipo
         }
         if (Object.keys(whereFamiliar).length > 0) {
-          const famInc = incAvanzado.find(i => i.as === 'caracteristicas_familiares');
+          const famInc = incAvanzado.find(i => i.as === 'familiares');
           famInc.where = whereFamiliar;
           famInc.required = true;
         }
@@ -561,7 +561,7 @@ class CensoReportesService {
               v.encuestado_nombre || 'N/A',
               v.encuestado_cedula ? `V-${v.encuestado_cedula}` : 'N/A',
               v.situacion_vivienda ? v.situacion_vivienda.tipo_vivienda : 'N/A',
-              v.caracteristicas_familiares ? v.caracteristicas_familiares.length + 1 : (v.cantidad_habitantes || 1),
+              v.familiares ? v.familiares.length + 1 : (v.cantidad_habitantes || 1),
               v.situacion_vivienda ? v.situacion_vivienda.forma_tenencia : 'N/A',
               v.servicios ? v.servicios.gas_tipo : 'N/A',
               v.servicios ? v.servicios.aguas_blancas_tipo : 'N/A',
@@ -575,7 +575,7 @@ class CensoReportesService {
               v.consejo ? v.consejo.nombre_comunidad : 'N/A',
               v.encuestado_cedula ? `V-${v.encuestado_cedula}` : 'N/A',
               v.encuestado_nombre || 'N/A',
-              v.caracteristicas_familiares ? v.caracteristicas_familiares.length + 1 : (v.cantidad_habitantes || 1)
+              v.familiares ? v.familiares.length + 1 : (v.cantidad_habitantes || 1)
             ]);
           }
         });
