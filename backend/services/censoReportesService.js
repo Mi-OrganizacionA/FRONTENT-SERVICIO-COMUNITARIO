@@ -557,11 +557,11 @@ class CensoReportesService {
             rowsCombinados.push([
               v.planilla_nro || 'N/A',
               v.consejo ? v.consejo.nombre_comunidad : 'N/A',
-              v.direccion_comunidad || 'N/A',
+              v.direccion || [v.calle_avenida, v.numero_casa, v.referencia_ubicacion].filter(Boolean).join(', ') || v.direccion_comunidad || 'N/A',
               v.encuestado_nombre || 'N/A',
               v.encuestado_cedula ? `V-${v.encuestado_cedula}` : 'N/A',
               v.situacion_vivienda ? v.situacion_vivienda.tipo_vivienda : 'N/A',
-              v.familiares ? v.familiares.length + 1 : (v.cantidad_habitantes || 1),
+              v.familiares ? v.familiares.length : (v.cantidad_habitantes || 1),
               v.situacion_vivienda ? v.situacion_vivienda.forma_tenencia : 'N/A',
               v.servicios ? v.servicios.gas_tipo : 'N/A',
               v.servicios ? v.servicios.aguas_blancas_tipo : 'N/A',
@@ -571,11 +571,11 @@ class CensoReportesService {
           } else {
             rowsCombinados.push([
               v.situacion_vivienda ? v.situacion_vivienda.tipo_vivienda : 'N/A',
-              v.direccion_comunidad || 'N/A',
+              v.direccion || [v.calle_avenida, v.numero_casa, v.referencia_ubicacion].filter(Boolean).join(', ') || v.direccion_comunidad || 'N/A',
               v.consejo ? v.consejo.nombre_comunidad : 'N/A',
               v.encuestado_cedula ? `V-${v.encuestado_cedula}` : 'N/A',
               v.encuestado_nombre || 'N/A',
-              v.familiares ? v.familiares.length + 1 : (v.cantidad_habitantes || 1)
+              v.familiares ? v.familiares.length : (v.cantidad_habitantes || 1)
             ]);
           }
         });
