@@ -38,10 +38,10 @@ class ExportGeneratorService {
     // Agregar filas de datos
     data.forEach(item => {
       const row = worksheet.addRow(item);
-      if (item[2] && item[2].toString().startsWith('  ↳')) {
+      if (item[2] && item[2].toString().startsWith('  Integrantes Familiares')) {
         row.font = { bold: true, color: { argb: 'FF444444' }, size: 9 };
         row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEAEAEA' } };
-      } else if (item[2] && item[2].toString().startsWith('    •')) {
+      } else if (item[2] && item[2].toString().startsWith('    -')) {
         row.font = { italic: true, color: { argb: 'FF666666' }, size: 9 };
         row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF9FAFB' } };
       }
@@ -107,9 +107,9 @@ class ExportGeneratorService {
         doc.table(table, {
           prepareHeader: () => doc.font('Helvetica-Bold').fontSize(10).fillColor('#000000'),
           prepareRow: (row, i) => {
-            if (row[2] && row[2].toString().startsWith('  ↳')) {
+            if (row[2] && row[2].toString().startsWith('  Integrantes Familiares')) {
               doc.font('Helvetica-Bold').fontSize(8).fillColor('#444444');
-            } else if (row[2] && row[2].toString().startsWith('    •')) {
+            } else if (row[2] && row[2].toString().startsWith('    -')) {
               doc.font('Helvetica-Oblique').fontSize(8).fillColor('#666666');
             } else {
               doc.font('Helvetica').fontSize(9).fillColor('#333333');
@@ -136,9 +136,9 @@ class ExportGeneratorService {
     const thead = headers.map(h => `<th>${h}</th>`).join('');
     const tbody = data.map(row => {
       let cssClass = '';
-      if (row[2] && row[2].toString().startsWith('  ↳')) {
+      if (row[2] && row[2].toString().startsWith('  Integrantes Familiares')) {
         cssClass = 'class="sub-header"';
-      } else if (row[2] && row[2].toString().startsWith('    •')) {
+      } else if (row[2] && row[2].toString().startsWith('    -')) {
         cssClass = 'class="sub-row"';
       }
       return `<tr ${cssClass}>${row.map(cell => `<td>${(cell || '').toString().replace(/\n/g, '<br>')}</td>`).join('')}</tr>`;

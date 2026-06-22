@@ -582,14 +582,24 @@ class CensoReportesService {
               if (otrosFamiliares.length > 0) {
                 // Header de sub-tabla
                 rowsCombinados.push([
-                  '', '', '  ↳ [Integrantes]', 'Cédula', 'Nombres y Apellidos', 'Parentesco', 'Edad', 'Ocupación', '', '', '', ''
+                  '', '', '  Integrantes Familiares', 'Cédula', 'Nombres y Apellidos', 'Parentesco', 'Fecha Nac.', 'Edad', 'Ocupación', '', '', ''
                 ]);
                 
                 otrosFamiliares.forEach(f => {
                   const edad = f.fecha_nacimiento ? Math.floor((new Date() - new Date(f.fecha_nacimiento)) / (1000 * 60 * 60 * 24 * 365.25)) + ' años' : 'N/A';
                   const doc = f.cedula_identidad ? `V-${f.cedula_identidad}` : 'S/C';
+                  
+                  let fechaNac = 'N/A';
+                  if (f.fecha_nacimiento) {
+                    const d = new Date(f.fecha_nacimiento);
+                    // Ajustar zona horaria local simple
+                    const userTimezoneOffset = d.getTimezoneOffset() * 60000;
+                    const dLocal = new Date(d.getTime() + userTimezoneOffset);
+                    fechaNac = `${dLocal.getDate().toString().padStart(2, '0')}/${(dLocal.getMonth() + 1).toString().padStart(2, '0')}/${dLocal.getFullYear()}`;
+                  }
+
                   rowsCombinados.push([
-                    '', '', '    •', doc, f.nombres_apellidos || 'N/A', f.parentesco || 'N/A', edad, f.ocupacion || 'N/A', '', '', '', ''
+                    '', '', '    -', doc, f.nombres_apellidos || 'N/A', f.parentesco || 'N/A', fechaNac, edad, f.ocupacion || 'N/A', '', '', ''
                   ]);
                 });
               }
