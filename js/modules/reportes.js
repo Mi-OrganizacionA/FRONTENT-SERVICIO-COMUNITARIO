@@ -472,9 +472,10 @@ class ReportesController {
       if (msg) msg.textContent = 'Consultando base de datos...';
 
       const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
+      const token = window.auth?.getToken() || '';
+      const downloadUrl = `${baseUrl}/censo-reportes/exportar?tipo=${tipo}&format=${formato}&action=${action}&token=${token}&${paramsAdicionales}`;
       
-      const downloadUrl = `${baseUrl}/censo-reportes/exportar?tipo=${tipo}&format=${formato}&action=${action}&${paramsAdicionales}`;
-      
+      console.log('🔗 URL de exportación:', downloadUrl);
       if (msg) msg.textContent = 'Preparando archivo...';
       const headers = window.auth ? { 'Authorization': `Bearer ${window.auth.getToken()}` } : {};
       const response = await fetch(downloadUrl, { headers });

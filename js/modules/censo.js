@@ -527,6 +527,25 @@ class CensoController {
           maintainAspectRatio: false,
           plugins: { 
             legend: { display: type !== 'bar', position: 'bottom' },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.label || '';
+                  if (label) { label += ': '; }
+                  if (context.parsed !== null) { label += context.parsed; }
+                  if (type === 'pie' || type === 'doughnut') {
+                    let sum = 0;
+                    let dataArr = context.chart.data.datasets[0].data;
+                    dataArr.forEach(data => { sum += data; });
+                    if (sum > 0) {
+                      let percentage = (context.parsed * 100 / sum).toFixed(2) + "%";
+                      label += ' (' + percentage + ')';
+                    }
+                  }
+                  return label;
+                }
+              }
+            },
             datalabels: {
               color: '#fff',
               font: { weight: 'bold', size: 11 },
@@ -743,7 +762,9 @@ function _ejecutarRequestExportacionAvanzada(formato, btn, orig, action) {
   const tipo = document.getElementById('customReportType')?.value || 'total-personas';
 
   const baseUrl = window.api ? window.api.baseURL : 'http://localhost:3000/api';
-  const downloadUrl = `${baseUrl}/censo-reportes/exportar?tipo=${tipo}&format=${formato}&action=${action}&${params.toString()}`;
+  const token = window.auth?.getToken() || '';
+  
+  const downloadUrl = `${baseUrl}/censo-reportes/exportar?tipo=${tipo}&format=${formato}&action=${action}&token=${token}&${params.toString()}`;
   
   window.open(downloadUrl, '_blank');
 

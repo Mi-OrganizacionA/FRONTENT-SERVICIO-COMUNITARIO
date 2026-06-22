@@ -272,6 +272,23 @@ class DashboardController {
           responsive: true, maintainAspectRatio: false, cutout: '52%',
           plugins: {
             legend: { position: 'bottom', labels: { padding: 10, font: { family: 'Poppins', size: 10 }, usePointStyle: true, pointStyleWidth: 8 } },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.label || '';
+                  if (label) { label += ': '; }
+                  if (context.parsed !== null) { label += context.parsed; }
+                  let sum = 0;
+                  let dataArr = context.chart.data.datasets[0].data;
+                  dataArr.forEach(data => { sum += data; });
+                  if (sum > 0) {
+                    let percentage = (context.parsed * 100 / sum).toFixed(2) + "%";
+                    label += ' (' + percentage + ')';
+                  }
+                  return label;
+                }
+              }
+            },
             datalabels: {
               color: '#fff',
               font: { weight: 'bold', size: 11 },
@@ -359,6 +376,23 @@ class DashboardController {
             responsive: true, maintainAspectRatio: false, cutout: '52%',
             plugins: {
               legend: { position: 'bottom', labels: { padding: 10, font: { family: 'Poppins', size: 10 }, usePointStyle: true } },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    let label = context.label || '';
+                    if (label) { label += ': '; }
+                    if (context.parsed !== null) { label += context.parsed; }
+                    let sum = 0;
+                    let dataArr = context.chart.data.datasets[0].data;
+                    dataArr.forEach(data => { sum += data; });
+                    if (sum > 0) {
+                      let percentage = (context.parsed * 100 / sum).toFixed(2) + "%";
+                      label += ' (' + percentage + ')';
+                    }
+                    return label;
+                  }
+                }
+              },
               datalabels: {
                 color: '#fff',
                 font: { weight: 'bold', size: 11 },
