@@ -50,18 +50,18 @@ const habitanteUpdateSchema = Joi.object({
 const votacionSchema = Joi.object({
   titulo: Joi.string().min(5).max(200).required(),
   descripcion: Joi.string().allow('', null),
-  consejo_comunal_id: Joi.number().integer().required(),
+  id_comunidad: Joi.number().integer().required(),
   fecha_inicio: Joi.date().optional(),
   fecha_fin: Joi.date().optional(),
   activa: Joi.boolean()
-});
+}).unknown(true);
 
 const proyectoSchema = Joi.object({
   titulo: Joi.string().min(5).max(200).required(),
   descripcion: Joi.string().allow('', null),
   estado: Joi.string().valid('propuesto','aprobado','rechazado','en_ejecucion','finalizado'),
   presupuesto: Joi.number().min(0),
-  consejo_comunal_id: Joi.number().integer().required()
+  id_comunidad: Joi.number().integer().required()
 }).unknown(true);
 
 const idParamSchema = Joi.object({
@@ -92,9 +92,9 @@ const noticiaSchema = Joi.object({
 const reporteSchema = Joi.object({
   titulo: Joi.string().min(5).max(200).required(),
   contenido: Joi.string().allow('', null),
-  consejo_comunal_id: Joi.number().integer().required(),
+  id_comunidad: Joi.number().integer().required(),
   fecha: Joi.date().optional()
-});
+}).unknown(true);
 
 // Esquemas para nuevas entidades
 const bandejaValidacionesSchema = Joi.object({
