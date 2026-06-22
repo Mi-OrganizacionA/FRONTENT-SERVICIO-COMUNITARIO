@@ -5441,7 +5441,7 @@
           if (datos.cedula && window.auth) {
             try {
               const apiBase = window.api?.baseURL || 'https://sicag-api.onrender.com/api';
-              const resCenso = await fetch(`${apiBase}/estudios_demograficos/verificar-habitante/${datos.cedula}`, {
+              const resCenso = await fetch(`${apiBase}/estudios-demograficos/verificar-habitante/${datos.cedula}`, {
                 headers: { 'Authorization': `Bearer ${window.auth.getToken()}` }
               });
               const dataCenso = await resCenso.json();
@@ -5599,7 +5599,7 @@
             if (datos.cedula && window.auth) {
               try {
                 const apiBase = window.api?.baseURL || 'https://sicag-api.onrender.com/api';
-                const resCenso = await fetch(`${apiBase}/estudios_demograficos/verificar-habitante/${datos.cedula}`, {
+                const resCenso = await fetch(`${apiBase}/estudios-demograficos/verificar-habitante/${datos.cedula}`, {
                   headers: { 'Authorization': `Bearer ${window.auth.getToken()}` }
                 });
                 const dataCenso = await resCenso.json();
