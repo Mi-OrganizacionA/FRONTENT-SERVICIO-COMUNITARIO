@@ -5,15 +5,22 @@ import { getStorage, ref, deleteObject } from 'https://www.gstatic.com/firebasej
 import { getFunctions } from 'https://www.gstatic.com/firebasejs/12.14.0/firebase-functions.js';
 
 // Reemplaza estas credenciales con las de tu proyecto Firebase.
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: 'TU_API_KEY',
-  authDomain: 'TU_AUTH_DOMAIN',
-  projectId: 'TU_PROJECT_ID',
-  storageBucket: 'TU_STORAGE_BUCKET',
-  messagingSenderId: 'TU_MESSAGING_SENDER_ID',
-  appId: 'TU_APP_ID',
-  measurementId: 'TU_MEASUREMENT_ID'
+  apiKey: "AIzaSyAype1QNZjlLF1KbzyktE8ekeTtBdixd70",
+  authDomain: "sicag-oficial.firebaseapp.com",
+  projectId: "sicag-oficial",
+  storageBucket: "sicag-oficial.firebasestorage.app",
+  messagingSenderId: "335229572111",
+  appId: "1:335229572111:web:13275dc759ed749754ff7a"
 };
+
+// Initialize Firebase
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
