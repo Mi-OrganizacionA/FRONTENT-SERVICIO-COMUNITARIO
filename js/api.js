@@ -1322,80 +1322,9 @@ class APIManager {
       const token = window.auth?.getToken();
       if (!token && !this.isDevelopment) throw new Error('NO_TOKEN');
 
-      const lowerQ = query.toLowerCase();
-      
-      // Consultamos de forma concurrente los diferentes endpoints existentes
-      const [habitantes, proyectos, organizaciones, noticias, voceros] = await Promise.all([
-        this.getHabitantes().catch(() => []),
-        this.getProyectos().catch(() => []),
-        this.getOrganizaciones().catch(() => []),
-        this.getNoticias().catch(() => []),
-        this.getVoceros().catch(() => [])
-      ]);
-
-      let results = [];
-
-      // Buscar en Habitantes
-      habitantes.forEach(h => {
-        if (h.nombre.toLowerCase().includes(lowerQ) || h.cedula.includes(lowerQ)) {
-          results.push({
-            tipo: 'habitante',
-            titulo: h.nombre,
-            subtitulo: `Habitante - C.I: ${h.cedula}`,
-            url: `censo.html?highlightSection=${encodeURIComponent(h.nombre)}`
-          });
-        }
-      });
-
-      // Buscar en Proyectos
-      proyectos.forEach(p => {
-        if (p.titulo.toLowerCase().includes(lowerQ)) {
-          results.push({
-            tipo: 'proyecto',
-            titulo: p.titulo,
-            subtitulo: `Proyecto AgroecolÃ³gico - ${p.estado}`,
-            url: `proyectos.html?highlightSection=${encodeURIComponent(p.titulo)}`
-          });
-        }
-      });
-
-      // Buscar en Organizaciones
-      organizaciones.forEach(o => {
-        if (o.nombre.toLowerCase().includes(lowerQ)) {
-          results.push({
-            tipo: 'organizacion',
-            titulo: o.nombre,
-            subtitulo: `OrganizaciÃ³n - ${o.tipo}`,
-            url: `organizaciones.html?highlightSection=${encodeURIComponent(o.nombre)}`
-          });
-        }
-      });
-
-      // Buscar en Noticias / Cartelera
-      noticias.forEach(n => {
-        if (n.titulo.toLowerCase().includes(lowerQ)) {
-          results.push({
-            tipo: 'noticia',
-            titulo: n.titulo,
-            subtitulo: `PublicaciÃ³n`,
-            url: `noticias.html?highlightSection=${encodeURIComponent(n.titulo)}`
-          });
-        }
-      });
-
-      // Buscar en Voceros
-      voceros.forEach(v => {
-        if (v.nombre.toLowerCase().includes(lowerQ) || v.cedula.includes(lowerQ)) {
-          results.push({
-            tipo: 'vocero',
-            titulo: v.nombre,
-            subtitulo: `Vocero - ${v.comite}`,
-            url: `voceros.html?highlightSection=${encodeURIComponent(v.nombre)}`
-          });
-        }
-      });
-
-      return results.slice(0, 15); // Limitar a 15 resultados
+      // Realizar peticiÃ³n al endpoint /api/search
+      const response = await this.fetchWithAuth(`/search?q=${encodeURIComponent(query)}`);
+      return response;
     } catch (e) {
       if (e.message === 'NO_TOKEN' || e.message === 'TOKEN_EXPIRED') {
         throw e;
