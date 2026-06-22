@@ -5631,7 +5631,17 @@
                     return; // Stop filling
                   }
                 }
-              } catch(e) { console.error(e); }
+              } catch(e) { 
+                console.error('Error al verificar duplicados:', e); 
+                window.showToast('Error de conexión al verificar duplicados. Intente nuevamente.', 'error');
+                
+                // Reset fields and block
+                if (row.querySelector('.fam-habitante-id')) row.querySelector('.fam-habitante-id').value = '';
+                if (row.querySelector('.fam-nombres')) row.querySelector('.fam-nombres').value = '';
+                const btnToggle = row.querySelector('.btn-toggle-info');
+                if (btnToggle) btnToggle.style.display = 'none';
+                return; // Stop filling if validation throws an error!
+              }
             }
 
             const idInput = row.querySelector('.fam-habitante-id');

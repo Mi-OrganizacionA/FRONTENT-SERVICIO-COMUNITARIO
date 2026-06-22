@@ -811,12 +811,13 @@ class EstudioDemograficoController {
       const { cedula } = req.params;
       if (!cedula) return res.status(400).json({ error: 'Cédula es requerida' });
 
-      // Clean the cedula if it has extra characters (assuming V-12345 format might come in)
-      const cedulaLimpia = cedula.replace(/^V-|^E-/i, '').trim();
+      // Extraer solo los números para evitar problemas de formato (V-, puntos, etc.)
+      const cedulaSoloNumeros = cedula.replace(/\D/g, '');
+      const { Op } = require('sequelize');
 
       // Check if is Jefe in any census
       const jefe = await EstudioDemografico.findOne({
-        where: { encuestado_cedula: cedulaLimpia }
+        where: { encuestado_cedula: { [Op.like]: `%${cedulaSoloNumeros}%` } }
       });
       if (jefe) {
         return res.json({
@@ -829,7 +830,7 @@ class EstudioDemograficoController {
 
       // Check if is Familiar in any census
       const familiar = await db.CensoCaracteristicaFamiliar.findOne({
-        where: { cedula_identidad: cedulaLimpia },
+        where: { cedula_identidad: { [Op.like]: `%${cedulaSoloNumeros}%` } },
         include: [{
           model: EstudioDemografico,
           as: 'estudio',
