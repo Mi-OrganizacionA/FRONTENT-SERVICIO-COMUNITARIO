@@ -513,6 +513,9 @@ class CensoController {
       const ctx = document.getElementById(id);
       if (!ctx) return;
       if (window[`_chart_inst_${id}`]) { window[`_chart_inst_${id}`].destroy(); }
+      if (typeof ChartDataLabels !== 'undefined') {
+        Chart.register(ChartDataLabels);
+      }
       window[`_chart_inst_${id}`] = new Chart(ctx, {
         type: type,
         data: {
@@ -522,7 +525,22 @@ class CensoController {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: type !== 'bar', position: 'bottom' } }
+          plugins: { 
+            legend: { display: type !== 'bar', position: 'bottom' },
+            datalabels: {
+              color: '#fff',
+              font: { weight: 'bold', size: 11 },
+              formatter: (value, ctx) => {
+                if (type !== 'pie' && type !== 'doughnut') return null;
+                let sum = 0;
+                let dArr = ctx.chart.data.datasets[0].data;
+                dArr.forEach(data => { sum += data; });
+                if(sum === 0) return null;
+                let percentage = (value * 100 / sum).toFixed(2) + "%";
+                return value > 0 ? percentage : null;
+              }
+            }
+          }
         }
       });
     };

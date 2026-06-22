@@ -210,6 +210,9 @@ class DashboardController {
 
   inicializarGraficos() {
     if (typeof Chart === 'undefined') return;
+    if (typeof ChartDataLabels !== 'undefined') {
+      Chart.register(ChartDataLabels);
+    }
 
     var palVerde = ['#2E7D32','#388E3C','#43A047','#4CAF50','#66BB6A','#81C784','#A5D6A7','#C8E6C9','#E8F5E9'];
 
@@ -269,6 +272,18 @@ class DashboardController {
           responsive: true, maintainAspectRatio: false, cutout: '52%',
           plugins: {
             legend: { position: 'bottom', labels: { padding: 10, font: { family: 'Poppins', size: 10 }, usePointStyle: true, pointStyleWidth: 8 } },
+            datalabels: {
+              color: '#fff',
+              font: { weight: 'bold', size: 11 },
+              formatter: (value, ctx) => {
+                let sum = 0;
+                let dataArr = ctx.chart.data.datasets[0].data;
+                dataArr.forEach(data => { sum += data; });
+                if(sum === 0) return null;
+                let percentage = (value * 100 / sum).toFixed(2) + "%";
+                return value > 0 ? percentage : null;
+              }
+            },
             tooltip: { backgroundColor: '#1A2E1A', padding: 12, cornerRadius: 8,
               callbacks: { label: ctx => { const t = ctx.dataset.data.reduce((a,b)=>a+b,0); return ` ${ctx.label}: ${ctx.raw} hab. (${((ctx.raw/t)*100).toFixed(1)}%)`; } } }
           }
@@ -344,6 +359,18 @@ class DashboardController {
             responsive: true, maintainAspectRatio: false, cutout: '52%',
             plugins: {
               legend: { position: 'bottom', labels: { padding: 10, font: { family: 'Poppins', size: 10 }, usePointStyle: true } },
+              datalabels: {
+                color: '#fff',
+                font: { weight: 'bold', size: 11 },
+                formatter: (value, ctx) => {
+                  let sum = 0;
+                  let dataArr = ctx.chart.data.datasets[0].data;
+                  dataArr.forEach(data => { sum += data; });
+                  if(sum === 0) return null;
+                  let percentage = (value * 100 / sum).toFixed(2) + "%";
+                  return value > 0 ? percentage : null;
+                }
+              },
               tooltip: { backgroundColor: '#1A2E1A', padding: 12, cornerRadius: 8 }
             }
           }
