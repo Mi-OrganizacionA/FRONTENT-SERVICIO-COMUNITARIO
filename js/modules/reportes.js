@@ -249,7 +249,10 @@ class ReportesController {
     const consejo_id = isVocero ? user.id_comunidad_asignada : document.getElementById('filtroV_Consejo')?.value;
     if (consejo_id) q += `&consejo_id=${encodeURIComponent(consejo_id)}`;
 
-    // Control
+    const incluirIntegrantes = document.getElementById('filtroV_IncluirIntegrantes')?.checked;
+    if (incluirIntegrantes) q += `&incluir_integrantes=true`;
+
+    // Identificación
     const planilla = document.getElementById('filtroV_Planilla')?.value;
     if (planilla) q += `&planilla_nro=${encodeURIComponent(planilla)}`;
     const encuestador = document.getElementById('filtroV_Encuestador')?.value;

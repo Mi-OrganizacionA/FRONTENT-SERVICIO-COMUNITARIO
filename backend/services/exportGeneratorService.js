@@ -38,7 +38,11 @@ class ExportGeneratorService {
 
     // Agregar filas
     data.forEach(item => {
-      worksheet.addRow(item);
+      const row = worksheet.addRow(item);
+      if (item[0] && item[0].toString().startsWith('  ↳')) {
+        row.font = { italic: true, color: { argb: 'FF666666' }, size: 9 };
+        row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF9FAFB' } };
+      }
     });
 
     return await workbook.xlsx.writeBuffer();
@@ -92,8 +96,14 @@ class ExportGeneratorService {
         };
 
         doc.table(table, {
-          prepareHeader: () => doc.font('Helvetica-Bold').fontSize(10),
-          prepareRow: (row, i) => doc.font('Helvetica').fontSize(9)
+          prepareHeader: () => doc.font('Helvetica-Bold').fontSize(10).fillColor('#000000'),
+          prepareRow: (row, i) => {
+            if (row[0] && row[0].toString().startsWith('  ↳')) {
+              doc.font('Helvetica-Oblique').fontSize(8).fillColor('#666666');
+            } else {
+              doc.font('Helvetica').fontSize(9).fillColor('#333333');
+            }
+          }
         });
 
         doc.end();

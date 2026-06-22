@@ -569,8 +569,28 @@ class CensoReportesService {
               v.servicios ? v.servicios.gas_tipo : 'N/A',
               v.servicios ? v.servicios.aguas_blancas_tipo : 'N/A',
               v.situacion_economica ? v.situacion_economica.ingreso_familiar_rango : 'N/A',
-              v.salud ? v.salud.necesita_ayuda_especial : 'N/A'
+              (v.salud && v.salud.necesita_ayuda_especial === 'Sí') ? `Sí, ${v.salud.cual_ayuda_especial || 'No especificada'}` : 'No'
             ]);
+
+            if (filtros.incluir_integrantes === 'true' && v.familiares && v.familiares.length > 0) {
+              v.familiares.forEach(f => {
+                const edad = f.fecha_nacimiento ? Math.floor((new Date() - new Date(f.fecha_nacimiento)) / (1000 * 60 * 60 * 24 * 365.25)) + ' años' : 'N/A';
+                rowsCombinados.push([
+                  '  ↳ [Familiar]',
+                  '',
+                  f.parentesco || 'N/A',
+                  f.nombres_apellidos || 'N/A',
+                  f.cedula_identidad ? `V-${f.cedula_identidad}` : 'N/A',
+                  edad,
+                  '',
+                  '',
+                  '',
+                  '',
+                  f.ocupacion || '',
+                  ''
+                ]);
+              });
+            }
           } else {
             rowsCombinados.push([
               v.situacion_vivienda ? v.situacion_vivienda.tipo_vivienda : 'N/A',
