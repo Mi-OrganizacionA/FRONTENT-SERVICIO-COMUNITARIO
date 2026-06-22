@@ -38,10 +38,7 @@ class ExportGeneratorService {
     // Agregar filas de datos
     data.forEach(item => {
       const row = worksheet.addRow(item);
-      if (item[0] && item[0].toString().startsWith('  ↳')) {
-        row.font = { italic: true, color: { argb: 'FF666666' }, size: 9 };
-        row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF9FAFB' } };
-      }
+      row.alignment = { wrapText: true, vertical: 'top' };
       currentRow++;
     });
 

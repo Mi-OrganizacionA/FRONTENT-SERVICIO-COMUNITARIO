@@ -366,6 +366,9 @@ class CensoReportesService {
       case 'viviendas_avanzado':
         title = 'Censo Avanzado de Viviendas';
         headers = ['Planilla', 'Consejo Comunal', 'Dirección', 'Jefe de Familia', 'Cédula', 'Tipo Vivienda', 'Nro. Habitantes', 'Tenencia', 'Gas', 'Agua', 'Ingreso', 'Ayuda Médica'];
+        if (filtros.incluir_integrantes === 'true') {
+          headers.push('Integrantes Familiares');
+        }
         
         // Includes básicos obligatorios
         const incAvanzado = [
@@ -560,7 +563,7 @@ class CensoReportesService {
     if (tipo === 'viviendas' || tipo === 'viviendas_avanzado') {
         rowsNuevos.forEach(v => {
           if (tipo === 'viviendas_avanzado') {
-            rowsCombinados.push([
+            const rowAv = [
               v.planilla_nro || 'N/A',
               v.consejo ? v.consejo.nombre_comunidad : 'N/A',
               v.direccion || [v.calle_avenida, v.numero_casa, v.referencia_ubicacion].filter(Boolean).join(', ') || v.direccion_comunidad || 'N/A',
@@ -573,27 +576,22 @@ class CensoReportesService {
               v.servicios ? v.servicios.aguas_blancas_tipo : 'N/A',
               v.situacion_economica ? v.situacion_economica.ingreso_familiar_rango : 'N/A',
               (v.salud && v.salud.necesita_ayuda_especial === 'Sí') ? `Sí, ${v.salud.cual_ayuda_especial || 'No especificada'}` : 'No'
-            ]);
+            ];
 
-            if (filtros.incluir_integrantes === 'true' && v.familiares && v.familiares.length > 0) {
-              v.familiares.forEach(f => {
-                const edad = f.fecha_nacimiento ? Math.floor((new Date() - new Date(f.fecha_nacimiento)) / (1000 * 60 * 60 * 24 * 365.25)) + ' años' : 'N/A';
-                rowsCombinados.push([
-                  '  ↳ [Familiar]',
-                  '',
-                  f.parentesco || 'N/A',
-                  f.nombres_apellidos || 'N/A',
-                  f.cedula_identidad ? `V-${f.cedula_identidad}` : 'N/A',
-                  edad,
-                  '',
-                  '',
-                  '',
-                  '',
-                  f.ocupacion || '',
-                  ''
-                ]);
-              });
+            if (filtros.incluir_integrantes === 'true') {
+              if (v.familiares && v.familiares.length > 0) {
+                const familiaresStr = v.familiares.map((f, i) => {
+                  const edad = f.fecha_nacimiento ? Math.floor((new Date() - new Date(f.fecha_nacimiento)) / (1000 * 60 * 60 * 24 * 365.25)) + ' años' : 'N/A';
+                  const doc = f.cedula_identidad ? `V-${f.cedula_identidad}` : 'S/C';
+                  return `${i+1}. ${f.nombres_apellidos} (${f.parentesco}, ${doc}, ${edad})`;
+                }).join('\n');
+                rowAv.push(familiaresStr);
+              } else {
+                rowAv.push('Ninguno registrado');
+              }
             }
+            
+            rowsCombinados.push(rowAv);
           } else {
             rowsCombinados.push([
               v.situacion_vivienda ? v.situacion_vivienda.tipo_vivienda : 'N/A',
