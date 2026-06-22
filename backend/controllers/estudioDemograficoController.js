@@ -734,15 +734,38 @@ class EstudioDemograficoController {
   static async eliminar(req, res, next) {
     try {
       const data = await EstudioDemografico.findByPk(req.params.id);
-      if (!data) return res.status(404).json({ error: "Estudio demogrfico no encontrado" });
+      if (!data) return res.status(404).json({ error: "Estudio demográfico no encontrado" });
+
+      // Lógica de Aprobación Automática
+      const Configuracion = models.Configuracion;
+      const BandejaValidaciones = models.BandejaValidaciones;
+      
+      const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Censos' } });
+      const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+      
+      const autoApprove = (globalConfig && globalConfig.valor === 'true') || 
+                          (config && config.valor === 'true') || 
+                          req.user?.rol === 'admin';
+
+      if (!autoApprove) {
+        await BandejaValidaciones.create({
+          id_vocero: req.user.id,
+          tabla_afectada: 'estudios_demograficos',
+          registro_id: data.id,
+          tipo_accion: 'DELETE',
+          datos_temporales: {},
+          estado_tramite: 'Pendiente'
+        });
+        return res.status(202).json({ validacion: true, mensaje: 'Solicitud de eliminación enviada a la bandeja de validaciones del administrador.' });
+      }
 
       const datosAntiguos = data.toJSON();
-      await data.update({ activo: false });
+      await data.destroy(); // Eliminación física en cascada
 
       if (req.user) {
-        await AuditService.log(req.user.id, "DELETE", "estudios_demograficos", data.id, datosAntiguos, data.toJSON());
+        await AuditService.log(req.user.id, "DELETE", "estudios_demograficos", data.id, datosAntiguos, null);
       }
-      res.json({ success: true, message: "Estudio eliminado lógicamente" });
+      res.json({ success: true, message: "Estudio eliminado físicamente de la base de datos" });
     } catch (error) { next(error); }
   }
 

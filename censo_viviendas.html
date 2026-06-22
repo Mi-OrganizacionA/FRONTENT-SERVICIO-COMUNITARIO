@@ -4707,23 +4707,41 @@
       });
     }
 
-    async function intentarEliminar(id, index) {
+    let censoAEliminarId = null;
+    let censoAEliminarIndex = null;
+
+    function intentarEliminar(id, index) {
       if (!id || id === 'undefined') { showToast('ID de vivienda no válido.', 'error'); return; }
       
-      if (!confirm('¿Está seguro que desea enviar la solicitud de eliminación para esta vivienda?')) {
-        return;
+      censoAEliminarId = id;
+      censoAEliminarIndex = index;
+
+      const modalEl = document.getElementById('modalEliminarCenso');
+      if (modalEl) {
+        new bootstrap.Modal(modalEl).show();
+      } else {
+        // Fallback en caso de que bootstrap falle
+        if (confirm('¿Está seguro que desea eliminar esta vivienda de forma irreversible?')) {
+          procesarEliminarCenso();
+        }
       }
+    }
+
+    async function procesarEliminarCenso() {
+      if (!censoAEliminarId) return;
 
       try {
         if (window.api && window.api.eliminarEstudioDemografico) {
-          const res = await window.api.eliminarEstudioDemografico(id);
+          const res = await window.api.eliminarEstudioDemografico(censoAEliminarId);
           
           if (res && res.validacion) {
             showToast('📋 Solicitud de eliminación enviada al administrador para revisión.', 'info');
           } else {
             showToast('✅ Vivienda eliminada correctamente.', 'success');
-            viviendas.splice(index, 1);
-            renderTable();
+            if (censoAEliminarIndex !== null) {
+              viviendas.splice(censoAEliminarIndex, 1);
+              renderTable();
+            }
           }
         } else {
           showToast('La API no está disponible.', 'error');
@@ -4731,6 +4749,14 @@
       } catch (err) {
         console.error(err);
         showToast('Error de red al eliminar o servidor no responde.', 'error');
+      } finally {
+        const modalEl = document.getElementById('modalEliminarCenso');
+        if (modalEl) {
+          const modalInstance = bootstrap.Modal.getInstance(modalEl);
+          if (modalInstance) modalInstance.hide();
+        }
+        censoAEliminarId = null;
+        censoAEliminarIndex = null;
       }
     }
 
