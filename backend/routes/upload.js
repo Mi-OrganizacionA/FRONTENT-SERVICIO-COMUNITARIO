@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { requireAuth } = require('../middleware/authMiddleware');
+const { verifyToken } = require('../middleware/auth');
 
 // Configuración de Multer: ahora guardamos en memoria RAM para no escribir en disco
 const upload = multer({
@@ -17,7 +17,7 @@ const upload = multer({
 });
 
 // Endpoint: POST /api/upload
-router.post('/', requireAuth, upload.single('image'), async (req, res) => {
+router.post('/', verifyToken, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No se subió ninguna imagen.' });
