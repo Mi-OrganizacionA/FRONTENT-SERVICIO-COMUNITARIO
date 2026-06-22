@@ -25,6 +25,13 @@ class ExportGeneratorService {
       currentRow++;
     }
 
+    // Fila de Fecha de Generación
+    const fechaActual = new Date().toLocaleString('es-VE', { timeZone: 'America/Caracas' });
+    worksheet.addRow([`Generado el: ${fechaActual}`]);
+    worksheet.getRow(currentRow).font = { italic: true, color: { argb: 'FF888888' }, size: 10 };
+    worksheet.mergeCells(currentRow, 1, currentRow, headers.length);
+    currentRow++;
+
     // Fila de Cabeceras
     const headerRow = worksheet.addRow(headers);
     headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
@@ -96,6 +103,10 @@ class ExportGeneratorService {
           doc.fontSize(10).fillColor('#666666').text(filtrosText, { align: 'center' });
         }
         
+        const fechaActual = new Date().toLocaleString('es-VE', { timeZone: 'America/Caracas' });
+        doc.moveDown(0.3);
+        doc.fontSize(9).fillColor('#888888').text(`Generado el: ${fechaActual}`, { align: 'center' });
+        
         doc.moveDown(2);
 
         // Tabla
@@ -144,6 +155,8 @@ class ExportGeneratorService {
       return `<tr ${cssClass}>${row.map(cell => `<td>${(cell || '').toString().replace(/\n/g, '<br>')}</td>`).join('')}</tr>`;
     }).join('');
 
+    const fechaActual = new Date().toLocaleString('es-VE', { timeZone: 'America/Caracas' });
+
     return `
       <!DOCTYPE html>
       <html lang="es">
@@ -174,6 +187,7 @@ class ExportGeneratorService {
           <div class="header-box">
             <h1>${title}</h1>
             ${filtrosText ? `<p class="filtros">${filtrosText}</p>` : ''}
+            <p class="filtros" style="color: #888; font-size: 12px; margin-top: 5px;">Generado el: ${fechaActual}</p>
           </div>
           <table>
             <thead><tr>${thead}</tr></thead>
