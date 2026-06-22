@@ -62,7 +62,7 @@ const proyectoSchema = Joi.object({
   estado: Joi.string().valid('propuesto','aprobado','rechazado','en_ejecucion','finalizado'),
   presupuesto: Joi.number().min(0),
   consejo_comunal_id: Joi.number().integer().required()
-});
+}).unknown(true);
 
 const idParamSchema = Joi.object({
   id: Joi.number().integer().positive().required()
@@ -87,7 +87,7 @@ const noticiaSchema = Joi.object({
   contenido: Joi.string().allow('', null),
   publicado: Joi.boolean(),
   fecha_publicacion: Joi.date().optional()
-});
+}).unknown(true);
 
 const reporteSchema = Joi.object({
   titulo: Joi.string().min(5).max(200).required(),
@@ -111,7 +111,7 @@ const carteleraDigitalSchema = Joi.object({
   enlace_extra: Joi.string().max(2000).allow('', null).optional(),
   fecha_cierre: Joi.date().allow(null).optional(),
   destacada: Joi.boolean().optional()
-});
+}).unknown(true);
 
 const personaGrupoSocialSchema = Joi.object({
   id_habitante: Joi.number().integer().positive().required(),
@@ -150,7 +150,7 @@ const viviendasSchema = Joi.object({
   tipo_techo: Joi.string().allow('', null),
   condiciones_salubridad: Joi.string().allow('', null),
   requiere_ayuda_mejora: Joi.boolean()
-});
+}).unknown(true);
 
 const organizacionSocialSchema = Joi.object({
   id_comunidad: Joi.number().integer().positive().allow(null, ''),
