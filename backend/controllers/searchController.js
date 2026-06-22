@@ -5,8 +5,26 @@ class SearchController {
     this.models = models;
   }
 
-  static _normalizeCedula(q) {
-    return q.replace(/[.\s-]/g, '').replace(/^[VE]/i, '');
+  static _generateCedulaVariations(q) {
+    const raw = q.trim();
+    const num = raw.replace(/[.\s-]/g, '').replace(/^[VE]/i, '');
+    if (!num || isNaN(num)) return [`%${raw}%`];
+
+    // Formatear con puntos (ej: 12345678 -> 12.345.678)
+    const formatDots = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    const dots = formatDots(num);
+
+    const vars = new Set([
+      `%${num}%`,
+      `%V-${num}%`, `%E-${num}%`,
+      `%V${num}%`, `%E${num}%`,
+      `%${dots}%`,
+      `%V-${dots}%`, `%E-${dots}%`,
+      `%V${dots}%`, `%E${dots}%`,
+      `%${raw}%`
+    ]);
+
+    return Array.from(vars);
   }
 
   static async globalSearch(req, res, next) {
@@ -22,7 +40,7 @@ class SearchController {
 
       const raw = q.trim();
       const query = `%${raw}%`;
-      const cedulaQuery = `%${this._normalizeCedula(raw)}%`;
+      const cedulaVariations = this._generateCedulaVariations(raw);
       const results = [];
 
       // 1. Buscar Habitantes y Jefe de Familia
@@ -31,8 +49,7 @@ class SearchController {
           const whereClause = {
             activo: true,
             [Op.or]: [
-              { cedula: { [Op.like]: cedulaQuery } },
-              { cedula: { [Op.like]: query } },
+              ...cedulaVariations.map(v => ({ cedula: { [Op.like]: v } })),
               { nombres: { [Op.like]: query } },
               { apellidos: { [Op.like]: query } }
             ]
@@ -97,8 +114,7 @@ class SearchController {
           const familiares = await this.models.CensoCaracteristicaFamiliar.findAll({
             where: {
               [Op.or]: [
-                { cedula_identidad: { [Op.like]: cedulaQuery } },
-                { cedula_identidad: { [Op.like]: query } },
+                ...cedulaVariations.map(v => ({ cedula_identidad: { [Op.like]: v } })),
                 { nombres_apellidos: { [Op.like]: query } }
               ]
             },
@@ -239,6 +255,41 @@ class SearchController {
         } catch (err) {
           console.error('Error buscando produccion:', err.message);
         }
+      }
+      // 7. Módulos y Secciones Estáticas del Frontend (excepto login, voceros, index)
+      const term = raw.toLowerCase();
+      if (term.length >= 2) {
+        const modulos = [
+          { titulo: 'Bandeja de Entrada', subtitulo: 'Módulo de solicitudes', url: 'bandeja.html', keywords: ['bandeja', 'solicitudes', 'mensajes', 'aprobaciones', 'entrada'] },
+          { titulo: 'Reportes y Gráficas Estadísticas', subtitulo: 'Módulo de estadísticas', url: 'reportes.html', keywords: ['reportes', 'graficas', 'estadisticas', 'estadísticas', 'gráficas', 'kpi', 'dashboard'] },
+          { titulo: 'Habitantes', subtitulo: 'Módulo de censo', url: 'censo.html', keywords: ['habitantes', 'censo', 'personas', 'registro'] },
+          { titulo: 'Censo de Viviendas', subtitulo: 'Módulo de viviendas', url: 'censo_viviendas.html', keywords: ['viviendas', 'censo viviendas', 'casas', 'hogares', 'estudio demografico'] },
+          { titulo: 'Organizaciones Sociales', subtitulo: 'Módulo de organizaciones', url: 'organizaciones.html', keywords: ['organizaciones', 'comites', 'sociales'] },
+          { titulo: 'Proyectos Agroecológicos', subtitulo: 'Módulo de proyectos', url: 'proyectos.html', keywords: ['proyectos', 'agroecologicos'] },
+          { titulo: 'Cartelera Digital', subtitulo: 'Módulo de noticias', url: 'noticias.html', keywords: ['cartelera', 'noticias', 'digital', 'informacion'] },
+          { titulo: 'Configuración de Perfil', subtitulo: 'Módulo de perfil', url: 'perfil.html', keywords: ['configuracion', 'perfil', 'ajustes', 'contraseña', 'datos'] },
+          { titulo: 'Producción Agrícola', subtitulo: 'Módulo de producción', url: 'produccion_agricola.html', keywords: ['produccion', 'agricola', 'productores', 'rubros', 'siembra'] },
+          { titulo: 'Estructura CLAP', subtitulo: 'Módulo CLAP', url: 'estructura_clap.html', keywords: ['clap', 'estructura', 'comite local', 'abastecimiento'] },
+          { titulo: 'Jefes de Calle', subtitulo: 'Módulo de jefes de calle', url: 'jefe_calle.html', keywords: ['jefes', 'calle', 'jefe de calle', 'lideres'] },
+        ];
+
+        modulos.forEach(m => {
+          const normalize = str => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+          const termNorm = normalize(term);
+          
+          const matchTitle = normalize(m.titulo).includes(termNorm);
+          const matchKeys = m.keywords.some(k => normalize(k).includes(termNorm) || termNorm.includes(normalize(k)));
+          
+          if (matchTitle || matchKeys) {
+            results.push({
+              tipo: 'seccion',
+              id: 'mod_' + m.url,
+              titulo: m.titulo,
+              subtitulo: `Sección del Sistema / ${m.subtitulo}`,
+              url: m.url
+            });
+          }
+        });
       }
 
       res.json(results.slice(0, 20)); // Limite total

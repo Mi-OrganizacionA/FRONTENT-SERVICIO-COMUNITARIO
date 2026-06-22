@@ -1087,8 +1087,8 @@
     setTimeout(() => {
       if (window.censoCtrl) {
         window.censoCtrl.renderTabla(viewHabitanteId);
-        if (typeof window.censoCtrl.editarHabitante === 'function') {
-          window.censoCtrl.editarHabitante(viewHabitanteId);
+        if (typeof window.censoCtrl.verExpediente === 'function') {
+          window.censoCtrl.verExpediente(viewHabitanteId);
         }
       }
     }, 800);

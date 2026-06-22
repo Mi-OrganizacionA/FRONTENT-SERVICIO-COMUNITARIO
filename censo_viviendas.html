@@ -4108,7 +4108,7 @@
         <i class="fas ${noGas ? 'fa-xmark' : 'fa-check'}"></i>${g || '—'}</span>`;
     }
 
-    function renderTable() {
+    function renderTable(highlightId = null) {
       const q = (document.getElementById('cvSearch').value || '').toLowerCase();
       const cc = document.getElementById('advFilterCC').value;
       const cond = document.getElementById('advFilterCond').value;
@@ -4162,7 +4162,7 @@
       document.getElementById('cvPagination').style.display = 'flex';
       
       body.innerHTML = paginated.map((v, i) => `
-        <tr>
+        <tr data-censo-id="${v.id || v._id}" class="${highlightId && String(v.id || v._id) === String(highlightId) ? 'row-highlight' : ''}">
           <td>${(currentPage - 1) * PAGE_SIZE + i + 1}</td>
           <td><span class="cv-cedula">${v.cedula || '—'}</span></td>
           <td><span class="cv-sector"><i class="fas fa-map-pin"></i>${v.sector || '—'}</span></td>
@@ -4191,6 +4191,14 @@
           </td>
         </tr>
       `).join('');
+
+      if (highlightId) {
+        const row = body.querySelector(`tr[data-censo-id="${highlightId}"]`);
+        if (row) {
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => row.classList.remove('row-highlight'), 4000);
+        }
+      }
 
       renderPagination(totalPages, data.length);
       updateKPIs();
@@ -5852,19 +5860,9 @@
       const highlightFamiliar = urlParams.get('highlightFamiliar');
       if (viewViviendaId) {
         setTimeout(() => {
-          if (typeof window.editarVivienda === 'function') {
-            window.editarVivienda(Number(viewViviendaId));
-            if (highlightFamiliar && typeof goToStep === 'function') {
-              setTimeout(() => {
-                goToStep(4);
-                const panel = document.getElementById('panel4');
-                if (panel) {
-                  panel.style.transition = 'box-shadow 0.3s ease';
-                  panel.style.boxShadow = '0 0 15px rgba(255, 193, 7, 0.6)';
-                  setTimeout(() => panel.style.boxShadow = '', 3000);
-                }
-              }, 500);
-            }
+          if (typeof renderTable === 'function') renderTable(viewViviendaId);
+          if (typeof window.previsualizarCenso === 'function') {
+            window.previsualizarCenso(Number(viewViviendaId));
           }
         }, 800);
       }

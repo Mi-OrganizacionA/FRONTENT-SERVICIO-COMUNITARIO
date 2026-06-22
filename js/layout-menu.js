@@ -364,7 +364,14 @@
 
     let timeoutId;
 
-    const renderResults = (results) => {
+    const highlightText = (text, q) => {
+      if (!q || !text) return text;
+      const safeText = String(text).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const regex = new RegExp(`(${q.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
+      return safeText.replace(regex, '<span style="background-color: rgba(255, 193, 7, 0.4); border-radius: 2px; padding: 0 2px;">$1</span>');
+    };
+
+    const renderResults = (results, query = '') => {
       dropdown.innerHTML = '';
       if (results.length === 0) {
         dropdown.innerHTML = '<div class="search-empty">No se encontraron resultados</div>';
@@ -377,7 +384,6 @@
         if (item.tipo === 'vocero') icon = 'user-tie';
         if (item.tipo === 'configuracion') icon = 'gear';
         if (item.tipo === 'familiar_vivienda') icon = 'people-roof';
-
         if (item.tipo === 'seccion') icon = 'folder-open';
 
         const a = document.createElement('a');
@@ -386,8 +392,8 @@
         a.innerHTML = `
           <div class="search-result-icon"><i class="fas fa-${icon}"></i></div>
           <div class="search-result-text">
-            <div class="search-result-title">${item.titulo}</div>
-            <div class="search-result-sub">${item.subtitulo}</div>
+            <div class="search-result-title">${highlightText(item.titulo, query)}</div>
+            <div class="search-result-sub">${highlightText(item.subtitulo, query)}</div>
           </div>
         `;
         dropdown.appendChild(a);
@@ -860,7 +866,7 @@
           }
 
           const combined = [...localMatches, ...dbResults];
-          renderResults(combined);
+          renderResults(combined, q);
         } catch (error) {
           dropdown.innerHTML = '<div class="search-empty text-danger">Error en la búsqueda</div>';
         }
