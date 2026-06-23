@@ -2551,10 +2551,6 @@ ul {
   transform: translateY(45px);
 }
 
-.js-anime-ready .pub-7t-card {
-  opacity: 0;
-  transform: translateX(-40px);
-}
 
 /* ── FULLSCREEN EXPLORADOR MODAL ── */
 .pub-fullscreen-overlay {

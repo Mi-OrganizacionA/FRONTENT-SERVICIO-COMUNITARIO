@@ -435,62 +435,104 @@
     // Populate KPIs using API (Base de datos real)
     document.addEventListener('DOMContentLoaded', async () => {
       try {
+        const userRole = window.auth ? window.auth.getUserRole() : null;
+        const baseUrl = window.api ? (window.api.baseURL || window.api.getBaseUrl?.() || 'http://localhost:3000/api') : 'http://localhost:3000/api';
+        const headers = window.auth ? { 'Authorization': `Bearer ${window.auth.getToken()}` } : {};
+        
+        const res = await fetch(`${baseUrl}/censo-reportes/resumen`, { headers });
+        if (!res.ok) throw new Error('Error al cargar resumen de cartografía');
+        
+        const datos = await res.json();
+        
         let totalHab = 0;
         let totalViv = 0;
         
-        // 1. Cargar Habitantes y distribuirlos por comunidad
-        if (window.api && window.api.getHabitantes) {
-          const habitantes = await window.api.getHabitantes();
-          totalHab = habitantes.length;
-          
-          // Agrupar por consejo
-          const habPorConsejo = {};
-          habitantes.forEach(h => {
-            const cc = h.consejo_comunal || 'Desconocido';
-            habPorConsejo[cc] = (habPorConsejo[cc] || 0) + 1;
-          });
-          
-          // Actualizar tooltips iniciales
-          consejos.forEach(cc => {
-            const count = habPorConsejo[cc.nombre] || 0;
-            if (ccLayers[cc.nombre]) {
-              ccLayers[cc.nombre].setTooltipContent(`<b>${cc.nombre}</b><br>${count} habitantes`);
-            }
-          });
-          
-          // Inyectar en popups abiertos
-          map.on('popupopen', function() {
-            consejos.forEach(cc => {
-              const elId = `pop-per-${cc.nombre.replace(/\s+/g, '')}`;
-              const el = document.getElementById(elId);
-              if (el) el.innerText = `${habPorConsejo[cc.nombre] || 0} personas`;
-            });
-          });
-        }
+        const habPorConsejo = {};
+        const vivPorConsejo = {};
+        const validConsejos = [];
         
-        // 2. Cargar Viviendas (Familias)
-        if (window.api && window.api.getViviendas) {
-          const viviendas = await window.api.getViviendas();
-          totalViv = viviendas.length;
-          
-          const vivPorConsejo = {};
-          viviendas.forEach(v => {
-            const cc = v.consejo_comunal || 'Desconocido';
-            vivPorConsejo[cc] = (vivPorConsejo[cc] || 0) + 1;
-          });
-          
-          map.on('popupopen', function() {
-            consejos.forEach(cc => {
-              const elId = `pop-fam-${cc.nombre.replace(/\s+/g, '')}`;
-              const el = document.getElementById(elId);
-              if (el) el.innerText = `${vivPorConsejo[cc.nombre] || 0} familias`;
-            });
-          });
-        }
+        datos.forEach(item => {
+          if (item.consejo === 'TOTAL') {
+             totalHab = item.total_hab;
+             totalViv = item.viviendas;
+          } else {
+             habPorConsejo[item.consejo] = item.total_hab;
+             vivPorConsejo[item.consejo] = item.viviendas;
+             validConsejos.push(item.consejo);
+          }
+        });
+        
+        // Actualizar herramienta global KPIs (usa el total de lo que devolvió el backend, 
+        // si es vocero, devolverá solo el total de su comunidad, lo cual es correcto)
+        const elKpiFam = document.getElementById('cartKpiFamilias');
+        if (elKpiFam) elKpiFam.innerText = totalViv.toLocaleString();
+        
+        const elKpiTrend = document.querySelector('#cartKpiFamilias + .kpi-trend');
+        if (elKpiTrend) elKpiTrend.innerHTML = `<i class="fas fa-users"></i> ~${totalHab.toLocaleString()} personas`;
 
-        // 3. Actualizar KPIs globales
-        document.getElementById('cartKpiFamilias').innerText = totalViv.toLocaleString();
-        document.querySelector('#cartKpiFamilias + .kpi-trend').innerHTML = `<i class="fas fa-users"></i> ~${totalHab.toLocaleString()} personas`;
+        // Actualizar popups y resaltado de polígonos
+        if (userRole === 'vocero' && validConsejos.length === 1) {
+           const myCc = validConsejos[0];
+           
+           // Atenuar los demás polígonos
+           Object.keys(ccLayers).forEach(name => {
+              const poly = ccLayers[name];
+              if (name === myCc) {
+                 poly.setStyle({ fillOpacity: 0.5, weight: 3 });
+              } else {
+                 poly.setStyle({ fillOpacity: 0.05, weight: 1, color: '#aaa' });
+              }
+           });
+           
+           // Interceptar la apertura de popups para inyectar datos o restringir
+           map.on('popupopen', function() {
+              consejos.forEach(cc => {
+                 const elIdPer = `pop-per-${cc.nombre.replace(/\s+/g, '')}`;
+                 const elIdFam = `pop-fam-${cc.nombre.replace(/\s+/g, '')}`;
+                 const elPer = document.getElementById(elIdPer);
+                 const elFam = document.getElementById(elIdFam);
+                 
+                 if (cc.nombre === myCc) {
+                    if (elPer) elPer.innerText = `${habPorConsejo[cc.nombre] || 0} personas`;
+                    if (elFam) elFam.innerText = `${vivPorConsejo[cc.nombre] || 0} familias`;
+                 } else {
+                    if (elPer) elPer.innerHTML = `<span style="color:red; font-weight:bold;">Acceso restringido</span>`;
+                    if (elFam) elFam.innerHTML = `<span style="color:red; font-weight:bold;">Acceso restringido</span>`;
+                 }
+              });
+           });
+           
+           // Actualizar tooltips iniciales
+           consejos.forEach(cc => {
+              if (ccLayers[cc.nombre]) {
+                 if (cc.nombre === myCc) {
+                    ccLayers[cc.nombre].setTooltipContent(`<b>${cc.nombre}</b><br>${habPorConsejo[cc.nombre] || 0} habitantes`);
+                 } else {
+                    ccLayers[cc.nombre].setTooltipContent(`<b>${cc.nombre}</b><br><span style="color:red">Restringido</span>`);
+                 }
+              }
+           });
+           
+        } else {
+           // Administrador (ve todo normal)
+           map.on('popupopen', function() {
+              consejos.forEach(cc => {
+                 const elIdPer = `pop-per-${cc.nombre.replace(/\s+/g, '')}`;
+                 const elIdFam = `pop-fam-${cc.nombre.replace(/\s+/g, '')}`;
+                 const elPer = document.getElementById(elIdPer);
+                 const elFam = document.getElementById(elIdFam);
+                 if (elPer) elPer.innerText = `${habPorConsejo[cc.nombre] || 0} personas`;
+                 if (elFam) elFam.innerText = `${vivPorConsejo[cc.nombre] || 0} familias`;
+              });
+           });
+           
+           // Actualizar tooltips
+           consejos.forEach(cc => {
+              if (ccLayers[cc.nombre]) {
+                 ccLayers[cc.nombre].setTooltipContent(`<b>${cc.nombre}</b><br>${habPorConsejo[cc.nombre] || 0} habitantes`);
+              }
+           });
+        }
         
       } catch(e) {
         console.error('Error fetching data for cartografia KPIs', e);
