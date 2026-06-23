@@ -8,3 +8,10 @@ database.sqlite
 .firebase/
 # Cache de Puppeteer (Chrome binarios > 100MB)
 backend/.cache/
+backend/scripts/importar_neon.js
+backend/migrations/20260623000000-add_ubicacion_to_estudios.js
+backend/migrations/20260606-actualizaciones_mer_completo.js
+backend/fix_pass.js
+backend/migrations/20260606-actualizaciones_mer_completo.js
+backend/migrations/20260606-actualizaciones_mer_completo.js
+backend/migrations/20260606-actualizaciones_mer_completo.js

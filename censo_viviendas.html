@@ -5386,11 +5386,11 @@
               5: 'Las Mercedes I', 6: 'Las Mercedes II', 7: 'Santa Cruz de las Mercedes',
               8: 'Fortaleza del Corozo', 9: 'Vencedores del Corozo'
             };
-            const targetName = mapIdName[cid];
+            const targetName = mapIdName[cid] || u.consejoComunal;
             
-            if (targetName) {
+            if (cid || targetName) {
               for (let option of selCC.options) {
-                if (option.value === targetName) {
+                if (option.value == cid || option.text === targetName) {
                   selCC.value = option.value;
                   matchedValue = option.value;
                   matched = true;
