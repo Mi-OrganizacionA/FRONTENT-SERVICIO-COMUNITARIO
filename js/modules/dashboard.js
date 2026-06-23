@@ -95,11 +95,20 @@ class DashboardController {
       const pViviendas = window.api.getEstudiosDemograficos ? window.api.getEstudiosDemograficos().catch(() => []) : window.api.getViviendas().catch(() => []);
       
       this.stats = await pStats;
-      this.habitantes = await pHabitantes;
-      this.noticias = await pNoticias;
-      this.resumen = await pResumen;
-      this.viviendas = await pViviendas;
-      this.habitantesTotales = await window.api.getHabitantes({ limit: 5000 }).catch(() => this.habitantes);
+      const habResult = await pHabitantes;
+      this.habitantes = Array.isArray(habResult) ? habResult : (habResult?.data || []);
+      
+      const notiResult = await pNoticias;
+      this.noticias = Array.isArray(notiResult) ? notiResult : (notiResult?.data || []);
+      
+      const resuResult = await pResumen;
+      this.resumen = Array.isArray(resuResult) ? resuResult : (resuResult?.data || []);
+      
+      const vivResult = await pViviendas;
+      this.viviendas = Array.isArray(vivResult) ? vivResult : (vivResult?.data || []);
+      
+      const habTotalesResult = await window.api.getHabitantes({ limit: 5000 }).catch(() => this.habitantes);
+      this.habitantesTotales = Array.isArray(habTotalesResult) ? habTotalesResult : (habTotalesResult?.data || []);
     } catch (err) {
       console.error(err);
       throw err;

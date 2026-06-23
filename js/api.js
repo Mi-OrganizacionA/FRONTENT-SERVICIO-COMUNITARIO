@@ -1,24 +1,24 @@
 /**
- * MÃ³dulo centralizado de API (SICAG v3.0)
+ * Módulo centralizado de API (SICAG v3.0)
  *
  * Mejoras de seguridad y robustez:
- * - Token leÃ­do desde window.auth.getToken() (memoria), nunca desde localStorage.
- * - Refresh automÃ¡tico de JWT al recibir 401 (PROBLEMA 2).
+ * - Token leído desde window.auth.getToken() (memoria), nunca desde localStorage.
+ * - Refresh automático de JWT al recibir 401 (PROBLEMA 2).
  * - Errores tipados con clase ApiError diferenciando 401/403/409/422/500 (PROBLEMA 6).
- * - Cola offline con deduplicaciÃ³n y lÃ­mite de tamaÃ±o (PROBLEMA 3).
+ * - Cola offline con deduplicación y límite de tamaño (PROBLEMA 3).
  * - Mutex isSubmitting/isSyncing para prevenir race conditions (PROBLEMA 7).
  */
 
 /**
- * Error tipado de la API con cÃ³digo HTTP y cÃ³digo de negocio.
+ * Error tipado de la API con código HTTP y código de negocio.
  * Permite al frontend diferencial el tipo de error y reaccionar apropiadamente.
  */
 class ApiError extends Error {
   constructor(mensaje, status, codigo, detalles = null) {
     super(mensaje);
     this.name = 'ApiError';
-    this.status = status;     // CÃ³digo HTTP (401, 409, 422, 500, etc.)
-    this.codigo = codigo;     // CÃ³digo de negocio ('CEDULA_DUPLICADA', 'TOKEN_EXPIRED', etc.)
+    this.status = status;     // Código HTTP (401, 409, 422, 500, etc.)
+    this.codigo = codigo;     // Código de negocio ('CEDULA_DUPLICADA', 'TOKEN_EXPIRED', etc.)
     this.detalles = detalles; // Array de detalles por campo (para errores 422)
   }
 }
@@ -46,7 +46,7 @@ class APIManager {
     // Flush inicial de pendientes al cargar
     try { this.flushPendingPasos(); } catch(e) { /* ignore */ }
     try { this.flushColaUniversal(); } catch(e) { /* ignore */ }
-    // Mostrar estado de conexiÃ³n actual
+    // Mostrar estado de conexión actual
     if (!navigator.onLine) this._mostrarBannerOffline();
   }
 
@@ -64,7 +64,7 @@ class APIManager {
         this.mockData = await response.json();
         this.saveMockData();
       } else {
-        console.warn('No se pudo cargar seed.json (Â¿EstÃ¡s abriendo el archivo localmente sin servidor?)');
+        console.warn('No se pudo cargar seed.json (Â¿Estás abriendo el archivo localmente sin servidor?)');
         this.mockData = { habitantes: [], proyectos: [], noticias: [], config: {} };
       }
     } catch (error) {
@@ -79,7 +79,7 @@ class APIManager {
     }
   }
 
-  // Esperar a que initMockData termine si se llama rÃ¡pido
+  // Esperar a que initMockData termine si se llama rápido
   async waitForMockData() {
     if (this.mockData !== null) return;
     return new Promise(resolve => {
@@ -94,7 +94,7 @@ class APIManager {
 
   _enableMockMode(error) {
     if (!this.isDevelopment) {
-      console.warn('API no disponible, activando modo local de simulaciÃ³n:', error?.message || error);
+      console.warn('API no disponible, activando modo local de simulación:', error?.message || error);
       this.isDevelopment = true;
     }
   }
@@ -103,7 +103,7 @@ class APIManager {
   // COLA OFFLINE â€” CENSO DEMOGRÃFICO (pasos de estudio)
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-  /** LÃ­mite mÃ¡ximo de Ã­tems en la cola offline para evitar saturar localStorage */
+  /** Límite máximo de ítems en la cola offline para evitar saturar localStorage */
   get MAX_QUEUE_SIZE() { return 100; }
 
   _getPendingQueue() {
@@ -117,7 +117,7 @@ class APIManager {
     try {
       const serializado = JSON.stringify(queue);
       if (serializado.length > 4 * 1024 * 1024) {
-        console.error('[Cola Censo] Supera 4MB, algunos Ã­tems no se guardarÃ¡n.');
+        console.error('[Cola Censo] Supera 4MB, algunos ítems no se guardarán.');
         window.dispatchEvent(new CustomEvent('censo:queueOverflow', { detail: { count: queue.length } }));
         return;
       }
@@ -130,15 +130,15 @@ class APIManager {
   }
 
   /**
-   * Encola un paso de censo para sincronizaciÃ³n futura.
-   * Incluye deduplicaciÃ³n por paso + id_estudio.
+   * Encola un paso de censo para sincronización futura.
+   * Incluye deduplicación por paso + id_estudio.
    */
   _enqueuePendingPaso(paso, idEstudio, datos) {
     const queue = this._getPendingQueue();
 
     if (queue.length >= this.MAX_QUEUE_SIZE) {
-      console.error('[Cola Censo] LÃ­mite alcanzado.');
-      throw new Error('La cola de sincronizaciÃ³n estÃ¡ llena. ConÃ©ctate a internet para sincronizar.');
+      console.error('[Cola Censo] Límite alcanzado.');
+      throw new Error('La cola de sincronización está llena. Conéctate a internet para sincronizar.');
     }
 
     const indiceExistente = queue.findIndex(
@@ -148,7 +148,7 @@ class APIManager {
 
     if (indiceExistente >= 0) {
       queue[indiceExistente] = nuevoItem;
-      console.info(`[Cola Censo] Paso ${paso} actualizado (reemplazÃ³ duplicado).`);
+      console.info(`[Cola Censo] Paso ${paso} actualizado (reemplazó duplicado).`);
     } else {
       queue.push(nuevoItem);
       console.info(`[Cola Censo] Paso ${paso} encolado. Total: ${queue.length}`);
@@ -195,12 +195,12 @@ class APIManager {
   }
 
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // COLA OFFLINE UNIVERSAL â€” Todos los mÃ³dulos (habitantes, proyectos, etc.)
+  // COLA OFFLINE UNIVERSAL â€” Todos los módulos (habitantes, proyectos, etc.)
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /**
    * Obtiene la cola offline universal desde localStorage.
-   * Esta cola aplica a TODOS los mÃ³dulos: habitantes, proyectos, producciÃ³n,
+   * Esta cola aplica a TODOS los módulos: habitantes, proyectos, producción,
    * organizaciones, voceros, noticias y cualquier otro que registre datos.
    */
   _getColaUniversal() {
@@ -217,7 +217,7 @@ class APIManager {
     try {
       const serializado = JSON.stringify(cola);
       if (serializado.length > 3 * 1024 * 1024) {
-        console.error('[Cola Universal] Supera 3MB. No se guardarÃ¡n mÃ¡s Ã­tems.');
+        console.error('[Cola Universal] Supera 3MB. No se guardarán más ítems.');
         return;
       }
       localStorage.setItem('sicag_offline_queue', serializado);
@@ -233,23 +233,23 @@ class APIManager {
   }
 
   /**
-   * Encola una operaciÃ³n fallida (cualquier mÃ³dulo) para sincronizaciÃ³n futura.
+   * Encola una operación fallida (cualquier módulo) para sincronización futura.
    *
-   * @param {string} modulo   - Nombre del mÃ³dulo ('habitantes', 'proyectos', etc.)
-   * @param {string} accion   - AcciÃ³n HTTP: 'POST', 'PUT', 'DELETE'
+   * @param {string} modulo   - Nombre del módulo ('habitantes', 'proyectos', etc.)
+   * @param {string} accion   - Acción HTTP: 'POST', 'PUT', 'DELETE'
    * @param {string} endpoint - URL del endpoint relativo al baseURL
-   * @param {object} datos    - Datos de la operaciÃ³n
+   * @param {object} datos    - Datos de la operación
    * @param {string|null} id  - ID del recurso (para PUT/DELETE)
    */
   _encolarOperacion(modulo, accion, endpoint, datos, id = null) {
     const cola = this._getColaUniversal();
 
     if (cola.length >= this.MAX_QUEUE_SIZE) {
-      console.error('[Cola Universal] LÃ­mite alcanzado. No se puede encolar mÃ¡s operaciones.');
-      throw new Error('La cola de sincronizaciÃ³n estÃ¡ llena. ConÃ©ctate a internet para sincronizar.');
+      console.error('[Cola Universal] Límite alcanzado. No se puede encolar más operaciones.');
+      throw new Error('La cola de sincronización está llena. Conéctate a internet para sincronizar.');
     }
 
-    // DeduplicaciÃ³n: mismo mÃ³dulo + acciÃ³n + id â†’ reemplazar
+    // Deduplicación: mismo módulo + acción + id â†’ reemplazar
     const clave = `${modulo}|${accion}|${id || 'nuevo'}`;
     const indiceExistente = cola.findIndex(item => item.clave === clave);
 
@@ -266,7 +266,7 @@ class APIManager {
 
     if (indiceExistente >= 0) {
       cola[indiceExistente] = nuevoItem;
-      console.info(`[Cola Universal] OperaciÃ³n ${accion} en ${modulo} actualizada (deduplicada).`);
+      console.info(`[Cola Universal] Operación ${accion} en ${modulo} actualizada (deduplicada).`);
     } else {
       cola.push(nuevoItem);
       console.info(`[Cola Universal] ${accion} en ${modulo} encolada. Total: ${cola.length}`);
@@ -277,11 +277,11 @@ class APIManager {
 
   /**
    * Sincroniza todas las operaciones pendientes de la cola universal.
-   * Se ejecuta automÃ¡ticamente cuando el navegador detecta conexiÃ³n.
+   * Se ejecuta automáticamente cuando el navegador detecta conexión.
    */
   async flushColaUniversal() {
     if (this.isSyncing) {
-      console.info('[Cola Universal] SincronizaciÃ³n ya en progreso.');
+      console.info('[Cola Universal] Sincronización ya en progreso.');
       return;
     }
 
@@ -331,7 +331,7 @@ class APIManager {
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /**
-   * Muestra un banner en la parte superior indicando que el dispositivo estÃ¡ offline.
+   * Muestra un banner en la parte superior indicando que el dispositivo está offline.
    */
   _mostrarBannerOffline() {
     this._eliminarBannerEstado();
@@ -351,9 +351,9 @@ class APIManager {
     ].join(';');
     banner.innerHTML = `
       <span style="font-size:1rem">ðŸ“¡</span>
-      <span>Sin conexiÃ³n a internet â€” Guardando localmente</span>
+      <span>Sin conexión a internet â€” Guardando localmente</span>
     `;
-    // Insertar style de animaciÃ³n si no existe
+    // Insertar style de animación si no existe
     if (!document.getElementById('sicag-banner-style')) {
       const style = document.createElement('style');
       style.id = 'sicag-banner-style';
@@ -362,7 +362,7 @@ class APIManager {
     }
     document.body.appendChild(banner);
 
-    // Auto-ocultar despuÃ©s de 2 segundos
+    // Auto-ocultar después de 2 segundos
     setTimeout(() => {
       banner.style.animation = 'slideUpBanner 0.3s ease reverse forwards';
       setTimeout(() => this._eliminarBannerEstado(), 300);
@@ -370,7 +370,7 @@ class APIManager {
   }
 
   /**
-   * Muestra un banner verde temporal indicando que se recuperÃ³ la conexiÃ³n.
+   * Muestra un banner verde temporal indicando que se recuperó la conexión.
    */
   _mostrarBannerOnline() {
     this._eliminarBannerEstado();
@@ -389,10 +389,10 @@ class APIManager {
     ].join(';');
     banner.innerHTML = `
       <span style="font-size:1rem">âœ…</span>
-      <span>ConexiÃ³n restaurada â€” Sincronizando...</span>
+      <span>Conexión restaurada â€” Sincronizando...</span>
     `;
     document.body.appendChild(banner);
-    // Auto-ocultar despuÃ©s de 4 segundos
+    // Auto-ocultar después de 4 segundos
     setTimeout(() => this._eliminarBannerEstado(), 4000);
   }
 
@@ -417,7 +417,7 @@ class APIManager {
       body: JSON.stringify({ passwordActual, nuevaPassword })
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Error al cambiar la contraseÃ±a');
+    if (!response.ok) throw new Error(data.error || 'Error al cambiar la contraseña');
     return data;
   }
 
@@ -461,8 +461,8 @@ class APIManager {
 
   async requestCode(email) {
     if (this.isDevelopment) {
-      console.log('Simulando envÃ­o de correo a:', email);
-      return { success: true, message: 'CÃ³digo simulado' };
+      console.log('Simulando envío de correo a:', email);
+      return { success: true, message: 'Código simulado' };
     }
     const response = await fetch(`${this.baseURL}/auth/request-code`, {
       method: 'POST',
@@ -476,8 +476,8 @@ class APIManager {
 
   async resetPassword(email, code, newPassword) {
     if (this.isDevelopment) {
-      console.log('Simulando reset de contraseÃ±a para:', email);
-      return { success: true, message: 'ContraseÃ±a cambiada simulada' };
+      console.log('Simulando reset de contraseña para:', email);
+      return { success: true, message: 'Contraseña cambiada simulada' };
     }
     const response = await fetch(`${this.baseURL}/auth/reset-password`, {
       method: 'POST',
@@ -548,7 +548,7 @@ class APIManager {
   }
 
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // CONFIGURACIÃ“N DEL SISTEMA Y RECOVERY PASS
+  // CONFIGURACIÓN DEL SISTEMA Y RECOVERY PASS
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   async getSystemConfig() {
@@ -638,7 +638,7 @@ class APIManager {
       body: JSON.stringify({ status: 'aceptado', nota: comentario })
     });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || 'Error al aprobar la notificaciÃ³n');
+    if (!response.ok) throw new Error(data.error || 'Error al aprobar la notificación');
     return data;
   }
 
@@ -650,7 +650,7 @@ class APIManager {
       body: JSON.stringify({ status: 'rechazado', nota: motivo })
     });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || 'Error al rechazar la notificaciÃ³n');
+    if (!response.ok) throw new Error(data.error || 'Error al rechazar la notificación');
     return data;
   }
 
@@ -821,10 +821,10 @@ class APIManager {
   /**
    * Interceptor de validaciones:
    * Revisa si el usuario actual es un vocero y si debe pasar por la bandeja de validaciones
-   * o si la "AprobaciÃ³n AutomÃ¡tica Global" estÃ¡ activa.
+   * o si la "Aprobación Automática Global" está activa.
    *
-   * MODO OFFLINE: Si no hay conexiÃ³n, encola la operaciÃ³n en la cola universal
-   * para sincronizarla automÃ¡ticamente cuando vuelva internet.
+   * MODO OFFLINE: Si no hay conexión, encola la operación en la cola universal
+   * para sincronizarla automáticamente cuando vuelva internet.
    */
   async _interceptarValidacion(tabla, accion, datos, callbackOriginal) {
     const user = window.auth ? window.auth.getUser() : null;
@@ -834,8 +834,8 @@ class APIManager {
     const autoGlobal = localStorage.getItem('sicag_auto_global') === 'true';
     const autoModulo = localStorage.getItem(`sicag_auto_${tabla}`) === 'true';
 
-    // Si es vocero y la aprobaciÃ³n automÃ¡tica NO estÃ¡ activa, va a la bandeja
-    // EXCEPCIÃ“N: Cartelera/Noticias siempre va directo para que todos lo vean de inmediato
+    // Si es vocero y la aprobación automática NO está activa, va a la bandeja
+    // EXCEPCIÓN: Cartelera/Noticias siempre va directo para que todos lo vean de inmediato
     if (isVocero && !autoGlobal && !autoModulo ) {
       console.log(`[API] Interceptado: Enviando ${accion} de ${tabla} a validaciones.`);
       const res = await this.crearNotificacion({
@@ -845,16 +845,16 @@ class APIManager {
         datos_temporales: datos
       });
 
-      // NotificaciÃ³n clara para que el Vocero sepa que no se ejecutÃ³ inmediatamente
+      // Notificación clara para que el Vocero sepa que no se ejecutó inmediatamente
       if (window.Components) {
-        let accionText = accion === 'CREATE' ? 'CreaciÃ³n' : (accion === 'UPDATE' ? 'EdiciÃ³n' : 'EliminaciÃ³n');
-        Components.showToast(`Solicitud de ${accionText} enviada a validaciÃ³n.`, 'info');
+        let accionText = accion === 'CREATE' ? 'Creación' : (accion === 'UPDATE' ? 'Edición' : 'Eliminación');
+        Components.showToast(`Solicitud de ${accionText} enviada a validación.`, 'info');
         
-        // Bloquear temporalmente los mensajes de Ã©xito/error genÃ©ricos que tengan las vistas
+        // Bloquear temporalmente los mensajes de éxito/error genéricos que tengan las vistas
         // para que no se sobreescriba el mensaje informativo anterior.
         const originalToast = Components.showToast;
         Components.showToast = function(msg, type) {
-           if (type === 'success' || type === 'error') return; // ignoramos el Ã©xito/error falso
+           if (type === 'success' || type === 'error') return; // ignoramos el éxito/error falso
            originalToast.apply(this, arguments);
         };
         setTimeout(() => { Components.showToast = originalToast; }, 500);
@@ -863,12 +863,12 @@ class APIManager {
       return res;
     }
 
-    // De lo contrario (es admin, o autoGlobal estÃ¡ activo), ejecutar directo
-    console.log(`[API] EjecuciÃ³n directa permitida para ${accion} en ${tabla}.`);
+    // De lo contrario (es admin, o autoGlobal está activo), ejecutar directo
+    console.log(`[API] Ejecución directa permitida para ${accion} en ${tabla}.`);
     try {
       return await callbackOriginal();
     } catch (errorRed) {
-      // Si el error es de red (sin conexiÃ³n), encolamos la operaciÃ³n en la cola universal
+      // Si el error es de red (sin conexión), encolamos la operación en la cola universal
       const esErrorDeRed = !navigator.onLine ||
         errorRed?.message?.toLowerCase().includes('failed to fetch') ||
         errorRed?.message?.toLowerCase().includes('network') ||
@@ -897,17 +897,17 @@ class APIManager {
           this._encolarOperacion(tabla, metodo, endpointFinal, datos, id);
           console.info(`[Cola Universal] ${accion} en ${tabla} guardada offline para sincronizar luego.`);
 
-          // Notificar al usuario que se guardÃ³ offline
+          // Notificar al usuario que se guardó offline
           if (window.Components?.showToast) {
-            const accionText = accion === 'CREATE' ? 'Registro' : (accion === 'UPDATE' ? 'ActualizaciÃ³n' : 'EliminaciÃ³n');
+            const accionText = accion === 'CREATE' ? 'Registro' : (accion === 'UPDATE' ? 'Actualización' : 'Eliminación');
             Components.showToast(
-              `ðŸ“´ Sin conexiÃ³n â€” ${accionText} guardada localmente. Se sincronizarÃ¡ al reconectar.`,
+              `ðŸ“´ Sin conexión â€” ${accionText} guardada localmente. Se sincronizará al reconectar.`,
               'warning'
             );
           }
           return { success: true, offline: true, encolado: true };
         } catch (colaError) {
-          throw colaError; // Cola llena u otro error crÃ­tico
+          throw colaError; // Cola llena u otro error crítico
         }
       }
 
@@ -923,7 +923,7 @@ class APIManager {
         ...this._getHeaders(),
         body: JSON.stringify({ comentarios })
       });
-      if (!response.ok) throw new Error('Error al aprobar notificaciÃ³n');
+      if (!response.ok) throw new Error('Error al aprobar notificación');
       return response.json();
     }
     return { success: true };
@@ -936,7 +936,7 @@ class APIManager {
         ...this._getHeaders(),
         body: JSON.stringify({ motivo })
       });
-      if (!response.ok) throw new Error('Error al rechazar notificaciÃ³n');
+      if (!response.ok) throw new Error('Error al rechazar notificación');
       return response.json();
     }
     return { success: true };
@@ -995,7 +995,7 @@ class APIManager {
       if (this.isDevelopment) {
         return this._filterProyectos(this.mockData?.proyectos || [], filtros);
       }
-      console.warn('API pÃºblica fallÃ³, usando datos locales como respaldo:', error.message);
+      console.warn('API pública falló, usando datos locales como respaldo:', error.message);
       return this._filterProyectos(this.mockData?.proyectos || [], filtros);
     }
   }
@@ -1060,7 +1060,7 @@ class APIManager {
   }
 
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // PRODUCCIÃ“N AGRÃCOLA
+  // PRODUCCIÓN AGRÃCOLA
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async getProduccion(filtros = {}) {
     if (this.isDevelopment) return [];
@@ -1346,7 +1346,7 @@ class APIManager {
   }
 
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // BÃšSQUEDA GLOBAL
+  // BÚSQUEDA GLOBAL
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async globalSearch(query) {
     if (!query || query.length < 2) return [];
@@ -1363,48 +1363,48 @@ class APIManager {
       if (e.message === 'NO_TOKEN' || e.message === 'TOKEN_EXPIRED') {
         throw e;
       }
-      console.error("Error en bÃºsqueda global", e);
+      console.error("Error en búsqueda global", e);
       return [];
     }
   }
 
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // MÃ‰TODOS AUXILIARES
+  // MÉTODOS AUXILIARES
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /**
-   * Construye los headers de autenticaciÃ³n leyendo el token DESDE MEMORIA.
+   * Construye los headers de autenticación leyendo el token DESDE MEMORIA.
    * Nunca se accede a localStorage para el token (PROBLEMA 1 + 2).
    */
   _getHeaders() {
-    // Token leÃ­do exclusivamente desde la instancia en memoria de AuthManager
+    // Token leído exclusivamente desde la instancia en memoria de AuthManager
     const token = window.auth?.getToken();
     return {
       headers: {
         'Content-Type': 'application/json',
         ...(token && { 'Authorization': `Bearer ${token}` })
       },
-      // credentials: 'include' es necesario para que el navegador envÃ­e la httpOnly cookie
+      // credentials: 'include' es necesario para que el navegador envíe la httpOnly cookie
       credentials: 'include'
     };
   }
 
   /**
    * Wrapper de fetch con:
-   * - Refresh automÃ¡tico de token al recibir 401 (PROBLEMA 2)
+   * - Refresh automático de token al recibir 401 (PROBLEMA 2)
    * - Errores tipados con ApiError diferenciando status HTTP (PROBLEMA 6)
    */
   async _fetch(url, options = {}) {
     try {
       const response = await fetch(url, { credentials: 'include', ...options });
 
-      // Si el token expirÃ³, intentar refresh automÃ¡tico (PROBLEMA 2)
+      // Si el token expiró, intentar refresh automático (PROBLEMA 2)
       if (response.status === 401) {
         const errData = await response.clone().json().catch(() => ({}));
 
         // Intentar renovar el token con el refreshToken (httpOnly cookie)
         if (window.auth) {
-          console.info('[API] Token expirado, intentando refresh automÃ¡tico...');
+          console.info('[API] Token expirado, intentando refresh automático...');
           const nuevoToken = await window.auth.intentarRefresh();
 
           if (nuevoToken) {
@@ -1420,8 +1420,8 @@ class APIManager {
             };
             return await fetch(url, opcionesActualizadas);
           } else {
-            // Refresh fallÃ³ â†’ sesiÃ³n expirada definitivamente
-            console.warn('[API] Refresh fallido. Cerrando sesiÃ³n.');
+            // Refresh falló â†’ sesión expirada definitivamente
+            console.warn('[API] Refresh fallido. Cerrando sesión.');
             window.auth.token = null;
             window.auth.user = null;
             sessionStorage.removeItem('sicag_user');
@@ -1429,10 +1429,10 @@ class APIManager {
             const esPublica = /index\.html$|consulta_habitantes\.html$|login\.html$|censo_viviendas\.html$/.test(window.location.pathname) ||
               window.location.pathname.endsWith('/');
             if (!esPublica) {
-              alert(errData.error || 'Su sesiÃ³n ha expirado. Por favor inicie sesiÃ³n nuevamente.');
+              alert(errData.error || 'Su sesión ha expirado. Por favor inicie sesión nuevamente.');
               window.location.href = 'login.html';
             }
-            throw new ApiError('SesiÃ³n expirada', 401, 'TOKEN_EXPIRED');
+            throw new ApiError('Sesión expirada', 401, 'TOKEN_EXPIRED');
           }
         }
       }
@@ -1448,7 +1448,7 @@ class APIManager {
 
   /**
    * Procesa una respuesta HTTP y lanza ApiError tipado si no fue exitosa.
-   * Diferencia entre 401, 403, 409 (duplicado), 422 (validaciÃ³n) y 500 (PROBLEMA 6).
+   * Diferencia entre 401, 403, 409 (duplicado), 422 (validación) y 500 (PROBLEMA 6).
    */
   async _procesarRespuesta(response) {
     if (response.ok) return response;
@@ -1465,7 +1465,7 @@ class APIManager {
       case 409:
         throw new ApiError(cuerpo.error || 'Registro duplicado', 409, 'DUPLICADO', cuerpo.details || null);
       case 422:
-        throw new ApiError(cuerpo.error || 'Datos invÃ¡lidos', 422, 'VALIDACION', cuerpo.details || null);
+        throw new ApiError(cuerpo.error || 'Datos inválidos', 422, 'VALIDACION', cuerpo.details || null);
       case 500:
       default:
         throw new ApiError(cuerpo.error || 'Error interno del servidor', response.status, 'ERROR_SERVIDOR');
@@ -1500,21 +1500,21 @@ class APIManager {
 
   /**
    * Guarda un paso del censo en el servidor o en la cola offline si no hay red.
-   * Usa mutex isSubmitting para prevenir envÃ­os concurrentes (PROBLEMA 7).
+   * Usa mutex isSubmitting para prevenir envíos concurrentes (PROBLEMA 7).
    */
   async guardarPasoCenso(paso, idEstudio, datos) {
     if (this.isDevelopment) {
       return new Promise(r => setTimeout(() => r({ success: true, id_estudio: idEstudio || Math.floor(Math.random() * 90000000) }), 500));
     }
 
-    // Prevenir envÃ­os concurrentes del mismo paso (PROBLEMA 7)
+    // Prevenir envíos concurrentes del mismo paso (PROBLEMA 7)
     if (this.isSubmitting) {
-      throw new Error('Ya hay un paso de censo en proceso de envÃ­o. Por favor espera.');
+      throw new Error('Ya hay un paso de censo en proceso de envío. Por favor espera.');
     }
 
-    // Prevenir envÃ­o mientras se estÃ¡ sincronizando la cola
+    // Prevenir envío mientras se está sincronizando la cola
     if (this.isSyncing) {
-      throw new Error('El sistema estÃ¡ sincronizando datos offline. Por favor espera un momento.');
+      throw new Error('El sistema está sincronizando datos offline. Por favor espera un momento.');
     }
 
     this.isSubmitting = true;
@@ -1527,7 +1527,7 @@ class APIManager {
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        // El body ya fue leÃ­do arriba: lanzar ApiError manualmente sin volver a leer
+        // El body ya fue leído arriba: lanzar ApiError manualmente sin volver a leer
         throw new ApiError(
           data.error || `Error HTTP ${response.status}`,
           response.status,
@@ -1541,10 +1541,10 @@ class APIManager {
       if (error instanceof ApiError && error.status !== 0) {
         throw error;
       }
-      // Si falla por red (sin conexiÃ³n), encolar para sincronizar luego
+      // Si falla por red (sin conexión), encolar para sincronizar luego
       try {
         this._enqueuePendingPaso(paso, idEstudio, datos);
-        console.info(`[CensoPaso] Sin conexiÃ³n. Paso ${paso} guardado en cola offline.`);
+        console.info(`[CensoPaso] Sin conexión. Paso ${paso} guardado en cola offline.`);
         return { success: true, id_estudio: idEstudio || Math.floor(Math.random() * 90000000), queued: true };
       } catch (queueError) {
         this._enableMockMode(error);
@@ -1685,10 +1685,10 @@ class APIManager {
     return await response.json();
   }
 
-  // --- CAMBIO DE CONTRASEÃ‘A ---
+  // --- CAMBIO DE CONTRASEÑA ---
   async changePassword(passwordActual, nuevaPassword) {
     if (this.isDevelopment) {
-      return new Promise(resolve => setTimeout(() => resolve({ success: true, message: 'ContraseÃ±a actualizada (Mock)' }), 1000));
+      return new Promise(resolve => setTimeout(() => resolve({ success: true, message: 'Contraseña actualizada (Mock)' }), 1000));
     }
     const response = await this._fetch(`${this.baseURL}/auth/password`, {
       method: 'PUT',
@@ -1698,7 +1698,7 @@ class APIManager {
     
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
-      throw new Error(data.error || 'Error al cambiar la contraseÃ±a');
+      throw new Error(data.error || 'Error al cambiar la contraseña');
     }
     return await response.json();
   }
@@ -1709,8 +1709,8 @@ class APIManager {
 
   /**
    * Obtiene todas las viviendas censadas del backend.
-   * Si la API falla, retorna un array vacÃ­o para no romper la UI.
-   * @param {Object} filtros - ParÃ¡metros de filtrado opcionales (ej. consejo_comunal_id)
+   * Si la API falla, retorna un array vacío para no romper la UI.
+   * @param {Object} filtros - Parámetros de filtrado opcionales (ej. consejo_comunal_id)
    * @returns {Promise<Array>}
    */
   async getViviendas(filtros = {}) {
@@ -1722,7 +1722,7 @@ class APIManager {
       // El backend puede devolver array directo o { viviendas: [...] }
       return Array.isArray(data) ? data : (data.viviendas || []);
     } catch (error) {
-      console.warn('[API] getViviendas fallÃ³, retornando array vacÃ­o:', error.message);
+      console.warn('[API] getViviendas falló, retornando array vacío:', error.message);
       return [];
     }
   }
@@ -1749,7 +1749,7 @@ class APIManager {
   /**
    * Elimina una vivienda del sistema.
    * @param {number} id - ID de la vivienda a eliminar
-   * @returns {Promise<Object>} - ConfirmaciÃ³n del servidor
+   * @returns {Promise<Object>} - Confirmación del servidor
    */
   async eliminarVivienda(id) {
     const response = await this._fetch(`${this.baseURL}/viviendas/${id}`, {
@@ -1762,7 +1762,7 @@ class APIManager {
   }
 
   /**
-   * Abre el PDF de la planilla de censo de una vivienda en una nueva pestaÃ±a.
+   * Abre el PDF de la planilla de censo de una vivienda en una nueva pestaña.
    * Usa la ruta GET /api/viviendas/:id/exportar-pdf del backend (Puppeteer).
    * @param {number} id - ID de la vivienda
    */

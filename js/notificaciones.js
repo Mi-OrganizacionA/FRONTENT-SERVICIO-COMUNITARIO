@@ -14,7 +14,7 @@ class NotificacionesController {
     this.paginaActual = 1;
     this.porPagina = 10;
 
-    // Verificar sesiÃ³n antes de arrancar
+    // Verificar sesión antes de arrancar
     const u = window.auth ? window.auth.getUser() : null;
     if (!u) return;
     this.userRole = u.rol;
@@ -29,7 +29,7 @@ class NotificacionesController {
     this.bindUIEvents();
   }
 
-  /* â”€â”€â”€ Adaptar la UI segÃºn el rol â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* â”€â”€â”€ Adaptar la UI según el rol â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   adaptarVistaRol() {
     const isVocero = this.userRole === 'vocero';
 
@@ -47,7 +47,7 @@ class NotificacionesController {
       if (phTitle) phTitle.textContent = 'Mis Solicitudes';
       if (phModule) phModule.innerHTML = '<i class="fas fa-id-badge"></i> Mi Cuenta';
       if (phMainTitle) phMainTitle.textContent = 'Mis Solicitudes';
-      if (phSub) phSub.textContent = 'AquÃ­ puedes ver el estado de las solicitudes que has enviado al administrador.';
+      if (phSub) phSub.textContent = 'Aquí puedes ver el estado de las solicitudes que has enviado al administrador.';
       if (phIcon) phIcon.className = 'fas fa-paper-plane';
       if (tableTitle) tableTitle.textContent = 'Mis solicitudes enviadas';
       // Mostrar checkboxes en vista vocero para selección múltiple
@@ -117,7 +117,7 @@ class NotificacionesController {
     // Filtro estado
     if (estado) lista = lista.filter(n => (n.estado || 'pendiente').toLowerCase() === estado);
 
-    // Filtro bÃºsqueda libre
+    // Filtro búsqueda libre
     if (busca) {
       lista = lista.filter(n => {
         const desc = this.getDescripcion(n).toLowerCase();
@@ -348,7 +348,7 @@ class NotificacionesController {
     // Click en fila â†’ abrir detalle
     document.querySelectorAll('#validacionesTbody tr').forEach(tr => {
       tr.addEventListener('click', (e) => {
-        // No abrir si fue clic en un botÃ³n o checkbox
+        // No abrir si fue clic en un botón o checkbox
         if (e.target.closest('button') || e.target.closest('input[type="checkbox"]')) return;
         const id = parseInt(tr.dataset.id, 10);
         if (id) this.abrirDetalle(id);
@@ -421,7 +421,7 @@ class NotificacionesController {
     }
 
     body.innerHTML = `
-      <!-- Info rÃ¡pida -->
+      <!-- Info rápida -->
       <div class="det-meta-grid">
         <div class="det-meta-item">
           <div class="det-meta-key">ID Solicitud</div>
@@ -436,7 +436,7 @@ class NotificacionesController {
           <div class="det-meta-value">${this.escapeHtml(n.tabla_afectada || 'â€”')}</div>
         </div>
         <div class="det-meta-item">
-          <div class="det-meta-key">Tipo AcciÃ³n</div>
+          <div class="det-meta-key">Tipo Acción</div>
           <div class="det-meta-value">${this.escapeHtml(n.tipo_accion || 'CREATE')}</div>
         </div>
         <div class="det-meta-item">
@@ -454,7 +454,7 @@ class NotificacionesController {
         <h4><i class="fas fa-database"></i> Datos de la Solicitud</h4>
         ${n.tabla_afectada === 'recuperacion_clave' ? `
           <div style="background: rgba(46, 125, 50, 0.1); border: 2px dashed #2E7D32; border-radius: 12px; padding: 1.5rem; text-align: center; margin-bottom: 1rem;">
-            <p style="margin: 0; font-size: 0.9rem; color: #1B5E20; font-weight: 600;">CÃ“DIGO DE VERIFICACIÃ“N GENERADO</p>
+            <p style="margin: 0; font-size: 0.9rem; color: #1B5E20; font-weight: 600;">CÓDIGO DE VERIFICACIÓN GENERADO</p>
             <h2 style="margin: 0.5rem 0 0 0; font-size: 2.5rem; color: #2E7D32; letter-spacing: 5px;">${registro.codigo}</h2>
           </div>
         ` : ''}
@@ -471,7 +471,7 @@ class NotificacionesController {
       ` : ''}
     `;
 
-    // Footer: botones de acciÃ³n (solo admin y si estÃ¡ pendiente)
+    // Footer: botones de acción (solo admin y si está pendiente)
     footer.innerHTML = `
       <button class="btn-sicag" style="background:var(--bg);color:var(--sub);border:1px solid var(--border);" id="btnCloseDetalle2">
         <i class="fas fa-xmark"></i> Cerrar
@@ -571,7 +571,7 @@ class NotificacionesController {
 
     if (icon) icon.textContent = isApprove ? 'âœ…' : 'âŒ';
     if (title) title.textContent = isApprove ? 'Aprobar en Lote' : 'Rechazar en Lote';
-    if (msg) msg.textContent = `EstÃ¡s a punto de ${isApprove ? 'aprobar' : 'rechazar'} ${n} solicitud${n !== 1 ? 'es' : ''} seleccionada${n !== 1 ? 's' : ''}. Esta acciÃ³n afectarÃ¡ directamente la base de datos.`;
+    if (msg) msg.textContent = `Estás a punto de ${isApprove ? 'aprobar' : 'rechazar'} ${n} solicitud${n !== 1 ? 'es' : ''} seleccionada${n !== 1 ? 's' : ''}. Esta acción afectará directamente la base de datos.`;
     if (btnOk) {
       btnOk.className = `btn-sicag ${isApprove ? 'btn-primary' : 'btn-danger'}`;
     }
@@ -631,7 +631,7 @@ class NotificacionesController {
 
 
   bindUIEvents() {
-    // BotÃ³n Actualizar
+    // Botón Actualizar
     document.getElementById('btnRefresh')?.addEventListener('click', async () => {
       await this.cargarDatos();
       Components.showToast('Bandeja actualizada.', 'success');
@@ -643,7 +643,7 @@ class NotificacionesController {
       if (e.target === e.currentTarget) this.cerrarDetalle();
     });
 
-    // Cerrar modal confirmaciÃ³n
+    // Cerrar modal confirmación
     document.getElementById('btnConfirmCancel')?.addEventListener('click', () => {
       document.getElementById('modalConfirm').classList.remove('show');
     });
@@ -683,7 +683,7 @@ class NotificacionesController {
   /* â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   getDescripcion(n) {
     const d = n.datos_temporales || {};
-    if (n.tabla_afectada === 'recuperacion_clave') return `RecuperaciÃ³n de clave: ${d.correo_usuario}`;
+    if (n.tabla_afectada === 'recuperacion_clave') return `Recuperación de clave: ${d.correo_usuario}`;
     if (n.tabla_afectada === 'contacto') return `Contacto de: ${d.nombre}`;
     if (n.tabla_afectada === 'estudios_demograficos') {
       const cedula = d.encuestado_cedula || d.cedula_jefe || '';
@@ -693,7 +693,7 @@ class NotificacionesController {
     if (d.nombres) return `Habitante: ${d.nombres} ${d.apellidos || ''}`.trim();
     if (d.titulo) return `Noticia: ${d.titulo}`;
     if (d.nombre_proyecto) return `Proyecto: ${d.nombre_proyecto}`;
-    if (d.nombre) return `OrganizaciÃ³n: ${d.nombre}`;
+    if (d.nombre) return `Organización: ${d.nombre}`;
     if (d.nuevo_correo) return `Cambio de correo â†’ ${d.nuevo_correo}`;
     if (d.cultivo) return `Cultivo: ${d.cultivo}`;
     return `Tabla: ${n.tabla_afectada || 'â€”'}`;
@@ -705,9 +705,9 @@ class NotificacionesController {
       'usuarios': ['usuario', 'user-shield'],
       'noticias': ['noticia', 'newspaper'],
       'proyectos': ['proyecto', 'seedling'],
-      'organizaciones': ['organizaciÃ³n', 'hands-holding-circle'],
-      'produccion_agricola': ['producciÃ³n', 'tractor'],
-      'recuperacion_clave': ['recuperaciÃ³n', 'key'],
+      'organizaciones': ['organización', 'hands-holding-circle'],
+      'produccion_agricola': ['producción', 'tractor'],
+      'recuperacion_clave': ['recuperación', 'key'],
       'contacto': ['contacto', 'envelope'],
       'estudios_demograficos': ['censo vivienda', 'house-chimney-user']
     };
@@ -727,7 +727,7 @@ class NotificacionesController {
       'pendiente': ['status-pendiente', 'Pendiente', 'clock'],
       'aceptado': ['status-aceptado', 'Aprobado', 'check-circle'],
       'rechazado': ['status-rechazado', 'Rechazado', 'times-circle'],
-      'reenvio': ['status-reenvio', 'En revisiÃ³n', 'redo']
+      'reenvio': ['status-reenvio', 'En revisión', 'redo']
     };
     const [cls, label, icon] = map[estado] || map['pendiente'];
     return `<span class="status-pill ${cls}"><i class="fas fa-${icon}"></i> ${label}</span>`;
@@ -757,5 +757,5 @@ class NotificacionesController {
 }
 
 window.notif = new NotificacionesController();
-// Compatibilidad hacia atrÃ¡s
+// Compatibilidad hacia atrás
 window.notificaciones = window.notif;

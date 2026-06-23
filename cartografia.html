@@ -203,7 +203,6 @@
           <div class="kpi-info">
             <h3>Consejos Comunales</h3>
             <div class="kpi-value" id="cartKpiCc" style="font-size:1.3rem;">9</div>
-            <span class="kpi-trend up">Las Mercedes</span>
           </div>
         </div>
         <div class="kpi-card border-azul">
@@ -472,6 +471,20 @@
         const elKpiCc = document.getElementById('cartKpiCc');
         if (elKpiCc) {
            elKpiCc.innerText = userRole === 'vocero' ? 1 : validConsejos.length;
+        }
+
+        // Obtener estadísticas públicas para "Ha Cultivadas"
+        try {
+           const resStats = await fetch(`${baseUrl}/system/public-stats`);
+           if (resStats.ok) {
+              const st = await resStats.json();
+              const elKpiHa = document.getElementById('cartKpiHa');
+              if (elKpiHa && st.hectareas) {
+                 elKpiHa.innerText = st.hectareas;
+              }
+           }
+        } catch (err) {
+           console.warn('Error fetching public stats for Ha Cultivadas', err);
         }
 
         // Actualizar popups y resaltado de polígonos
