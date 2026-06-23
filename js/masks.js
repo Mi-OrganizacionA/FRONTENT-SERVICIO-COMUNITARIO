@@ -371,6 +371,24 @@
     aplicarPorAtributo();
     aplicarPorIds();
     aplicarPorDeteccion();
+
+    if (!window.sicagMasksObserverSetup && document.body) {
+      const observer = new MutationObserver(function (mutations) {
+        let needsApply = false;
+        mutations.forEach(function (m) {
+          if (m.addedNodes.length > 0) needsApply = true;
+        });
+        if (needsApply) {
+          setTimeout(function () {
+            aplicarPorAtributo();
+            aplicarPorIds();
+            aplicarPorDeteccion();
+          }, 100);
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      window.sicagMasksObserverSetup = true;
+    }
   }
 
   // Ejecutar al cargar DOM (también sirve para páginas que cargan dinámicamente)
@@ -379,22 +397,6 @@
   } else {
     init();
   }
-
-  // Re-ejecutar si algún modal carga campos nuevos (MutationObserver ligero)
-  const observer = new MutationObserver(function (mutations) {
-    let needsApply = false;
-    mutations.forEach(function (m) {
-      if (m.addedNodes.length > 0) needsApply = true;
-    });
-    if (needsApply) {
-      setTimeout(function () {
-        aplicarPorAtributo();
-        aplicarPorIds();
-        aplicarPorDeteccion();
-      }, 100);
-    }
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
 
   // Exponer funciones para uso externo si se necesita
   window.SICAGMasks = {

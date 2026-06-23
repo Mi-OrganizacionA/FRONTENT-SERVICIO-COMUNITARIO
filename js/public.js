@@ -356,6 +356,7 @@
             const portalConfig = JSON.parse(dataC.config);
             localStorage.setItem('sicag_portal_settings', dataC.config);
             if(window.actualizarUIContacto) window.actualizarUIContacto(portalConfig);
+          }
         }
       } catch (e) {
         console.warn('Error cargando config pública:', e.message);
