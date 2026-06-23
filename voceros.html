@@ -538,6 +538,17 @@
     document.addEventListener('DOMContentLoaded', () => {
       if (window.HabitanteAutocomplete) {
         HabitanteAutocomplete.attachTo('inputCedula', (datos) => {
+          if (window.verificarVoceroExistente && window.verificarVoceroExistente(datos.cedula)) {
+            if (window.Components) Components.showToast('Este habitante ya está registrado como vocero.', 'error');
+            const card = document.getElementById('habitanteCard');
+            if (card) card.classList.remove('visible');
+            const inputHabId = document.getElementById('inputHabitanteId');
+            if (inputHabId) inputHabId.value = '';
+            const inputNombre = document.getElementById('inputNombre');
+            if (inputNombre) inputNombre.value = '';
+            return;
+          }
+
           const nombres = datos.nombres || '';
           const apellidos = datos.apellidos || '';
           const fullName = (nombres + ' ' + apellidos).trim();

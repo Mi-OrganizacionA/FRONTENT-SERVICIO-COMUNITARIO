@@ -11,6 +11,14 @@
   let vocerosData = [];   // Caché local de la lista
   let esAdmin = false;    // Se determina tras cargar el usuario
 
+  window.verificarVoceroExistente = (cedula) => {
+    if (!vocerosData) return false;
+    const cleanCedula = c => (c || '').toString().replace(/[^0-9]/g, '');
+    const cIn = cleanCedula(cedula);
+    if (!cIn) return false;
+    return vocerosData.some(v => cleanCedula(v.cedula) === cIn || cleanCedula(v.nombre_usuario) === cIn);
+  };
+
   // ─────────────────────────────────────────
   // Referencias al DOM
   // ─────────────────────────────────────────
@@ -331,6 +339,11 @@
     const adminPass   = el.confirmPass?.value;
 
     // Validaciones
+    if (window.verificarVoceroExistente && window.verificarVoceroExistente(cedula)) {
+      Components.showToast('Esta cédula ya está registrada como un vocero o usuario.', 'error');
+      return el.inputCedula?.focus();
+    }
+    
     if (!cedula || !habitanteId) {
       Components.showToast('Debes buscar y seleccionar un habitante válido mediante el botón de la lupa.', 'error');
       return el.inputCedula?.focus();
@@ -447,7 +460,7 @@
       const cambios = {
         email: email || undefined,
         telefono: telefono || null,
-        comunidad: comunidad || undefined,
+        comunidad: comunidad || null,
         activo: estado === 'activo'
       };
       if (password) cambios.password = password;

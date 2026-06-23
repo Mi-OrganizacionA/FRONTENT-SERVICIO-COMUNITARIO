@@ -71,9 +71,13 @@ module.exports = {
       const ConsejoComunal = Usuario.sequelize?.models?.ConsejoComunal;
       let id_comunidad_asignada = vocero.id_comunidad_asignada;
 
-      if (req.body.comunidad && ConsejoComunal) {
-        const consejo = await ConsejoComunal.findOne({ where: { nombre_comunidad: req.body.comunidad } });
-        if (consejo) id_comunidad_asignada = consejo.id;
+      if (req.body.comunidad !== undefined) {
+        if (req.body.comunidad === null || req.body.comunidad === '') {
+          id_comunidad_asignada = null;
+        } else if (ConsejoComunal) {
+          const consejo = await ConsejoComunal.findOne({ where: { nombre_comunidad: req.body.comunidad } });
+          if (consejo) id_comunidad_asignada = consejo.id;
+        }
       }
 
       // Actualizar campos permitidos
