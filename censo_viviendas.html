@@ -4745,7 +4745,7 @@
       if (!id || id === 'undefined') { showToast('ID de vivienda no válido.', 'error'); return; }
       
       censoAEliminarId = id;
-      censoAEliminarIndex = index;
+      censoAEliminarIndex = viviendas.findIndex(v => String(v.id || v._id) === String(id));
 
       const modalEl = document.getElementById('modalEliminarCenso');
       if (modalEl) {

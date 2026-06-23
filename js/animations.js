@@ -244,14 +244,14 @@
       easing: 'easeOutBack',
     });
 
-    // Tarjetas 7 Transformaciones
-    createScrollAnimator('.pub-7t-card', {
+    // Tarjetas 7 Transformaciones (Manejado por CSS para mayor velocidad)
+    /* createScrollAnimator('.pub-7t-card', {
       translateX: [-20, 0],
       translateY: [10, 0],
       stagger: 70,
       duration: 400,
       easing: 'easeOutExpo',
-    });
+    }); */
 
     // Section labels y títulos
     createScrollAnimator('.pub-section-label', {

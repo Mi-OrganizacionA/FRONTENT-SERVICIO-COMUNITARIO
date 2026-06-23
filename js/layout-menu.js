@@ -875,7 +875,7 @@
 
     // Cerrar al hacer clic fuera
     document.addEventListener('click', (e) => {
-      if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+      if (input && dropdown && !input.contains(e.target) && !dropdown.contains(e.target)) {
         dropdown.classList.remove('show');
       }
     });

@@ -275,6 +275,7 @@ class CensoReportesService {
     let [tHab, tElec, tNinos, tMayores, tDisc, tViv] = [0,0,0,0,0,0];
 
     for (let c of consejos) {
+      if (c.id === 10 || c.nombre_comunidad === 'Toda la Comuna') continue;
       if (filtros.consejo_id && filtros.consejo_id.toString() !== c.id.toString()) continue;
       
       const cIdStr = c.id.toString();
