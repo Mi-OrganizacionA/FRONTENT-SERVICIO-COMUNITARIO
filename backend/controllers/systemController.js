@@ -56,10 +56,21 @@ class SystemController {
       let hectareas_cultivadas = 0;
       let kg_producidos = 0;
       if (models.ProduccionAgricola) {
-         const sumHa = await models.ProduccionAgricola.sum('hectareas_cultivadas', { where: { activo: true } });
-         hectareas_cultivadas = sumHa || 0;
-         const sumKg = await models.ProduccionAgricola.sum('rendimiento_estimado', { where: { activo: true } });
-         kg_producidos = sumKg || 0;
+         const producciones = await models.ProduccionAgricola.findAll({ 
+             attributes: ['hectareas_cultivadas', 'rendimiento_estimado'],
+             where: { activo: true } 
+         });
+         
+         producciones.forEach(p => {
+             if (p.hectareas_cultivadas) hectareas_cultivadas += parseFloat(p.hectareas_cultivadas) || 0;
+             if (p.rendimiento_estimado) {
+                 const match = String(p.rendimiento_estimado).match(/[\d.]+/);
+                 if (match) {
+                     const num = parseFloat(match[0]);
+                     if (!isNaN(num)) kg_producidos += num;
+                 }
+             }
+         });
       }
       
       const countProyectosAll = models.Proyecto ? await models.Proyecto.count() : 0;
