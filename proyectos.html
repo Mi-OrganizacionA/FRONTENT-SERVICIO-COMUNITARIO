@@ -762,11 +762,17 @@
     <!-- ══ PROJECTS GRID ══ -->
     <div class="proj-grid" id="projGrid"></div>
 
-    <!-- ══ EMPTY STATE ══ -->
+    <!-- 🗄️ EMPTY STATE 🗄️ -->
     <div class="proj-empty" id="projEmpty" style="display:none">
       <i class="fas fa-seedling"></i>
       <strong>No hay proyectos que coincidan</strong>
       <span>Intenta con otro filtro o registra el primer proyecto.</span>
+    </div>
+
+    <!-- 🗄️ PAGINATION 🗄️ -->
+    <div class="cv-pagination" id="projPagination" style="display:none; margin-top:2rem; background:#fff; border-radius:var(--r-md); border:1px solid var(--gray3);">
+      <span id="projPagInfo">Mostrando 0 de 0</span>
+      <div class="cv-pag-btns" id="projPagBtns"></div>
     </div>
 
   </main>
@@ -1024,8 +1030,10 @@
 
     // Datos de ejemplo hasta conectar API real
     let proyectos = [];
-
-    let filtroActivo = 'todos';
+  let currentId = null;
+  let filtroActivo = 'todos';
+  let currentPage = 1;
+  const PAGE_SIZE = 10;
     let projEliminarId = null;
 
     // ── RENDER ──
@@ -1045,19 +1053,26 @@
         return matchFilter && matchSearch;
       });
 
+      const totalPages = Math.ceil(list.length / PAGE_SIZE) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+      const paginated = list.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
       const grid = document.getElementById('projGrid');
       const empty = document.getElementById('projEmpty');
       const count = document.getElementById('projCount');
+      const pagination = document.getElementById('projPagination');
       if (count) count.textContent = list.length;
 
       if (list.length === 0) {
         grid.innerHTML = '';
         if (empty) empty.style.display = '';
+        if (pagination) pagination.style.display = 'none';
         return;
       }
       if (empty) empty.style.display = 'none';
+      if (pagination) pagination.style.display = 'flex';
 
-      grid.innerHTML = list.map(p => {
+      grid.innerHTML = paginated.map(p => {
         const barClass = `bar-${p.estado}`;
         const badgeClass = `badge-${p.estado}`;
         const statusLabel = { propuesto: 'Propuesto', aprobado: 'Aprobado', en_ejecucion: 'En Ejecución', finalizado: 'Finalizado', rechazado: 'Rechazado' }[p.estado] || p.estado;
@@ -1102,12 +1117,39 @@
         </div>
       `;
       }).join('');
+      
+      renderPagination(totalPages, list.length);
+    }
+
+    function renderPagination(totalPages, totalRecords) {
+      const pagBtns = document.getElementById('projPagBtns');
+      let html = '';
+      
+      html += `<button class="cv-pag-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="currentPage--; renderGrid()"><i class="fas fa-chevron-left"></i></button>`;
+      
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, startPage + 4);
+      if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="cv-pag-btn ${i === currentPage ? 'active' : ''}" onclick="currentPage=${i}; renderGrid()">${i}</button>`;
+      }
+      
+      html += `<button class="cv-pag-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="currentPage++; renderGrid()"><i class="fas fa-chevron-right"></i></button>`;
+      pagBtns.innerHTML = html;
+      
+      const startIdx = (currentPage - 1) * PAGE_SIZE + 1;
+      const endIdx = Math.min(currentPage * PAGE_SIZE, totalRecords);
+      document.getElementById('projPagInfo').textContent = `Mostrando ${startIdx} - ${endIdx} de ${totalRecords}`;
     }
 
     // ── FILTROS ──
 
     function filtrarProyectos(chip) {
       filtroActivo = chip.dataset.filter;
+      currentPage = 1;
       document.querySelectorAll('.proj-chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
       renderGrid();
@@ -1150,7 +1192,7 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       const inp = document.getElementById('projSearchInput');
-      if (inp) inp.addEventListener('input', renderGrid);
+      if (inp) inp.addEventListener('input', () => { currentPage = 1; renderGrid(); });
       await cargarProyectos();
 
       const btnQuitar = document.getElementById('btnQuitarImagen');

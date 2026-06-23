@@ -6,8 +6,8 @@
 class NoticiasController {
   constructor() {
     this.noticias = [];
-    // Opcional: si usamos FormValidator
-    // this.form = new FormValidator('formNoticia', 'noticia');
+    this.currentPage = 1;
+    this.PAGE_SIZE = 10;
     this.init();
   }
 
@@ -36,14 +36,15 @@ class NoticiasController {
 
     const searchInput = document.getElementById('pubSearchInput');
     if (searchInput) {
-      searchInput.addEventListener('input', () => this.filtrarPubs());
+      searchInput.addEventListener('input', () => { this.currentPage = 1; this.renderNoticias(); });
     }
 
     document.querySelectorAll('.chip').forEach(chip => {
       chip.addEventListener('click', (e) => {
         document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
         e.currentTarget.classList.add('active');
-        this.filtrarPubs();
+        this.currentPage = 1;
+        this.renderNoticias();
       });
     });
 
@@ -107,8 +108,34 @@ class NoticiasController {
 
   renderNoticias() {
     const grid = document.getElementById('pubGrid');
+    const pubEmpty = document.getElementById('pubEmpty');
+    const pubCount = document.getElementById('pubCount');
+    const pagination = document.getElementById('pubPagination');
     if (!grid) return;
     grid.innerHTML = '';
+
+    const activeChip = document.querySelector('.chip.active');
+    const tipoFiltro = activeChip ? activeChip.dataset.filter : 'todos';
+    const searchInput = document.getElementById('pubSearchInput');
+    const buscar = searchInput ? searchInput.value.toLowerCase() : '';
+
+    const list = this.noticias.filter(n => {
+      const tipo = (n.tipo_publicacion || 'noticia').toLowerCase();
+      const matchTipo = tipoFiltro === 'todos' || tipo === tipoFiltro;
+      const titleText = (n.titulo || '').toLowerCase();
+      const matchBusca = buscar === '' || titleText.includes(buscar);
+      return matchTipo && matchBusca;
+    });
+
+    if (pubCount) pubCount.textContent = list.length;
+
+    if (list.length === 0) {
+      if (pubEmpty) pubEmpty.style.display = 'block';
+      if (pagination) pagination.style.display = 'none';
+      return;
+    }
+    if (pubEmpty) pubEmpty.style.display = 'none';
+    if (pagination) pagination.style.display = 'flex';
 
     const iconMap = {
       'noticia': 'fa-newspaper',
@@ -118,13 +145,17 @@ class NoticiasController {
     };
 
     // Ordenar: las publicaciones destacadas aparecen primero
-    const ordenadas = [...this.noticias].sort((a, b) => {
+    const ordenadas = [...list].sort((a, b) => {
       const aDestacada = a.destacada === true || a.destacada === 1 ? 1 : 0;
       const bDestacada = b.destacada === true || b.destacada === 1 ? 1 : 0;
       return bDestacada - aDestacada;
     });
+    
+    const totalPages = Math.ceil(ordenadas.length / this.PAGE_SIZE) || 1;
+    if (this.currentPage > totalPages) this.currentPage = totalPages;
+    const paginated = ordenadas.slice((this.currentPage - 1) * this.PAGE_SIZE, this.currentPage * this.PAGE_SIZE);
 
-    ordenadas.forEach(n => {
+    paginated.forEach(n => {
       const tipo = (n.tipo_publicacion || 'noticia').toLowerCase();
       const cssClass = tipo === 'aviso' ? 'aviso-cd' : tipo;
       const icono = iconMap[tipo] || 'fa-file-alt';
@@ -180,6 +211,33 @@ class NoticiasController {
       `;
       grid.appendChild(card);
     });
+    
+    this.renderPagination(totalPages, ordenadas.length);
+  }
+
+  renderPagination(totalPages, totalRecords) {
+    const pagBtns = document.getElementById('pubPagBtns');
+    if(!pagBtns) return;
+    let html = '';
+    
+    html += `<button class="cv-pag-btn" ${this.currentPage === 1 ? 'disabled' : ''} onclick="window.noticiasCtrl.currentPage--; window.noticiasCtrl.renderNoticias()"><i class="fas fa-chevron-left"></i></button>`;
+    
+    let startPage = Math.max(1, this.currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+    if (endPage - startPage < 4) {
+      startPage = Math.max(1, endPage - 4);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      html += `<button class="cv-pag-btn ${i === this.currentPage ? 'active' : ''}" onclick="window.noticiasCtrl.currentPage=${i}; window.noticiasCtrl.renderNoticias()">${i}</button>`;
+    }
+    
+    html += `<button class="cv-pag-btn" ${this.currentPage === totalPages ? 'disabled' : ''} onclick="window.noticiasCtrl.currentPage++; window.noticiasCtrl.renderNoticias()"><i class="fas fa-chevron-right"></i></button>`;
+    pagBtns.innerHTML = html;
+    
+    const startIdx = (this.currentPage - 1) * this.PAGE_SIZE + 1;
+    const endIdx = Math.min(this.currentPage * this.PAGE_SIZE, totalRecords);
+    document.getElementById('pubPagInfo').textContent = `Mostrando ${startIdx} - ${endIdx} de ${totalRecords}`;
   }
 
   abrirModalNoticia(id, tipo = 'noticia') {
@@ -359,43 +417,12 @@ class NoticiasController {
   }
 
   filtrarPubs() {
-    const activeChip = document.querySelector('.chip.active');
-    const tipo = activeChip ? activeChip.dataset.filter : 'todos';
-    const searchInput = document.getElementById('pubSearchInput');
-    const buscar = searchInput ? searchInput.value.toLowerCase() : '';
-    const cards = document.querySelectorAll('#pubGrid .pub-card');
-    
-    let visible = 0;
-    cards.forEach(card => {
-      const matchTipo = tipo === 'todos' || card.dataset.type === tipo;
-      const titleEl = card.querySelector('.pub-card-title');
-      const titleText = titleEl ? titleEl.textContent.toLowerCase() : '';
-      const matchBusca = buscar === '' || titleText.includes(buscar);
-      
-      if (matchTipo && matchBusca) { 
-        card.style.display = ''; 
-        visible++; 
-      } else { 
-        card.style.display = 'none'; 
-      }
-    });
-    
-    this.actualizarContador(visible);
+    this.currentPage = 1;
+    this.renderNoticias();
   }
 
   actualizarContador(forceCount = null) {
-    const cards = document.querySelectorAll('#pubGrid .pub-card');
-    let visible = forceCount !== null ? forceCount : 0;
-    
-    if (forceCount === null) {
-      cards.forEach(c => { if (c.style.display !== 'none') visible++; });
-    }
-    
-    const pubCount = document.getElementById('pubCount');
-    if (pubCount) pubCount.textContent = visible;
-    
-    const pubEmpty = document.getElementById('pubEmpty');
-    if (pubEmpty) pubEmpty.style.display = visible === 0 ? 'block' : 'none';
+    // Deprecated, we handle it in renderNoticias
   }
 
   exportarCartelera() {

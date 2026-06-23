@@ -202,11 +202,17 @@
     <!-- ══ GRID ══ -->
     <div class="org-grid" id="orgGrid"></div>
 
-    <!-- ══ EMPTY STATE ══ -->
+    <!-- 🗄️ EMPTY STATE 🗄️ -->
     <div class="org-empty" id="orgEmpty" style="display:none">
       <i class="fas fa-hands-holding-circle"></i>
       <strong>No hay organizaciones que coincidan</strong>
       <span>Registra una nueva organización social o comité en el sistema.</span>
+    </div>
+
+    <!-- 🗄️ PAGINATION 🗄️ -->
+    <div class="cv-pagination" id="orgPagination" style="display:none; margin-top:2rem; background:#fff; border-radius:var(--r-md); border:1px solid var(--gray3);">
+      <span id="orgPagInfo">Mostrando 0 de 0</span>
+      <div class="cv-pag-btns" id="orgPagBtns"></div>
     </div>
 
   </main>
@@ -293,6 +299,9 @@
 
   <script>
   let organizaciones = [];
+  let currentId = null;
+  let currentPage = 1;
+  const PAGE_SIZE = 10;
 
   async function init() {
     try {
@@ -329,19 +338,26 @@
       return !q || nombre.includes(q) || tipo.includes(q);
     });
 
+    const totalPages = Math.ceil(list.length / PAGE_SIZE) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    const paginated = list.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
     const grid = document.getElementById('orgGrid');
     const empty = document.getElementById('orgEmpty');
     const count = document.getElementById('orgCount');
+    const pagination = document.getElementById('orgPagination');
     if (count) count.textContent = list.length;
 
     if (list.length === 0) {
       grid.innerHTML = '';
       if (empty) empty.style.display = '';
+      if (pagination) pagination.style.display = 'none';
       return;
     }
     if (empty) empty.style.display = 'none';
+    if (pagination) pagination.style.display = 'flex';
 
-    grid.innerHTML = list.map(o => `
+    grid.innerHTML = paginated.map(o => `
       <div class="org-card fade-in-up" data-id="${o.id}">
         <div class="org-bar"></div>
         <div class="org-card-body">
@@ -364,6 +380,32 @@
         </div>
       </div>
     `).join('');
+    
+    renderPagination(totalPages, list.length);
+  }
+
+  function renderPagination(totalPages, totalRecords) {
+    const pagBtns = document.getElementById('orgPagBtns');
+    let html = '';
+    
+    html += `<button class="cv-pag-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="currentPage--; renderGrid()"><i class="fas fa-chevron-left"></i></button>`;
+    
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+    if (endPage - startPage < 4) {
+      startPage = Math.max(1, endPage - 4);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      html += `<button class="cv-pag-btn ${i === currentPage ? 'active' : ''}" onclick="currentPage=${i}; renderGrid()">${i}</button>`;
+    }
+    
+    html += `<button class="cv-pag-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="currentPage++; renderGrid()"><i class="fas fa-chevron-right"></i></button>`;
+    pagBtns.innerHTML = html;
+    
+    const startIdx = (currentPage - 1) * PAGE_SIZE + 1;
+    const endIdx = Math.min(currentPage * PAGE_SIZE, totalRecords);
+    document.getElementById('orgPagInfo').textContent = `Mostrando ${startIdx} - ${endIdx} de ${totalRecords}`;
   }
 
   function abrirModalOrganizacion(id = null) {
@@ -456,7 +498,7 @@
   function escapeHtml(str) { return str ? str.toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
 
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('orgSearchInput').addEventListener('input', renderGrid);
+    document.getElementById('orgSearchInput').addEventListener('input', () => { currentPage = 1; renderGrid(); });
     init();
   });
   </script>

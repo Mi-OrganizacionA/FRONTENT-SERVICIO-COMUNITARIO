@@ -211,11 +211,17 @@
     <!-- ══ GRID ══ -->
     <div class="prod-grid" id="prodGrid"></div>
 
-    <!-- ══ EMPTY STATE ══ -->
+    <!-- 🗄️ EMPTY STATE 🗄️ -->
     <div class="prod-empty" id="prodEmpty" style="display:none">
       <i class="fas fa-tractor"></i>
       <strong>No hay registros de producción que coincidan</strong>
       <span>Registra una nueva parcela agrícola en el sistema.</span>
+    </div>
+
+    <!-- 🗄️ PAGINATION 🗄️ -->
+    <div class="cv-pagination" id="prodPagination" style="display:none; margin-top:2rem; background:#fff; border-radius:var(--r-md); border:1px solid var(--gray3);">
+      <span id="prodPagInfo">Mostrando 0 de 0</span>
+      <div class="cv-pag-btns" id="prodPagBtns"></div>
     </div>
 
   </main>
@@ -330,6 +336,9 @@
 
   <script>
   let produccion = [];
+  let currentId = null;
+  let currentPage = 1;
+  const PAGE_SIZE = 10;
 
   async function init() {
     try {
@@ -378,19 +387,26 @@
         (p.ubicacion_cultivo || '').toLowerCase().includes(q)
       );
 
+    const totalPages = Math.ceil(list.length / PAGE_SIZE) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    const paginated = list.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
     const grid = document.getElementById('prodGrid');
     const empty = document.getElementById('prodEmpty');
     const count = document.getElementById('prodCount');
+    const pagination = document.getElementById('prodPagination');
     if (count) count.textContent = list.length;
 
     if (list.length === 0) {
       grid.innerHTML = '';
       if (empty) empty.style.display = '';
+      if (pagination) pagination.style.display = 'none';
       return;
     }
     if (empty) empty.style.display = 'none';
+    if (pagination) pagination.style.display = 'flex';
 
-    grid.innerHTML = list.map(p => `
+    grid.innerHTML = paginated.map(p => `
       <div class="prod-card fade-in-up" data-id="${p.id}">
         <div class="prod-bar"></div>
         <div class="prod-card-body">
@@ -413,6 +429,32 @@
         </div>
       </div>
     `).join('');
+    
+    renderPagination(totalPages, list.length);
+  }
+
+  function renderPagination(totalPages, totalRecords) {
+    const pagBtns = document.getElementById('prodPagBtns');
+    let html = '';
+    
+    html += `<button class="cv-pag-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="currentPage--; renderGrid()"><i class="fas fa-chevron-left"></i></button>`;
+    
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+    if (endPage - startPage < 4) {
+      startPage = Math.max(1, endPage - 4);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      html += `<button class="cv-pag-btn ${i === currentPage ? 'active' : ''}" onclick="currentPage=${i}; renderGrid()">${i}</button>`;
+    }
+    
+    html += `<button class="cv-pag-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="currentPage++; renderGrid()"><i class="fas fa-chevron-right"></i></button>`;
+    pagBtns.innerHTML = html;
+    
+    const startIdx = (currentPage - 1) * PAGE_SIZE + 1;
+    const endIdx = Math.min(currentPage * PAGE_SIZE, totalRecords);
+    document.getElementById('prodPagInfo').textContent = `Mostrando ${startIdx} - ${endIdx} de ${totalRecords}`;
   }
 
   function abrirModalProduccion(id = null) {
@@ -517,12 +559,11 @@
   function formatDate(val) { try { return new Date(val + 'T00:00:00').toLocaleDateString('es-VE', { day:'2-digit', month:'short', year:'numeric' }); } catch { return val; } }
 
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('prodSearchInput').addEventListener('input', renderGrid);
+    document.getElementById('prodSearchInput').addEventListener('input', () => { currentPage = 1; renderGrid(); });
     init();
   });
   </script>
 </body>
+
+
 </html>
-
-
-
