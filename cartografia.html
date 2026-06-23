@@ -435,7 +435,7 @@
     // Populate KPIs using API (Base de datos real)
     document.addEventListener('DOMContentLoaded', async () => {
       try {
-        const userRole = window.auth ? window.auth.getUserRole() : null;
+        const userRole = (window.auth && window.auth.getUser()) ? window.auth.getUser().rol : null;
         const baseUrl = window.api ? (window.api.baseURL || window.api.getBaseUrl?.() || 'http://localhost:3000/api') : 'http://localhost:3000/api';
         const headers = window.auth ? { 'Authorization': `Bearer ${window.auth.getToken()}` } : {};
         
@@ -449,35 +449,40 @@
         
         const habPorConsejo = {};
         const vivPorConsejo = {};
-        const validConsejos = [];
         
         datos.forEach(item => {
-          if (item.consejo === 'TOTAL') {
-             totalHab = item.total_hab;
-             totalViv = item.viviendas;
-          } else {
-             habPorConsejo[item.consejo] = item.total_hab;
-             vivPorConsejo[item.consejo] = item.viviendas;
-             validConsejos.push(item.consejo);
-          }
+           if (item.consejo === 'TOTAL') return;
+           // The backend returns names like "Jobito I"
+           habPorConsejo[item.consejo] = item.total_hab || 0;
+           vivPorConsejo[item.consejo] = item.viviendas || 0;
+           totalViv += item.viviendas || 0;
+           totalHab += item.total_hab || 0;
         });
         
-        // Actualizar herramienta global KPIs (usa el total de lo que devolvió el backend, 
-        // si es vocero, devolverá solo el total de su comunidad, lo cual es correcto)
+        const validConsejos = Object.keys(habPorConsejo);
+
+        // Actualizar herramienta global KPIs
         const elKpiFam = document.getElementById('cartKpiFamilias');
         if (elKpiFam) elKpiFam.innerText = totalViv.toLocaleString();
         
         const elKpiTrend = document.querySelector('#cartKpiFamilias + .kpi-trend');
         if (elKpiTrend) elKpiTrend.innerHTML = `<i class="fas fa-users"></i> ~${totalHab.toLocaleString()} personas`;
 
+        // Update Consejos Comunales KPI
+        const elKpiCc = document.getElementById('cartKpiCc');
+        if (elKpiCc) {
+           elKpiCc.innerText = userRole === 'vocero' ? 1 : validConsejos.length;
+        }
+
         // Actualizar popups y resaltado de polígonos
         if (userRole === 'vocero' && validConsejos.length === 1) {
-           const myCc = validConsejos[0];
+           const myCc = validConsejos[0]; // e.g. "Jobito I"
            
            // Atenuar los demás polígonos
            Object.keys(ccLayers).forEach(name => {
               const poly = ccLayers[name];
-              if (name === myCc) {
+              // name has "C.C. ", so we strip it to compare with backend data
+              if (name.replace('C.C. ', '') === myCc) {
                  poly.setStyle({ fillOpacity: 0.5, weight: 3 });
               } else {
                  poly.setStyle({ fillOpacity: 0.05, weight: 1, color: '#aaa' });
@@ -492,9 +497,9 @@
                  const elPer = document.getElementById(elIdPer);
                  const elFam = document.getElementById(elIdFam);
                  
-                 if (cc.nombre === myCc) {
-                    if (elPer) elPer.innerText = `${habPorConsejo[cc.nombre] || 0} personas`;
-                    if (elFam) elFam.innerText = `${vivPorConsejo[cc.nombre] || 0} familias`;
+                 if (cc.nombre.replace('C.C. ', '') === myCc) {
+                    if (elPer) elPer.innerText = `${habPorConsejo[cc.nombre.replace('C.C. ', '')] || 0} personas`;
+                    if (elFam) elFam.innerText = `${vivPorConsejo[cc.nombre.replace('C.C. ', '')] || 0} familias`;
                  } else {
                     if (elPer) elPer.innerHTML = `<span style="color:red; font-weight:bold;">Acceso restringido</span>`;
                     if (elFam) elFam.innerHTML = `<span style="color:red; font-weight:bold;">Acceso restringido</span>`;
@@ -505,10 +510,10 @@
            // Actualizar tooltips iniciales
            consejos.forEach(cc => {
               if (ccLayers[cc.nombre]) {
-                 if (cc.nombre === myCc) {
-                    ccLayers[cc.nombre].setTooltipContent(`<b>${cc.nombre}</b><br>${habPorConsejo[cc.nombre] || 0} habitantes`);
+                 if (cc.nombre.replace('C.C. ', '') === myCc) {
+                    ccLayers[cc.nombre].setTooltipContent(`<b>${cc.nombre}</b><br>${habPorConsejo[cc.nombre.replace('C.C. ', '')] || 0} habitantes`);
                  } else {
-                    ccLayers[cc.nombre].setTooltipContent(`<b>${cc.nombre}</b><br><span style="color:red">Restringido</span>`);
+                    ccLayers[cc.nombre].setTooltipContent(`<b>${cc.nombre}</b><br><span style="color:red">Área Restringida</span>`);
                  }
               }
            });
@@ -521,15 +526,15 @@
                  const elIdFam = `pop-fam-${cc.nombre.replace(/\s+/g, '')}`;
                  const elPer = document.getElementById(elIdPer);
                  const elFam = document.getElementById(elIdFam);
-                 if (elPer) elPer.innerText = `${habPorConsejo[cc.nombre] || 0} personas`;
-                 if (elFam) elFam.innerText = `${vivPorConsejo[cc.nombre] || 0} familias`;
+                 if (elPer) elPer.innerText = `${habPorConsejo[cc.nombre.replace('C.C. ', '')] || 0} personas`;
+                 if (elFam) elFam.innerText = `${vivPorConsejo[cc.nombre.replace('C.C. ', '')] || 0} familias`;
               });
            });
            
            // Actualizar tooltips
            consejos.forEach(cc => {
               if (ccLayers[cc.nombre]) {
-                 ccLayers[cc.nombre].setTooltipContent(`<b>${cc.nombre}</b><br>${habPorConsejo[cc.nombre] || 0} habitantes`);
+                 ccLayers[cc.nombre].setTooltipContent(`<b>${cc.nombre}</b><br>${habPorConsejo[cc.nombre.replace('C.C. ', '')] || 0} habitantes`);
               }
            });
         }
