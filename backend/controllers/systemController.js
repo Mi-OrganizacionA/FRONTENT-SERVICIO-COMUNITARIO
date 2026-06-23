@@ -47,14 +47,83 @@ class SystemController {
 
   static async getPublicStats(req, res) {
     try {
-      const countHab = SystemController.models && SystemController.models.Habitante ? await SystemController.models.Habitante.count({ where: { activo: true } }) : 0;
-      const countProy = SystemController.models && SystemController.models.Proyecto ? await SystemController.models.Proyecto.count() : 0;
-      const countViv = SystemController.models && SystemController.models.Vivienda ? await SystemController.models.Vivienda.count() : 0;
-      // Si el modelo ConsejoComunal existiera, podríamos contar, pero son 9 estáticos
+      const models = SystemController.models;
+      if (!models) {
+         return res.json({ habitantes: 0, proyectos: 0, viviendas: 0, consejos: 9 });
+      }
+
+      // Transformación Económica
+      let hectareas_cultivadas = 0;
+      let kg_producidos = 0;
+      if (models.ProduccionAgricola) {
+         const sumHa = await models.ProduccionAgricola.sum('hectareas_cultivadas', { where: { activo: true } });
+         hectareas_cultivadas = sumHa || 0;
+         const sumKg = await models.ProduccionAgricola.sum('rendimiento_estimado', { where: { activo: true } });
+         kg_producidos = sumKg || 0;
+      }
+      
+      const countProyectosAll = models.Proyecto ? await models.Proyecto.count() : 0;
+      
+      // Transformación Social & Dashboard
+      let countHab = 0, countElectores = 0, ninos = 0, adultosMayores = 0, discapacidad = 0;
+      if (models.Habitante) {
+         const habitantes = await models.Habitante.findAll({ 
+            where: { activo: true },
+            attributes: ['fecha_nacimiento', 'inscrito_cne', 'condicion_salud', 'incapacitado']
+         });
+         countHab = habitantes.length;
+         
+         const hoy = new Date();
+         habitantes.forEach(h => {
+            if (h.inscrito_cne) countElectores++;
+            if (h.condicion_salud === 'discapacidad' || h.incapacitado) discapacidad++;
+            
+            if (h.fecha_nacimiento) {
+               const fn = new Date(h.fecha_nacimiento);
+               let edad = hoy.getFullYear() - fn.getFullYear();
+               const m = hoy.getMonth() - fn.getMonth();
+               if (m < 0 || (m === 0 && hoy.getDate() < fn.getDate())) {
+                  edad--;
+               }
+               if (edad <= 11) ninos++;
+               if (edad >= 60) adultosMayores++;
+            }
+         });
+      }
+
+      // Servicios Públicos
+      let countElec = 0, countAgua = 0, countGas = 0;
+      if (models.CensoServicios) {
+         const censos = await models.CensoServicios.findAll({
+            attributes: ['sistema_electrico_tipo', 'aguas_blancas_tipo', 'gas_tipo']
+         });
+         censos.forEach(c => {
+            const hasLuz = c.sistema_electrico_tipo && c.sistema_electrico_tipo !== 'Ninguno' && c.sistema_electrico_tipo !== '';
+            const hasAgua = c.aguas_blancas_tipo && c.aguas_blancas_tipo !== 'Ninguno' && c.aguas_blancas_tipo !== '';
+            const hasGas = c.gas_tipo && c.gas_tipo !== 'Ninguno' && c.gas_tipo !== '';
+            if (hasLuz) countElec++;
+            if (hasAgua) countAgua++;
+            if (hasGas) countGas++;
+         });
+      }
+
+      const countViv = models.Vivienda ? await models.Vivienda.count({ where: { activo: true } }) : 0;
+
       res.json({
         habitantes: countHab,
-        proyectos: countProy,
+        electores: countElectores,
+        ninos: ninos,
+        adultosMayores: adultosMayores,
+        discapacidad: discapacidad,
+        hectareas: hectareas_cultivadas,
+        kg_producidos: kg_producidos,
+        proyectos: countProyectosAll,
         viviendas: countViv,
+        servicios: {
+          electricidad: countElec,
+          agua: countAgua,
+          gas: countGas
+        },
         consejos: 9
       });
     } catch (error) {

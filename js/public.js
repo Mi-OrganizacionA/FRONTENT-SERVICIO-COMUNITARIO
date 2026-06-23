@@ -34,10 +34,12 @@
       });
     });
 
-    // Cargar Configuración del Portal
-    const portalConfig = JSON.parse(localStorage.getItem('sicag_portal_settings') || '{}');
-    if (Object.keys(portalConfig).length > 0) {
+    // Función auxiliar para actualizar la UI de contacto (Middle y Footer)
+    window.actualizarUIContacto = function(portalConfig) {
+      if (!portalConfig || Object.keys(portalConfig).length === 0) return;
       const setEl = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+      const setHref = (id, val) => { const el = document.getElementById(id); if (el && val) el.href = val; };
+
       setEl('txtContactDir', portalConfig.direccion);
       setEl('txtContactTlf', portalConfig.telefono);
       setEl('txtContactHorario', portalConfig.horario);
@@ -45,14 +47,41 @@
 
       // Limpiar números para WhatsApp URL
       const waNumber = (portalConfig.telefono || '').replace(/\D/g, '');
-      const waLink = waNumber ? `https://wa.me/${waNumber}?text=Hola,%20les%20escribo%20desde%20el%20portal%20SICAG` : '#';
+      const waLink = waNumber ? `https://wa.me/${waNumber}` : '#';
 
-      // Actualizar redes (Contacto y Footer)
+      // Footer y otras redes
+      setEl('footerDirText', portalConfig.direccion);
+      
+      setHref('footerWhatsapp', waLink);
+      
+      if (portalConfig.correo) {
+         setHref('footerCorreo', `mailto:${portalConfig.correo}`);
+         setEl('footerCorreoText', portalConfig.correo);
+      }
+      
+      if (portalConfig.tiktok) {
+         setHref('footerTiktok', portalConfig.tiktok);
+         let tkUser = portalConfig.tiktok.split('/').pop() || '@ComunaSimonRodriguez';
+         if (!tkUser.startsWith('@') && tkUser !== '#') tkUser = '@' + tkUser;
+         setEl('footerTiktokText', tkUser);
+      }
+      
+      if (portalConfig.instagram) {
+         setHref('footerInstagram', portalConfig.instagram);
+         let igUser = portalConfig.instagram.split('/').pop() || '@sicag_yaracuy';
+         if (!igUser.startsWith('@') && igUser !== '#') igUser = '@' + igUser;
+         setEl('footerInstagramText', igUser);
+      }
+
       document.querySelectorAll('.pub-btn-whatsapp').forEach(a => a.href = waLink);
       document.querySelectorAll('.pub-btn-facebook').forEach(a => a.href = portalConfig.facebook || '#');
       document.querySelectorAll('.pub-btn-instagram').forEach(a => a.href = portalConfig.instagram || '#');
       document.querySelectorAll('.pub-btn-tiktok').forEach(a => a.href = portalConfig.tiktok || '#');
-    }
+    };
+
+    // Cargar Configuración del Portal desde caché local
+    const portalConfigCache = JSON.parse(localStorage.getItem('sicag_portal_settings') || '{}');
+    window.actualizarUIContacto(portalConfigCache);
   });
 
   /* ── NAV SCROLL ── */
@@ -326,20 +355,7 @@
           if (dataC.success && dataC.config) {
             const portalConfig = JSON.parse(dataC.config);
             localStorage.setItem('sicag_portal_settings', dataC.config);
-            const setEl = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
-            setEl('txtContactDir', portalConfig.direccion);
-            setEl('txtContactTlf', portalConfig.telefono);
-            setEl('txtContactHorario', portalConfig.horario);
-            setEl('txtContactCorreo', portalConfig.correo);
-
-            const waNumber = (portalConfig.telefono || '').replace(/\D/g, '');
-            const waLink = waNumber ? `https://wa.me/${waNumber}?text=Hola,%20les%20escribo%20desde%20el%20portal%20SICAG` : '#';
-
-            document.querySelectorAll('.pub-btn-whatsapp').forEach(a => a.href = waLink);
-            document.querySelectorAll('.pub-btn-facebook').forEach(a => a.href = portalConfig.facebook || '#');
-            document.querySelectorAll('.pub-btn-instagram').forEach(a => a.href = portalConfig.instagram || '#');
-            document.querySelectorAll('.pub-btn-tiktok').forEach(a => a.href = portalConfig.tiktok || '#');
-          }
+            if(window.actualizarUIContacto) window.actualizarUIContacto(portalConfig);
         }
       } catch (e) {
         console.warn('Error cargando config pública:', e.message);
@@ -371,19 +387,19 @@
     const map = {
       'idxHab': stats.habitantes || 0,
       'idxCC': 9,
-      'idxHectareas': 156,
-      't1Ha': 156,
-      't1Proj': totalProyectos || stats.proyectos || 0,
-      't1Prod': 8500,
-      't2Elec': 92,
-      't2Agua': 85,
-      't2Gas': 78,
+      'idxHectareas': stats.hectareas || 0,
+      't1Ha': stats.hectareas || 0,
+      't1Proj': stats.proyectos || totalProyectos || 0,
+      't1Prod': stats.kg_producidos || 0,
+      't2Elec': stats.servicios ? stats.servicios.electricidad : 0,
+      't2Agua': stats.servicios ? stats.servicios.agua : 0,
+      't2Gas': stats.servicios ? stats.servicios.gas : 0,
       't4Ninos': stats.ninos || 0,
-      't4AdultosM': 850,
-      't4Disc': 120,
+      't4AdultosM': stats.adultosMayores || 0,
+      't4Disc': stats.discapacidad || 0,
       'dashHab': stats.habitantes || 0,
       'dashElec': stats.electores || 0,
-      'dashCC': 9
+      'dashCC': stats.consejos || 9
     };
 
     for (const [id, value] of Object.entries(map)) {
