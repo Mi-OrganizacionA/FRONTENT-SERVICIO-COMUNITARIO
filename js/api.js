@@ -838,29 +838,61 @@ class APIManager {
     // EXCEPCIÓN: Cartelera/Noticias siempre va directo para que todos lo vean de inmediato
     if (isVocero && !autoGlobal && !autoModulo ) {
       console.log(`[API] Interceptado: Enviando ${accion} de ${tabla} a validaciones.`);
-      const res = await this.crearNotificacion({
-        tabla_afectada: tabla,
-        tipo_accion: accion,
-        id_vocero: user.id,
-        datos_temporales: datos
-      });
+      
+      try {
+        const res = await this.crearNotificacion({
+          tabla_afectada: tabla,
+          tipo_accion: accion,
+          id_vocero: user.id,
+          datos_temporales: datos
+        });
 
-      // Notificación clara para que el Vocero sepa que no se ejecutó inmediatamente
-      if (window.Components) {
-        let accionText = accion === 'CREATE' ? 'Creación' : (accion === 'UPDATE' ? 'Edición' : 'Eliminación');
-        Components.showToast(`Solicitud de ${accionText} enviada a validación.`, 'info');
-        
-        // Bloquear temporalmente los mensajes de éxito/error genéricos que tengan las vistas
-        // para que no se sobreescriba el mensaje informativo anterior.
-        const originalToast = Components.showToast;
-        Components.showToast = function(msg, type) {
-           if (type === 'success' || type === 'error') return; // ignoramos el éxito/error falso
-           originalToast.apply(this, arguments);
-        };
-        setTimeout(() => { Components.showToast = originalToast; }, 500);
+        // Notificación clara para que el Vocero sepa que no se ejecutó inmediatamente
+        if (window.Components) {
+          let accionText = accion === 'CREATE' ? 'Creación' : (accion === 'UPDATE' ? 'Edición' : 'Eliminación');
+          Components.showToast(`Solicitud de ${accionText} enviada a validación.`, 'info');
+          
+          // Bloquear temporalmente los mensajes de éxito/error genéricos que tengan las vistas
+          // para que no se sobreescriba el mensaje informativo anterior.
+          const originalToast = Components.showToast;
+          Components.showToast = function(msg, type) {
+             if (type === 'success' || type === 'error') return; // ignoramos el éxito/error falso
+             originalToast.apply(this, arguments);
+          };
+          setTimeout(() => { Components.showToast = originalToast; }, 500);
+        }
+
+        return res;
+      } catch (errorRed) {
+        const esErrorDeRed = !navigator.onLine ||
+          errorRed?.message?.toLowerCase().includes('failed to fetch') ||
+          errorRed?.message?.toLowerCase().includes('network') ||
+          errorRed?.code === 0;
+
+        if (esErrorDeRed) {
+          try {
+            this._encolarOperacion('validaciones', 'POST', '/validaciones', {
+              tabla_afectada: tabla,
+              tipo_accion: accion,
+              id_vocero: user.id,
+              datos_temporales: datos
+            }, null);
+            console.info(`[Cola Universal] Validación de ${accion} en ${tabla} guardada offline.`);
+
+            if (window.Components?.showToast) {
+              const accionText = accion === 'CREATE' ? 'Registro' : (accion === 'UPDATE' ? 'Actualización' : 'Eliminación');
+              Components.showToast(
+                `💾 Sin conexión — Solicitud de ${accionText} guardada localmente. Se enviará a validación al reconectar.`,
+                'warning'
+              );
+            }
+            return { success: true, offline: true, encolado: true };
+          } catch (colaError) {
+            throw colaError;
+          }
+        }
+        throw errorRed;
       }
-
-      return res;
     }
 
     // De lo contrario (es admin, o autoGlobal está activo), ejecutar directo

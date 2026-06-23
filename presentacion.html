@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es-VE">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SICAG - Presentación Oficial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2E7D32;
+      --primary-light: #4CAF50;
+      --primary-dark: #1B5E20;
+      --secondary: #F57F17;
+      --bg-dark: #0D1F0D;
+      --text-main: #E8F5E9;
+      --text-muted: #A5D6A7;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top right, #1B5E20 0%, #0D1F0D 50%, #000000 100%);
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    h1, h2, h3 { font-family: 'Outfit', sans-serif; }
+
+    .slider-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+
+    .slides-wrapper {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    .slide {
+      min-width: 100vw;
+      height: 100vh;
+      padding: 4rem 10rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      opacity: 0.3;
+      transition: opacity 0.6s ease;
+    }
+
+    .slide.active { opacity: 1; }
+
+    /* Layouts */
+    .slide-center { text-align: center; align-items: center; }
+    .slide-split { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+    .slide-top-img { display: flex; flex-direction: column; align-items: center; gap: 2rem; }
+    
+    .title-main { font-size: 5rem; font-weight: 800; background: linear-gradient(135deg, #4CAF50, #AEEA00); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem; }
+    .subtitle { font-size: 1.8rem; color: var(--text-muted); font-weight: 300; }
+    .section-title { font-size: 2.8rem; margin-bottom: 1rem; color: #fff; line-height: 1.1;}
+    .section-text { font-size: 1.15rem; line-height: 1.6; color: #ccc; margin-bottom: 1.5rem; }
+
+    /* Screenshot Images */
+    .screenshot-img {
+      max-height: 65vh;
+      max-width: 100%;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
+      border: 1px solid rgba(255,255,255,0.15);
+      transition: transform 0.3s ease;
+    }
+    .screenshot-img:hover {
+      transform: scale(1.02);
+    }
+
+    /* Fixed Controls (No overlap) */
+    .controls {
+      position: fixed;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      transform: translateY(-50%);
+      padding: 0 2rem;
+      pointer-events: none; /* Let clicks pass through empty areas */
+      z-index: 1000;
+    }
+
+    .btn-control {
+      pointer-events: auto; /* Enable clicks on buttons */
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+    .btn-control:hover { background: var(--primary); transform: scale(1.1); }
+
+    .indicators-wrapper {
+      position: fixed;
+      bottom: 2rem;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .indicators { display: flex; gap: 10px; background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 30px; backdrop-filter: blur(10px); }
+    .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.3); border-radius: 50%; transition: 0.3s; cursor: pointer; }
+    .dot.active { background: var(--primary-light); transform: scale(1.3); }
+
+    .icon-large { font-size: 3rem; color: var(--primary-light); margin-bottom: 1rem; }
+
+    @media(max-width: 900px) {
+      .slide-split { grid-template-columns: 1fr; gap: 2rem; }
+      .screenshot-img { max-height: 40vh; }
+      .slide { padding: 4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="slider-container">
+    <div class="slides-wrapper" id="slidesWrapper">
+
+      <!-- 1. INICIO -->
+      <div class="slide slide-center">
+        <img src="assets/img/logo_comuna_fondoremovido.png" alt="Logo" style="width: 150px; margin-bottom: 2rem; filter: drop-shadow(0 0 20px rgba(76,175,80,0.5));">
+        <h1 class="title-main">SICAG</h1>
+        <h2 class="subtitle">Sistema de Información Comunal Agroecológica</h2>
+        <p style="margin-top: 2rem; color: #888;">Comuna Socialista Agroecológica Simón Rodríguez</p>
+      </div>
+
+      <!-- 2. PORTAL 1 -->
+      <div class="slide slide-split">
+        <div>
+          <i class="fas fa-globe icon-large"></i>
+          <h2 class="section-title">El Portal Público (Inicio)</h2>
+          <p class="section-text">Cualquier habitante o visitante puede ingresar al portal sin necesidad de usuario ni contraseña para informarse.</p>
+        </div>
+        <div><img src="assets/img/screenshots/portal_1.png" class="screenshot-img" alt="Portal Público"></div>
+      </div>
+
+      <!-- 3. PORTAL 2 -->
+      <div class="slide slide-split">
+        <div>
+          <i class="fas fa-chart-pie icon-large"></i>
+          <h2 class="section-title">Transparencia y Estadísticas</h2>
+          <p class="section-text">Mostramos en tiempo real la cantidad de habitantes y familias beneficiadas.</p>
+        </div>
+        <div><img src="assets/img/screenshots/portal_2.png" class="screenshot-img" alt="Portal Estadísticas"></div>
+      </div>
+
+      <!-- 4. PORTAL 3 -->
+      <div class="slide slide-split">
+        <div>
+          <i class="fas fa-newspaper icon-large"></i>
+          <h2 class="section-title">Noticias y Proyectos</h2>
+          <p class="section-text">Mantén informada a la comunidad mediante la cartelera digital y los proyectos socio-productivos.</p>
+        </div>
+        <div><img src="assets/img/screenshots/portal_3.png" class="screenshot-img" alt="Portal Noticias"></div>
+      </div>
+
+      <!-- 5. LOGIN -->
+      <div class="slide slide-split">
+        <div><img src="assets/img/screenshots/login.png" class="screenshot-img" alt="Login"></div>
+        <div>
+          <i class="fas fa-shield-alt icon-large"></i>
+          <h2 class="section-title">Seguridad y Roles</h2>
+          <p class="section-text">Acceso protegido. <strong>Administrador:</strong> Control total. <strong>Vocero:</strong> Recolecta información en campo de forma online u offline.</p>
+        </div>
+      </div>
+
+      <!-- 6. DASHBOARD -->
+      <div class="slide slide-split">
+        <div>
+          <i class="fas fa-tachometer-alt icon-large"></i>
+          <h2 class="section-title">Panel de Control (Dashboard)</h2>
+          <p class="section-text">Centro de mando con vista global de métricas y accesos rápidos a todos los censos.</p>
+        </div>
+        <div><img src="assets/img/screenshots/dashboard.png" class="screenshot-img" alt="Dashboard"></div>
+      </div>
+
+      <!-- 7. HABITANTES 1 -->
+      <div class="slide slide-split">
+        <div><img src="assets/img/screenshots/censo_hab_1.png" class="screenshot-img" alt="Habitantes Listado"></div>
+        <div>
+          <i class="fas fa-users icon-large"></i>
+          <h2 class="section-title">Módulo: Habitantes (Listado)</h2>
+          <p class="section-text">El padrón poblacional. Listado completo de habitantes con opciones de filtrado avanzado y exportación.</p>
+        </div>
+      </div>
+
+      <!-- 8. HABITANTES 2 -->
+      <div class="slide slide-split">
+        <div>
+          <i class="fas fa-id-card icon-large"></i>
+          <h2 class="section-title">Registro: Datos Básicos</h2>
+          <p class="section-text">Formulario multi-paso. El paso 1 recaba identidad, fecha de nacimiento y cálculos automáticos de edad.</p>
+        </div>
+        <div><img src="assets/img/screenshots/censo_hab_2.png" class="screenshot-img" alt="Habitantes Paso 1"></div>
+      </div>
+
+      <!-- 9. HABITANTES 3 -->
+      <div class="slide slide-split">
+        <div><img src="assets/img/screenshots/censo_hab_3.png" class="screenshot-img" alt="Habitantes Paso 2"></div>
+        <div>
+          <i class="fas fa-heartbeat icon-large"></i>
+          <h2 class="section-title">Registro: Salud y Contacto</h2>
+          <p class="section-text">Recolección de datos de salud (enfermedades, discapacidad) e información de ubicación exacta del habitante.</p>
+        </div>
+      </div>
+
+      <!-- 10. VIVIENDAS 1 -->
+      <div class="slide slide-split">
+        <div>
+          <i class="fas fa-home icon-large"></i>
+          <h2 class="section-title">Módulo: Viviendas (Listado)</h2>
+          <p class="section-text">Control de la infraestructura del sector. Muestra los indicadores de riesgo y carencia de servicios.</p>
+        </div>
+        <div><img src="assets/img/screenshots/censo_viv_1.png" class="screenshot-img" alt="Viviendas Listado"></div>
+      </div>
+
+      <!-- 11. VIVIENDAS 2 -->
+      <div class="slide slide-split">
+        <div><img src="assets/img/screenshots/censo_viv_2.png" class="screenshot-img" alt="Viviendas Paso 1"></div>
+        <div>
+          <i class="fas fa-map-marker-alt icon-large"></i>
+          <h2 class="section-title">Registro: Datos de Vivienda</h2>
+          <p class="section-text">Paso 1 del censo de vivienda. Se recaba tipo de vivienda, condición y dirección exacta en la comunidad.</p>
+        </div>
+      </div>
+
+      <!-- 12. VIVIENDAS 3 -->
+      <div class="slide slide-split">
+        <div>
+          <i class="fas fa-faucet icon-large"></i>
+          <h2 class="section-title">Registro: Servicios Públicos</h2>
+          <p class="section-text">Identificación detallada de los servicios: agua, luz, gas, internet y riesgos estructurales del hogar.</p>
+        </div>
+        <div><img src="assets/img/screenshots/censo_viv_3.png" class="screenshot-img" alt="Viviendas Paso 2"></div>
+      </div>
+
+      <!-- 13. PROYECTOS -->
+      <div class="slide slide-split">
+        <div><img src="assets/img/screenshots/proyectos.png" class="screenshot-img" alt="Proyectos"></div>
+        <div>
+          <i class="fas fa-project-diagram icon-large"></i>
+          <h2 class="section-title">Proyectos Comunitarios</h2>
+          <p class="section-text">Seguimiento a las iniciativas de la comuna (planificación, ejecución) y su impacto social directo.</p>
+        </div>
+      </div>
+
+      <!-- 14. PRODUCCIÓN AGRÍCOLA -->
+      <div class="slide slide-split">
+        <div>
+          <i class="fas fa-tractor icon-large"></i>
+          <h2 class="section-title">Producción Agrícola</h2>
+          <p class="section-text">El núcleo de la Comuna Agroecológica. Registro y seguimiento de parcelas, siembras y cría de animales.</p>
+        </div>
+        <div><img src="assets/img/screenshots/produccion_agricola.png" class="screenshot-img" alt="Producción"></div>
+      </div>
+
+      <!-- 15. VALIDACIONES -->
+      <div class="slide slide-split">
+        <div><img src="assets/img/screenshots/validaciones.png" class="screenshot-img" alt="Validaciones"></div>
+        <div>
+          <i class="fas fa-check-double icon-large" style="color: #9C27B0;"></i>
+          <h2 class="section-title">Bandeja de Validaciones</h2>
+          <p class="section-text">Seguridad total. Los voceros envían los datos (online u offline) a esta bandeja, donde el Administrador debe revisarlos y aprobarlos antes de guardarse.</p>
+        </div>
+      </div>
+
+      <!-- 16. CARTOGRAFÍA -->
+      <div class="slide slide-split">
+        <div>
+          <i class="fas fa-map-marked-alt icon-large"></i>
+          <h2 class="section-title">Cartografía Social</h2>
+          <p class="section-text">Visualización geoespacial interactiva de las viviendas, sectores y zonas productivas de la Comuna.</p>
+        </div>
+        <div><img src="assets/img/screenshots/cartografia.png" class="screenshot-img" alt="Cartografía"></div>
+      </div>
+
+      <!-- 17. CONCLUSIÓN -->
+      <div class="slide slide-center">
+        <i class="fas fa-check-circle icon-large" style="font-size: 5rem;"></i>
+        <h2 class="title-main" style="font-size: 3.5rem;">Un Sistema Moderno y Escalable</h2>
+        <p class="section-text" style="max-width: 700px; margin: 2rem auto;">
+          SICAG centraliza datos, empodera a los voceros en campo gracias al modo offline, garantiza la seguridad mediante validaciones y expone los logros de la comunidad al mundo a través del portal público.
+        </p>
+        <button style="background: var(--primary); padding: 15px 40px; border:none; border-radius:30px; color:#fff; font-size:1.2rem; cursor:pointer;" onclick="location.href='index.html'">Ir al Portal SICAG <i class="fas fa-external-link-alt"></i></button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-control" id="prevBtn" onclick="prevSlide()"><i class="fas fa-chevron-left"></i></button>
+    <button class="btn-control" id="nextBtn" onclick="nextSlide()"><i class="fas fa-chevron-right"></i></button>
+  </div>
+  
+  <div class="indicators-wrapper">
+    <div class="indicators" id="indicators"></div>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const wrapper = document.getElementById('slidesWrapper');
+    const indicatorsContainer = document.getElementById('indicators');
+    let currentSlide = 0;
+
+    slides.forEach((_, index) => {
+      const dot = document.createElement('div');
+      dot.classList.add('dot');
+      if (index === 0) dot.classList.add('active');
+      dot.onclick = () => goToSlide(index);
+      indicatorsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.dot');
+
+    function updateSlider() {
+      wrapper.style.transform = `translateX(-${currentSlide * 100}vw)`;
+      slides.forEach((slide, index) => {
+        if (index === currentSlide) slide.classList.add('active');
+        else slide.classList.remove('active');
+      });
+      dots.forEach((dot, index) => {
+        if (index === currentSlide) dot.classList.add('active');
+        else dot.classList.remove('active');
+      });
+      document.getElementById('prevBtn').style.opacity = currentSlide === 0 ? '0.3' : '1';
+      document.getElementById('prevBtn').style.pointerEvents = currentSlide === 0 ? 'none' : 'auto';
+      document.getElementById('nextBtn').style.opacity = currentSlide === slides.length - 1 ? '0.3' : '1';
+      document.getElementById('nextBtn').style.pointerEvents = currentSlide === slides.length - 1 ? 'none' : 'auto';
+    }
+
+    function nextSlide() {
+      if (currentSlide < slides.length - 1) {
+        currentSlide++;
+        updateSlider();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlider();
+      }
+    }
+
+    function goToSlide(index) {
+      currentSlide = index;
+      updateSlider();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+    });
+
+    updateSlider();
+  </script>
+</body>
+</html>
