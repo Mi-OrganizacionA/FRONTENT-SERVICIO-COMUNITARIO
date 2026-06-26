@@ -64,7 +64,7 @@ class APIManager {
         this.mockData = await response.json();
         this.saveMockData();
       } else {
-        console.warn('No se pudo cargar seed.json (Â¿Estás abriendo el archivo localmente sin servidor?)');
+        console.warn('No se pudo cargar seed.json (¿Estás abriendo el archivo localmente sin servidor?)');
         this.mockData = { habitantes: [], proyectos: [], noticias: [], config: {} };
       }
     } catch (error) {
@@ -99,9 +99,9 @@ class APIManager {
     }
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // COLA OFFLINE â€” CENSO DEMOGRÃFICO (pasos de estudio)
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ──────────────────────────────────────────────────────────────────────────
+  // COLA OFFLINE — CENSO DEMOGRÁFICO (pasos de estudio)
+  // ──────────────────────────────────────────────────────────────────────────
 
   /** Límite máximo de ítems en la cola offline para evitar saturar localStorage */
   get MAX_QUEUE_SIZE() { return 100; }
@@ -1427,6 +1427,25 @@ class APIManager {
    * - Errores tipados con ApiError diferenciando status HTTP (PROBLEMA 6)
    */
   async _fetch(url, options = {}) {
+    let warmupTimer = null;
+    let warmupBanner = null;
+
+    // Mostrar banner si la petición tarda más de 3s (posible cold start de Render.com)
+    warmupTimer = setTimeout(() => {
+      if (document.getElementById('coldstart-banner')) return; // ya existe
+      warmupBanner = document.createElement('div');
+      warmupBanner.id = 'coldstart-banner';
+      warmupBanner.style.cssText = [
+        'position:fixed', 'bottom:20px', 'left:50%', 'transform:translateX(-50%)',
+        'background:#1565C0', 'color:white', 'padding:12px 24px', 'border-radius:8px',
+        'font-size:14px', 'z-index:9999', 'box-shadow:0 4px 12px rgba(0,0,0,0.3)',
+        'display:flex', 'align-items:center', 'gap:10px', 'font-family:sans-serif',
+        'max-width:90vw', 'text-align:center'
+      ].join(';');
+      warmupBanner.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Conectando con el servidor — puede tardar hasta 60 segundos en el primer acceso del día...</span>';
+      document.body.appendChild(warmupBanner);
+    }, 3000);
+
     try {
       const response = await fetch(url, { credentials: 'include', ...options });
 
@@ -1475,6 +1494,12 @@ class APIManager {
       if (error instanceof ApiError) throw error;
       this._enableMockMode(error);
       throw error;
+    } finally {
+      // Limpiar siempre el timer y el banner del cold start
+      clearTimeout(warmupTimer);
+      if (warmupBanner && warmupBanner.parentNode) warmupBanner.remove();
+      const existing = document.getElementById('coldstart-banner');
+      if (existing) existing.remove();
     }
   }
 

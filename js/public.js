@@ -291,7 +291,7 @@
   // ─────────────────────────────────────────
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').then(reg => {
+      navigator.serviceWorker.register('./sw.js', { scope: './' }).then(reg => {
         console.log('[PWA Público] Service Worker registrado:', reg.scope);
       }).catch(err => {
         console.warn('[PWA Público] Fallo al registrar:', err);
@@ -314,6 +314,19 @@
     try {
       const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
       const baseApi = window.api ? window.api.baseURL : (isLocal ? 'http://localhost:3000/api' : 'https://sicag-api.onrender.com/api');
+
+      // Cargar nombres de consejos comunales dinámicamente
+      let nombresConsejoCache = {};
+      try {
+        const resCC = await fetch(`${baseApi}/consejos`); // Ojo: SystemController expone getConsejos
+        if (resCC.ok) {
+          const consejos = await resCC.json();
+          consejos.forEach(c => { nombresConsejoCache[c.id] = c.nombre_comunidad; });
+          window.nombresConsejoCache = nombresConsejoCache;
+        }
+      } catch (e) {
+        window.nombresConsejoCache = { 1: 'C.C. Jobito I', 2: 'C.C. Jobito II', 3: 'C.C. Jobito III', 10: 'Para toda la Comuna' };
+      }
 
       // 1. Proyectos públicos
       try {
@@ -437,12 +450,7 @@
      const esDestacado = p.destacado === true || p.destacado === 1 ||
                          p.is_featured === true || p.is_featured === 1;
 
-     const nombresConsejo = {
-       1: 'C.C. Jobito I',
-       2: 'C.C. Jobito II',
-       3: 'C.C. Jobito III',
-       10: 'Para toda la Comuna'
-     };
+     const nombresConsejo = window.nombresConsejoCache || { 10: 'Para toda la Comuna' };
      const nombreConsejo = nombresConsejo[p.id_comunidad] || p.consejo_comunal || p.consejo || 'Sector General';
 
      let badgeColor = 'rgba(21,101,192,.1)';
@@ -619,7 +627,7 @@
     }
   });
 
-  window.abrirModalDetalle = function(id, tipo) {
+  window.abrirModalDetalle = async function(id, tipo) {
     const titleEl = document.getElementById('modalDetalleTitle');
     const infoEl = document.getElementById('modalDetalleInfo');
     const descEl = document.getElementById('modalDetalleDesc');
@@ -634,7 +642,30 @@
     let item = null;
     if (tipo === 'proyecto') {
       item = todosLosProyectos.find(p => String(p.id) === String(id));
-      if (!item) return;
+      
+      if (!item) {
+        try {
+          const baseApi = window.api?.baseURL || 'https://sicag-api.onrender.com/api';
+          const res = await fetch(`${baseApi}/proyectos/publico`);
+          if (res.ok) {
+            const proyectosFrescos = await res.json();
+            todosLosProyectos = proyectosFrescos;
+            item = proyectosFrescos.find(p => String(p.id) === String(id));
+          }
+        } catch (e) {
+          console.warn('Error cargando proyecto por ID:', e);
+        }
+      }
+
+      if (!item) {
+        if (titleEl) titleEl.textContent = 'Proyecto no disponible';
+        if (descEl) descEl.innerHTML = '<p style="color:var(--muted)">No se pudo cargar la información de este proyecto. Por favor recarga la página.</p>';
+        modalDetalleOverlay.setAttribute('aria-hidden', 'false');
+        modalDetalleOverlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        return;
+      }
+      
       titleEl.textContent = item.titulo || item.nombre_proyecto || 'Proyecto sin título';
 
       if (imgEl && item.imagen_portada) {
@@ -646,12 +677,7 @@
          imgEl.style.borderBottom = '4px solid var(--vp)';
       }
       
-      const nombresConsejo = {
-        1: 'C.C. Jobito I',
-        2: 'C.C. Jobito II',
-        3: 'C.C. Jobito III',
-        10: 'Para toda la Comuna'
-      };
+      const nombresConsejo = window.nombresConsejoCache || { 10: 'Para toda la Comuna' };
       const nombreConsejo = nombresConsejo[item.id_comunidad] || item.consejo_comunal || item.consejo || 'Sector General';
 
       const estadoRaw = (item.estado || 'propuesto').toLowerCase();

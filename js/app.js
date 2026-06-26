@@ -10,16 +10,18 @@ window.produccionService = produccionService;
 window.gruposService = gruposService;
 window.censoService = censoService;
 
-authService.onAuthChange(user => {
-  if (user) {
-    console.log('Firebase authenticated user:', user.uid);
-    if (window.Components && Components.applyCommunityScope) {
-      Components.applyCommunityScope();
-    }
-  } else {
-    console.log('Firebase session closed.');
-  }
-});
+// Firebase Auth no es el sistema principal de login.
+// Comentado para evitar confusiones en consola:
+// authService.onAuthChange(user => {
+//   if (user) {
+//     console.log('Firebase authenticated user:', user.uid);
+//     if (window.Components && Components.applyCommunityScope) {
+//       Components.applyCommunityScope();
+//     }
+//   } else {
+//     console.log('Firebase session closed.');
+//   }
+// });
 
 /**
  * ============================================================
@@ -259,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // ---- REGISTRO DEL SERVICE WORKER (PWA - MODO OFFLINE) ----
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
         .then((registration) => {
           console.log('[PWA] Service Worker registrado con éxito. Scope:', registration.scope);
         })

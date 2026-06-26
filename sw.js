@@ -13,7 +13,7 @@
  */
 
 // ── VERSIONES DE CACHÉ ──────────────────────────────────────────────────────
-const CORE_CACHE   = 'sicag-core-v3.7';
+const CORE_CACHE   = 'sicag-core-v3.8';
 const CDN_CACHE    = 'sicag-cdn-v3';
 const API_CACHE    = 'sicag-api-v3';
 const TODOS_LOS_CACHES = [CORE_CACHE, CDN_CACHE, API_CACHE];
@@ -90,14 +90,15 @@ const PRECACHE_CORE = [
   '/data/seed.json',
 
   // ── Imágenes (todas) ──
-  '/assets/img/logo_comuna_fondoremovido.png',
-  '/assets/img/hero_banner.png',
-  '/assets/img/proyecto_cacao.png',
-  '/assets/img/proyecto_cafe.png',
-  '/assets/img/proyecto_frutales.png',
-  '/assets/img/proyecto_hortalizas.png',
-  '/assets/img/proyecto_maiz.png',
-  '/assets/img/proyecto_siembra.png',
+  // ── Imágenes WebP Optimizadas ──
+  '/assets/img/logo_comuna_fondoremovido.webp',
+  '/assets/img/hero_banner.webp',
+  '/assets/img/proyecto_cacao.webp',
+  '/assets/img/proyecto_cafe.webp',
+  '/assets/img/proyecto_frutales.webp',
+  '/assets/img/proyecto_hortalizas.webp',
+  '/assets/img/proyecto_maiz.webp',
+  '/assets/img/proyecto_siembra.webp',
 
   // ── Datos GeoJSON ──
   '/venezuela.geojson',

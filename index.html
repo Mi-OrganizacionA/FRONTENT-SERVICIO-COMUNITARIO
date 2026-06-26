@@ -31,7 +31,8 @@
     rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link href="css/public.css" rel="stylesheet">
-  <link rel="preload" href="assets/img/hero_banner.png" as="image">
+  <link rel="preload" href="assets/img/hero_banner.webp" as="image" type="image/webp">
+  <link rel="preload" href="assets/img/hero_banner.png" as="image" media="not all and (min-width:0px)">
 </head>
 
 <body class="public-page">
@@ -131,7 +132,20 @@
 
     <script>
       (function () {
-        const images = ['assets/img/hero_banner.png', 'assets/img/proyecto_siembra.png', 'assets/img/proyecto_maiz.png', 'assets/img/proyecto_hortalizas.png'];
+        // Detección de soporte WebP para fallback a PNG en navegadores antiguos
+        const supportsWebP = (() => {
+          const el = document.createElement('canvas');
+          return el.getContext && el.getContext('2d')
+            ? el.toDataURL('image/webp').indexOf('data:image/webp') === 0
+            : false;
+        })();
+        const ext = supportsWebP ? 'webp' : 'png';
+        const images = [
+          `assets/img/hero_banner.${ext}`,
+          `assets/img/proyecto_siembra.${ext}`,
+          `assets/img/proyecto_maiz.${ext}`,
+          `assets/img/proyecto_hortalizas.${ext}`,
+        ];
         let idx = 0;
         const heroBg = document.getElementById('heroBg');
         const dots = () => Array.from(document.querySelectorAll('.hero-dot'));
