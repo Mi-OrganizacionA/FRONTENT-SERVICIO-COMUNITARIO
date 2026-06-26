@@ -310,6 +310,18 @@
               </label>
             </div>
 
+            <div class="switch-container" style="border-left: 4px solid var(--vv);">
+              <div class="switch-info">
+                <h4>Censo Comunitario Abierto</h4>
+                <p>Permite el registro de nuevos habitantes. Si se desactiva, los voceros no podrán crear ni modificar registros del censo.</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="toggleCensoAbierto"
+                  onchange="toggleSetting('Censo', this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+
           </div>
         </section>
 
@@ -386,67 +398,72 @@
   <!-- js/voceros.js eliminado: no se necesita en configuración -->
   
   <script>
-    // Lógica para Switches de Configuración
-    document.addEventListener('DOMContentLoaded', () => {
-      // Mapeo de IDs de checkbox a claves de localStorage
-      const configs = {
-        'toggleAutoGlobal': 'sicag_auto_global',
-        'toggleAutoHabitantes': 'sicag_auto_habitantes',
-        'toggleAutoNoticias': 'sicag_auto_noticias',
-        'toggleAutoProyectos': 'sicag_auto_proyectos',
-        'toggleAutoOrganizaciones': 'sicag_auto_organizaciones',
-        'toggleAutoProduccion': 'sicag_auto_produccion_agricola'
-      };
+    // Mapeo de claves del backend a IDs de checkbox en la UI
+    const CONFIG_MAP = {
+      'Aprobación Automática Global': 'toggleAutoGlobal',
+      'Aprobación Automática Habitantes': 'toggleAutoHabitantes',
+      'Aprobación Automática Noticias': 'toggleAutoNoticias',
+      'Aprobación Automática Proyectos': 'toggleAutoProyectos',
+      'Aprobación Automática Organizaciones': 'toggleAutoOrganizaciones',
+      'Aprobación Automática Producción': 'toggleAutoProduccion',
+      'Censo': 'toggleCensoAbierto'
+    };
 
-      // Cargar estados
-      Object.keys(configs).forEach(id => {
-        const checkbox = document.getElementById(id);
-        if (checkbox) {
-          const val = localStorage.getItem(configs[id]);
-          // Por defecto false, a menos que sea explicitly 'true'
-          checkbox.checked = val === 'true';
-        }
-      });
+    // Cargar configuraciones desde el BACKEND (no localStorage) al inicializar
+    async function cargarConfigDesdeBackend() {
+      if (!window.api || window.api.isDevelopment) return;
+      try {
+        const res = await fetch(`${window.api.baseURL}/system/config`, window.api._getHeaders());
+        if (!res.ok) return;
+        const data = await res.json();
+        const config = data.config || {};
+
+        // Aplicar el estado de cada switch según la BD
+        Object.keys(CONFIG_MAP).forEach(clave => {
+          const checkboxId = CONFIG_MAP[clave];
+          const checkbox = document.getElementById(checkboxId);
+          if (checkbox && config[clave] !== undefined) {
+            checkbox.checked = config[clave] === true || config[clave] === 'true';
+          }
+        });
+
+        console.info('[Configuración] Estado cargado desde el backend.');
+      } catch (e) {
+        console.warn('[Configuración] No se pudo cargar desde el backend, sin cambios:', e.message);
+      }
+    }
+
+    // Inicializar cuando el DOM y la API estén listos
+    document.addEventListener('DOMContentLoaded', () => {
+      // Pequeño delay para que window.api se inicialice
+      setTimeout(cargarConfigDesdeBackend, 300);
     });
 
     let pendingGlobalActivation = false;
 
     function toggleSetting(nombre, activado, esGlobal = false) {
-      const nombreMap = {
-        'Aprobación Automática Global': 'sicag_auto_global',
-        'Aprobación Automática Habitantes': 'sicag_auto_habitantes',
-        'Aprobación Automática Noticias': 'sicag_auto_noticias',
-        'Aprobación Automática Proyectos': 'sicag_auto_proyectos',
-        'Aprobación Automática Organizaciones': 'sicag_auto_organizaciones',
-        'Aprobación Automática Producción': 'sicag_auto_produccion_agricola'
-      };
-      
-      const clave = nombreMap[nombre];
-      
       if (esGlobal) {
         if (activado) {
-          // Prevenir activación inmediata, abrir modal
+          // Prevenir activación inmediata del control global, pedir contraseña
           document.getElementById('toggleAutoGlobal').checked = false;
           pendingGlobalActivation = true;
           document.getElementById('passwordModal').style.display = 'flex';
         } else {
-          localStorage.setItem(clave, 'false');
           syncConfigWithBackend(nombre, 'false');
-          
+
           // Apagar TODOS los submódulos automáticamente
           const switches = [
-            { id: 'toggleAutoHabitantes', name: 'Aprobación Automática Habitantes', clave: 'sicag_auto_habitantes' },
-            { id: 'toggleAutoNoticias', name: 'Aprobación Automática Noticias', clave: 'sicag_auto_noticias' },
-            { id: 'toggleAutoProyectos', name: 'Aprobación Automática Proyectos', clave: 'sicag_auto_proyectos' },
-            { id: 'toggleAutoOrganizaciones', name: 'Aprobación Automática Organizaciones', clave: 'sicag_auto_organizaciones' },
-            { id: 'toggleAutoProduccion', name: 'Aprobación Automática Producción', clave: 'sicag_auto_produccion_agricola' }
+            { id: 'toggleAutoHabitantes', name: 'Aprobación Automática Habitantes' },
+            { id: 'toggleAutoNoticias', name: 'Aprobación Automática Noticias' },
+            { id: 'toggleAutoProyectos', name: 'Aprobación Automática Proyectos' },
+            { id: 'toggleAutoOrganizaciones', name: 'Aprobación Automática Organizaciones' },
+            { id: 'toggleAutoProduccion', name: 'Aprobación Automática Producción' }
           ];
 
           switches.forEach(s => {
             const el = document.getElementById(s.id);
             if (el && el.checked) {
               el.checked = false;
-              localStorage.setItem(s.clave, 'false');
               syncConfigWithBackend(s.name, 'false');
             }
           });
@@ -455,16 +472,14 @@
         }
       } else {
         const estado = activado ? 'ACTIVADA' : 'DESACTIVADA';
-        localStorage.setItem(clave, activado ? 'true' : 'false');
         syncConfigWithBackend(nombre, activado ? 'true' : 'false');
         Components.showToast(`Política de ${nombre}: ${estado}`, activado ? 'success' : 'info');
 
-        // Si apagan uno individual, se debe apagar el maestro
+        // Si apagan uno individual, también apagar el maestro
         if (!activado) {
           const maestro = document.getElementById('toggleAutoGlobal');
           if (maestro && maestro.checked) {
             maestro.checked = false;
-            localStorage.setItem('sicag_auto_global', 'false');
             syncConfigWithBackend('Aprobación Automática Global', 'false');
             Components.showToast('El interruptor Global se ha apagado porque un submódulo fue desactivado.', 'info');
           }
@@ -484,19 +499,29 @@
         Components.showToast('Debes ingresar la contraseña.', 'error');
         return;
       }
-      
+
       try {
-        // Verificar la contraseña con la API (si existe el método)
-        await window.api.verifyPassword(pass);
-        
-        // Contraseña correcta
+        // Verificar la contraseña de administrador con la API
+        const baseURL = window.api?.baseURL || 'https://sicag-api.onrender.com/api';
+        const token = window.auth?.getToken() || '';
+        const verifyRes = await fetch(`${baseURL}/auth/verify-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          credentials: 'include',
+          body: JSON.stringify({ password: pass })
+        });
+        const verifyData = await verifyRes.json().catch(() => ({}));
+        if (!verifyRes.ok || !verifyData.success) {
+          Components.showToast('Contraseña incorrecta.', 'error');
+          return;
+        }
+
+        // Contraseña correcta: activar el global
         cerrarPasswordModal();
-        
-        // Activar el global
+
         document.getElementById('toggleAutoGlobal').checked = true;
-        localStorage.setItem('sicag_auto_global', 'true');
         await syncConfigWithBackend('Aprobación Automática Global', 'true');
-        
+
         // Encender TODOS los submódulos automáticamente
         const switches = [
           { id: 'toggleAutoHabitantes', name: 'Aprobación Automática Habitantes' },
@@ -506,33 +531,36 @@
           { id: 'toggleAutoProduccion', name: 'Aprobación Automática Producción' }
         ];
 
-        switches.forEach(s => {
+        for (const s of switches) {
           const el = document.getElementById(s.id);
           if (el && !el.checked) {
             el.checked = true;
-            toggleSetting(s.name, true, false); // No es global
+            await syncConfigWithBackend(s.name, 'true');
           }
-        });
+        }
 
         Components.showToast('Aprobación Automática Global ACTIVADA con éxito.', 'warning');
 
       } catch (err) {
-        Components.showToast('Contraseña incorrecta.', 'error');
+        Components.showToast('Error al verificar la contraseña.', 'error');
+        console.error(err);
       }
     }
 
-
+    // Persiste la configuración en el BACKEND (base de datos real)
     async function syncConfigWithBackend(nombreClaveOriginal, valor) {
       if (window.api && !window.api.isDevelopment) {
         try {
-           const response = await fetch(`${window.api.baseURL}/system/config`, {
-             method: 'POST',
-             ...window.api._getHeaders(),
-             body: JSON.stringify({ nombre: nombreClaveOriginal, estado: valor === 'true' })
-           });
-           // Ignoramos el error si no existe la ruta en el backend por ahora
+          const response = await fetch(`${window.api.baseURL}/system/config`, {
+            method: 'POST',
+            ...window.api._getHeaders(),
+            body: JSON.stringify({ nombre: nombreClaveOriginal, estado: valor === 'true' })
+          });
+          if (!response.ok) {
+            console.warn('[Configuración] Error al guardar en el backend:', response.status);
+          }
         } catch(e) {
-           console.warn('Backend endpoint no listo', e);
+          console.warn('[Configuración] Backend no disponible para guardar config:', e.message);
         }
       }
     }

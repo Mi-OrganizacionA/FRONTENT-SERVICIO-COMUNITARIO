@@ -1620,7 +1620,7 @@ class APIManager {
     // Filtro automático para vocero
     const user = window.auth ? window.auth.getUser() : null;
     if (user && user.rol && user.rol.toLowerCase() === 'vocero' && user.id_comunidad_asignada) {
-       filtros.consejoId = user.id_comunidad_asignada;
+       filtros.consejo_id = user.id_comunidad_asignada;
     }
 
     const params = new URLSearchParams(filtros);

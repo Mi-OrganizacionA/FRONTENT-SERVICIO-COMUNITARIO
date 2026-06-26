@@ -6,7 +6,14 @@ let ProyectoModel = null;
 class ProyectosController {
   static async getPublicos(req, res) {
     try {
-      const proyectos = await ProyectosService.list(ProyectoModel, {});
+      const { Op } = require('sequelize');
+      // Solo mostrar proyectos que NO estén rechazados en el portal público
+      const proyectos = await ProyectoModel.findAll({
+        where: {
+          estado: { [Op.notIn]: ['rechazado'] },
+        },
+        order: [['fecha_creacion', 'DESC']],
+      });
       res.json(proyectos);
     } catch (error) {
       logger.error('Error obteniendo proyectos publicos:', error);
@@ -17,7 +24,12 @@ class ProyectosController {
   static async getAll(req, res) {
     try {
       const filtros = {};
-      if (req.query.consejo_id) filtros.consejo_comunal_id = req.query.consejo_id;
+      // El campo real en la tabla proyectos es id_comunidad (no consejo_comunal_id)
+      if (req.query.consejo_id) filtros.id_comunidad = parseInt(req.query.consejo_id);
+      // Si es vocero, forzar filtro a su comunidad asignada (aislamiento de datos)
+      if (req.user?.rol === 'vocero' && req.user.id_comunidad_asignada) {
+        filtros.id_comunidad = req.user.id_comunidad_asignada;
+      }
       const proyectos = await ProyectosService.list(ProyectoModel, filtros);
       res.json(proyectos);
     } catch (error) {

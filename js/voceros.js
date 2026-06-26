@@ -128,7 +128,8 @@
 
   const eliminarVoceroAPI = async (id) => {
     if (window.api) return await window.api.eliminarVocero(id);
-    const baseURL = 'https://sicag-api.onrender.com/api';
+    // Fallback con URL dinámica (NO hardcodeada) si window.api no está disponible
+    const baseURL = window.api?.baseURL || 'https://sicag-api.onrender.com/api';
     const token = window.auth?.getToken() || '';
     const res = await fetch(`${baseURL}/voceros/${id}`, {
       method: 'DELETE',

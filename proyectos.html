@@ -1274,7 +1274,7 @@
       if (isVocero && currentUser) {
         if (!id) {
           // Si es nuevo, preseleccionar su comunidad
-          selectConsejo.value = currentUser.id_comunidad || '';
+          selectConsejo.value = currentUser.id_comunidad_asignada || '';
         }
         // Siempre deshabilitado para vocero
         selectConsejo.disabled = true;
@@ -1313,7 +1313,7 @@
       const desc = document.getElementById('projDescripcion').value.trim();
       const estado = document.getElementById('projEstado').value;
       const selectConsejo = document.getElementById('projConsejo');
-      const consejo = selectConsejo.value || (selectConsejo.disabled && window.auth.getUser() ? window.auth.getUser().id_comunidad : '');
+      const consejo = selectConsejo.value || (selectConsejo.disabled && window.auth.getUser() ? window.auth.getUser().id_comunidad_asignada : '');
 
       if (!titulo || !desc || !estado || !consejo) {
         if (window.Components) Components.showToast('Completa los campos obligatorios.', 'error');

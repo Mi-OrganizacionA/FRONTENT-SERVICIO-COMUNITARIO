@@ -8,6 +8,10 @@ class ReportesController {
     try {
       const filtros = {};
       if (req.query.consejo_id) filtros.consejo_comunal_id = req.query.consejo_id;
+      // Si es vocero, forzar filtro a su comunidad asignada (aislamiento de datos)
+      if (req.user?.rol === 'vocero' && req.user.id_comunidad_asignada) {
+        filtros.consejo_comunal_id = req.user.id_comunidad_asignada;
+      }
       const reportes = await ReportesService.list(ReporteModel, filtros);
       res.json(reportes);
     } catch (error) {

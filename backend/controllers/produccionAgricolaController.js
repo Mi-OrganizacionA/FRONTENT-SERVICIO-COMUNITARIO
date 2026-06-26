@@ -21,6 +21,13 @@ class ProduccionAgricolaController {
       if (id_habitante) where.id_habitante = id_habitante;
       if (tipo_cultivo) where.tipo_cultivo = tipo_cultivo;
 
+      // Si es vocero, filtrar solo producciones de su consejo comunal (aislamiento de datos)
+      if (req.user?.rol === 'vocero' && req.user.id_comunidad_asignada) {
+        where.consejo_comunal_id = req.user.id_comunidad_asignada;
+      } else if (consejo_comunal_id) {
+        where.consejo_comunal_id = consejo_comunal_id;
+      }
+
       const producciones = await ProduccionAgricolaModel.findAll({
         where,
         order: [['fecha_registro', 'DESC']],

@@ -14,6 +14,10 @@ class OrganizacionesController {
       const { tipo_organizacion } = req.query;
       const where = {};
       if (tipo_organizacion) where.tipo_organizacion = tipo_organizacion;
+      // Si es vocero, filtrar solo su comunidad asignada (aislamiento de datos)
+      if (req.user?.rol === 'vocero' && req.user.id_comunidad_asignada) {
+        where.id_comunidad = req.user.id_comunidad_asignada;
+      }
       const data = await OrganizacionSocial.findAll({ where });
       res.json(data);
     } catch (error) { next(error); }

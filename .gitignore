@@ -8,3 +8,28 @@ database.sqlite
 .firebase/
 # Cache de Puppeteer (Chrome binarios > 100MB)
 backend/.cache/
+# Archivos SQLite de desarrollo (contienen datos reales)
+*.sqlite
+sicag.sqlite
+# Scripts de diagnóstico y depuración temporal
+scratch_*.js
+debug_*.js
+check_*.js
+fix.js
+fix_index.js
+borrar_*.js
+truncate_*.js
+enable_*.js
+list_*.js
+count_*.js
+test_diff.js
+test_monica.js
+# Archivos de análisis y diff
+changes_review.diff
+diff_*.txt
+# Archivos de exportación de prueba
+test_*.xlsx
+test_*.zip
+test_render_extracted/
+# Archivos de base de datos locales
+selects.json

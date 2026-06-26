@@ -1,5 +1,12 @@
 require('dotenv').config();
 
+// Validación de seguridad: impedir que el servidor arranque en producción sin JWT_SECRET configurado
+if (process.env.NODE_ENV === 'production' && (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'secret')) {
+  console.error('FATAL: JWT_SECRET no está configurado en producción o usa el valor por defecto inseguro.');
+  console.error('Configura la variable de entorno JWT_SECRET en Render.com con un valor aleatorio de 48+ bytes.');
+  process.exit(1);
+}
+
 const allowedOrigins = [
   'https://sicag-oficial.web.app',
   ...(process.env.ALLOWED_ORIGINS || process.env.FRONTEND_URL || 'http://localhost:8080')
@@ -25,7 +32,7 @@ module.exports = {
   },
 
   jwt: {
-    secret: process.env.JWT_SECRET || 'secret',
+    secret: process.env.JWT_SECRET || 'dev_secret_inseguro_cambiar_en_produccion',
     refresh_secret: process.env.JWT_REFRESH_SECRET || 'refresh_secret',
     expire: process.env.JWT_EXPIRE || '24h',
     refresh_expire: process.env.JWT_REFRESH_EXPIRE || '7d'
