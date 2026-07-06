@@ -41,6 +41,15 @@ class APIManager {
       this._mostrarBannerOnline();
       this.flushPendingPasos();
       this.flushColaUniversal();
+
+      // ── Validar que la sesión sigue siendo válida en el servidor ─────────────
+      // Si el admin cambió la contraseña del vocero mientras estaba offline,
+      // el refresh devolverá 401 y el vocero será redirigido al login.
+      if (window.auth && typeof window.auth._validarSesionConServidor === 'function') {
+        window.auth._sessionValidada = false; // Forzar re-validación al reconectar
+        window.auth._validarSesionConServidor();
+      }
+      // ────────────────────────────────────────────────────────────────────────
     });
     window.addEventListener('offline', () => this._mostrarBannerOffline());
     // Flush inicial de pendientes al cargar

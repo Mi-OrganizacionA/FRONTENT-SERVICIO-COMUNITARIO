@@ -7,7 +7,7 @@
   <meta name="description"
     content="Panel de control principal — Sistema de Información Comunal Agroecológica SICAG, Comuna Socialista Agroecológica Simón Rodríguez.">
   <title>Dashboard — SICAG v2.5</title>
-  <link rel="manifest" href="/manifest.json">
+  <link rel="manifest" href="/manifest-sistema.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -70,6 +70,9 @@
           </div>
         </div>
         <div style="display:flex;gap:.6rem;align-self:center;flex-wrap:wrap">
+          <button id="btnInstalarAppDash" style="display:none;background:#43A047;color:#fff;border:1.5px solid rgba(255,255,255,.3);" class="ph-btn" onclick="window.sicagInstalarApp()">
+            <i class="fas fa-mobile-alt"></i> Instalar App del Sistema
+          </button>
           <button onclick="window.generarReporteGeneral()" class="ph-btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)">
             <i class="fas fa-file-pdf"></i> Generar Reporte General
           </button>

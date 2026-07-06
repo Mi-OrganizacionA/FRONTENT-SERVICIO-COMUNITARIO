@@ -282,3 +282,36 @@ document.addEventListener('DOMContentLoaded', function () {
     window.deferredPrompt = e;
     console.log('[PWA] El evento beforeinstallprompt fue capturado. Listo para instalar.');
   });
+
+  window.sicagInstalarApp = async () => {
+    if (!window.deferredPrompt) {
+      alert('La app ya está instalada o tu navegador no soporta esta función.');
+      return;
+    }
+    window.deferredPrompt.prompt();
+    const { outcome } = await window.deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      const btns = document.querySelectorAll('#btnInstalarApp, #btnInstalarAppDash');
+      btns.forEach(btn => { btn.style.display = 'none'; });
+
+      // Detectar desde qué página se instaló
+      const esAppSistema = document.querySelector('link[rel="manifest"][href*="sistema"]') !== null;
+      
+      if (esAppSistema && window.auth && window.auth.isAuthenticated()) {
+        // Instalando la app del sistema → cachear módulos privados
+        const user = window.auth.getUser();
+        const rol = user?.rol || '';
+        if ((rol === 'admin' || rol === 'vocero') && 'serviceWorker' in navigator) {
+          navigator.serviceWorker.ready.then(registration => {
+            registration.active?.postMessage({
+              tipo: 'CACHEAR_MODULOS_PRIVADOS',
+              payload: { rol }
+            });
+          }).catch(() => {});
+        }
+      }
+      // Si es la app pública, no cachear módulos privados
+    }
+    window.deferredPrompt = null;
+  };

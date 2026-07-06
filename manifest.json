@@ -1,6 +1,7 @@
 {
+  "id": "/sicag-portal",
   "name": "SICAG — Comuna Socialista Agroecológica Simón Rodríguez",
-  "short_name": "SICAG",
+  "short_name": "SICAG Portal",
   "description": "Sistema de Información Comunal Agroecológica. Gestión digital de habitantes, proyectos y consejos comunales del sector Las Mercedes, San Felipe, Yaracuy, Venezuela.",
   "start_url": "/index.html",
   "scope": "/",

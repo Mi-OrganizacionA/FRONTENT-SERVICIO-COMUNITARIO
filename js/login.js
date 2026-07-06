@@ -57,6 +57,24 @@ class LoginController {
       this.setLoading(true);
       await window.auth.login(usuario, password);
       this.mostrarExito('¡BIENVENIDO!');
+      
+      // Verificar si el usuario está usando la app pública instalada
+      // y debería instalar la app del sistema para una mejor experiencia
+      const esAppPublicaInstalada = window.matchMedia('(display-mode: standalone)').matches
+        && !document.querySelector('link[rel="manifest"][href*="sistema"]');
+
+      if (esAppPublicaInstalada) {
+        // Mostrar mensaje suave (no bloquear el flujo)
+        setTimeout(() => {
+          if (window.Components?.showToast) {
+            Components.showToast(
+              '💡 Para una mejor experiencia offline, instala también la "App del Sistema" desde el dashboard.',
+              'info'
+            );
+          }
+        }, 1500); // Mostrar después de la redirección
+      }
+
       setTimeout(() => {
         window.location.href = 'dashboard.html';
       }, 900);

@@ -10,11 +10,21 @@
  */
 class AuthManager {
   constructor() {
-    // Al usar file:// no podemos depender de cookies, guardamos token en sessionStorage
+    // Token en sessionStorage (se pierde al cerrar el navegador — intencional para seguridad)
+    // NOTA: auth.js usa file:// también por eso guarda token en sessionStorage
     this.token = sessionStorage.getItem('sicag_token') || null;
-    // Datos del usuario (sin secretos) se restauran desde sessionStorage al recargar
+    
+    // Usuario: primero intentar sessionStorage, luego IndexedDB (persistente offline)
     this.user = this._parseUser(sessionStorage.getItem('sicag_user'));
     this.observers = [];
+    this._sessionValidada = false; // Flag para saber si ya validamos contra el servidor
+    
+    // Si no hay usuario en sessionStorage pero sí en IndexedDB, cargarlo
+    // (esto permite entrar al sistema aunque se haya cerrado el navegador)
+    if (!this.user) {
+      this._cargarSesionDesdeIndexedDB(); // async, no bloquea el constructor
+    }
+    
     this._escucharCambiosPestana();
   }
 
@@ -51,6 +61,10 @@ class AuthManager {
       // (se usa una clave sin el token para no exponerlo)
       localStorage.setItem('sicag_sesion_activa', Date.now().toString());
 
+      // Guardar en IndexedDB para persistencia offline
+      this._guardarSesionEnIndexedDB(data.usuario).catch(() => {});
+      this._sessionValidada = true; // Acabamos de autenticarnos, no necesita re-validar
+
       this._notifyObservers({ tipo: 'login', usuario: data.usuario });
       return data.usuario;
     } catch (error) {
@@ -60,6 +74,10 @@ class AuthManager {
   }
 
   logout(silencioso = false) {
+    // Limpiar la sesión de IndexedDB al hacer logout
+    this._limpiarSesionDeIndexedDB().catch(() => {});
+    this._sessionValidada = false;
+
     this.token = null;
     this.user = null;
     sessionStorage.removeItem('sicag_token');
@@ -102,6 +120,20 @@ class AuthManager {
       // Guardar nuevo token en sessionStorage
       this.token = data.token;
       sessionStorage.setItem('sicag_token', data.token);
+
+      // Si el servidor devuelve datos frescos del usuario, actualizar IndexedDB
+      // NOTA: El backend actual /auth/refresh solo devuelve {token}. Si a futuro
+      // devuelve {token, usuario}, esto se activará automáticamente.
+      if (data.usuario) {
+        this.user = data.usuario;
+        sessionStorage.setItem('sicag_user', JSON.stringify(data.usuario));
+        this._guardarSesionEnIndexedDB(data.usuario).catch(() => {});
+      } else if (this.user) {
+        // Si el servidor no devuelve usuario fresco, re-guardar el usuario actual
+        // (para actualizar el timestamp _guardadoEn y extender los 7 días)
+        this._guardarSesionEnIndexedDB(this.user).catch(() => {});
+      }
+      this._sessionValidada = true;
       return data.token;
     } catch (error) {
       console.warn('Error al intentar refresh del token:', error);
@@ -113,15 +145,30 @@ class AuthManager {
   // VERIFICACIÓN Y PERMISOS
   // ─────────────────────────────────────────
   isAuthenticated() {
-    // El token vive en memoria: si está presente, hay sesión activa
-    // Si se recargó la página, el token se perdió de memoria pero hay datos de usuario
-    // en sessionStorage; en ese caso, se intentará hacer refresh automático al primer request
+    // 1. Si hay usuario en memoria, está autenticado
+    if (this.user) return true;
+    
+    // 2. Intentar recuperar de sessionStorage (recarga de página en la misma sesión)
     const userStr = sessionStorage.getItem('sicag_user');
-    if (userStr && !this.user) {
+    if (userStr) {
       this.user = this._parseUser(userStr);
+      if (this.user) return true;
     }
-    // Se considera autenticado si hay datos de usuario (el token se renovará automáticamente)
-    return !!this.user;
+    
+    // 3. Si hay señal de sesión activa en localStorage pero no tenemos usuario,
+    //    puede ser que el usuario cerró el navegador pero IndexedDB tiene su sesión.
+    //    _cargarSesionDesdeIndexedDB() ya fue llamado en el constructor y es async.
+    //    En este punto devolvemos false pero la carga async puede actualizar this.user
+    //    antes de que el módulo protegido termine de inicializarse.
+    const sesionActiva = localStorage.getItem('sicag_sesion_activa');
+    if (sesionActiva) {
+      // Hay señal de sesión activa, pero los datos aún no cargaron de IndexedDB.
+      // Devolver true provisionalmente y dejar que _cargarSesionDesdeIndexedDB termine.
+      // roles.js verificará de nuevo cuando this.user esté disponible.
+      return true; // provisional — se confirma cuando IndexedDB termina de cargar
+    }
+    
+    return false;
   }
 
   hasRole(role) {
@@ -186,6 +233,137 @@ class AuthManager {
     } catch {
       return null;
     }
+  }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PERSISTENCIA DE SESIÓN EN INDEXEDDB (para modo offline)
+// ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Guarda los datos del usuario en IndexedDB.
+   * Se llama después de un login exitoso o de un refresh exitoso.
+   * NO guarda el token JWT (ese sigue siendo solo sessionStorage por seguridad).
+   */
+  async _guardarSesionEnIndexedDB(usuario) {
+    try {
+      if (typeof window.SicagDB === 'undefined') return;
+      await window.SicagDB.guardarMeta('sesion_usuario', {
+        ...usuario,
+        _guardadoEn: Date.now()
+      });
+    } catch (e) {
+      console.warn('[Auth] No se pudo guardar sesión en IndexedDB:', e.message);
+    }
+  }
+
+  /**
+   * Carga la sesión desde IndexedDB cuando sessionStorage está vacío.
+   * Esto ocurre cuando el usuario cerró el navegador pero vuelve offline.
+   */
+  async _cargarSesionDesdeIndexedDB() {
+    try {
+      if (typeof window.SicagDB === 'undefined') return;
+      
+      const sesionGuardada = await window.SicagDB.obtenerMeta('sesion_usuario');
+      if (!sesionGuardada) return;
+      
+      // Verificar que la sesión no sea demasiado vieja (máximo 7 días = vida del refresh token)
+      const SIETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000;
+      if (Date.now() - sesionGuardada._guardadoEn > SIETE_DIAS_MS) {
+        // Sesión expirada — limpiar y no cargar
+        await this._limpiarSesionDeIndexedDB();
+        return;
+      }
+      
+      // Cargar el usuario en memoria
+      const { _guardadoEn, ...usuarioLimpio } = sesionGuardada;
+      this.user = usuarioLimpio;
+      
+      // También guardarlo en sessionStorage para la pestaña actual
+      sessionStorage.setItem('sicag_user', JSON.stringify(usuarioLimpio));
+      
+      console.info('[Auth] Sesión restaurada desde IndexedDB (modo offline).');
+      this._notifyObservers({ tipo: 'sesion_restaurada', usuario: usuarioLimpio });
+      
+      // Intentar validar la sesión contra el servidor (en segundo plano, sin bloquear)
+      // Si hay red, esto verificará que la contraseña no haya sido cambiada
+      this._validarSesionConServidor();
+      
+    } catch (e) {
+      console.warn('[Auth] No se pudo cargar sesión desde IndexedDB:', e.message);
+    }
+  }
+
+  /**
+   * Intenta validar la sesión contra el servidor cuando hay red disponible.
+   * Si el servidor dice que la sesión es inválida (401), fuerza el logout.
+   * Si no hay red, espera silenciosamente hasta que regrese la conexión.
+   */
+  async _validarSesionConServidor() {
+    if (this._sessionValidada) return; // Solo validar una vez por sesión de navegador
+    
+    // Si no hay internet ahora, esperar al evento 'online'
+    if (!navigator.onLine) {
+      window.addEventListener('online', () => {
+        this._validarSesionConServidor();
+      }, { once: true });
+      return;
+    }
+    
+    try {
+      const baseURL = window.API_BASE_URL || window.api?.baseURL || 'https://sicag-api.onrender.com/api';
+      
+      // Intentar refresh del token (credentials: 'include' envía la cookie httpOnly automáticamente)
+      const response = await fetch(`${baseURL}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (response.ok) {
+        // Servidor confirmó que la sesión sigue válida
+        const data = await response.json();
+        this.token = data.token;
+        sessionStorage.setItem('sicag_token', data.token);
+        this._sessionValidada = true;
+        console.info('[Auth] Sesión validada con el servidor. Token renovado.');
+        
+        // Actualizar los datos del usuario si el servidor devuelve datos frescos
+        if (data.usuario) {
+          this.user = data.usuario;
+          sessionStorage.setItem('sicag_user', JSON.stringify(data.usuario));
+          await this._guardarSesionEnIndexedDB(data.usuario);
+        }
+      } else if (response.status === 401) {
+        // La sesión fue invalidada en el servidor (contraseña cambiada, usuario desactivado, etc.)
+        console.warn('[Auth] Sesión rechazada por el servidor. Redirigiendo al login...');
+        await this._limpiarSesionDeIndexedDB();
+        
+        // Mostrar mensaje claro al usuario antes de redirigir
+        const mensaje = 'Tu sesión ha expirado o fue cerrada por el administrador. Por favor inicia sesión nuevamente.';
+        alert(mensaje); // alert bloquea y garantiza que el usuario lo vea antes del redirect
+        
+        this.logout(true); // silencioso (no vuelve a llamar a alert)
+        window.location.href = 'login.html';
+      }
+      // Si es otro error (500, red intermitente), ignorar silenciosamente
+      // La validación se reintentará en la próxima sesión o al reconectar
+      
+    } catch (e) {
+      // Error de red — no hacer nada, el usuario puede seguir trabajando offline
+      console.info('[Auth] No se pudo validar sesión con el servidor (sin red):', e.message);
+    }
+  }
+
+  /**
+   * Elimina la sesión guardada en IndexedDB.
+   * Llamar en logout y cuando la sesión es invalidada.
+   */
+  async _limpiarSesionDeIndexedDB() {
+    try {
+      if (typeof window.SicagDB === 'undefined') return;
+      await window.SicagDB.guardarMeta('sesion_usuario', null);
+    } catch (e) { /* ignorar */ }
   }
 }
 

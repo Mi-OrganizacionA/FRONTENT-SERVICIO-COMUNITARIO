@@ -29,7 +29,9 @@
     return false;
   };
 
-  const protectPage = () => {
+  const protectPage = async () => {
+    await _esperarSesion();
+
     if (!window.auth || !window.auth.isAuthenticated()) {
       return; // auth.js ya maneja la redirección si no hay sesión
     }
@@ -43,6 +45,32 @@
       window.location.replace('censo_viviendas.html');
     }
   };
+
+  /**
+   * Espera hasta 3 segundos a que la sesión se cargue desde IndexedDB.
+   * Si después de 3s no hay sesión, asume que el usuario no está autenticado.
+   */
+  async function _esperarSesion() {
+    const MAX_ESPERA_MS = 3000;
+    const INTERVALO_MS = 100;
+    let tiempo = 0;
+    
+    // Si ya hay sesión, no esperar
+    if (window.auth?.getUser()) return;
+    
+    // Si no hay señal de sesión activa, tampoco esperar
+    if (!localStorage.getItem('sicag_sesion_activa')) return;
+    
+    // Esperar hasta MAX_ESPERA_MS para que IndexedDB cargue la sesión
+    while (tiempo < MAX_ESPERA_MS) {
+      await new Promise(resolve => setTimeout(resolve, INTERVALO_MS));
+      tiempo += INTERVALO_MS;
+      if (window.auth?.getUser()) return; // Ya cargó
+    }
+    
+    // Timeout: limpiar señales de sesión
+    localStorage.removeItem('sicag_sesion_activa');
+  }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', protectPage);

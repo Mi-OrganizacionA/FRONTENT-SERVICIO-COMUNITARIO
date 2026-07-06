@@ -1,0 +1,46 @@
+{
+  "id": "/sicag-sistema",
+  "name": "SICAG Sistema — Gestión Comunal",
+  "short_name": "SICAG Sistema",
+  "description": "Panel de gestión para voceros y administradores de la Comuna Socialista Agroecológica Simón Rodríguez.",
+  "start_url": "/dashboard.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0D1F0D",
+  "theme_color": "#1B5E20",
+  "lang": "es-VE",
+  "categories": ["government", "productivity"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/assets/img/logo_comuna_fondoremovido.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/img/logo_comuna_fondoremovido.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Censo de Habitantes",
+      "url": "/censo.html",
+      "icons": [{ "src": "/assets/img/logo_comuna_fondoremovido.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Validaciones",
+      "url": "/notificaciones.html",
+      "icons": [{ "src": "/assets/img/logo_comuna_fondoremovido.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Producción Agrícola",
+      "url": "/produccion_agricola.html",
+      "icons": [{ "src": "/assets/img/logo_comuna_fondoremovido.png", "sizes": "96x96" }]
+    }
+  ]
+}
