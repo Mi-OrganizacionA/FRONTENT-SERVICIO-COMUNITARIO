@@ -18,6 +18,13 @@ module.exports = {
 
   create: async (req, res, next) => {
     try {
+      if (req.user?.rol !== 'admin') {
+        // Un no-admin no puede crear voceros directamente
+        return res.status(403).json({
+          error: 'Solo el administrador puede registrar voceros directamente.'
+        });
+      }
+
       const bcrypt = require('bcryptjs');
       const ConsejoComunal = Usuario.sequelize.models.ConsejoComunal;
       let id_comunidad_asignada = req.body.comunidad_id || null;
@@ -62,6 +69,12 @@ module.exports = {
 
   update: async (req, res, next) => {
     try {
+      if (req.user?.rol !== 'admin') {
+        return res.status(403).json({
+          error: 'Solo el administrador puede modificar voceros.'
+        });
+      }
+
       const bcrypt = require('bcryptjs');
       const vocero = await Usuario.findByPk(req.params.id);
       if (!vocero || vocero.rol !== 'vocero') {

@@ -559,7 +559,29 @@ class APIManager {
     try {
       const response = await this._fetch(`${this.baseURL}/system/config`, this._getHeaders());
       const data = await response.json().catch(() => ({}));
-      return data.config || {};
+      const config = data.config || {};
+      
+      // Mapeo de claves del backend a claves de localStorage
+      const mapeo = {
+        'Aprobación Automática Global': 'sicag_auto_global',
+        'Aprobación Automática Habitantes': 'sicag_auto_habitantes',
+        'Aprobación Automática Noticias': 'sicag_auto_noticias',
+        'Aprobación Automática Produccion': 'sicag_auto_produccion_agricola',
+        'Aprobación Automática Proyectos': 'sicag_auto_proyectos',
+        'Aprobación Automática Organizaciones': 'sicag_auto_organizaciones_sociales',
+        'Aprobación Automática Viviendas': 'sicag_auto_viviendas',
+        'Censo': 'sicag_censo_abierto'
+      };
+
+      // Guardar en localStorage para que _interceptarValidacion pueda usarlas síncronamente
+      for (const [keyBackend, valBackend] of Object.entries(config)) {
+        const keyLocal = mapeo[keyBackend];
+        if (keyLocal) {
+          localStorage.setItem(keyLocal, valBackend);
+        }
+      }
+
+      return config;
     } catch (error) {
       if (this.isDevelopment) {
         return this.mockData.config || {};

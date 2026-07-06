@@ -123,6 +123,30 @@ class ProduccionAgricolaController {
   // Crear nueva producción
   static async crear(req, res) {
     try {
+      // ── LÓGICA DE APROBACIÓN AUTOMÁTICA ─────────────────────────────────────
+      if (req.user?.rol !== 'admin') {
+        const Configuracion = ProduccionAgricolaModel.sequelize.models.Configuracion;
+        const BandejaValidaciones = ProduccionAgricolaModel.sequelize.models.BandejaValidaciones;
+
+        const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Produccion' } });
+        const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+        const autoApprove = (globalConfig?.valor === 'true') || (config?.valor === 'true');
+
+        if (!autoApprove) {
+          await BandejaValidaciones.create({
+            id_vocero: req.user.id,
+            tabla_afectada: 'produccion_agricola',
+            tipo_accion: 'CREATE',
+            datos_temporales: req.body,
+            estado_tramite: 'Pendiente'
+          });
+          return res.status(202).json({
+            mensaje: 'Solicitud de registro enviada a la bandeja de validaciones del administrador.'
+          });
+        }
+      }
+      // ── FIN LÓGICA BANDEJA ───────────────────────────────────────────────────
+
       const produccion = await ProduccionAgricolaService.crear(
         ProduccionAgricolaModel,
         {
@@ -155,7 +179,32 @@ class ProduccionAgricolaController {
   static async actualizar(req, res) {
     try {
       const { id } = req.params;
-      
+
+      // ── LÓGICA DE APROBACIÓN AUTOMÁTICA (UPDATE) ────────────────────────────────
+      if (req.user?.rol !== 'admin') {
+        const Configuracion = ProduccionAgricolaModel.sequelize.models.Configuracion;
+        const BandejaValidaciones = ProduccionAgricolaModel.sequelize.models.BandejaValidaciones;
+
+        const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Produccion' } });
+        const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+        const autoApprove = (globalConfig?.valor === 'true') || (config?.valor === 'true');
+
+        if (!autoApprove) {
+          await BandejaValidaciones.create({
+            id_vocero: req.user.id,
+            tabla_afectada: 'produccion_agricola',
+            registro_id: id,
+            tipo_accion: 'UPDATE',
+            datos_temporales: req.body,
+            estado_tramite: 'Pendiente'
+          });
+          return res.status(202).json({
+            mensaje: 'Solicitud de actualización enviada a la bandeja de validaciones del administrador.'
+          });
+        }
+      }
+      // ── FIN ──────────────────────────────────────────────────────────────────────
+
       const produccionAntiguos = await ProduccionAgricolaModel.findByPk(id);
       if (!produccionAntiguos) {
         return res.status(404).json({ error: 'Producción no encontrada' });
@@ -190,6 +239,31 @@ class ProduccionAgricolaController {
   static async eliminar(req, res) {
     try {
       const { id } = req.params;
+
+      // ── LÓGICA DE APROBACIÓN AUTOMÁTICA (DELETE) ────────────────────────────────
+      if (req.user?.rol !== 'admin') {
+        const Configuracion = ProduccionAgricolaModel.sequelize.models.Configuracion;
+        const BandejaValidaciones = ProduccionAgricolaModel.sequelize.models.BandejaValidaciones;
+
+        const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Produccion' } });
+        const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+        const autoApprove = (globalConfig?.valor === 'true') || (config?.valor === 'true');
+
+        if (!autoApprove) {
+          await BandejaValidaciones.create({
+            id_vocero: req.user.id,
+            tabla_afectada: 'produccion_agricola',
+            registro_id: id,
+            tipo_accion: 'DELETE',
+            datos_temporales: { id: id },
+            estado_tramite: 'Pendiente'
+          });
+          return res.status(202).json({
+            mensaje: 'Solicitud de eliminación enviada a la bandeja de validaciones del administrador.'
+          });
+        }
+      }
+      // ── FIN ──────────────────────────────────────────────────────────────────────
 
       const produccion = await ProduccionAgricolaModel.findByPk(id);
       if (!produccion) {

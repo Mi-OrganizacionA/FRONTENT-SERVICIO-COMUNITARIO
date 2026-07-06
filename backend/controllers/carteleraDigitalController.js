@@ -74,6 +74,33 @@ class CarteleraDigitalController {
 
   static async crear(req, res) {
     try {
+      // ── LÓGICA DE APROBACIÓN AUTOMÁTICA ─────────────────────────────────────
+      // Si el usuario es vocero y la aprobación automática no está activa,
+      // la publicación va a la bandeja de validaciones del admin.
+      if (req.user?.rol !== 'admin') {
+        const Configuracion = CarteleraModel.sequelize.models.Configuracion;
+        const BandejaValidaciones = CarteleraModel.sequelize.models.BandejaValidaciones;
+
+        const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Noticias' } });
+        const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+
+        const autoApprove = (globalConfig?.valor === 'true') || (config?.valor === 'true');
+
+        if (!autoApprove) {
+          await BandejaValidaciones.create({
+            id_vocero: req.user.id,
+            tabla_afectada: 'noticias',
+            tipo_accion: 'CREATE',
+            datos_temporales: req.body,
+            estado_tramite: 'Pendiente'
+          });
+          return res.status(202).json({
+            mensaje: 'Solicitud de publicación enviada a la bandeja de validaciones del administrador.'
+          });
+        }
+      }
+      // ── FIN LÓGICA BANDEJA ───────────────────────────────────────────────────
+
       const { tipo_publicacion, titulo, contenido, enlace_extra, fecha_cierre, destacada, fecha_publicacion } = req.body;
 
       if (!TIPOS_VALIDOS.includes(tipo_publicacion)) {
@@ -111,6 +138,32 @@ class CarteleraDigitalController {
   static async actualizar(req, res) {
     try {
       const { id } = req.params;
+
+      // ── LÓGICA DE APROBACIÓN AUTOMÁTICA (UPDATE) ────────────────────────────────
+      if (req.user?.rol !== 'admin') {
+        const Configuracion = CarteleraModel.sequelize.models.Configuracion;
+        const BandejaValidaciones = CarteleraModel.sequelize.models.BandejaValidaciones;
+
+        const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Noticias' } });
+        const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+        const autoApprove = (globalConfig?.valor === 'true') || (config?.valor === 'true');
+
+        if (!autoApprove) {
+          await BandejaValidaciones.create({
+            id_vocero: req.user.id,
+            tabla_afectada: 'noticias',
+            registro_id: id,
+            tipo_accion: 'UPDATE',
+            datos_temporales: req.body,
+            estado_tramite: 'Pendiente'
+          });
+          return res.status(202).json({
+            mensaje: 'Solicitud de edición enviada a la bandeja de validaciones del administrador.'
+          });
+        }
+      }
+      // ── FIN ──────────────────────────────────────────────────────────────────────
+
       const { titulo, contenido, activo, enlace_extra, fecha_cierre, destacada, tipo_publicacion, fecha_publicacion } = req.body;
 
       const publicacion = await CarteleraModel.findByPk(id);
@@ -148,6 +201,34 @@ class CarteleraDigitalController {
   static async eliminar(req, res) {
     try {
       const { id } = req.params;
+
+      // ── LÓGICA DE APROBACIÓN AUTOMÁTICA (DELETE) ────────────────────────────────
+      if (req.user?.rol !== 'admin') {
+        const Configuracion = CarteleraModel.sequelize.models.Configuracion;
+        const BandejaValidaciones = CarteleraModel.sequelize.models.BandejaValidaciones;
+
+        const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Noticias' } });
+        const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+        const autoApprove = (globalConfig?.valor === 'true') || (config?.valor === 'true');
+
+        if (!autoApprove) {
+          const publicacion = await CarteleraModel.findByPk(id);
+          if (!publicacion) return res.status(404).json({ error: 'Publicación no encontrada' });
+
+          await BandejaValidaciones.create({
+            id_vocero: req.user.id,
+            tabla_afectada: 'noticias',
+            registro_id: id,
+            tipo_accion: 'DELETE',
+            datos_temporales: { id: id, titulo: publicacion.titulo },
+            estado_tramite: 'Pendiente'
+          });
+          return res.status(202).json({
+            mensaje: 'Solicitud de eliminación enviada a la bandeja de validaciones del administrador.'
+          });
+        }
+      }
+      // ── FIN ──────────────────────────────────────────────────────────────────────
 
       const publicacion = await CarteleraModel.findByPk(id);
       if (!publicacion) return res.status(404).json({ error: 'Publicación no encontrada' });

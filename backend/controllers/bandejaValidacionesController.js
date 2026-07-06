@@ -368,7 +368,34 @@ class BandejaValidacionesController {
         } else if (validacion.tipo_accion === 'DELETE') {
           const registro = await Modelo.findByPk(validacion.registro_id || datos.id);
           if (!registro) throw new Error(`El registro a eliminar no existe en ${tabla}`);
-          await registro.destroy();
+
+          // Tablas que usan SOFT DELETE (activo = false):
+          // NOTA: Verificado contra el dump de NeonDB (2026-07-05):
+          // - 'habitantes', 'produccion_agricola', 'organizaciones_sociales', 'cartelera_digital',
+          //   'viviendas', 'proyectos' todas tienen la columna 'activo'.
+          // - 'noticias' es el alias del mapa que apunta al modelo CarteleraDigital.
+          const tablasSoftDelete = [
+            'habitantes',
+            'produccion_agricola',
+            'organizaciones',
+            'organizaciones_sociales',
+            'noticias',         // alias → CarteleraDigital (tabla: cartelera_digital)
+            'cartelera_digital',
+            'viviendas',
+            'proyectos',
+          ];
+
+          if (tablasSoftDelete.includes(tabla)) {
+            // SOFT DELETE: marcar como inactivo sin borrar el registro físicamente
+            await registro.update({ activo: false });
+            logger.info(`[Bandeja] Soft delete aplicado en '${tabla}' id=${registro.id}`);
+          } else {
+            // HARD DELETE para tablas que no tienen el campo 'activo'
+            // Verificado en NeonDB: 'voceros' (tabla: usuarios) y 'reportes_7t' no tienen 'activo'.
+            await registro.destroy();
+            logger.info(`[Bandeja] Hard delete aplicado en '${tabla}' id=${registro.id}`);
+          }
+
           nuevoRegistro = { id: validacion.registro_id || datos.id };
         } else {
           throw new Error(`AcciÃ³n no soportada para la tabla ${tabla}: ${validacion.tipo_accion}`);

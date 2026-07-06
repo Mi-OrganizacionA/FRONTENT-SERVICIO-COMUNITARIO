@@ -237,6 +237,11 @@ document.addEventListener('DOMContentLoaded', function () {
   initGlobalSearch();
   initScrollAnimations();
 
+  // Cargar configuraciones del sistema desde el backend al localStorage
+  if (window.api && typeof window.api.getSystemConfig === 'function') {
+    window.api.getSystemConfig().catch(err => console.warn('No se pudo cargar configuración:', err));
+  }
+
   // Init Bootstrap tooltips if available
   if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
     initTooltips();
