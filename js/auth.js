@@ -87,6 +87,16 @@ class AuthManager {
     localStorage.setItem('sicag_sesion_cerrada', Date.now().toString());
     localStorage.removeItem('sicag_sesion_activa');
 
+    // ── LIMPIAR CACHÉ PRIVADO EN LOGOUT ───────────────────────────────────
+    // Ordenarle al SW que elimine el caché privado para que un usuario público
+    // que tome el dispositivo no pueda ver módulos del sistema sin autenticarse.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(registration => {
+        registration.active?.postMessage({ tipo: 'LIMPIAR_CACHE_PRIVADO' });
+      }).catch(() => {}); // Ignorar silenciosamente si el SW no está activo
+    }
+    // ──────────────────────────────────────────────────────────────────────
+
     this._notifyObservers({ tipo: 'logout' });
 
     if (!silencioso) {

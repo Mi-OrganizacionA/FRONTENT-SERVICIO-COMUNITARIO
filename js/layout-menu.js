@@ -230,6 +230,10 @@
           </div>
         </div>
 
+        <button id="btnInstalarAppDash" class="header-action-btn btn-install-app" style="display:none; color: #4CAF50; border: 1px solid #4CAF50; border-radius: 4px; padding: 0 10px; font-size: 0.85rem;" aria-label="Instalar App del Sistema" onclick="window.sicagInstalarApp()" title="Instalar como App">
+          <i class="fas fa-download"></i> <span style="margin-left:5px; font-weight:500;">Instalar App</span>
+        </button>
+
         <a href="ayuda.html" class="header-action-btn" aria-label="Centro de Ayuda">
           <i class="fas fa-circle-question"></i>
         </a>

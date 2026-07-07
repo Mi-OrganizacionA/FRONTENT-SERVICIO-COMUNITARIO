@@ -278,18 +278,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ---- GESTIÓN DE INSTALACIÓN (Añadir a pantalla de inicio) ----
   window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevenir que Chrome muestre el mini-infobar automático
+    e.preventDefault();
     // Guarda el evento para poder dispararlo luego con un botón de "Instalar App"
     window.deferredPrompt = e;
-    console.log('[PWA] El evento beforeinstallprompt fue capturado. Listo para instalar.');
+    console.log('[PWA] beforeinstallprompt capturado. Listo para instalar.');
+    
+    // Mostrar el botón de instalación en CUALQUIER página que lo tenga
+    const btns = document.querySelectorAll('#btnInstalarApp, #btnInstalarAppDash');
+    btns.forEach(btn => { btn.style.display = ''; });
   });
 
   window.sicagInstalarApp = async () => {
-    if (!window.deferredPrompt) {
-      alert('La app ya está instalada o tu navegador no soporta esta función.');
+    const prompt = window.deferredPrompt;
+    if (!prompt) {
+      if (window.Components?.showToast) {
+        Components.showToast('La app ya está instalada o tu navegador no soporta instalación directa.', 'info');
+      } else {
+        alert('La app ya está instalada o tu navegador no soporta esta función.');
+      }
       return;
     }
-    window.deferredPrompt.prompt();
-    const { outcome } = await window.deferredPrompt.userChoice;
+    
+    // Mostrar el diálogo de instalación del navegador
+    prompt.prompt();
+    const { outcome } = await prompt.userChoice;
+    console.log(`[PWA] Resultado de instalación: ${outcome}`);
     
     if (outcome === 'accepted') {
       const btns = document.querySelectorAll('#btnInstalarApp, #btnInstalarAppDash');
@@ -308,10 +322,38 @@ document.addEventListener('DOMContentLoaded', function () {
               tipo: 'CACHEAR_MODULOS_PRIVADOS',
               payload: { rol }
             });
+            console.log('[PWA] Caché de módulos privados solicitado tras instalación.');
           }).catch(() => {});
         }
       }
-      // Si es la app pública, no cachear módulos privados
     }
     window.deferredPrompt = null;
   };
+
+  window.addEventListener('appinstalled', () => {
+    console.log('[PWA] App instalada correctamente.');
+    window.deferredPrompt = null;
+    const btns = document.querySelectorAll('#btnInstalarApp, #btnInstalarAppDash');
+    btns.forEach(btn => { btn.style.display = 'none'; });
+  });
+
+  // ── ESCUCHAR MENSAJES DEL SW ──────────────────────────────────────────────
+  // Este listener maneja mensajes del Fase 1. En la Fase 3, se ampliará.
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      const { tipo, total } = event.data || {};
+
+      if (tipo === 'MODULOS_PRIVADOS_LISTOS') {
+        console.log(`[PWA] ${total} módulos privados cacheados. La app funciona offline.`);
+        // Mostrar notificación discreta al usuario
+        if (window.Components?.showToast) {
+          Components.showToast(
+            `✅ App lista para usar sin internet (${total} recursos guardados).`,
+            'success'
+          );
+        }
+      }
+
+      // ── Mensajes para Fase 3 (Background Sync) — Se amplían en Fase 3 ────
+    });
+  }

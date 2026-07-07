@@ -57,14 +57,36 @@ class LoginController {
       this.setLoading(true);
       await window.auth.login(usuario, password);
       this.mostrarExito('¡BIENVENIDO!');
-      
+
+      // ── DISPARAR CACHÉ DE MÓDULOS PRIVADOS ────────────────────────────────
+      // Obtener el rol del usuario recién autenticado y pedirle al SW que
+      // cachee los módulos privados. Ocurre en segundo plano sin bloquear el redirect.
+      try {
+        const usuarioLogueado = window.auth.getUser();
+        const rol = usuarioLogueado?.rol || '';
+
+        if ((rol === 'admin' || rol === 'vocero') && 'serviceWorker' in navigator) {
+          navigator.serviceWorker.ready.then(registration => {
+            registration.active?.postMessage({
+              tipo: 'CACHEAR_MODULOS_PRIVADOS',
+              payload: { rol }
+            });
+            console.log(`[Login] Mensaje enviado al SW para cachear módulos privados (rol: ${rol}).`);
+          }).catch(err => {
+            console.warn('[Login] No se pudo enviar mensaje al SW:', err.message);
+          });
+        }
+      } catch (swErr) {
+        // No interrumpir el flujo de login si el SW falla
+        console.warn('[Login] Error al notificar SW:', swErr.message);
+      }
+      // ──────────────────────────────────────────────────────────────────────
+
       // Verificar si el usuario está usando la app pública instalada
-      // y debería instalar la app del sistema para una mejor experiencia
       const esAppPublicaInstalada = window.matchMedia('(display-mode: standalone)').matches
         && !document.querySelector('link[rel="manifest"][href*="sistema"]');
 
       if (esAppPublicaInstalada) {
-        // Mostrar mensaje suave (no bloquear el flujo)
         setTimeout(() => {
           if (window.Components?.showToast) {
             Components.showToast(
@@ -72,7 +94,7 @@ class LoginController {
               'info'
             );
           }
-        }, 1500); // Mostrar después de la redirección
+        }, 1500);
       }
 
       setTimeout(() => {

@@ -13,21 +13,39 @@
  */
 
 // ── VERSIONES DE CACHÉ ──────────────────────────────────────────────────────
-const CORE_CACHE   = 'sicag-core-v3.8';
-const CDN_CACHE    = 'sicag-cdn-v3';
-const API_CACHE    = 'sicag-api-v3';
-const TODOS_LOS_CACHES = [CORE_CACHE, CDN_CACHE, API_CACHE];
+// NOTA: Al pasar a v4, el activate limpia automáticamente los caches v3 anteriores.
+const CORE_CACHE     = 'sicag-core-v4';
+const CDN_CACHE      = 'sicag-cdn-v4';
+const API_CACHE      = 'sicag-api-v4';
+const PRIVATE_CACHE  = 'sicag-private-v4';
+const TODOS_LOS_CACHES = [CORE_CACHE, CDN_CACHE, API_CACHE, PRIVATE_CACHE];
 
-// ── PRE-CACHE: TODO EL FRONTEND PROPIO ─────────────────────────────────────
-// Lista exhaustiva de todos los archivos del sitio que deben estar disponibles offline
-const PRECACHE_CORE = [
-  // Página de fallback offline (PRIMERO — crítica)
+// ── CACHÉ PÚBLICO: lo mínimo que necesita cualquier visitante ───────────────
+// Solo se cachea esto durante el install inicial del SW (antes del login).
+// Regla: menos de 500KB en total. Sin módulos privados.
+const PRECACHE_PUBLICO = [
   '/offline.html',
-
-  // ── Páginas HTML principales ──
   '/',
   '/index.html',
   '/login.html',
+  '/404.html',
+  '/manifest.json',
+  '/css/public.css',
+  '/css/login.css',
+  '/js/public.js',
+  '/js/animations.js',
+  '/js/login.js',
+  '/js/auth.js',
+  '/js/api.js',
+  '/assets/img/logo_comuna_fondoremovido.webp',
+  '/assets/img/hero_banner.webp',
+];
+
+// ── CACHÉ PRIVADO: todo lo que necesita un vocero o admin ──────────────────
+// Se cachea SOLO cuando el usuario inicia sesión con rol 'vocero' o 'admin'.
+// El SW recibe el mensaje 'CACHEAR_MODULOS_PRIVADOS' y ejecuta este precache.
+const PRECACHE_PRIVADO = [
+  // Páginas del sistema (solo accesibles con login)
   '/dashboard.html',
   '/censo.html',
   '/censo_viviendas.html',
@@ -43,20 +61,11 @@ const PRECACHE_CORE = [
   '/cartografia.html',
   '/ayuda.html',
   '/map_embed.html',
-  '/404.html',
-
-  // ── Hojas de estilo ──
-  '/css/public.css',
+  // CSS del panel privado
   '/css/admin.css',
-  '/css/login.css',
   '/css/styles.css',
-
-  // ── Scripts JavaScript propios ──
-  '/js/api.js',
-  '/js/auth.js',
+  // Scripts del panel privado
   '/js/app.js',
-  '/js/public.js',
-  '/js/animations.js',
   '/js/components.js',
   '/js/layout-menu.js',
   '/js/sidebar-menu.js',
@@ -69,42 +78,29 @@ const PRECACHE_CORE = [
   '/js/poligonos.js',
   '/js/habitante-autocomplete.js',
   '/js/censo-viviendas.js',
-
-  // ── Módulos JS ──
   '/js/modules/censo.js',
   '/js/modules/dashboard.js',
   '/js/modules/noticias.js',
   '/js/modules/reportes.js',
-
-  // ── Servicios JS ──
   '/js/services/auth-service.js',
   '/js/services/censo-service.js',
   '/js/services/grupos-service.js',
   '/js/services/habitantes-service.js',
   '/js/services/produccion-service.js',
-
-  // ── Configuración JS ──
+  // Servicios de fases futuras — el SW los ignora si no existen (Promise.allSettled)
+  '/js/services/sicag-db.js',
+  '/js/services/sicag-conflict.js',
   '/js/config/firebase-config.js',
-
-  // ── Datos locales (seed para modo offline) ──
+  // Datos
   '/data/seed.json',
-
-  // ── Imágenes (todas) ──
-  // ── Imágenes WebP Optimizadas ──
-  '/assets/img/logo_comuna_fondoremovido.webp',
-  '/assets/img/hero_banner.webp',
+  '/venezuela.geojson',
+  // Imágenes privadas (proyectos)
   '/assets/img/proyecto_cacao.webp',
   '/assets/img/proyecto_cafe.webp',
   '/assets/img/proyecto_frutales.webp',
   '/assets/img/proyecto_hortalizas.webp',
   '/assets/img/proyecto_maiz.webp',
   '/assets/img/proyecto_siembra.webp',
-
-  // ── Datos GeoJSON ──
-  '/venezuela.geojson',
-
-  // ── Manifest ──
-  '/manifest.json',
 ];
 
 // ── DOMINIOS EXTERNOS A CACHEAR (CDN) ───────────────────────────────────────
@@ -127,22 +123,22 @@ const API_CACHE_PATTERNS = [
   '/api/system/config',
 ];
 
-// ── INSTALL: Pre-cachear todo el core ───────────────────────────────────────
+// ── INSTALL: Pre-cachear solo el núcleo público ──────────────────────────────
+// En el install inicial solo cacheamos lo público (mínimo).
+// Los módulos privados se cachean cuando el cliente envía 'CACHEAR_MODULOS_PRIVADOS'.
 self.addEventListener('install', (event) => {
-  console.log('[SW] Instalando SICAG SW v3.0 — pre-cacheando frontend...');
+  console.log('[SW] Instalando SICAG SW v4 — cacheando núcleo público...');
   event.waitUntil(
     caches.open(CORE_CACHE).then((cache) => {
-      // addAll falla si UNO falla; usamos Promise.allSettled para ser tolerantes
       return Promise.allSettled(
-        PRECACHE_CORE.map(url =>
+        PRECACHE_PUBLICO.map(url =>
           cache.add(url).catch(err => {
-            console.warn(`[SW] No se pudo pre-cachear: ${url}`, err.message);
+            console.warn(`[SW] No se pudo pre-cachear público: ${url}`, err.message);
           })
         )
       );
     }).then(() => {
-      console.log('[SW] Pre-cache completado.');
-      // skipWaiting DESPUÉS de que el caché esté listo
+      console.log('[SW] Núcleo público cacheado. Esperando login para cachear módulos privados.');
       return self.skipWaiting();
     })
   );
@@ -225,31 +221,35 @@ self.addEventListener('fetch', (event) => {
  * Si la red falla también, retorna la página offline.
  */
 async function cachePrimeroConFallback(request) {
-  const cache = await caches.open(CORE_CACHE);
-  const cached = await cache.match(request);
+  // Buscar en caché privado primero (tiene más recursos)
+  const cachePrivado = await caches.open(PRIVATE_CACHE);
+  const enPrivado = await cachePrivado.match(request);
+  if (enPrivado) {
+    actualizarEnFondo(request, cachePrivado);
+    return enPrivado;
+  }
 
-  if (cached) {
-    // Actualizar en segundo plano (sin bloquear al usuario)
-    actualizarEnFondo(request, cache);
-    return cached;
+  // Luego buscar en caché público
+  const cachePublico = await caches.open(CORE_CACHE);
+  const enPublico = await cachePublico.match(request);
+  if (enPublico) {
+    actualizarEnFondo(request, cachePublico);
+    return enPublico;
   }
 
   // No está en caché: intentar la red
   try {
     const networkResponse = await fetch(request);
     if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-      // Cachear la respuesta nueva (lazy caching)
+      // Guardar en caché público por defecto (lazy caching)
       const responseToCache = networkResponse.clone();
-      cache.put(request, responseToCache);
+      cachePublico.put(request, responseToCache);
     }
     return networkResponse;
   } catch (err) {
-    // Sin caché y sin red: mostrar página offline
     console.warn('[SW] Sin conexión y sin caché para:', request.url);
-    const offlinePage = await cache.match('/offline.html');
+    const offlinePage = await cachePublico.match('/offline.html');
     if (offlinePage) return offlinePage;
-
-    // Último recurso: respuesta vacía 503
     return new Response('<h1>Sin conexión</h1>', {
       status: 503,
       headers: { 'Content-Type': 'text/html; charset=utf-8' }
@@ -329,11 +329,56 @@ function actualizarEnFondo(request, cache) {
 
 // ── MENSAJES DESDE EL CLIENTE ────────────────────────────────────────────────
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.tipo === 'SKIP_WAITING') {
+  const { tipo, payload } = event.data || {};
+
+  // Saltar la espera y activar el nuevo SW inmediatamente
+  if (tipo === 'SKIP_WAITING') {
     self.skipWaiting();
   }
 
-  if (event.data && event.data.tipo === 'GET_VERSION') {
-    event.ports[0].postMessage({ version: CORE_CACHE });
+  // Retornar la versión actual del SW
+  if (tipo === 'GET_VERSION') {
+    event.ports[0]?.postMessage({ version: CORE_CACHE });
+  }
+
+  // ── CACHEAR MÓDULOS PRIVADOS (se dispara tras login exitoso) ────────────────
+  // El cliente envía este mensaje con el rol del usuario.
+  // Solo se cachea si el rol es 'vocero' o 'admin'.
+  if (tipo === 'CACHEAR_MODULOS_PRIVADOS') {
+    const rol = payload?.rol || '';
+    if (rol === 'admin' || rol === 'vocero') {
+      console.log(`[SW] Usuario '${rol}' autenticado. Cacheando módulos privados...`);
+      event.waitUntil(
+        caches.open(PRIVATE_CACHE).then((cache) => {
+          return Promise.allSettled(
+            PRECACHE_PRIVADO.map(url =>
+              cache.add(url).catch(err => {
+                // No fallar si algún recurso no está disponible
+                console.warn(`[SW] No se pudo cachear módulo privado: ${url}`, err.message);
+              })
+            )
+          );
+        }).then(() => {
+          console.log('[SW] Módulos privados cacheados exitosamente.');
+          // Notificar al cliente que el caché privado está listo
+          self.clients.matchAll().then(clients => {
+            clients.forEach(client => client.postMessage({
+              tipo: 'MODULOS_PRIVADOS_LISTOS',
+              total: PRECACHE_PRIVADO.length
+            }));
+          });
+        })
+      );
+    }
+  }
+
+  // ── LIMPIAR CACHÉ PRIVADO (se dispara en logout) ────────────────────────────
+  if (tipo === 'LIMPIAR_CACHE_PRIVADO') {
+    console.log('[SW] Logout detectado. Limpiando caché privado...');
+    event.waitUntil(
+      caches.delete(PRIVATE_CACHE).then(() => {
+        console.log('[SW] Caché privado eliminado.');
+      })
+    );
   }
 });
