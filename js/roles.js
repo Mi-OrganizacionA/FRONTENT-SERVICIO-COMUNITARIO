@@ -23,17 +23,21 @@
 
   const isPageAllowed = (role, page) => {
     // Admin puede ver todo
-    if (!role || role === 'admin' || !role) return true;
+    if (!role || role === 'admin') return true;
     // Vocero: solo sus páginas
     if (role === 'vocero') return VOCERO_ALLOWED.includes(page);
     return false;
   };
 
   const protectPage = async () => {
-    await _esperarSesion();
+    // Esperar a que la sesión cargue (sea de sessionStorage o IndexedDB)
+    // usando el método oficial de AuthManager para evitar duplicar lógica
+    if (window.auth?._esperarSesionAsync) {
+      await window.auth._esperarSesionAsync(2500);
+    }
 
     if (!window.auth || !window.auth.isAuthenticated()) {
-      return; // auth.js ya maneja la redirección si no hay sesión
+      return; // checkAuthMiddleware en auth.js ya maneja la redirección
     }
 
     const user = window.auth.getUser();
@@ -41,36 +45,10 @@
     const page = getCurrentPage();
 
     if (role && !isPageAllowed(role, page)) {
-      // Redirigir al Vocero a su página principal
+      // Redirigir al Vocero a su página permitida
       window.location.replace('censo_viviendas.html');
     }
   };
-
-  /**
-   * Espera hasta 3 segundos a que la sesión se cargue desde IndexedDB.
-   * Si después de 3s no hay sesión, asume que el usuario no está autenticado.
-   */
-  async function _esperarSesion() {
-    const MAX_ESPERA_MS = 3000;
-    const INTERVALO_MS = 100;
-    let tiempo = 0;
-    
-    // Si ya hay sesión, no esperar
-    if (window.auth?.getUser()) return;
-    
-    // Si no hay señal de sesión activa, tampoco esperar
-    if (!localStorage.getItem('sicag_sesion_activa')) return;
-    
-    // Esperar hasta MAX_ESPERA_MS para que IndexedDB cargue la sesión
-    while (tiempo < MAX_ESPERA_MS) {
-      await new Promise(resolve => setTimeout(resolve, INTERVALO_MS));
-      tiempo += INTERVALO_MS;
-      if (window.auth?.getUser()) return; // Ya cargó
-    }
-    
-    // Timeout: limpiar señales de sesión
-    localStorage.removeItem('sicag_sesion_activa');
-  }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', protectPage);

@@ -155,19 +155,9 @@ class AuthManager {
       if (this.user) return true;
     }
     
-    // 3. Si hay señal de sesión activa en localStorage pero no tenemos usuario,
-    //    puede ser que el usuario cerró el navegador pero IndexedDB tiene su sesión.
-    //    _cargarSesionDesdeIndexedDB() ya fue llamado en el constructor y es async.
-    //    En este punto devolvemos false pero la carga async puede actualizar this.user
-    //    antes de que el módulo protegido termine de inicializarse.
-    const sesionActiva = localStorage.getItem('sicag_sesion_activa');
-    if (sesionActiva) {
-      // Hay señal de sesión activa, pero los datos aún no cargaron de IndexedDB.
-      // Devolver true provisionalmente y dejar que _cargarSesionDesdeIndexedDB termine.
-      // roles.js verificará de nuevo cuando this.user esté disponible.
-      return true; // provisional — se confirma cuando IndexedDB termina de cargar
-    }
-    
+    // 3. NO devolver true provisional en base a sicag_sesion_activa.
+    // La carga desde IndexedDB es asíncrona y el middleware ya no la necesita
+    // aquí porque checkAuthMiddleware ahora espera con _esperarSesionAsync().
     return false;
   }
 
@@ -365,6 +355,47 @@ class AuthManager {
       await window.SicagDB.guardarMeta('sesion_usuario', null);
     } catch (e) { /* ignorar */ }
   }
+
+  /**
+   * Espera hasta maxMs milisegundos a que el usuario se cargue en memoria
+   * (ya sea de sessionStorage o de IndexedDB vía _cargarSesionDesdeIndexedDB).
+   * Si ya hay usuario o no hay señal de sesión activa, retorna inmediatamente.
+   * Usado por checkAuthMiddleware para evitar redirigir antes de que IndexedDB responda.
+   */
+  async _esperarSesionAsync(maxMs = 2500) {
+    // Si ya hay usuario en memoria, retornar inmediatamente
+    if (this.user) return;
+    
+    // Si no hay señal de sesión guardada, no tiene sentido esperar
+    if (!localStorage.getItem('sicag_sesion_activa')) return;
+    
+    // Si SicagDB no está disponible aún, la sesión nunca llegará de IndexedDB
+    // Esperar un momento corto por si tarda en definirse
+    const INTERVALO = 100;
+    let transcurrido = 0;
+    
+    while (transcurrido < maxMs) {
+      await new Promise(resolve => setTimeout(resolve, INTERVALO));
+      transcurrido += INTERVALO;
+      
+      // ¿Ya cargó el usuario?
+      if (this.user) return;
+      
+      // ¿SicagDB ya existe pero aún no cargó? Seguir esperando.
+      // ¿SicagDB nunca apareció después de 1s? Limpiar señal huérfana.
+      if (transcurrido >= 1000 && typeof window.SicagDB === 'undefined') {
+        // IndexedDB no está disponible en esta fase del proyecto.
+        // Limpiar la señal huérfana para evitar loops futuros.
+        localStorage.removeItem('sicag_sesion_activa');
+        return;
+      }
+    }
+    
+    // Timeout agotado sin sesión — limpiar señal para evitar loops
+    if (!this.user) {
+      localStorage.removeItem('sicag_sesion_activa');
+    }
+  }
 }
 
 // Asegurar instancia global
@@ -393,17 +424,35 @@ if (!document.querySelector('link[rel="manifest"]')) {
   document.head.appendChild(manifestLink);
 }
 
-// Middleware de protección visual para las páginas HTML
-function checkAuthMiddleware() {
+// Middleware de protección para las páginas HTML.
+// Espera a que IndexedDB cargue la sesión antes de redirigir.
+async function checkAuthMiddleware() {
   const path = window.location.pathname;
   const isPublicPage = path.includes('login.html') ||
                        path.includes('index.html') ||
                        path.includes('consulta_habitantes.html') ||
                        path.endsWith('/');
 
-  if (!isPublicPage && !window.auth.isAuthenticated()) {
-    alert('Debes iniciar sesión para acceder al sistema.');
-    window.location.href = 'login.html';
+  // En páginas públicas: si no hay usuario real, limpiar señal huérfana
+  // Esto evita que sicag_sesion_activa persista si el módulo IndexedDB no existe
+  if (isPublicPage) {
+    if (!window.auth.getUser() && localStorage.getItem('sicag_sesion_activa')) {
+      // Esperar un momento breve por si SicagDB va a cargar el usuario
+      setTimeout(() => {
+        if (!window.auth.getUser()) {
+          localStorage.removeItem('sicag_sesion_activa');
+        }
+      }, 500);
+    }
+    return;
+  }
+
+  // En páginas privadas: esperar hasta 2.5s por si la sesión está cargando de IndexedDB
+  await window.auth._esperarSesionAsync(2500);
+
+  if (!window.auth.isAuthenticated()) {
+    console.warn('[Auth] Acceso denegado: no hay sesión activa. Redirigiendo al login.');
+    window.location.replace('login.html');
   }
 }
 
@@ -413,7 +462,9 @@ if (document.readyState === 'loading') {
   checkAuthMiddleware();
 }
 
-// Escuchar cualquier clic en la página para proteger acciones si la sesión se cerró (ej. en otra pestaña)
+// Escuchar clics para proteger acciones si la sesión fue cerrada en otra pestaña
+// NOTA: usar getUser() en lugar de isAuthenticated() para evitar falsos positivos
+// durante la carga asíncrona de la sesión desde IndexedDB.
 document.addEventListener('click', (e) => {
   const path = window.location.pathname;
   const isPublicPage = path.includes('login.html') ||
@@ -421,24 +472,36 @@ document.addEventListener('click', (e) => {
                        path.includes('consulta_habitantes.html') ||
                        path.endsWith('/');
 
-  if (!isPublicPage && !window.auth.isAuthenticated()) {
+  // Solo actuar si hay un usuario previamente cargado en memoria que ya no está
+  // (indica que otra pestaña hizo logout). No actuar durante la carga inicial.
+  if (!isPublicPage && window.auth._sessionValidada && !window.auth.getUser()) {
     e.preventDefault();
     e.stopPropagation();
     alert('Tu sesión ha expirado o fue cerrada desde otra pestaña.');
     window.location.href = 'login.html';
   }
-}, true); // Fase de captura para interceptar antes que cualquier otro evento
+}, true);
 
-// Redirigir directamente al dashboard desde index.html si ya está logueado
+// Redirigir directamente al dashboard desde páginas públicas si ya está logueado
+// SOLO si hay usuario real en memoria (no provisional)
 document.addEventListener('DOMContentLoaded', () => {
-  if (window.auth.isAuthenticated()) {
+  const path = window.location.pathname;
+  const isLoginPage = path.includes('login.html');
+  
+  // Solo actuar en la página de login, y solo si ya hay sesión REAL (no provisional)
+  if (isLoginPage && window.auth.getUser()) {
+    window.location.replace('dashboard.html');
+    return;
+  }
+
+  // Cambiar texto del botón de login en index.html si hay sesión
+  if (window.auth.getUser()) {
     const loginLinks = document.querySelectorAll('a[href="login.html"]');
     loginLinks.forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         window.location.href = 'dashboard.html';
       });
-      // Opcional: Cambiar texto del botón
       if (link.innerHTML.includes('Acceso Voceros')) {
         link.innerHTML = '<i class="fas fa-chart-line"></i> Ir al Dashboard';
       }
