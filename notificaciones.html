@@ -410,6 +410,223 @@
       </div>
     </div>
 
+    <!-- ── PANEL DE COLA OFFLINE ──────────────────────────────────────────────── -->
+    <section id="cola-offline" class="mt-4" style="background:var(--card); border-radius:var(--r-lg); padding:2rem; box-shadow:var(--shadow);">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem;">
+        <h3 style="font-size:1.1rem; font-weight:700; margin:0; display:flex; align-items:center;">
+          <i class="fas fa-clock-rotate-left" style="color:var(--ru); margin-right:10px;"></i>
+          Operaciones pendientes
+          <span id="badgePendientesOffline2" style="background:#E65100; color:#fff; border-radius:12px; padding:2px 8px; font-size:0.8rem; margin-left:10px; display:none;">0</span>
+        </h3>
+        <button class="btn btn-outline" onclick="window.sicagSincronizarAhora()" style="font-size:0.85rem; padding:0.4rem 0.8rem;">
+          <i class="fas fa-sync"></i> Sincronizar
+        </button>
+      </div>
+      
+      <p style="color:var(--sub); font-size:0.9rem; margin-bottom:1.5rem;">
+        Estas operaciones se realizaron sin conexión a internet y se enviarán automáticamente cuando recuperes la red.
+      </p>
+      
+      <div id="listaColaOffline">
+        <div id="colaOfflineVacia" style="text-align:center; padding:2rem; color:var(--muted); border:1px dashed var(--border); border-radius:var(--r-sm);">
+          <i class="fas fa-check-circle" style="font-size:2rem; color:var(--su); margin-bottom:10px; display:block;"></i>
+          No hay operaciones pendientes. Todo está sincronizado.
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PANEL DE CONFLICTOS OFFLINE (solo admin) ───────────────────────────── -->
+    <section id="conflictos-offline" class="mt-4" style="display:none; background:var(--card); border-radius:var(--r-lg); padding:2rem; box-shadow:var(--shadow); border:2px solid #dc3545;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.5rem; background:#dc3545; color:white; padding:1rem; border-radius:var(--r-sm);">
+        <h3 style="font-size:1.1rem; font-weight:700; margin:0; display:flex; align-items:center;">
+          <i class="fas fa-exclamation-triangle" style="margin-right:10px;"></i>
+          Conflictos de sincronización
+          <span id="badgeConflictos" style="background:white; color:#dc3545; border-radius:12px; padding:2px 8px; font-size:0.8rem; margin-left:10px; display:none;">0</span>
+        </h3>
+      </div>
+      
+      <p style="color:var(--sub); font-size:0.9rem; margin-bottom:1.5rem;">
+        Estas operaciones no pudieron sincronizarse porque ya existe un registro con los mismos datos.
+        Como administrador, debes decidir cómo resolver cada conflicto.
+      </p>
+      
+      <div id="listaConflictos">
+        <div id="sinConflictos" style="text-align:center; padding:2rem; color:var(--muted); border:1px dashed var(--border); border-radius:var(--r-sm);">
+          <i class="fas fa-check-circle" style="font-size:2rem; color:var(--su); margin-bottom:10px; display:block;"></i>
+          No hay conflictos pendientes.
+        </div>
+      </div>
+    </section>
+
+    <script>
+    // ── Panel de conflictos — solo admin ─────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = window.auth?.getUser();
+      if (!user || user.rol !== 'admin') return;
+
+      const seccion = document.getElementById('conflictos-offline');
+      if (seccion) seccion.style.display = 'block';
+
+      const badge = document.getElementById('badgeConflictos');
+      const lista = document.getElementById('listaConflictos');
+      const sinConflictos = document.getElementById('sinConflictos');
+
+      async function cargarConflictos() {
+        if (!window.SicagConflictos) return;
+        const conflictos = await window.SicagConflictos.obtenerConflictos();
+
+        if (badge) {
+          badge.textContent = conflictos.length;
+          badge.style.display = conflictos.length > 0 ? 'inline-block' : 'none';
+        }
+
+        if (!lista) return;
+
+        lista.querySelectorAll('.conflicto-item').forEach(el => el.remove());
+
+        if (conflictos.length === 0) {
+          if (sinConflictos) sinConflictos.style.display = 'block';
+          return;
+        }
+        if (sinConflictos) sinConflictos.style.display = 'none';
+
+        conflictos.forEach(conf => {
+          const op = conf.operacion;
+          const fecha = new Date(conf.ts).toLocaleString('es-VE');
+          const datosStr = JSON.stringify(op?.datos || {}, null, 2).slice(0, 200) + '...';
+
+          const div = document.createElement('div');
+          div.className = 'conflicto-item';
+          div.style.cssText = 'padding:1rem; border:1px solid #ffc107; border-radius:var(--r-sm); margin-bottom:1rem; background:var(--bg);';
+          div.innerHTML = `
+            <div style="display:flex; align-items:center; margin-bottom:0.5rem;">
+              <i class="fas fa-exclamation-circle text-warning" style="margin-right:10px;"></i>
+              <strong style="color:var(--txt);">${op?.accion || 'Operación'} en ${op?.modulo || 'módulo'}</strong>
+              <span style="color:var(--sub); font-size:0.8rem; margin-left:auto;">${fecha}</span>
+            </div>
+            <div style="background:#f8f9fa; border-radius:4px; padding:0.5rem; font-family:monospace; font-size:0.8rem; max-height:100px; overflow:auto; margin-bottom:1rem; color:#333;">
+              ${datosStr}
+            </div>
+            <p style="color:#dc3545; font-size:0.85rem; margin-bottom:1rem;">
+              <i class="fas fa-info-circle" style="margin-right:5px;"></i> Error del servidor: ${conf.mensajeServidor || 'Registro duplicado'}
+            </p>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-outline" style="font-size:0.85rem; padding:0.4rem 0.8rem;" onclick="window.SicagConflictos.resolverConflicto('${conf.id}', 'mantener_existente').then(() => window.dispatchEvent(new Event('offline:conflictoResuelto')))">
+                <i class="fas fa-database"></i> Mantener el existente
+              </button>
+              <button class="btn btn-warning" style="font-size:0.85rem; padding:0.4rem 0.8rem; background:#ffc107; color:#333; border:none;" onclick="window.SicagConflictos.resolverConflicto('${conf.id}', 'usar_nuevo').then(() => window.dispatchEvent(new Event('offline:conflictoResuelto')))">
+                <i class="fas fa-upload"></i> Usar el nuevo (sobrescribir)
+              </button>
+              <button class="btn" style="font-size:0.85rem; padding:0.4rem 0.8rem; background:transparent; color:#dc3545; border:1px solid #dc3545;" onclick="window.SicagConflictos.resolverConflicto('${conf.id}', 'descartar').then(() => window.dispatchEvent(new Event('offline:conflictoResuelto')))">
+                <i class="fas fa-trash"></i> Descartar
+              </button>
+            </div>
+          `;
+          lista.appendChild(div);
+        });
+      }
+
+      await cargarConflictos();
+      window.addEventListener('offline:conflictoDetectado', () => cargarConflictos());
+      window.addEventListener('offline:conflictoResuelto', () => cargarConflictos());
+    });
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const badge2 = document.getElementById('badgePendientesOffline2');
+      const lista = document.getElementById('listaColaOffline');
+      const vaciaMensaje = document.getElementById('colaOfflineVacia');
+
+      async function cargarCola() {
+        if (!window.SicagDB) {
+          if (vaciaMensaje) vaciaMensaje.style.display = '';
+          return;
+        }
+        try {
+          const cola = await window.SicagDB.obtenerColaEscritura();
+
+          if (badge2) {
+            badge2.textContent = cola.length;
+            badge2.style.display = cola.length > 0 ? 'inline-block' : 'none';
+          }
+
+          if (!lista) return;
+
+          // Limpiar lista anterior
+          const itemsAnteriores = lista.querySelectorAll('.cola-item');
+          itemsAnteriores.forEach(el => el.remove());
+
+          if (cola.length === 0) {
+            if (vaciaMensaje) vaciaMensaje.style.display = '';
+            return;
+          }
+
+          if (vaciaMensaje) vaciaMensaje.style.display = 'none';
+
+          const iconosModulo = {
+            habitantes: 'users',
+            proyectos: 'seedling',
+            produccion_agricola: 'tractor',
+            organizaciones: 'hands-holding-circle',
+            noticias: 'newspaper',
+            viviendas: 'house',
+            voceros: 'users-gear',
+            validaciones: 'clipboard-check',
+          };
+
+          const etiquetasAccion = { POST: 'Crear', PUT: 'Editar', DELETE: 'Eliminar' };
+
+          cola.forEach(item => {
+            const icono = iconosModulo[item.modulo] || 'database';
+            const accionLabel = etiquetasAccion[item.accion] || item.accion;
+            const fechaLocal = new Date(item.ts).toLocaleString('es-VE');
+            const intentos = item.intentos || 0;
+            const colorIntento = intentos > 3 ? '#d32f2f' : intentos > 1 ? '#f57c00' : 'var(--sub)';
+
+            const div = document.createElement('div');
+            div.className = 'cola-item';
+            div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:1rem; border:1px solid var(--border); border-radius:var(--r-sm); margin-bottom:0.5rem; background:var(--bg);';
+            div.innerHTML = `
+              <div style="display:flex; align-items:center; gap:1rem;">
+                <div style="width:40px; height:40px; border-radius:50%; background:var(--card); display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-sm); color:var(--pr);">
+                  <i class="fas fa-${icono}"></i>
+                </div>
+                <div>
+                  <div style="font-weight:600; font-size:0.95rem; color:var(--txt);">${accionLabel} en ${item.modulo}</div>
+                  <div style="font-size:0.8rem; color:var(--sub);">Guardado local: ${fechaLocal}</div>
+                  ${intentos > 0 ? `<div style="font-size:0.75rem; color:${colorIntento}; margin-top:2px;">Intentos: ${intentos}</div>` : ''}
+                </div>
+              </div>
+              <span style="font-size:0.75rem; font-weight:600; padding:4px 8px; border-radius:4px; background:${intentos >= 5 ? '#ffebee' : '#fff3e0'}; color:${intentos >= 5 ? '#c62828' : '#e65100'}; border:1px solid ${intentos >= 5 ? '#ffcdd2' : '#ffe0b2'};">
+                ${intentos >= 5 ? 'Fallida' : 'Pendiente'}
+              </span>
+            `;
+            lista.appendChild(div);
+          });
+        } catch (err) {
+          console.error('[ColaPanel] Error:', err);
+        }
+      }
+
+      await cargarCola();
+      window.addEventListener('offline:syncCompleted', () => cargarCola());
+      window.addEventListener('offline:pendingCount', () => cargarCola());
+    });
+
+    window.sicagSincronizarAhora = async function() {
+      if (!navigator.onLine) {
+        if (window.Components?.showToast) Components.showToast('No hay conexión a internet. Vuelve a intentarlo cuando tengas red.', 'error');
+        return;
+      }
+      if (window.Components?.showToast) Components.showToast('Sincronizando...', 'info');
+      if (window.api) {
+        await window.api.flushColaUniversal();
+        if (typeof window.api.flushPendingPasos === 'function') await window.api.flushPendingPasos();
+      }
+    };
+    </script>
+
   </main>
 
   <!-- MODAL DE DETALLE DE SOLICITUD -->
@@ -446,6 +663,11 @@
   </div>
 
   <script src="js/auth.js"></script>
+    <!-- IndexedDB wrapper (1.5 KB) -->
+  <script src="https://cdn.jsdelivr.net/npm/idb@8/build/umd.js"></script>
+  <!-- Base de datos local de SICAG -->
+  <script src="js/services/sicag-db.js"></script>
+  <script src="js/services/sicag-conflict.js"></script>
   <script src="js/api.js"></script>
   <script src="js/components.js"></script>
   <script src="js/notificaciones.js"></script>

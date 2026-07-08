@@ -237,6 +237,21 @@ document.addEventListener('DOMContentLoaded', function () {
   initGlobalSearch();
   initScrollAnimations();
 
+  // Inicializar Badge de Operaciones Offline (Fase 3)
+  if (window.SicagBadgePendientes) {
+    window.SicagBadgePendientes.init();
+  }
+
+  // Inicializar estado offline en Formularios (Fase 4)
+  if (window.SicagFormOffline) {
+    window.SicagFormOffline.initTodos();
+  }
+
+  // Limpiar conflictos resueltos hace más de 30 días (Fase 4)
+  if (window.SicagConflictos) {
+    window.SicagConflictos.limpiarConflictosAntiguos().catch(() => {});
+  }
+
   // Cargar configuraciones del sistema desde el backend al localStorage
   if (window.api && typeof window.api.getSystemConfig === 'function') {
     window.api.getSystemConfig().catch(err => console.warn('No se pudo cargar configuración:', err));
@@ -355,5 +370,24 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       // ── Mensajes para Fase 3 (Background Sync) — Se amplían en Fase 3 ────
+      if (tipo === 'EJECUTAR_FLUSH_COLA') {
+        console.log('[App] SW solicita flush de cola universal...');
+        if (window.api) {
+          window.api.flushColaUniversal().then(() => {
+            console.log('[App] Flush de cola completado.');
+          }).catch(err => {
+            console.warn('[App] Error en flush de cola:', err.message);
+          });
+        }
+      }
+
+      if (tipo === 'EJECUTAR_FLUSH_CENSO') {
+        console.log('[App] SW solicita flush de cola de censo...');
+        if (window.api) {
+          window.api.flushPendingPasos().catch(err => {
+            console.warn('[App] Error en flush de censo:', err.message);
+          });
+        }
+      }
     });
   }

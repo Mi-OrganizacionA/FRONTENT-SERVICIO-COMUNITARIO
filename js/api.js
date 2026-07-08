@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Módulo centralizado de API (SICAG v3.0)
  *
  * Mejoras de seguridad y robustez:
@@ -36,6 +36,12 @@ class APIManager {
     this.isSyncing = false;
     this.isSubmitting = false;
     this.initMockData();
+
+    // Inicializar IndexedDB y migrar localStorage al cargar
+    // Esto es async pero no bloqueamos el constructor — se ejecuta en paralelo
+    this._dbIniciada = false;
+    this._initDB();
+
     // Sincronizar AMBAS colas al reconectar (censo + universal)
     window.addEventListener('online', () => {
       this._mostrarBannerOnline();
@@ -57,6 +63,22 @@ class APIManager {
     try { this.flushColaUniversal(); } catch(e) { /* ignore */ }
     // Mostrar estado de conexión actual
     if (!navigator.onLine) this._mostrarBannerOffline();
+  }
+
+  async _initDB() {
+    try {
+      if (typeof window.SicagDB === 'undefined') {
+        // SicagDB no está disponible (página pública sin el script)
+        return;
+      }
+      await window.SicagDB.abrirDB();
+      await window.SicagDB.migrarDesdeLocalStorage();
+      this._dbIniciada = true;
+      console.info('[API] IndexedDB inicializada y migración completada.');
+    } catch (err) {
+      console.warn('[API] IndexedDB no disponible, usando localStorage como fallback:', err.message);
+      this._dbIniciada = false;
+    }
   }
 
   // Cargar datos de ejemplo
@@ -169,99 +191,70 @@ class APIManager {
    * Sincroniza todos los pasos pendientes del censo.
    */
   async flushPendingPasos() {
-    if (this.isSyncing) return;
-    const queue = this._getPendingQueue();
-    if (!queue.length) return;
+    const cola = this._dbIniciada && window.SicagDB
+      ? await window.SicagDB.obtenerColaCenso()
+      : (() => {
+          try {
+            const raw = localStorage.getItem('sicag_censo_queue');
+            return raw ? JSON.parse(raw) : [];
+          } catch (e) { return []; }
+        })();
 
-    this.isSyncing = true;
-    console.info(`[Cola Censo] Sincronizando ${queue.length} pasos...`);
-    const remaining = [];
+    if (!cola.length) return;
+
+    console.info(`[Cola Censo] Sincronizando ${cola.length} pasos pendientes...`);
     let sincronizados = 0;
 
-    try {
-      for (const item of queue) {
-        try {
-          const resp = await this._fetch(`${this.baseURL}/estudios-demograficos/paso`, {
-            method: 'POST',
-            ...this._getHeaders(),
-            body: JSON.stringify(item)
-          });
-          if (!resp.ok) throw new Error('HTTP ' + resp.status);
-          sincronizados++;
-        } catch (e) {
-          console.warn(`[Cola Censo] No se pudo sincronizar paso ${item.paso}:`, e.message);
-          remaining.push({ ...item, intentos: (item.intentos || 0) + 1 });
+    for (const item of cola) {
+      try {
+        const resp = await this._fetch(`${this.baseURL}/estudios-demograficos/paso`, {
+          method: 'POST',
+          ...this._getHeaders(),
+          body: JSON.stringify({ paso: item.paso, id_estudio: item.id_estudio, datos: item.datos })
+        });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+        // Eliminar de la cola
+        if (this._dbIniciada && window.SicagDB) {
+          await window.SicagDB.eliminarDeColaCenso(item.clave);
         }
+        sincronizados++;
+        console.info(`[Cola Censo] ✅ Paso ${item.paso} sincronizado.`);
+      } catch (e) {
+        console.warn(`[Cola Censo] ❌ Paso ${item.paso}:`, e.message);
       }
-    } finally {
-      this._savePendingQueue(remaining);
-      this.isSyncing = false;
-      console.info(`[Cola Censo] Completado. OK: ${sincronizados}, Pendientes: ${remaining.length}`);
-      window.dispatchEvent(new CustomEvent('censo:syncCompleted', {
-        detail: { sincronizados, pendientes: remaining.length }
-      }));
     }
+
+    console.info(`[Cola Censo] Completado. OK: ${sincronizados}`);
+    window.dispatchEvent(new CustomEvent('censo:syncCompleted', {
+      detail: { sincronizados, pendientes: cola.length - sincronizados }
+    }));
+  }
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // COLA OFFLINE UNIVERSAL â€” Todos los módulos (habitantes, proyectos, etc.)
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-  /**
-   * Obtiene la cola offline universal desde localStorage.
-   * Esta cola aplica a TODOS los módulos: habitantes, proyectos, producción,
-   * organizaciones, voceros, noticias y cualquier otro que registre datos.
+  // â”€â”€�  /**
+   * Obtiene la cola offline universal desde IndexedDB.
    */
-  _getColaUniversal() {
+  async _getColaUniversal() {
+    if (!this._dbIniciada || !window.SicagDB) return [];
     try {
-      const raw = localStorage.getItem('sicag_offline_queue');
-      return raw ? JSON.parse(raw) : [];
-    } catch (e) { return []; }
-  }
-
-  /**
-   * Guarda la cola universal en localStorage.
-   */
-  _guardarColaUniversal(cola) {
-    try {
-      const serializado = JSON.stringify(cola);
-      if (serializado.length > 3 * 1024 * 1024) {
-        console.error('[Cola Universal] Supera 3MB. No se guardarán más ítems.');
-        return;
-      }
-      localStorage.setItem('sicag_offline_queue', serializado);
-      // Notificar conteo total combinado (censo + universal)
-      const totalCenso = this._getPendingQueue().length;
-      const totalUniversal = cola.length;
-      window.dispatchEvent(new CustomEvent('offline:pendingCount', {
-        detail: { total: totalCenso + totalUniversal, universal: totalUniversal, censo: totalCenso }
-      }));
+      return await window.SicagDB.obtenerColaEscritura();
     } catch (e) {
-      console.error('[Cola Universal] No se pudo guardar:', e);
+      console.warn('[Cola Universal] Error obteniendo cola desde IndexedDB', e);
+      return [];
     }
   }
 
   /**
    * Encola una operación fallida (cualquier módulo) para sincronización futura.
-   *
-   * @param {string} modulo   - Nombre del módulo ('habitantes', 'proyectos', etc.)
-   * @param {string} accion   - Acción HTTP: 'POST', 'PUT', 'DELETE'
-   * @param {string} endpoint - URL del endpoint relativo al baseURL
-   * @param {object} datos    - Datos de la operación
-   * @param {string|null} id  - ID del recurso (para PUT/DELETE)
    */
-  _encolarOperacion(modulo, accion, endpoint, datos, id = null) {
-    const cola = this._getColaUniversal();
-
-    if (cola.length >= this.MAX_QUEUE_SIZE) {
-      console.error('[Cola Universal] Límite alcanzado. No se puede encolar más operaciones.');
-      throw new Error('La cola de sincronización está llena. Conéctate a internet para sincronizar.');
+  async _encolarOperacion(modulo, accion, endpoint, datos, id = null) {
+    if (!this._dbIniciada || !window.SicagDB) {
+      console.warn('[Cola Universal] No se puede encolar: IndexedDB no disponible.');
+      return;
     }
 
-    // Deduplicación: mismo módulo + acción + id â†’ reemplazar
     const clave = `${modulo}|${accion}|${id || 'nuevo'}`;
-    const indiceExistente = cola.findIndex(item => item.clave === clave);
-
     const nuevoItem = {
       clave,
       modulo,
@@ -273,35 +266,190 @@ class APIManager {
       intentos: 0
     };
 
-    if (indiceExistente >= 0) {
-      cola[indiceExistente] = nuevoItem;
-      console.info(`[Cola Universal] Operación ${accion} en ${modulo} actualizada (deduplicada).`);
-    } else {
-      cola.push(nuevoItem);
-      console.info(`[Cola Universal] ${accion} en ${modulo} encolada. Total: ${cola.length}`);
+    try {
+      await window.SicagDB.encolarEscritura(nuevoItem);
+    } catch (e) {
+      console.error('[Cola Universal] Error al encolar operación:', e);
+      throw new Error('No se pudo guardar la operación offline.');
     }
 
-    this._guardarColaUniversal(cola);
+    // ── Registrar Background Sync para que el SW lo ejecute aunque la app se cierre ──
+    try {
+      if ('serviceWorker' in navigator && 'SyncManager' in window) {
+        navigator.serviceWorker.ready.then(reg => {
+          reg.sync.register('sicag-sync-escritura').then(() => {
+            console.info('[Cola] Background Sync registrado: sicag-sync-escritura');
+          }).catch(err => {
+            console.warn('[Cola] No se pudo registrar Background Sync:', err.message);
+          });
+        });
+      }
+    } catch (syncErr) {
+      // Background Sync no soportado en este navegador — ignorar silenciosamente
+    }
+
+    // Actualizar el badge visual de pendientes
+    this._actualizarBadgePendientes();
+  }
   }
 
   /**
-   * Sincroniza todas las operaciones pendientes de la cola universal.
-   * Se ejecuta automáticamente cuando el navegador detecta conexión.
+   * Sincroniza todas las operaciones pendientes de la cola universal en IndexedDB.
    */
   async flushColaUniversal() {
     if (this.isSyncing) {
-      console.info('[Cola Universal] Sincronización ya en progreso.');
+      console.info('[Cola] Sincronización ya en progreso.');
       return;
     }
 
-    const cola = this._getColaUniversal();
-    if (!cola.length) return;
+    // Verificar que hay conexión real antes de intentar
+    if (!navigator.onLine) {
+      console.info('[Cola] Sin conexión. Flush cancelado.');
+      return;
+    }
+
+    let cola = [];
+    if (this._dbIniciada && window.SicagDB) {
+      cola = await window.SicagDB.obtenerColaEscritura();
+    } else {
+      try {
+        cola = JSON.parse(localStorage.getItem('sicag_offline_queue') || '[]');
+      } catch (e) { cola = []; }
+    }
+
+    if (!cola.length) {
+      console.info('[Cola] Cola vacía, nada que sincronizar.');
+      return;
+    }
 
     this.isSyncing = true;
-    console.info(`[Cola Universal] Sincronizando ${cola.length} operaciones pendientes...`);
+    console.info(`[Cola] Sincronizando ${cola.length} operaciones pendientes...`);
 
-    const pendientes = [];
+    const MAX_INTENTOS = 5; // Después de 5 fallos, marcar como fallida y abandonar
     let sincronizados = 0;
+    let fallidas = 0;
+    let abandonadas = 0;
+
+    try {
+      for (const item of cola) {
+        // Si ya superó el límite de intentos, marcar como fallida y saltar
+        if ((item.intentos || 0) >= MAX_INTENTOS) {
+          console.warn(`[Cola] Operación ${item.clave} superó ${MAX_INTENTOS} intentos. Marcando como fallida.`);
+          abandonadas++;
+          // Eliminar de la cola para no bloquear las demás
+          if (this._dbIniciada && window.SicagDB) {
+            await window.SicagDB.eliminarDeColaEscritura(item.clave);
+          }
+          // Notificar al usuario de la operación fallida
+          window.dispatchEvent(new CustomEvent('offline:operacionFallida', {
+            detail: { item, motivo: 'max_intentos_alcanzados' }
+          }));
+          continue;
+        }
+
+        try {
+          const url = `${this.baseURL}${item.endpoint}`;
+          const opciones = { method: item.accion, ...this._getHeaders() };
+          if (item.accion !== 'DELETE' && item.datos) {
+            opciones.body = JSON.stringify(item.datos);
+          }
+
+          const resp = await this._fetch(url, opciones);
+
+          // 409 = conflicto (registro duplicado) — también se considera éxito (ya existe)
+          if (resp.ok || resp.status === 409) {
+            if (this._dbIniciada && window.SicagDB) {
+              await window.SicagDB.eliminarDeColaEscritura(item.clave);
+            }
+            sincronizados++;
+            console.info(`[Cola] ✅ ${item.accion} ${item.modulo} sincronizado.`);
+          } else {
+            throw new Error(`HTTP ${resp.status}`);
+          }
+        } catch (e) {
+          const status = e?.status || (e?.message?.match(/HTTP (\d+)/)?.[1] ? parseInt(e.message.match(/HTTP (\d+)/)[1]) : 0);
+
+          // ── 409 Conflict: registro duplicado ──────────────────────────────────────
+          if (status === 409) {
+            console.warn(`[Cola] ⚠️ Conflicto detectado para ${item.clave}: registro ya existe.`);
+            // Registrar como conflicto para resolución por el admin
+            if (window.SicagConflictos) {
+              await window.SicagConflictos.registrarConflicto(item, 409, e.message || 'Registro duplicado');
+            }
+            // Eliminar de la cola (no tiene sentido reintentar un 409 sin cambiar los datos)
+            if (this._dbIniciada && window.SicagDB) {
+              await window.SicagDB.eliminarDeColaEscritura(item.clave);
+            }
+            fallidas++;
+            continue;
+          }
+
+          // ── 404 Not Found: el registro fue eliminado ──────────────────────────────
+          if (status === 404) {
+            console.warn(`[Cola] 🗑️ Registro no encontrado para ${item.clave}. Posiblemente fue eliminado.`);
+            // Eliminar de la cola — no tiene sentido editar/eliminar algo que ya no existe
+            if (this._dbIniciada && window.SicagDB) {
+              await window.SicagDB.eliminarDeColaEscritura(item.clave);
+            }
+            // Notificar al usuario
+            window.dispatchEvent(new CustomEvent('offline:registroEliminado', {
+              detail: { item, mensaje: 'El registro fue eliminado por otro usuario mientras estabas offline.' }
+            }));
+            fallidas++;
+            continue;
+          }
+
+          // ── 422 Validation Error: datos inválidos ─────────────────────────────────
+          if (status === 422) {
+            console.warn(`[Cola] ❌ Datos inválidos para ${item.clave}. Descartando operación.`);
+            if (this._dbIniciada && window.SicagDB) {
+              await window.SicagDB.eliminarDeColaEscritura(item.clave);
+            }
+            window.dispatchEvent(new CustomEvent('offline:operacionInvalida', {
+              detail: { item, mensaje: 'Los datos de esta operación ya no son válidos.' }
+            }));
+            fallidas++;
+            continue;
+          }
+
+          // ── Error genérico (red, 500, etc.) — reintentar ─────────────────────────
+          console.warn(`[Cola] ❌ Intento ${(item.intentos || 0) + 1}/${MAX_INTENTOS} para ${item.clave}:`, e.message);
+          if (this._dbIniciada && window.SicagDB) {
+            await window.SicagDB.actualizarIntentosEscritura(item.clave, (item.intentos || 0) + 1);
+          }
+          fallidas++;
+        }
+      }
+    } finally {
+      this.isSyncing = false;
+
+      const resumen = { sincronizados, fallidas, abandonadas };
+      console.info(`[Cola] Flush completado. OK: ${sincronizados}, Fallidas: ${fallidas}, Abandonadas: ${abandonadas}`);
+
+      window.dispatchEvent(new CustomEvent('offline:syncCompleted', { detail: resumen }));
+
+      // Actualizar badge de pendientes
+      this._actualizarBadgePendientes();
+    }
+  }
+
+  /**
+   * Actualiza el badge visual con el conteo actual de pendientes.
+   * Se llama después de cada flush y después de cada encolar.
+   */
+  async _actualizarBadgePendientes() {
+    try {
+      let total = 0;
+      if (this._dbIniciada && window.SicagDB) {
+        const cola = await window.SicagDB.obtenerColaEscritura();
+        total = cola.length;
+      }
+      window.dispatchEvent(new CustomEvent('offline:pendingCount', {
+        detail: { total }
+      }));
+    } catch (e) { /* ignorar */ }
+  }
+  }  let sincronizados = 0;
 
     try {
       for (const item of cola) {
@@ -693,19 +841,47 @@ class APIManager {
     if (this.isDevelopment) {
       return this._aplicarFiltroCC(this._filterHabitantes(this.mockData.habitantes, filtros));
     }
+
     const params = new URLSearchParams(filtros);
     try {
+      // Intentar la red primero
       const response = await this._fetch(`${this.baseURL}/habitantes?${params}`, this._getHeaders());
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
         throw new Error(err.error || 'Error fetching habitantes');
       }
       const data = await response.json();
-      return this._aplicarFiltroCC(data.habitantes || data);
+      const lista = data.habitantes || data;
+
+      // Guardar en IndexedDB para uso offline (no bloquear el return)
+      if (this._dbIniciada && window.SicagDB) {
+        window.SicagDB.guardarTodos('habitantes', lista).catch(e =>
+          console.warn('[API] No se pudo cachear habitantes en IndexedDB:', e.message)
+        );
+      }
+
+      return this._aplicarFiltroCC(lista);
     } catch (error) {
-      if (this.isDevelopment) {
+      // Sin red: intentar IndexedDB primero
+      if (this._dbIniciada && window.SicagDB) {
+        try {
+          console.info('[API] Red no disponible. Cargando habitantes desde IndexedDB...');
+          const cached = await window.SicagDB.obtenerTodos('habitantes');
+          if (cached && cached.length > 0) {
+            console.info(`[API] ${cached.length} habitantes cargados desde IndexedDB.`);
+            this._mostrarAvisoOffline('habitantes');
+            return this._aplicarFiltroCC(this._filterHabitantes(cached, filtros));
+          }
+        } catch (dbErr) {
+          console.warn('[API] Error leyendo IndexedDB:', dbErr.message);
+        }
+      }
+
+      // Fallback final: mockData (datos de ejemplo)
+      if (this.mockData?.habitantes?.length > 0) {
         return this._aplicarFiltroCC(this._filterHabitantes(this.mockData.habitantes, filtros));
       }
+
       throw error;
     }
   }
@@ -902,7 +1078,7 @@ class APIManager {
 
         if (esErrorDeRed) {
           try {
-            this._encolarOperacion('validaciones', 'POST', '/validaciones', {
+            await this._encolarOperacion('validaciones', 'POST', '/validaciones', {
               tabla_afectada: tabla,
               tipo_accion: accion,
               id_vocero: user.id,
@@ -957,7 +1133,7 @@ class APIManager {
         const endpointFinal = (metodo !== 'POST' && id) ? `${endpoint}/${id}` : endpoint;
 
         try {
-          this._encolarOperacion(tabla, metodo, endpointFinal, datos, id);
+          await this._encolarOperacion(tabla, metodo, endpointFinal, datos, id);
           console.info(`[Cola Universal] ${accion} en ${tabla} guardada offline para sincronizar luego.`);
 
           // Notificar al usuario que se guardó offline
@@ -1026,20 +1202,38 @@ class APIManager {
   // PROYECTOS
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async getProyectos(filtros = {}) {
-    await this.waitForMockData();
     if (this.isDevelopment) {
-      return this._aplicarFiltroCC(this._filterProyectos(this.mockData.proyectos, filtros));
+      return this._aplicarFiltroCC(this.mockData.proyectos || []);
     }
+
     const params = new URLSearchParams(filtros);
     try {
       const response = await this._fetch(`${this.baseURL}/proyectos?${params}`, this._getHeaders());
       if (!response.ok) throw new Error('Error fetching proyectos');
       const data = await response.json();
-      return this._aplicarFiltroCC(data);
-    } catch (error) {
-      if (this.isDevelopment) {
-        return this._aplicarFiltroCC(this._filterProyectos(this.mockData.proyectos, filtros));
+      const lista = Array.isArray(data) ? data : (data.proyectos || []);
+
+      // Guardar en IndexedDB
+      if (this._dbIniciada && window.SicagDB) {
+        window.SicagDB.guardarTodos('proyectos', lista).catch(e =>
+          console.warn('[API] No se pudo cachear proyectos:', e.message)
+        );
       }
+
+      return this._aplicarFiltroCC(lista);
+    } catch (error) {
+      // Fallback IndexedDB
+      if (this._dbIniciada && window.SicagDB) {
+        try {
+          const cached = await window.SicagDB.obtenerTodos('proyectos');
+          if (cached && cached.length > 0) {
+            console.info(`[API] ${cached.length} proyectos cargados desde IndexedDB.`);
+            this._mostrarAvisoOffline('proyectos');
+            return this._aplicarFiltroCC(cached);
+          }
+        } catch (dbErr) { /* ignorar */ }
+      }
+      if (this.mockData?.proyectos) return this._aplicarFiltroCC(this.mockData.proyectos);
       throw error;
     }
   }
@@ -1126,12 +1320,38 @@ class APIManager {
   // PRODUCCIÓN AGRÃCOLA
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async getProduccion(filtros = {}) {
-    if (this.isDevelopment) return [];
+    if (this.isDevelopment) {
+      return this._aplicarFiltroCC(this.mockData.produccion_agricola || []);
+    }
+
     const params = new URLSearchParams(filtros);
-    const response = await this._fetch(`${this.baseURL}/produccion_agricola?${params}`, this._getHeaders());
-    if (!response.ok) throw new Error('Error fetching produccion agricola');
-    const data = await response.json();
-    return this._aplicarFiltroCC(data);
+    try {
+      const response = await this._fetch(`${this.baseURL}/produccion_agricola?${params}`, this._getHeaders());
+      if (!response.ok) throw new Error('Error fetching produccion_agricola');
+      const data = await response.json();
+      const lista = Array.isArray(data) ? data : (data.produccion_agricola || data.data || []);
+
+      if (this._dbIniciada && window.SicagDB) {
+        window.SicagDB.guardarTodos('produccion_agricola', lista).catch(e =>
+          console.warn('[API] No se pudo cachear produccion_agricola:', e.message)
+        );
+      }
+
+      return this._aplicarFiltroCC(lista);
+    } catch (error) {
+      if (this._dbIniciada && window.SicagDB) {
+        try {
+          const cached = await window.SicagDB.obtenerTodos('produccion_agricola');
+          if (cached && cached.length > 0) {
+            console.info(`[API] ${cached.length} produccion_agricola cargados desde IndexedDB.`);
+            this._mostrarAvisoOffline('produccion_agricola');
+            return this._aplicarFiltroCC(cached);
+          }
+        } catch (dbErr) { /* ignorar */ }
+      }
+      if (this.mockData?.produccion_agricola) return this._aplicarFiltroCC(this.mockData.produccion_agricola);
+      throw error;
+    }
   }
 
   async crearProduccion(datos) {
@@ -1165,12 +1385,38 @@ class APIManager {
   // ORGANIZACIONES SOCIALES
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async getOrganizaciones(filtros = {}) {
-    if (this.isDevelopment) return [];
+    if (this.isDevelopment) {
+      return this._aplicarFiltroCC(this.mockData.organizaciones || []);
+    }
+
     const params = new URLSearchParams(filtros);
-    const response = await this._fetch(`${this.baseURL}/organizaciones?${params}`, this._getHeaders());
-    if (!response.ok) throw new Error('Error fetching organizaciones');
-    const data = await response.json();
-    return this._aplicarFiltroCC(data);
+    try {
+      const response = await this._fetch(`${this.baseURL}/organizaciones?${params}`, this._getHeaders());
+      if (!response.ok) throw new Error('Error fetching organizaciones');
+      const data = await response.json();
+      const lista = Array.isArray(data) ? data : (data.organizaciones || data.data || []);
+
+      if (this._dbIniciada && window.SicagDB) {
+        window.SicagDB.guardarTodos('organizaciones', lista).catch(e =>
+          console.warn('[API] No se pudo cachear organizaciones:', e.message)
+        );
+      }
+
+      return this._aplicarFiltroCC(lista);
+    } catch (error) {
+      if (this._dbIniciada && window.SicagDB) {
+        try {
+          const cached = await window.SicagDB.obtenerTodos('organizaciones');
+          if (cached && cached.length > 0) {
+            console.info(`[API] ${cached.length} organizaciones cargadas desde IndexedDB.`);
+            this._mostrarAvisoOffline('organizaciones');
+            return this._aplicarFiltroCC(cached);
+          }
+        } catch (dbErr) { /* ignorar */ }
+      }
+      if (this.mockData?.organizaciones) return this._aplicarFiltroCC(this.mockData.organizaciones);
+      throw error;
+    }
   }
 
   async crearOrganizacion(datos) {
@@ -1207,12 +1453,38 @@ class APIManager {
   // VIVIENDAS
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async getViviendas(filtros = {}) {
-    if (this.isDevelopment) return [];
+    if (this.isDevelopment) {
+      return this._aplicarFiltroCC(this.mockData.viviendas || []);
+    }
+
     const params = new URLSearchParams(filtros);
-    const response = await this._fetch(`${this.baseURL}/viviendas?${params}`, this._getHeaders());
-    if (!response.ok) throw new Error('Error fetching viviendas');
-    const data = await response.json();
-    return this._aplicarFiltroCC(data);
+    try {
+      const response = await this._fetch(`${this.baseURL}/viviendas?${params}`, this._getHeaders());
+      if (!response.ok) throw new Error('Error fetching viviendas');
+      const data = await response.json();
+      const lista = Array.isArray(data) ? data : (data.viviendas || data.data || []);
+
+      if (this._dbIniciada && window.SicagDB) {
+        window.SicagDB.guardarTodos('viviendas', lista).catch(e =>
+          console.warn('[API] No se pudo cachear viviendas:', e.message)
+        );
+      }
+
+      return this._aplicarFiltroCC(lista);
+    } catch (error) {
+      if (this._dbIniciada && window.SicagDB) {
+        try {
+          const cached = await window.SicagDB.obtenerTodos('viviendas');
+          if (cached && cached.length > 0) {
+            console.info(`[API] ${cached.length} viviendas cargadas desde IndexedDB.`);
+            this._mostrarAvisoOffline('viviendas');
+            return this._aplicarFiltroCC(cached);
+          }
+        } catch (dbErr) { /* ignorar */ }
+      }
+      if (this.mockData?.viviendas) return this._aplicarFiltroCC(this.mockData.viviendas);
+      throw error;
+    }
   }
 
   async crearVivienda(datos) {
@@ -1246,12 +1518,38 @@ class APIManager {
   // VOCEROS
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async getVoceros(filtros = {}) {
-    if (this.isDevelopment) return [];
+    if (this.isDevelopment) {
+      return this._aplicarFiltroCC(this.mockData.voceros || []);
+    }
+
     const params = new URLSearchParams(filtros);
-    const response = await this._fetch(`${this.baseURL}/voceros?${params}`, this._getHeaders());
-    if (!response.ok) throw new Error('Error fetching voceros');
-    const data = await response.json();
-    return this._aplicarFiltroCC(data);
+    try {
+      const response = await this._fetch(`${this.baseURL}/voceros?${params}`, this._getHeaders());
+      if (!response.ok) throw new Error('Error fetching voceros');
+      const data = await response.json();
+      const lista = Array.isArray(data) ? data : (data.voceros || data.data || []);
+
+      if (this._dbIniciada && window.SicagDB) {
+        window.SicagDB.guardarTodos('voceros', lista).catch(e =>
+          console.warn('[API] No se pudo cachear voceros:', e.message)
+        );
+      }
+
+      return this._aplicarFiltroCC(lista);
+    } catch (error) {
+      if (this._dbIniciada && window.SicagDB) {
+        try {
+          const cached = await window.SicagDB.obtenerTodos('voceros');
+          if (cached && cached.length > 0) {
+            console.info(`[API] ${cached.length} voceros cargados desde IndexedDB.`);
+            this._mostrarAvisoOffline('voceros');
+            return this._aplicarFiltroCC(cached);
+          }
+        } catch (dbErr) { /* ignorar */ }
+      }
+      if (this.mockData?.voceros) return this._aplicarFiltroCC(this.mockData.voceros);
+      throw error;
+    }
   }
 
   async crearVocero(datos) {
@@ -1276,20 +1574,37 @@ class APIManager {
   // NOTICIAS (CARTELERA DIGITAL)
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async getNoticias(filtros = {}) {
-    await this.waitForMockData();
-    if (this.isDevelopment) return this.mockData?.noticias || [];
+    if (this.isDevelopment) {
+      return this.mockData.noticias || [];
+    }
+
     const params = new URLSearchParams(filtros);
     try {
-      const response = await this._fetch(`${this.baseURL}/cartelera/publico/activas`, this._getHeaders());
+      const response = await this._fetch(`${this.baseURL}/cartelera/publico/activas?${params}`, this._getHeaders());
       if (!response.ok) throw new Error('Error fetching noticias');
       const data = await response.json();
-      return data;
-    } catch (error) {
-      if (this.isDevelopment) {
-        return this.mockData?.noticias || [];
+      const lista = Array.isArray(data) ? data : (data.noticias || data.data || []);
+
+      if (this._dbIniciada && window.SicagDB) {
+        window.SicagDB.guardarTodos('noticias', lista).catch(e =>
+          console.warn('[API] No se pudo cachear noticias:', e.message)
+        );
       }
-      console.warn('No se pudo cargar noticias desde la API; usando datos locales:', error.message);
-      return this.mockData?.noticias || [];
+
+      return lista;
+    } catch (error) {
+      if (this._dbIniciada && window.SicagDB) {
+        try {
+          const cached = await window.SicagDB.obtenerTodos('noticias');
+          if (cached && cached.length > 0) {
+            console.info(`[API] ${cached.length} noticias cargadas desde IndexedDB.`);
+            this._mostrarAvisoOffline('noticias');
+            return cached;
+          }
+        } catch (dbErr) { /* ignorar */ }
+      }
+      if (this.mockData?.noticias) return this.mockData.noticias;
+      throw error;
     }
   }
 
@@ -1859,7 +2174,41 @@ class APIManager {
     const url = `${this.baseURL}/viviendas/${id}/exportar-pdf?token=${token}`;
     window.open(url, '_blank');
   }
+
+  /**
+   * Retorna true si se puede saber que los datos son del caché local.
+   * Usar en los módulos para mostrar un badge "Datos locales - última sync: hace X min"
+   */
+  async _mostrarAvisoOffline(storeName) {
+    if (!this._dbIniciada || !window.SicagDB) return;
+    const segundos = await window.SicagDB.segundosDesdeSincronizacion(storeName);
+    if (segundos === Infinity) return; // Nunca sincronizó, no mostrar nada
+
+    const minutos = Math.floor(segundos / 60);
+    const texto = minutos < 1
+      ? 'hace menos de 1 minuto'
+      : minutos < 60
+        ? `hace ${minutos} minutos`
+        : `hace ${Math.floor(minutos / 60)} horas`;
+
+    // Buscar un contenedor para el aviso en la página actual
+    let avisoEl = document.getElementById('sicag-datos-cache-aviso');
+    if (!avisoEl) {
+      avisoEl = document.createElement('div');
+      avisoEl.id = 'sicag-datos-cache-aviso';
+      avisoEl.style.cssText = `
+        background: #FFF8E1; border-left: 4px solid #F9A825; padding: 8px 14px;
+        font-size: 0.82rem; color: #5D4037; margin-bottom: 12px; border-radius: 4px;
+        display: flex; align-items: center; gap: 8px;
+      `;
+      // Insertar al principio del contenido principal
+      const main = document.querySelector('main, .main-content, #contenidoPrincipal, .container');
+      if (main) main.prepend(avisoEl);
+    }
+    avisoEl.innerHTML = `<i class="fas fa-database"></i> Mostrando datos guardados localmente (última actualización: ${texto}). Conecta a internet para ver datos en tiempo real.`;
+  }
 }
 
 // Instancia global
 window.api = new APIManager();
+

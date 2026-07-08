@@ -211,6 +211,11 @@
       <div class="header-actions">
         ${roleBadge}
         
+        <a href="notificaciones.html#cola-offline" class="header-action-btn" aria-label="Operaciones Offline" title="Operaciones pendientes" id="btnSincronizacionOffline" style="position:relative;">
+          <i class="fas fa-sync"></i>
+          <span class="badge-notif" id="badgePendientesOffline" style="display:none; background-color: #E65100;">0</span>
+        </a>
+
         <div class="header-notif-wrapper" id="headerNotifWrapper">
           <button class="header-action-btn" type="button" aria-label="Notificaciones" id="headerNotifBtn">
             <i class="fas fa-bell"></i><span class="badge-notif" id="headerNotifBadge" style="display:none;">0</span>

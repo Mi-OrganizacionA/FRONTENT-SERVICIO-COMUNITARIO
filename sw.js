@@ -14,10 +14,10 @@
 
 // ── VERSIONES DE CACHÉ ──────────────────────────────────────────────────────
 // NOTA: Al pasar a v4, el activate limpia automáticamente los caches v3 anteriores.
-const CORE_CACHE     = 'sicag-core-v4';
-const CDN_CACHE      = 'sicag-cdn-v4';
-const API_CACHE      = 'sicag-api-v4';
-const PRIVATE_CACHE  = 'sicag-private-v4';
+const CORE_CACHE     = 'sicag-core-v5';
+const CDN_CACHE      = 'sicag-cdn-v5';
+const API_CACHE      = 'sicag-api-v5';
+const PRIVATE_CACHE  = 'sicag-private-v5';
 const TODOS_LOS_CACHES = [CORE_CACHE, CDN_CACHE, API_CACHE, PRIVATE_CACHE];
 
 // ── CACHÉ PÚBLICO: lo mínimo que necesita cualquier visitante ───────────────
@@ -378,6 +378,47 @@ self.addEventListener('message', (event) => {
     event.waitUntil(
       caches.delete(PRIVATE_CACHE).then(() => {
         console.log('[SW] Caché privado eliminado.');
+      })
+    );
+  }
+});
+
+// ── BACKGROUND SYNC: Sincronizar cola al reconectar ──────────────────────────
+// Este evento se dispara cuando el navegador detecta conexión Y hay un sync registrado.
+// Funciona incluso si el usuario cerró la app (Android/Chrome con SW activo).
+self.addEventListener('sync', (event) => {
+  console.log('[SW] Evento sync recibido:', event.tag);
+
+  if (event.tag === 'sicag-sync-escritura') {
+    // Notificar a todos los clientes activos para que procesen la cola
+    event.waitUntil(
+      self.clients.matchAll({ type: 'window', includeUncontrolled: false }).then(clients => {
+        if (clients.length > 0) {
+          // Hay pestañas abiertas → notificar al cliente para que use su instancia de api.js
+          clients.forEach(client => {
+            client.postMessage({ tipo: 'EJECUTAR_FLUSH_COLA' });
+          });
+          console.log(`[SW] Notificados ${clients.length} clientes para sincronizar cola.`);
+          return Promise.resolve();
+        } else {
+          // No hay clientes activos (app cerrada) → el SW sincroniza directamente
+          // NOTA: No tenemos acceso a window.auth desde el SW, así que solo podemos
+          // ejecutar operaciones que no necesiten token (limitado).
+          // En la práctica, la mayoría de sync ocurre con clientes abiertos.
+          console.log('[SW] No hay clientes activos. Sincronización en background no disponible sin sesión activa.');
+          return Promise.resolve();
+        }
+      })
+    );
+  }
+
+  if (event.tag === 'sicag-sync-censo') {
+    event.waitUntil(
+      self.clients.matchAll({ type: 'window' }).then(clients => {
+        clients.forEach(client => {
+          client.postMessage({ tipo: 'EJECUTAR_FLUSH_CENSO' });
+        });
+        return Promise.resolve();
       })
     );
   }
