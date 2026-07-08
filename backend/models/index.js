@@ -40,8 +40,9 @@ async function initModels(sequelize) {
   ProduccionAgricola.belongsTo(ConsejoComunal, { foreignKey: 'consejo_comunal_id', as: 'consejo' });
 
   // Relaciones específicas
-  ProduccionAgricola.belongsTo(Habitante, { foreignKey: 'habitante_id', as: 'productor' });
-  Habitante.hasMany(ProduccionAgricola, { foreignKey: 'habitante_id', as: 'producciones' });
+  // CORRECCIÓN B1: el modelo ProduccionAgricola define el campo como 'id_habitante', no 'habitante_id'
+  ProduccionAgricola.belongsTo(Habitante, { foreignKey: 'id_habitante', as: 'productor' });
+  Habitante.hasMany(ProduccionAgricola, { foreignKey: 'id_habitante', as: 'producciones' });
 
   Vivienda.belongsTo(Habitante, { foreignKey: 'id_jefe_familia', as: 'jefe' });
   Habitante.hasOne(Vivienda, { foreignKey: 'id_jefe_familia', as: 'vivienda_liderada' });

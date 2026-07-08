@@ -36,6 +36,7 @@
       "truncate_*.js",
       "list_*.js",
       "debug_*.js",
+      "update_*.js",
       "google4e8c9b33fe4996f3.html",
       "data/",
       "test_render_extracted/",

@@ -117,7 +117,7 @@ class HabitantesService {
   static async getPorConsejo(habitanteModel, consejoId) {
     try {
       const habitantes = await habitanteModel.findAll({
-        where: { id_comunidad: consejoId, activo: true },
+        where: { consejo_comunal_id: consejoId, activo: true },
         order: [['nombre', 'ASC']]
       });
       
@@ -294,7 +294,7 @@ class HabitantesService {
   static async listar(habitanteModel, limit = 50, offset = 0, consejoId = null) {
     try {
       const where = { activo: true };
-      if (consejoId) where.id_comunidad = consejoId;
+      if (consejoId) where.consejo_comunal_id = consejoId;
 
       const { count, rows } = await habitanteModel.findAndCountAll({
         where,

@@ -14,10 +14,10 @@
 
 // ── VERSIONES DE CACHÉ ──────────────────────────────────────────────────────
 // NOTA: Al pasar a v4, el activate limpia automáticamente los caches v3 anteriores.
-const CORE_CACHE     = 'sicag-core-v5';
-const CDN_CACHE      = 'sicag-cdn-v5';
-const API_CACHE      = 'sicag-api-v5';
-const PRIVATE_CACHE  = 'sicag-private-v5';
+const CORE_CACHE     = 'sicag-core-v6';
+const CDN_CACHE      = 'sicag-cdn-v6';
+const API_CACHE      = 'sicag-api-v6';
+const PRIVATE_CACHE  = 'sicag-private-v6';
 const TODOS_LOS_CACHES = [CORE_CACHE, CDN_CACHE, API_CACHE, PRIVATE_CACHE];
 
 // ── CACHÉ PÚBLICO: lo mínimo que necesita cualquier visitante ───────────────
@@ -94,6 +94,8 @@ const PRECACHE_PRIVADO = [
   // Datos
   '/data/seed.json',
   '/venezuela.geojson',
+  '/manifest-sistema.json',
+  'https://cdn.jsdelivr.net/npm/idb@8/build/umd.js',
   // Imágenes privadas (proyectos)
   '/assets/img/proyecto_cacao.webp',
   '/assets/img/proyecto_cafe.webp',
