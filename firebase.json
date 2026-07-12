@@ -41,7 +41,12 @@
       "data/",
       "test_render_extracted/",
       "selects.json",
-      "changes_review.diff"
+      "changes_review.diff",
+      "**/*.xlsx",
+      "diff_*.txt",
+      "temp_*.txt",
+      "select_*.txt",
+      "iniciar_*.bat"
     ]
   }
 }

@@ -30,6 +30,7 @@ const PRECACHE_PUBLICO = [
   '/login.html',
   '/404.html',
   '/manifest.json',
+  '/manifest-sistema.json',
   '/css/public.css',
   '/css/login.css',
   '/js/public.js',
