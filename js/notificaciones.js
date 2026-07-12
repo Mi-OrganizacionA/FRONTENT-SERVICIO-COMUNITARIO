@@ -1,5 +1,5 @@
 /**
- * notificaciones.js â€” Controlador de Bandeja de Validaciones v3.0
+ * notificaciones.js "” Controlador de Bandeja de Validaciones v3.0
  * Soporta vista tabla (Admin) y vista solicitudes propias (Vocero)
  */
 class NotificacionesController {
@@ -29,7 +29,7 @@ class NotificacionesController {
     this.bindUIEvents();
   }
 
-  /* â”€â”€â”€ Adaptar la UI según el rol â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ─── Adaptar la UI según el rol ─────────────────────────── */
   adaptarVistaRol() {
     const isVocero = this.userRole === 'vocero';
 
@@ -67,7 +67,7 @@ class NotificacionesController {
     }
   }
 
-  /* â”€â”€â”€ Carga de datos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ─── Carga de datos ──────────────────────────────────────── */
   async cargarDatos() {
     try {
       const isVocero = this.userRole === 'vocero';
@@ -356,7 +356,7 @@ class NotificacionesController {
     });
   }
 
-  /* â”€â”€â”€ Barra Masiva â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ─── Barra Masiva ────────────────────────────────────────── */
   actualizarBulkBar() {
     const bar = document.getElementById('bulkActionsBar');
     const countEl = document.getElementById('bulkCount');
@@ -366,7 +366,7 @@ class NotificacionesController {
     bar.classList.toggle('visible', n > 0);
   }
 
-  /* â”€â”€â”€ Modal Detalle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ─── Modal Detalle ───────────────────────────────────────── */
   abrirDetalle(id) {
     this.detailId = id;
     const n = this.todas.find(x => x.id === id);
@@ -382,7 +382,7 @@ class NotificacionesController {
     const isVocero = this.userRole === 'vocero';
     const solicitante = n.nombre_vocero || `Vocero #${n.id_vocero}`;
 
-    if (title) title.innerHTML = `<i class="fas fa-file-lines"></i> ${this.capitalize(n.tabla_afectada?.replace(/_/g, ' '))} â€” ${this.capitalize(n.tipo_accion || '')}`;
+    if (title) title.innerHTML = `<i class="fas fa-file-lines"></i> ${this.capitalize(n.tabla_afectada?.replace(/_/g, ' '))} "” ${this.capitalize(n.tipo_accion || '')}`;
 
     // Construir filas de datos temporales
     let datosHtml = '';
@@ -433,7 +433,7 @@ class NotificacionesController {
         </div>
         <div class="det-meta-item">
           <div class="det-meta-key">Tabla Afectada</div>
-          <div class="det-meta-value">${this.escapeHtml(n.tabla_afectada || 'â€”')}</div>
+          <div class="det-meta-value">${this.escapeHtml(n.tabla_afectada || '"”')}</div>
         </div>
         <div class="det-meta-item">
           <div class="det-meta-key">Tipo Acción</div>
@@ -555,7 +555,7 @@ class NotificacionesController {
     );
   }
 
-  /* â”€â”€â”€ Acciones masivas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ─── Acciones masivas ────────────────────────────────────── */
   confirmarAccionMasiva(accion) {
     const n = this.selected.size;
     if (n === 0) return;
@@ -569,7 +569,7 @@ class NotificacionesController {
     const btnOk = document.getElementById('btnConfirmOk');
     const btnLabel = document.getElementById('confirmBtnLabel');
 
-    if (icon) icon.textContent = isApprove ? 'âœ…' : 'âŒ';
+    if (icon) icon.textContent = isApprove ? '✅' : '❌';
     if (title) title.textContent = isApprove ? 'Aprobar en Lote' : 'Rechazar en Lote';
     if (msg) msg.textContent = `Estás a punto de ${isApprove ? 'aprobar' : 'rechazar'} ${n} solicitud${n !== 1 ? 'es' : ''} seleccionada${n !== 1 ? 's' : ''}. Esta acción afectará directamente la base de datos.`;
     if (btnOk) {
@@ -623,7 +623,7 @@ class NotificacionesController {
     await this.cargarDatos();
 
     if (err === 0) {
-      Components.showToast(`âœ… ${ok} solicitud${ok !== 1 ? 'es' : ''} ${isApprove ? 'aprobada' : 'rechazada'}${ok !== 1 ? 's' : ''} correctamente.`, 'success');
+      Components.showToast(`✅ ${ok} solicitud${ok !== 1 ? 'es' : ''} ${isApprove ? 'aprobada' : 'rechazada'}${ok !== 1 ? 's' : ''} correctamente.`, 'success');
     } else {
       Components.showToast(`${ok} procesada${ok !== 1 ? 's' : ''}, ${err} con error.`, 'warning');
     }
@@ -680,7 +680,7 @@ class NotificacionesController {
     });
   }
 
-  /* â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ─── Helpers ─────────────────────────────────────────────── */
   getDescripcion(n) {
     const d = n.datos_temporales || {};
     if (n.tabla_afectada === 'recuperacion_clave') return `Recuperación de clave: ${d.correo_usuario}`;
@@ -696,7 +696,7 @@ class NotificacionesController {
     if (d.nombre) return `Organización: ${d.nombre}`;
     if (d.nuevo_correo) return `Cambio de correo â†’ ${d.nuevo_correo}`;
     if (d.cultivo) return `Cultivo: ${d.cultivo}`;
-    return `Tabla: ${n.tabla_afectada || 'â€”'}`;
+    return `Tabla: ${n.tabla_afectada || '"”'}`;
   }
 
   getTipoBadge(tabla) {
@@ -719,7 +719,7 @@ class NotificacionesController {
         </span>`;
       }
     }
-    return `<span class="v-tipo-badge v-tipo-otro"><i class="fas fa-file"></i> ${this.escapeHtml(tabla || 'â€”')}</span>`;
+    return `<span class="v-tipo-badge v-tipo-otro"><i class="fas fa-file"></i> ${this.escapeHtml(tabla || '"”')}</span>`;
   }
 
   getEstadoPill(estado) {

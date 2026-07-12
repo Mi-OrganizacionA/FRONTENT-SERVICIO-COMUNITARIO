@@ -230,9 +230,8 @@ class APIManager {
       detail: { sincronizados, pendientes: cola.length - sincronizados }
     }));
   }
-  }
 
-  // â”€â”€�  /**
+  /**
    * Obtiene la cola offline universal desde IndexedDB.
    */
   async _getColaUniversal() {
@@ -290,7 +289,6 @@ class APIManager {
 
     // Actualizar el badge visual de pendientes
     this._actualizarBadgePendientes();
-  }
   }
 
   /**
@@ -449,43 +447,10 @@ class APIManager {
       }));
     } catch (e) { /* ignorar */ }
   }
-  }  let sincronizados = 0;
 
-    try {
-      for (const item of cola) {
-        try {
-          const url = `${this.baseURL}${item.endpoint}`;
-          const opciones = {
-            method: item.accion,
-            ...this._getHeaders()
-          };
-          // Solo adjuntar body si no es DELETE
-          if (item.accion !== 'DELETE' && item.datos) {
-            opciones.body = JSON.stringify(item.datos);
-          }
-
-          const resp = await this._fetch(url, opciones);
-          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-          sincronizados++;
-          console.info(`[Cola Universal] âœ… ${item.accion} ${item.modulo} sincronizado.`);
-        } catch (e) {
-          console.warn(`[Cola Universal] âŒ No se pudo sincronizar ${item.accion} ${item.modulo}:`, e.message);
-          pendientes.push({ ...item, intentos: (item.intentos || 0) + 1 });
-        }
-      }
-    } finally {
-      this._guardarColaUniversal(pendientes);
-      this.isSyncing = false;
-      console.info(`[Cola Universal] Completado. OK: ${sincronizados}, Pendientes: ${pendientes.length}`);
-      window.dispatchEvent(new CustomEvent('offline:syncCompleted', {
-        detail: { sincronizados, pendientes: pendientes.length }
-      }));
-    }
-  }
-
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────────────────────────────────────
   // BANNER VISUAL ONLINE / OFFLINE
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────────────────────────────────────
 
   /**
    * Muestra un banner en la parte superior indicando que el dispositivo está offline.
@@ -508,7 +473,7 @@ class APIManager {
     ].join(';');
     banner.innerHTML = `
       <span style="font-size:1rem">ðŸ“¡</span>
-      <span>Sin conexión a internet â€” Guardando localmente</span>
+      <span>Sin conexión a internet "” Guardando localmente</span>
     `;
     // Insertar style de animación si no existe
     if (!document.getElementById('sicag-banner-style')) {
@@ -545,8 +510,8 @@ class APIManager {
       'animation:slideUpBanner 0.3s ease'
     ].join(';');
     banner.innerHTML = `
-      <span style="font-size:1rem">âœ…</span>
-      <span>Conexión restaurada â€” Sincronizando...</span>
+      <span style="font-size:1rem">✅</span>
+      <span>Conexión restaurada "” Sincronizando...</span>
     `;
     document.body.appendChild(banner);
     // Auto-ocultar después de 4 segundos
@@ -561,9 +526,9 @@ class APIManager {
     if (banner) banner.remove();
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   // AUTHENTICATION & SECURITY
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   async changePassword(passwordActual, nuevaPassword) {
     if (this.isDevelopment) {
       return new Promise(r => setTimeout(() => r({ success: true, message: 'Simulado' }), 500));
@@ -704,9 +669,9 @@ class APIManager {
     return `${backendHost}${data.url}`;
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   // CONFIGURACIÓN DEL SISTEMA Y RECOVERY PASS
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
 
   async getSystemConfig() {
     await this.waitForMockData();
@@ -793,9 +758,9 @@ class APIManager {
     return data;
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   // NOTIFICACIONES INTERNAS
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
 
   async getNotificaciones() {
     if (this.isDevelopment) return [];
@@ -833,9 +798,9 @@ class APIManager {
     return data;
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   // HABITANTES
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   async getHabitantes(filtros = {}) {
     await this.waitForMockData();
     if (this.isDevelopment) {
@@ -1140,7 +1105,7 @@ class APIManager {
           if (window.Components?.showToast) {
             const accionText = accion === 'CREATE' ? 'Registro' : (accion === 'UPDATE' ? 'Actualización' : 'Eliminación');
             Components.showToast(
-              `ðŸ“´ Sin conexión â€” ${accionText} guardada localmente. Se sincronizará al reconectar.`,
+              `ðŸ“´ Sin conexión "” ${accionText} guardada localmente. Se sincronizará al reconectar.`,
               'warning'
             );
           }
@@ -1198,9 +1163,9 @@ class APIManager {
     });
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   // PROYECTOS
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   async getProyectos(filtros = {}) {
     if (this.isDevelopment) {
       return this._aplicarFiltroCC(this.mockData.proyectos || []);
@@ -1316,9 +1281,9 @@ class APIManager {
     });
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // PRODUCCIÓN AGRÃCOLA
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
+  // PRODUCCIÓN AGRÍCOLA
+  // ─────────────────────────────────────────
   async getProduccion(filtros = {}) {
     if (this.isDevelopment) {
       return this._aplicarFiltroCC(this.mockData.produccion_agricola || []);
@@ -1381,9 +1346,9 @@ class APIManager {
     });
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   // ORGANIZACIONES SOCIALES
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   async getOrganizaciones(filtros = {}) {
     if (this.isDevelopment) {
       return this._aplicarFiltroCC(this.mockData.organizaciones || []);
@@ -1449,9 +1414,9 @@ class APIManager {
     });
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   // VIVIENDAS
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   async getViviendas(filtros = {}) {
     if (this.isDevelopment) {
       return this._aplicarFiltroCC(this.mockData.viviendas || []);
@@ -1514,9 +1479,9 @@ class APIManager {
     });
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   // VOCEROS
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   async getVoceros(filtros = {}) {
     if (this.isDevelopment) {
       return this._aplicarFiltroCC(this.mockData.voceros || []);
@@ -1570,9 +1535,9 @@ class APIManager {
     });
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   // NOTICIAS (CARTELERA DIGITAL)
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   async getNoticias(filtros = {}) {
     if (this.isDevelopment) {
       return this.mockData.noticias || [];
@@ -1668,9 +1633,9 @@ class APIManager {
     });
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // DASHBOARD Y ESTADÃSTICAS
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
+  // DASHBOARD Y ESTADÍSTICAS
+  // ─────────────────────────────────────────
   async getDashboardStats() {
     await this.waitForMockData();
     if (this.isDevelopment) {
@@ -1723,9 +1688,9 @@ class APIManager {
     }
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   // BÚSQUEDA GLOBAL
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   async globalSearch(query) {
     if (!query || query.length < 2) return [];
     try {
@@ -1746,9 +1711,9 @@ class APIManager {
     }
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
   // MÉTODOS AUXILIARES
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
 
   /**
    * Construye los headers de autenticación leyendo el token DESDE MEMORIA.
@@ -2106,9 +2071,9 @@ class APIManager {
     return await response.json();
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // VIVIENDAS (Censo T2 â€” Infraestructura)
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────
+  // VIVIENDAS (Censo T2 "” Infraestructura)
+  // ─────────────────────────────────────────
 
   /**
    * Obtiene todas las viviendas censadas del backend.
