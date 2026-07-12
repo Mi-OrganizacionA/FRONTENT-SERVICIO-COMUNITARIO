@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Componentes reutilizables de SICAG v2.5 y utilidades de interfaz
  * Archivo: js/components.js
  */
@@ -477,7 +477,7 @@ window.SicagBadgePendientes = {
     } catch (e) { /* ignorar */ }
   },
 
-    async _actualizarConConflictos() {
+  async _actualizarConConflictos() {
     if (!this._badge) return;
     try {
       let pendientes = 0;
@@ -494,9 +494,6 @@ window.SicagBadgePendientes = {
         this._badge.textContent = total;
         this._badge.style.display = '';
         // Cambiar color si hay conflictos (rojo) vs solo pendientes (naranja)
-        this._badge.className = conflictos > 0
-          ? 'badge-notif bg-danger'
-          : 'badge-notif bg-warning text-dark';
         this._badge.style.backgroundColor = conflictos > 0 ? '#C62828' : '#E65100';
         this._badge.title = `${pendientes} pendiente(s), ${conflictos} conflicto(s)`;
       } else {
@@ -505,7 +502,7 @@ window.SicagBadgePendientes = {
     } catch (e) { /* ignorar */ }
   }
 };
-\n
+
 /**
  * SicagFormOffline
  * Muestra un banner en la parte superior de un formulario cuando no hay internet.

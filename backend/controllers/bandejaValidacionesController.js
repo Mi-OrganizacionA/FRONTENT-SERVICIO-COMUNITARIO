@@ -55,7 +55,7 @@ class BandejaValidacionesController {
     }
   }
 
-  // Crear solicitud de validaciÃ³n
+  // Crear solicitud de validación
   static async crear(req, res) {
     try {
       const { tabla_afectada, registro_id, tipo_accion, datos_temporales } = req.body;
@@ -78,7 +78,7 @@ class BandejaValidacionesController {
       });
 
       if (existente && JSON.stringify(existente.datos_temporales) === JSON.stringify(datos_temporales)) {
-        logger.info(`ValidaciÃ³n duplicada detectada y prevenida para vocero ${req.user.id}`);
+        logger.info(`Validación duplicada detectada y prevenida para vocero ${req.user.id}`);
         return res.status(200).json({ 
           mensaje: 'Solicitud ya estaba registrada (deduplicada exitosamente)',
           validacion: existente 
@@ -98,16 +98,16 @@ class BandejaValidacionesController {
       await AuditService.log(req.user.id, 'CREATE', 'bandeja_validaciones', validacion.id, null, validacion.toJSON());
       
       res.status(201).json({ 
-        mensaje: 'Solicitud registrada y pendiente de aprobaciÃ³n',
+        mensaje: 'Solicitud registrada y pendiente de aprobación',
         validacion 
       });
     } catch (error) {
-      logger.error('Error creando solicitud de validaciÃ³n:', error);
+      logger.error('Error creando solicitud de validación:', error);
       res.status(400).json({ error: error.message });
     }
   }
 
-  // Aprobar validaciÃ³n (admin)
+  // Aprobar validación (admin)
   static async aprobar(req, res) {
     try {
       const { id } = req.params;
@@ -398,10 +398,10 @@ class BandejaValidacionesController {
 
           nuevoRegistro = { id: validacion.registro_id || datos.id };
         } else {
-          throw new Error(`AcciÃ³n no soportada para la tabla ${tabla}: ${validacion.tipo_accion}`);
+          throw new Error(`Acción no soportada para la tabla ${tabla}: ${validacion.tipo_accion}`);
         }
       } else {
-        throw new Error(`Tabla afectada o tipo de acciÃ³n desconocida: ${tabla} - ${validacion.tipo_accion}`);
+        throw new Error(`Tabla afectada o tipo de acción desconocida: ${tabla} - ${validacion.tipo_accion}`);
       }
 
       await validacion.update({
@@ -419,12 +419,12 @@ class BandejaValidacionesController {
         validacion 
       });
     } catch (error) {
-      logger.error('Error aprobando validaciÃ³n:', error);
+      logger.error('Error aprobando validación:', error);
       res.status(400).json({ error: error.message });
     }
   }
 
-  // Rechazar validaciÃ³n (admin)
+  // Rechazar validación (admin)
   static async rechazar(req, res) {
     try {
       const { id } = req.params;
@@ -462,12 +462,12 @@ class BandejaValidacionesController {
     }
   }
 
-  // Obtener detalles de una validaciÃ³n
+  // Obtener detalles de una validación
   static async getById(req, res) {
     try {
       const { id } = req.params;
       const validacion = await BandejaModel.findByPk(id);
-      if (!validacion) return res.status(404).json({ error: 'ValidaciÃ³n no encontrada' });
+      if (!validacion) return res.status(404).json({ error: 'Validación no encontrada' });
       res.json(validacion);
     } catch (error) {
       res.status(500).json({ error: error.message });

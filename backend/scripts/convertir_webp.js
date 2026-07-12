@@ -20,16 +20,16 @@ const raw = fs.readFileSync(API_JS, 'utf8');
 // Reemplazos de doble-encoding UTF-8 → caracteres correctos
 const fixes = [
   // Separadores de sección (─ = U+2500 → su double-encoding)
-  [/â"€/g, '─'],
+  [/─/g, '─'],
   // Guión em (— = U+2014)
-  [/â€"/g, '—'],
+  [/""/g, '—'],
   // DEMOGRÁFICO
   [/DEMOGRÃFICO/g, 'DEMOGRÁFICO'],
   [/DEMOGR\u00c3\u0081FICO/g, 'DEMOGRÁFICO'],
   // Comilla apertura " (U+201C)
-  [/â€œ/g, '"'],
+  [/"/g, '"'],
   // Comilla cierre " (U+201D)
-  [/â€\x9d/g, '"'],
+  [/"\x9d/g, '"'],
   // Ó (U+00D3)
   [/\u00c3\u0093/g, 'Ó'],
   // É (U+00C9)
