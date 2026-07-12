@@ -114,7 +114,7 @@ module.exports = {
       if (!data || data.rol !== 'vocero') return res.status(404).json({ error: 'Vocero no encontrado' });
       
       // Eliminar registros dependientes en bandeja_validaciones y log_auditoria
-      const Bandeja = Usuario.sequelize.models.BandejaValidacion;
+      const Bandeja = Usuario.sequelize.models.BandejaValidaciones;
       const Log = Usuario.sequelize.models.LogAuditoria;
       
       if (Bandeja) await Bandeja.destroy({ where: { id_vocero: req.params.id } });

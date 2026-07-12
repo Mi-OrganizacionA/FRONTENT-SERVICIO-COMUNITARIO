@@ -36,26 +36,23 @@ class ReportesController {
       const Configuracion = ReporteModel.sequelize.models.Configuracion;
       const BandejaValidaciones = ReporteModel.sequelize.models.BandejaValidaciones;
 
-      let requiereValidacion = false;
-
+      // Lógica de aprobación: aplica a todos los reportes de voceros,
+      // no solo a los inter-comunales
       if (req.user?.rol === 'vocero') {
-        if (id_comunidad && parseInt(id_comunidad) !== req.user.id_comunidad_asignada) {
-          const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Reportes' } });
-          const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
-          const autoApprove = (globalConfig && globalConfig.valor === 'true') || (config && config.valor === 'true');
-          if (!autoApprove) requiereValidacion = true;
-        }
-      }
+        const config = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Reportes' } });
+        const globalConfig = await Configuracion.findOne({ where: { clave: 'Aprobación Automática Global' } });
+        const autoApprove = (globalConfig?.valor === 'true') || (config?.valor === 'true');
 
-      if (requiereValidacion) {
-        await BandejaValidaciones.create({
-          id_vocero: req.user.id,
-          tabla_afectada: 'reportes',
-          tipo_accion: 'CREATE',
-          datos_temporales: req.body,
-          estado_tramite: 'Pendiente'
-        });
-        return res.status(202).json({ mensaje: 'Solicitud de reporte inter-comunal enviada a validación.' });
+        if (!autoApprove) {
+          await BandejaValidaciones.create({
+            id_vocero: req.user.id,
+            tabla_afectada: 'reportes',
+            tipo_accion: 'CREATE',
+            datos_temporales: req.body,
+            estado_tramite: 'Pendiente'
+          });
+          return res.status(202).json({ mensaje: 'Solicitud de reporte enviada a la bandeja de validaciones del administrador.' });
+        }
       }
 
       const reporte = await ReportesService.create(ReporteModel, req.body);

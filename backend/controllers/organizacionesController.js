@@ -26,7 +26,7 @@ class OrganizacionesController {
   static async getById(req, res, next) {
     try {
       const data = await OrganizacionSocial.findByPk(req.params.id);
-      if (!data) return res.status(404).json({ error: "Organizacin no encontrada" });
+      if (!data) return res.status(404).json({ error: "Organización no encontrada" });
       res.json(data);
     } catch (error) { next(error); }
   }
@@ -71,7 +71,7 @@ class OrganizacionesController {
   static async update(req, res, next) {
     try {
       const data = await OrganizacionSocial.findByPk(req.params.id);
-      if (!data) return res.status(404).json({ error: "Organizacin no encontrada" });
+      if (!data) return res.status(404).json({ error: "Organización no encontrada" });
       const datosAntiguos = data.toJSON();
       await data.update(req.body);
       if (req.user) {
@@ -84,13 +84,13 @@ class OrganizacionesController {
   static async remove(req, res, next) {
     try {
       const data = await OrganizacionSocial.findByPk(req.params.id);
-      if (!data) return res.status(404).json({ error: "Organizaci�n no encontrada" });
+      if (!data) return res.status(404).json({ error: "Organización no encontrada" });
       const datosAntiguos = data.toJSON();
       await data.update({ activo: false }); 
       if (req.user) {
         await AuditService.log(req.user.id, "DELETE", "organizaciones_sociales", data.id, datosAntiguos, data.toJSON());
       }
-      res.json({ success: true, message: "Organizaci�n eliminada (soft delete)" });
+      res.json({ success: true, message: "Organización eliminada (soft delete)" });
     } catch (error) { next(error); }
   }
 
