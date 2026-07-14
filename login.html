@@ -8,6 +8,11 @@
     content="Acceso al Sistema SICAG v2.5 — Voceros y Administradores de la Comuna Socialista Agroecológica Simón Rodríguez.">
   <title>Acceso Voceros — SICAG · Comuna Socialista Agroecológica Simón Rodríguez</title>
   <link rel="manifest" href="/manifest.json">
+  <meta property="og:url" content="https://sicag-oficial.web.app/">
+  <meta property="og:image" content="https://sicag-oficial.web.app/assets/img/banner_social.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -921,7 +926,9 @@
       style="position: absolute; top: 20px; left: 20px; z-index: 1000; display: inline-flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.85rem; font-weight: 600; font-family: 'Poppins', sans-serif; background: rgba(0,0,0,0.2); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px); transition: all 0.3s ease;">
       <i class="fas fa-arrow-left"></i> Volver al Portal
     </a>
-    <button id="btnInstalarApp" style="display:none; position: absolute; top: 20px; right: 20px; z-index: 1000; align-items: center; gap: 8px; color: rgba(255,255,255,0.8); font-size: 0.85rem; font-weight: 600; font-family: 'Poppins', sans-serif; background: rgba(0,0,0,0.2); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px); transition: all 0.3s ease; cursor: pointer;" onclick="window.sicagInstalarApp()">
+    <button id="btnInstalarApp"
+      style="display:none; position: absolute; top: 20px; right: 20px; z-index: 1000; align-items: center; gap: 8px; color: rgba(255,255,255,0.8); font-size: 0.85rem; font-weight: 600; font-family: 'Poppins', sans-serif; background: rgba(0,0,0,0.2); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px); transition: all 0.3s ease; cursor: pointer;"
+      onclick="window.sicagInstalarApp()">
       <i class="fas fa-download"></i> Instalar Portal
     </button>
     <!-- Fondos compartidos (Unificados) -->
@@ -1051,12 +1058,14 @@
 
         </form>
 
-        <p class="text-muted text-center" style="font-size: 0.85rem; margin-top: 16px; padding: 12px; background: rgba(21, 101, 192, 0.05); border-radius: 8px; border-left: 3px solid var(--vp);">
-          <i class="fas fa-info-circle" style="color: var(--vp); margin-right: 4px;"></i> 
+        <p class="text-muted text-center"
+          style="font-size: 0.85rem; margin-top: 16px; padding: 12px; background: rgba(21, 101, 192, 0.05); border-radius: 8px; border-left: 3px solid var(--vp);">
+          <i class="fas fa-info-circle" style="color: var(--vp); margin-right: 4px;"></i>
           El servidor puede tardar hasta 60 segundos en responder en el primer acceso del día.
         </p>
 
-        <!-- Demo roles removidos -->      </div>
+        <!-- Demo roles removidos -->
+      </div>
     </main>
 
   </div>
