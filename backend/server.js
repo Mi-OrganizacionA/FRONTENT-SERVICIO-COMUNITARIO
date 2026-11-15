@@ -54,7 +54,19 @@ app.use('/api/', apiLimiter);
 
 app.use((req, res, next) => { logger.info(`${req.method} ${req.path}`); next(); });
 
+app.get('/', (req, res) => res.json({
+  status: 'OK',
+  nombre: 'SICAG API',
+  version: '1.0.1',
+  estado: 'Servidor operativo y conectado a la base de datos',
+  timestamp: new Date()
+}));
+
 app.get('/health', (req, res) => res.json({ status: 'OK', timestamp: new Date() }));
+app.get('/api/consejos', (req, res, next) => {
+  const SystemController = require('./controllers/systemController');
+  SystemController.getConsejos(req, res, next);
+});
 app.use('/api/auth', authRoutes);
 app.use('/api/habitantes', habitantesRoutes);
 app.use('/api/votaciones', votacionesRoutes);

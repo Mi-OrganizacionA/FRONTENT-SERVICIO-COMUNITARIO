@@ -317,15 +317,18 @@
 
       // Cargar nombres de consejos comunales dinámicamente
       let nombresConsejoCache = {};
+      const fallbackConsejos = { 1: 'C.C. Jobito I', 2: 'C.C. Jobito II', 3: 'C.C. Jobito III', 10: 'Para toda la Comuna' };
       try {
-        const resCC = await fetch(`${baseApi}/consejos`); // Ojo: SystemController expone getConsejos
-        if (resCC.ok) {
+        const resCC = await fetch(`${baseApi}/system/consejos`).catch(() => fetch(`${baseApi}/consejos`));
+        if (resCC && resCC.ok) {
           const consejos = await resCC.json();
           consejos.forEach(c => { nombresConsejoCache[c.id] = c.nombre_comunidad; });
-          window.nombresConsejoCache = nombresConsejoCache;
+          window.nombresConsejoCache = Object.keys(nombresConsejoCache).length > 0 ? nombresConsejoCache : fallbackConsejos;
+        } else {
+          window.nombresConsejoCache = fallbackConsejos;
         }
       } catch (e) {
-        window.nombresConsejoCache = { 1: 'C.C. Jobito I', 2: 'C.C. Jobito II', 3: 'C.C. Jobito III', 10: 'Para toda la Comuna' };
+        window.nombresConsejoCache = fallbackConsejos;
       }
 
       // 1. Proyectos públicos
